@@ -1,0 +1,2 @@
+# Preserve evidence bytes and recorded CSV checksums on every platform.
+results/**/*.csv -text
