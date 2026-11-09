@@ -1,0 +1,32 @@
+[
+  {
+    "number": 1,
+    "text": "Xintong Wang and Michael P. Wellman. Spoofing the Limit Order Book: An Agent-Based Model. AAMAS, 2017, pp. 651-659.",
+    "url": "https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p651.pdf"
+  },
+  {
+    "number": 2,
+    "text": "David Byrd. Learning Not to Spoof. arXiv:2306.06087, 2023. Related ICAIF publication, 2022.",
+    "url": "https://arxiv.org/abs/2306.06087"
+  },
+  {
+    "number": 3,
+    "text": "Xintong Wang and Michael P. Wellman. Market Manipulation: An Adversarial Learning Framework for Detection and Evasion. IJCAI, 2020, pp. 4626-4632.",
+    "url": "https://doi.org/10.24963/ijcai.2020/638"
+  },
+  {
+    "number": 4,
+    "text": "David Byrd, Maria Hybinette, and Tucker Hybinette Balch. ABIDES: Towards High-Fidelity Market Simulation for AI Research. arXiv:1904.12066, 2019.",
+    "url": "https://arxiv.org/abs/1904.12066"
+  },
+  {
+    "number": 5,
+    "text": "Eren Kurshan, Tucker Balch, and David Byrd. The Agentic Regulator: Risks for AI in Finance and a Proposed Agent-based Framework for Governance. arXiv:2512.11933, 2025.",
+    "url": "https://arxiv.org/abs/2512.11933"
+  },
+  {
+    "number": 6,
+    "text": "FINRA. Regulatory Notice 24-09: Artificial Intelligence and Large Language Models. June 27, 2024.",
+    "url": "https://www.finra.org/rules-guidance/notices/24-09"
+  }
+]
