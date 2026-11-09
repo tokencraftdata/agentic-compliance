@@ -20,9 +20,9 @@ See the [official category taxonomy](https://arxiv.org/category_taxonomy).
 
 ## Before upload
 
-1. Confirm exact author names, order, affiliations, and consent. Replace the
-   anonymous review label. The current PDF is a reviewed draft pending these
-   details; do not represent it as already submitted.
+1. Author details are confirmed: **Sandip Nandi, Independent Researcher**. Version
+   1.2 replaces the anonymous label. Confirm the final content before submission;
+   the current paper has not been submitted.
 2. Have the human author read the paper and inspect the result tables and cited
    sources. The code audit passed 80 tests and replayed 360 new episodes without
    mismatches, but this is not independent scientific peer review.
