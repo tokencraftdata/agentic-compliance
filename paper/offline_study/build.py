@@ -122,7 +122,7 @@ def build(commit):
     def n(x):return f'{x:.2f}'
     p(TITLE,'title');p(SUBTITLE,'subtitle')
     p('Sandip Nandi<br/>Independent Researcher','subtitle')
-    p('9 November 2026 | Preprint version 1.2','subtitle')
+    p('9 November 2026 | Preprint version 1.3','subtitle')
     p('Abstract','h1')
     p('An order-level control can reject a conspicuous spoof while admitting the same displayed quantity split across smaller orders. We study this failure in a deterministic, replayable limit-order-book simulator. An initial 960-episode scripted evaluation is followed by 2,160 repair episodes, throttle-isolation and randomized-parameter probes, and a new 360-episode measurement study. Six 10-lot orders bypass both a legacy per-order gate and its original detectors in all 40 tested seeds. An aggregate gate removes the engineered response benefit for this probe, but its apparent advantage over the legacy gate on legitimate trading is largely a cancellation-throttle interaction. Matching responsive and unresponsive markets at the same gate finds no response-dependent wealth advantage in 40 randomized draws. Detection remains sensitive to legitimate quoting cadence: a 180-second window flags a patient market maker in 34 of 40 episodes when it re-quotes every 180 seconds, despite zero alerts at a 300-second cadence. These are exploratory results in a stipulated market mechanism. No LLM policy, live market, or human intent annotation is evaluated.')
     p('1. Introduction','h1')
@@ -254,7 +254,7 @@ def build(commit):
     p('10.2. Conclusion','h2')
     p('Order splitting, cancellation timing, and throttle accounting expose different weaknesses in the same control stack. Aggregation prevents the tested response-dependent payoff, but a detector window selected on a narrow control set produces frequent alerts when a legitimate maker changes cadence. The evidence supports explicit separation of alerts, economic effects, and execution cost. It also supplies a testbed in which a future agent study can fail these checks before its results are interpreted.')
     p('10.3. Use of generative AI tools','h2')
-    p('OpenAI Codex assisted with implementation, tests, analysis scripts, literature checks, and manuscript drafting and revision. The reported trading experiments used scripted policies and made no LLM calls. AI assistance in producing the research artifact is separate from the policies evaluated by the simulator. The human author is responsible for the methods, results, and references reported in the paper.')
+    p('Two generative AI coding assistants were used to produce the research artifact: Anthropic Claude Code wrote the throttle-isolation, parameterized-evasion, negative-control, and detector-window-sweep modules, their tests, and the accompanying results notes; OpenAI Codex wrote the matched-counterfactual and cadence-grid study, the paper builder, and assisted with literature checks and manuscript drafting and revision. The reported trading experiments used scripted policies and made no LLM calls. AI assistance in producing the research artifact is separate from the policies evaluated by the simulator. The human author is responsible for the methods, results, and references reported in the paper.')
 
     page();p('References','h1')
     for i,(text,url) in enumerate(REFS,1):
@@ -270,11 +270,11 @@ def build(commit):
         ['paper/offline_study/REVIEW_RESPONSE.md','Disposition of the manuscript and code review findings']
     ],[.50,.50])
     p('Version note','h1')
-    p('Version 1.2 retains the clarified order-splitting and matched-comparison claims, embeds outline fonts, and discloses generative AI assistance in producing the artifact. It includes the author details for the planned arXiv submission. The experimental results are unchanged. Historical reports and their original measurements remain in the artifact. The experiments are exploratory and were not externally preregistered.')
+    p('Version 1.3 corrects the generative AI disclosure to name both coding assistants used to produce the artifact; version 1.2 named only one. Version 1.2 retained the clarified order-splitting and matched-comparison claims, embedded outline fonts, and added the author details for the planned arXiv submission. The experimental results are unchanged. Historical reports and their original measurements remain in the artifact. The experiments are exploratory and were not externally preregistered.')
 
     def footer(canvas, doc):
         canvas.saveState();canvas.setFont('StudySerif',8);canvas.setFillColor(colors.HexColor('#555555'))
-        canvas.drawString(.875*inch,.45*inch,'Order Splitting and Timing | Offline study v1.2')
+        canvas.drawString(.875*inch,.45*inch,'Order Splitting and Timing | Offline study v1.3')
         canvas.drawRightString(7.625*inch,.45*inch,str(doc.page));canvas.restoreState()
     doc=SimpleDocTemplate(str(out),pagesize=(8.5*inch,11*inch),rightMargin=.875*inch,leftMargin=.875*inch,
                           topMargin=.65*inch,bottomMargin=.7*inch,title=TITLE,author='Sandip Nandi',
@@ -284,7 +284,7 @@ def build(commit):
         'authors':[{'name':'Sandip Nandi','affiliation':'Independent Researcher'}],
         'blocks':source},indent=2)+'\n')
     (HERE/'references.json').write_text(json.dumps([{'number':i,'text':t,'url':u} for i,(t,u) in enumerate(REFS,1)],indent=2)+'\n')
-    manifest={'document_version':'1.2','date':'2026-11-09','code_commit':commit,'python':platform.python_version(),
+    manifest={'document_version':'1.3','date':'2026-11-09','code_commit':commit,'python':platform.python_version(),
               'reportlab':reportlab.Version,'matplotlib':matplotlib.__version__,
               'source_sha256':digest(Path(__file__)),'evidence_manifest_sha256':digest(DATA/'manifest.json'),
               'summary_sha256':digest(DATA/'summary.json'),'pdf_sha256':digest(out),
