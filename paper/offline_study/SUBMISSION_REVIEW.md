@@ -15,6 +15,20 @@ It adds ten references, compares the nearest agent-compliance and constrained
 execution work, and distinguishes FINRA context from the tested engineering
 policies. No new experiment or legal-compliance finding is reported.
 
+Version 1.6 has been reviewed again for submission. It defines offline execution
+and scripted policies separately, keeps the experimental findings unchanged,
+and supplies a copyable arXiv submission sheet. The final prose pass removes
+generic transitions and repeated novelty disclaimers from the related-work
+discussion while preserving its substantive comparisons. The internal release version is
+kept in the repository rather than presented as an assigned arXiv version.
+
+The deeper research review additionally checks five central claims directly
+against saved episode records (`audit_claims.py` and `research_review.json`), adds
+Gu et al. (ICAIF 2024) on liquidity dependence, and distinguishes a proposed
+cryptographic audit pipeline from an implemented one in the cited execution work.
+No numerical mismatch was found. The remaining weaknesses are scientific scope
+limits, listed below, rather than hidden completed experiments.
+
 ## Verdict
 
 With the focused related-work and FINRA revision completed, the manuscript is
@@ -34,6 +48,13 @@ market, and an independent detector or expert-adjudicated comparison. The curren
 window study is post-hoc and its 15-case recall result is tuning performance.
 
 ## Checks completed
+
+For version 1.6, the unchanged experiment code, saved evidence, figures, and
+quantitative manuscript sections were compared with version 1.5. The 80-test and
+360-episode replay results below are from that preceding validation; they were
+not rerun for the scope clarification. Source/evidence hashes and the rebuilt
+PDF were checked anew.
+
 
 Version 1.5 checks include source verification, comparison of unchanged experimental
 sections and measurements against version 1.4, numeric replay, and inspection of

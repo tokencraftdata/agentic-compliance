@@ -1,8 +1,8 @@
 {
   "date": "2026-11-09",
-  "document_version": "1.5",
+  "document_version": "1.6",
   "scope": "Focused literature and regulatory-positioning review; not a systematic review or validation of cited experiments.",
-  "new_references": 10,
+  "new_references": 1,
   "entries": [
     {
       "reference_number": 1,
@@ -73,7 +73,7 @@
       "citation": "Ailiya Borjigin and Cong He. Safe and Compliant Cross-Market Trade Execution via Constrained RL and Zero-Knowledge Audits. arXiv:2510.04952, version 2, 2025.",
       "url": "https://arxiv.org/abs/2510.04952v2",
       "checked_primary_url": "https://arxiv.org/html/2510.04952v2",
-      "verification_scope": "Primary arXiv record and version-2 HTML checked for architecture. No independent reproduction or validation of its claims.",
+      "verification_scope": "Primary arXiv version-2 HTML, including discussion sections. The full cryptographic proof pipeline is identified as future work. Architectural comparison only; no independent validation of performance or proofs.",
       "added_in_v1_5": true
     },
     {
@@ -131,8 +131,20 @@
       "checked_primary_url": "https://www.finra.org/rules-guidance/rulebooks/finra-rules/5210",
       "verification_scope": "Official rule: Supplementary Material .02 and .03 checked. Code checked for one-account matching and same-price split orders.",
       "added_in_v1_5": true
+    },
+    {
+      "reference_number": 17,
+      "citation": "Anri Gu et al. The Effect of Liquidity on the Spoofability of Financial Markets. ICAIF, 2024, pp. 239-247.",
+      "url": "https://doi.org/10.1145/3677052.3698634",
+      "checked_primary_url": "https://strategicreasoning.org/wp-content/uploads/2024/10/Spoofing_in_markets_with_varying_liquidity.pdf",
+      "verification_scope": "Primary author-hosted PDF abstract and introduction, with publication metadata checked against the institutional repository. Comparison concerns variation in liquidity and strategy families; no numeric effect imported or independently reproduced.",
+      "added_in_v1_5": false,
+      "added_in_v1_6": true
     }
   ],
   "legal_scope": "Regulatory context for candidate control evaluation. No FINRA certification, complete rule implementation, or legal assessment of individual trades.",
-  "experiment_scope": "Scripted offline study only; no new trading episode or LLM inference in this revision."
+  "experiment_scope": "Scripted offline study only; no new trading episode or LLM inference in this revision.",
+  "baseline_version": "1.5",
+  "prior_revision_added_references": 10,
+  "total_references": 17
 }
