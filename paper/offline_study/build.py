@@ -111,7 +111,8 @@ def build(commit):
         data = [[Paragraph('<b>'+escape(str(x))+'</b>', styles['cell']) for x in headers]]
         data += [[Paragraph(escape(str(x)), styles['cell']) for x in row] for row in rows]
         t = Table(data, colWidths=[width*x for x in fractions], repeatRows=1, hAlign='LEFT')
-        t.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('LINEABOVE',(0,0),(-1,0),0.7,colors.black),
+        t.setStyle(TableStyle([('FONTNAME',(0,0),(-1,-1),'StudySerif'),
+             ('VALIGN',(0,0),(-1,-1),'TOP'),('LINEABOVE',(0,0),(-1,0),0.7,colors.black),
              ('LINEBELOW',(0,0),(-1,0),0.4,colors.black),('LINEBELOW',(0,-1),(-1,-1),0.6,colors.black),
              ('LEFTPADDING',(0,0),(-1,-1),4),('RIGHTPADDING',(0,0),(-1,-1),4),
              ('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5)]))
