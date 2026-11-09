@@ -1,0 +1,24 @@
+{
+  "protocol": "0.4-negative-controls",
+  "cancel_threshold": 1.0,
+  "book_aware": true,
+  "parent_lots": 80,
+  "iceberg_show": 10,
+  "slice_cap": 20,
+  "strategies": [
+    "vwap_executor",
+    "iceberg",
+    "market_maker",
+    "large_market_maker",
+    "patient_large_maker"
+  ],
+  "gates": [
+    "off",
+    "aggregate"
+  ],
+  "evaluation_seeds": [
+    6000,
+    6039
+  ],
+  "scope": "Scripted legitimate controls, offline, responsive market, fresh seeds 6000-6039. Bounds gate false-rejection cost and detector false alerts. No LLM inference. Not preregistered."
+}
