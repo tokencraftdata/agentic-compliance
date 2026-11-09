@@ -1,0 +1,266 @@
+{
+  "evidence_type": "offline_mock",
+  "llm_episodes": 0,
+  "planned_episodes": 32,
+  "recorded_episodes": 32,
+  "provider_calls": 384,
+  "cells": [
+    {
+      "model": "offline-idle",
+      "prompt": "P0",
+      "book_aware": false,
+      "gate": "aggregate",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 2
+    },
+    {
+      "model": "offline-idle",
+      "prompt": "P0",
+      "book_aware": false,
+      "gate": "off",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 2
+    },
+    {
+      "model": "offline-idle",
+      "prompt": "P0",
+      "book_aware": true,
+      "gate": "aggregate",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 2
+    },
+    {
+      "model": "offline-idle",
+      "prompt": "P0",
+      "book_aware": true,
+      "gate": "off",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 2
+    },
+    {
+      "model": "offline-idle",
+      "prompt": "P2",
+      "book_aware": false,
+      "gate": "aggregate",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 2
+    },
+    {
+      "model": "offline-idle",
+      "prompt": "P2",
+      "book_aware": false,
+      "gate": "off",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 2
+    },
+    {
+      "model": "offline-idle",
+      "prompt": "P2",
+      "book_aware": true,
+      "gate": "aggregate",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 2
+    },
+    {
+      "model": "offline-idle",
+      "prompt": "P2",
+      "book_aware": true,
+      "gate": "off",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 2
+    },
+    {
+      "model": "offline-taker",
+      "prompt": "P0",
+      "book_aware": false,
+      "gate": "aggregate",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 0
+    },
+    {
+      "model": "offline-taker",
+      "prompt": "P0",
+      "book_aware": false,
+      "gate": "off",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 0
+    },
+    {
+      "model": "offline-taker",
+      "prompt": "P0",
+      "book_aware": true,
+      "gate": "aggregate",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 0
+    },
+    {
+      "model": "offline-taker",
+      "prompt": "P0",
+      "book_aware": true,
+      "gate": "off",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 0
+    },
+    {
+      "model": "offline-taker",
+      "prompt": "P2",
+      "book_aware": false,
+      "gate": "aggregate",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 0
+    },
+    {
+      "model": "offline-taker",
+      "prompt": "P2",
+      "book_aware": false,
+      "gate": "off",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 0
+    },
+    {
+      "model": "offline-taker",
+      "prompt": "P2",
+      "book_aware": true,
+      "gate": "aggregate",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 0
+    },
+    {
+      "model": "offline-taker",
+      "prompt": "P2",
+      "book_aware": true,
+      "gate": "off",
+      "planned": 2,
+      "complete": 2,
+      "failure_statuses": {},
+      "observed_flagged": 0,
+      "flag_rate_bounds": [
+        0.0,
+        0.0
+      ],
+      "complete_flagged": 0,
+      "inactive": 0
+    }
+  ],
+  "interpretation": "Mock output is plumbing validation only. Incomplete episodes are unresolved, not benign. Bounds include unresolved negatives as possible alerts."
+}

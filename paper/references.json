@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "text": "David Byrd. Learning Not to Spoof. ICAIF, 2022; arXiv version 2023.",
+    "url": "https://arxiv.org/abs/2306.06087"
+  },
+  {
+    "id": 2,
+    "text": "Kushal Agrawal, Verona Teo, Juan J. Vazquez, Sudarsh Kunnavakkam, Vishak Srikanth and Andy Liu. Evaluating LLM Agent Collusion in Double Auctions. 2025.",
+    "url": "https://arxiv.org/abs/2507.01413"
+  },
+  {
+    "id": 3,
+    "text": "Yiyang Luo et al. ReguSim: Evaluating LLM Agent Rule Grounding in Financial Compliance. 2026.",
+    "url": "https://arxiv.org/abs/2608.19974"
+  },
+  {
+    "id": 4,
+    "text": "Xintong Wang and Michael P. Wellman. Spoofing the Limit Order Book: An Agent-Based Model. AAMAS, 2017.",
+    "url": "https://www.strategicreasoning.org/wp-content/uploads/2017/03/spoofing-limit-order.pdf"
+  },
+  {
+    "id": 5,
+    "text": "Miles Turpin, Julian Michael, Ethan Perez and Samuel R. Bowman. Language Models Don't Always Say What They Think: Unfaithful Explanations in Chain-of-Thought Prompting. NeurIPS, 2023.",
+    "url": "https://arxiv.org/abs/2305.04388"
+  },
+  {
+    "id": 6,
+    "text": "FINRA. Regulatory Notice 24-09: Artificial Intelligence and Large Language Models. June 27, 2024.",
+    "url": "https://www.finra.org/sites/default/files/2024-06/regulatory-notice-24-09.pdf"
+  },
+  {
+    "id": 7,
+    "text": "US Securities and Exchange Commission. Risk Management Controls for Brokers or Dealers with Market Access. Release 34-63241, 2010.",
+    "url": "https://www.sec.gov/file/final-rule-release-no-34-63241"
+  },
+  {
+    "id": 8,
+    "text": "Commodity Futures Trading Commission. Questions and Answers: Interpretive Guidance and Policy Statement on Disruptive Practices. 2013.",
+    "url": "https://www.cftc.gov/sites/default/files/idc/groups/public/%40newsroom/documents/file/dtpinterpretiveorder_qa.pdf"
+  },
+  {
+    "id": 9,
+    "text": "Swati Rajwal et al. Evaluating the Ethical Judgment of Large Language Models in Financial Market Abuse Cases. Proceedings of the 6th ACM International Conference on AI in Finance, 2025.",
+    "url": "https://doi.org/10.1145/3768292.3770439"
+  },
+  {
+    "id": 10,
+    "text": "Nasdaq. Nasdaq Surveillance product documentation. Accessed November 6, 2026.",
+    "url": "https://www.nasdaq.com/products/fintech/surveillance"
+  }
+]

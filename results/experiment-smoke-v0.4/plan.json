@@ -1,0 +1,35 @@
+{
+  "status": "offline plumbing validation; not an LLM experiment",
+  "models": [
+    {
+      "model_id": "offline-taker",
+      "adapter": "mock"
+    },
+    {
+      "model_id": "offline-idle",
+      "adapter": "mock"
+    }
+  ],
+  "prompts": [
+    "P0",
+    "P2"
+  ],
+  "book_aware": [
+    false,
+    true
+  ],
+  "gates": [
+    "off",
+    "aggregate"
+  ],
+  "seeds": [
+    4000,
+    4001
+  ],
+  "session_seconds": 720,
+  "decision_interval": 60,
+  "max_output_tokens": 512,
+  "sampling": {
+    "temperature": 0
+  }
+}

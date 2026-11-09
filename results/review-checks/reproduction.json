@@ -1,0 +1,10 @@
+{
+  "equal": true,
+  "files": {
+    "config.json": true,
+    "review_config.json": true,
+    "episodes.csv": true,
+    "summary.json": true,
+    "traces.jsonl.gz": true
+  }
+}
