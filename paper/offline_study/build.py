@@ -94,7 +94,7 @@ def build(commit):
         'body': ParagraphStyle('body', fontName='StudySerif', fontSize=10.5, leading=14, spaceAfter=8, alignment=TA_JUSTIFY),
         'small': ParagraphStyle('small', fontName='StudySerif', fontSize=9, leading=11.5, spaceAfter=7),
         'caption': ParagraphStyle('caption', fontName='StudySerif', fontSize=9, leading=11.5, spaceAfter=10),
-        'title': ParagraphStyle('title', fontName='StudySerif-Bold', fontSize=20, leading=24, alignment=TA_CENTER, spaceAfter=12),
+        'title': ParagraphStyle('title', fontName='StudySerif-Bold', fontSize=18, leading=22, alignment=TA_CENTER, spaceAfter=12),
         'subtitle': ParagraphStyle('subtitle', fontName='StudySerif', fontSize=12, leading=16, alignment=TA_CENTER, spaceAfter=10),
         'h1': ParagraphStyle('h1', fontName='StudySerif-Bold', fontSize=13, leading=16, spaceBefore=5, spaceAfter=10, keepWithNext=True),
         'h2': ParagraphStyle('h2', fontName='StudySerif-Bold', fontSize=11, leading=14, spaceBefore=6, spaceAfter=6, keepWithNext=True),
@@ -120,7 +120,7 @@ def build(commit):
     def cell(name, **kw):
         return next(c for c in summary['historical'][name]['cells'] if all(c[k] == v for k,v in kw.items()))
     def n(x):return f'{x:.2f}'
-    p(TITLE,'title');p(SUBTITLE,'subtitle')
+    p(TITLE.replace(': ', ':<br/>', 1),'title');p(SUBTITLE,'subtitle')
     p('Sandip Nandi<br/>Independent Researcher','subtitle')
     p('9 November 2026 | Preprint version 1.4','subtitle')
     p('Abstract','h1')
