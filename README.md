@@ -2,10 +2,13 @@
 
 ## New standalone paper (9 November 2026)
 
-[Read the paper](output/pdf/order_splitting_and_timing.pdf): **Order Splitting,
-Cancellation Timing, and the Limits of Trading Controls**. The paper reports only
-completed offline experiments and includes the legitimate-maker cadence failure
-found during review. See [source and reproduction](paper/offline_study/README.md)
+[Read the paper](output/pdf/order_splitting_and_timing.pdf): **Evaluating Controls
+for Trading Compliance: An Offline Study of Order Splitting and Cancellation
+Timing** (version 1.4). The paper evaluates candidate surveillance and pre-trade
+controls through completed scripted experiments, including the legitimate-maker
+cadence failure found during review. It separates detection, response-dependent
+economic effects, and legitimate execution cost; it does not establish legal
+compliance or LLM trading behaviour. See [source and reproduction](paper/offline_study/README.md)
 and [review responses](paper/offline_study/REVIEW_RESPONSE.md).
 
 The new measurement package adds 360 episodes, matched economic endpoints, and a

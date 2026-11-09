@@ -5,6 +5,11 @@ The author now plans an arXiv preprint. This is an internal technical and
 editorial review, not external peer review. The arXiv preparation and research
 plan is in `ARXIV_PLAN.md`.
 
+Version 1.4 makes trading compliance the explicit purpose of the candidate-control
+evaluation. It changes the title and framing, with no new experiments or results.
+The paper separates the tested engineering controls from legal compliance,
+human review workflows, and oversight of LLM trading agents.
+
 ## Verdict
 
 The scientific claims are adequately supported for the paper's stated offline,
