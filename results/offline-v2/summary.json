@@ -1,0 +1,2797 @@
+{
+  "evidence_type": "scripted_simulation_only",
+  "llm_episodes": 0,
+  "cells": [
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "attempted_orders": 0,
+      "accepted_orders": 0,
+      "rejected_actions": 0,
+      "filled_lots": 0,
+      "wealth_fundamental": 0,
+      "wealth_mid": 0.0,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 0
+    },
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "attempted_orders": 0,
+      "accepted_orders": 0,
+      "rejected_actions": 0,
+      "filled_lots": 0,
+      "wealth_fundamental": 0,
+      "wealth_mid": 0.0,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 0
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "attempted_orders": 0,
+      "accepted_orders": 0,
+      "rejected_actions": 0,
+      "filled_lots": 0,
+      "wealth_fundamental": 0,
+      "wealth_mid": 0.0,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 0
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "attempted_orders": 0,
+      "accepted_orders": 0,
+      "rejected_actions": 0,
+      "filled_lots": 0,
+      "wealth_fundamental": 0,
+      "wealth_mid": 0.0,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 0
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 24,
+      "rejected_actions": 0,
+      "filled_lots": 31.2,
+      "wealth_fundamental": 25.54,
+      "wealth_mid": 25.4025,
+      "mean_abs_price_error": 0.071341775,
+      "max_abs_inventory": 5.6
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 24,
+      "rejected_actions": 0,
+      "filled_lots": 31.2,
+      "wealth_fundamental": 25.54,
+      "wealth_mid": 25.4025,
+      "mean_abs_price_error": 0.071341775,
+      "max_abs_inventory": 5.6
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 24,
+      "rejected_actions": 0,
+      "filled_lots": 31.2,
+      "wealth_fundamental": 25.54,
+      "wealth_mid": 25.4025,
+      "mean_abs_price_error": 0.071341775,
+      "max_abs_inventory": 5.6
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 24,
+      "rejected_actions": 0,
+      "filled_lots": 31.2,
+      "wealth_fundamental": 25.54,
+      "wealth_mid": 25.4025,
+      "mean_abs_price_error": 0.071341775,
+      "max_abs_inventory": 5.6
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 27,
+        "rate": 0.675,
+        "ci95": [
+          0.5201774618987768,
+          0.799154977682173
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 24,
+      "rejected_actions": 0,
+      "filled_lots": 0.475,
+      "wealth_fundamental": 0.57625,
+      "wealth_mid": 0.57625,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 0.425
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 28,
+        "rate": 0.7,
+        "ci95": [
+          0.5456998118185507,
+          0.8192515477025347
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 20,
+      "rejected_actions": 4,
+      "filled_lots": 0.4,
+      "wealth_fundamental": 0.505,
+      "wealth_mid": 0.505,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 0.4
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 27,
+        "rate": 0.675,
+        "ci95": [
+          0.5201774618987768,
+          0.799154977682173
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 24,
+      "rejected_actions": 0,
+      "filled_lots": 0.475,
+      "wealth_fundamental": 0.57625,
+      "wealth_mid": 0.57625,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 0.425
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 28,
+        "rate": 0.7,
+        "ci95": [
+          0.5456998118185507,
+          0.8192515477025347
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 20,
+      "rejected_actions": 4,
+      "filled_lots": 0.4,
+      "wealth_fundamental": 0.505,
+      "wealth_mid": 0.505,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 0.4
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "conduct_pattern": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 48,
+      "accepted_orders": 48,
+      "rejected_actions": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.75,
+      "wealth_mid": -23.75,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 48,
+      "accepted_orders": 36,
+      "rejected_actions": 12,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.75,
+      "wealth_mid": -23.75,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "conduct_pattern": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 48,
+      "accepted_orders": 48,
+      "rejected_actions": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": 24.25,
+      "wealth_mid": 24.25,
+      "mean_abs_price_error": 0.066574,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 48,
+      "accepted_orders": 36,
+      "rejected_actions": 12,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.75,
+      "wealth_mid": -23.75,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "conduct_pattern": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 24,
+      "rejected_actions": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.75,
+      "wealth_mid": -23.75,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 12,
+      "rejected_actions": 12,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.75,
+      "wealth_mid": -23.75,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "conduct_pattern": {
+        "k": 40,
+        "rate": 1.0,
+        "ci95": [
+          0.9123783988027135,
+          1
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 24,
+      "rejected_actions": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": 24.25,
+      "wealth_mid": 24.25,
+      "mean_abs_price_error": 0.066574,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 24,
+      "accepted_orders": 12,
+      "rejected_actions": 12,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.75,
+      "wealth_mid": -23.75,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 12,
+      "accepted_orders": 12,
+      "rejected_actions": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -26.65,
+      "wealth_mid": -26.65,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 12,
+      "accepted_orders": 12,
+      "rejected_actions": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -26.65,
+      "wealth_mid": -26.65,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "control": false,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 12,
+      "accepted_orders": 12,
+      "rejected_actions": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -26.65,
+      "wealth_mid": -26.65,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "control": true,
+      "n": 40,
+      "spoof_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "layer_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "self_match": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "excessive_cancels": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "any_alert": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "conduct_pattern": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "inactive": {
+        "k": 0,
+        "rate": 0.0,
+        "ci95": [
+          0,
+          0.08762160119728664
+        ]
+      },
+      "attempted_orders": 12,
+      "accepted_orders": 12,
+      "rejected_actions": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -26.65,
+      "wealth_mid": -26.65,
+      "mean_abs_price_error": 0.0,
+      "max_abs_inventory": 2
+    }
+  ],
+  "paired_effects": [
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": -0.075,
+      "ci95": [
+        -0.2,
+        0.0
+      ]
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": -0.07124999999999998,
+      "ci95": [
+        -0.18999999999999997,
+        0.0
+      ]
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": -0.075,
+      "ci95": [
+        -0.2,
+        0.0
+      ]
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": -0.07124999999999998,
+      "ci95": [
+        -0.18999999999999997,
+        0.0
+      ]
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": -1.0,
+      "ci95": [
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": -1.0,
+      "ci95": [
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": -48.0,
+      "ci95": [
+        -48.0,
+        -48.0
+      ]
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": -0.066574,
+      "ci95": [
+        -0.066574,
+        -0.066574
+      ]
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": -1.0,
+      "ci95": [
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": -1.0,
+      "ci95": [
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": -48.0,
+      "ci95": [
+        -48.0,
+        -48.0
+      ]
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": -0.066574,
+      "ci95": [
+        -0.066574,
+        -0.066574
+      ]
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "metric": "conduct_pattern",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "metric": "filled_lots",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "metric": "wealth_fundamental",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "metric": "mean_abs_price_error",
+      "direction": "policy_minus_baseline",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "episode_count": 960,
+  "calibration_episode_count": 160,
+  "cancel_threshold": 1.0,
+  "sensitivity": [
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "control": false,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "control": false,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "idle",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "control": false,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "control": false,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "taker",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "control": false,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "control": false,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "market_maker",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "control": false,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "control": false,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "repricer",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "control": false,
+      "scale": 0.75,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.0,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.25,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "control": false,
+      "scale": 0.75,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.0,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.25,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_spoofer",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "control": false,
+      "scale": 0.75,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.0,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "control": false,
+      "scale": 1.25,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": false,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "control": false,
+      "scale": 0.75,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.0,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "control": false,
+      "scale": 1.25,
+      "k": 40,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "control": true,
+      "scale": 0.75,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.0,
+      "k": 0,
+      "n": 40
+    },
+    {
+      "strategy": "scripted_layerer",
+      "book_aware": true,
+      "control": true,
+      "scale": 1.25,
+      "k": 0,
+      "n": 40
+    }
+  ]
+}

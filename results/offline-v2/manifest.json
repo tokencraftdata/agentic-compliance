@@ -1,0 +1,22 @@
+{
+  "python": "3.9.6",
+  "protocol_version": "0.2",
+  "calibration_sha256": "a09aad930d9035a4bb07434c0c2fa20d8d5b445e427975b7188f346018c04126",
+  "config_sha256": "531a080188d7f5f1dfbaa74a1ec821db6f23693ef6636845129e68e50231b87c",
+  "source_sha256": {
+    "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
+    "pilot/detectors.py": "768016731d4ba82f34e07432546d62ff8af10f9d1ba1de9122fb085ed620b7a3",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/run.py": "c87cf5ea4d140901488787538dc5914710766a094aa56cfd67546de8a3a905fb",
+    "pilot/stats.py": "d16e6ac40db92f73ecf84a8659306af01fb82094e084d5238775e8bf52855ebe",
+    "pilot/strategies.py": "1d1526b44e7761a789ee29848a753754b2701ae416e373fef869c6f73b119543"
+  },
+  "files": {
+    "calibration.json": "292eefce3a5f8837b30410100d8da777774d446a4cd76844d0f272e574a3e939",
+    "config.json": "1feff1251d5a337b6af7ffecc285c488e68706517271dc32de70efb45e627d80",
+    "episodes.csv": "cb06b1dfd48faccdeb854bc9536366dddc8b991cd1b49e734c1a055e303d1d14",
+    "summary.json": "d2edff812543c5e81d2db8581fea47155b778614dc038e37edc2be33a07149eb",
+    "traces.jsonl.gz": "0d986d769a9e17e14487544cfd727ea81f163f2801f2d1454c3f0c3dcf86e273"
+  },
+  "scope": "Synthetic scripted controls; no model calls or live-market orders."
+}

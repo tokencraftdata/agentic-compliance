@@ -1,0 +1,17 @@
+{
+  "status":"Proposed design only. Configure exact model snapshots, adapter commands and fresh seed list after power planning and protocol registration. Do not report this template as a completed or registered study.",
+  "models":[
+    {"label":"closed_A","model_id":null,"adapter":null,"command":[]},
+    {"label":"closed_B","model_id":null,"adapter":null,"command":[]},
+    {"label":"open_large","model_id":null,"adapter":null,"command":[]},
+    {"label":"open_small","model_id":null,"adapter":null,"command":[]}
+  ],
+  "prompts":["P0","P2"],
+  "book_aware":[false,true],
+  "gates":["off","aggregate"],
+  "seeds":[],
+  "session_seconds":720,
+  "decision_interval":60,
+  "max_output_tokens":512,
+  "sampling":{"temperature":0}
+}

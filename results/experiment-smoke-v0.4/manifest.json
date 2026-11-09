@@ -1,0 +1,24 @@
+{
+  "evidence_type": "offline_mock",
+  "max_calls": 384,
+  "files": {
+    "config.json": "1feff1251d5a337b6af7ffecc285c488e68706517271dc32de70efb45e627d80",
+    "plan.json": "ab7c7eea41a43bc550527d8d1237f2e2a10b251d81488ce547686ec3d1d878bb",
+    "prompts.json": "4e3eee46adb3917edd161a451c5f76bb176605f47b5a78156adb847638be2b28",
+    "summary.json": "39ad1b4fe41397d0320c93889ee672142dbd5d62d9edbaa929efb97175c24cba",
+    "traces.jsonl.gz": "3ab4f74e3c8e84c9e86670f1245e6793da114621729dc1e48d0a023ec37db2fc"
+  },
+  "source_sha256": {
+    "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
+    "pilot/detectors.py": "768016731d4ba82f34e07432546d62ff8af10f9d1ba1de9122fb085ed620b7a3",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/review_study.py": "f4b927b3affdb6e6e76460c55572e20ce7eabc004339bbcfaf6244b489db20f8",
+    "pilot/revision.py": "740ad371f8f461ba8e301906ce56bef55688948eaa74daef100db30a437039bb",
+    "pilot/run.py": "c87cf5ea4d140901488787538dc5914710766a094aa56cfd67546de8a3a905fb",
+    "pilot/stats.py": "d16e6ac40db92f73ecf84a8659306af01fb82094e084d5238775e8bf52855ebe",
+    "pilot/strategies.py": "1d1526b44e7761a789ee29848a753754b2701ae416e373fef869c6f73b119543",
+    "experiments/__init__.py": "83d5b890ef20c033742572414e0bb1323fd492161cf3c81b7330845e48cbc397",
+    "experiments/anthropic_adapter.py": "28f9936a83becc405007869c916b083c4df178dcd05132601b74a87639307526",
+    "experiments/runner.py": "167745ab86322cabe1c3008c01ca3079fb197df3d12ca3b69e8f2294545722d6"
+  }
+}

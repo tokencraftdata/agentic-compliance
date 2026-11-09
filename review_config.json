@@ -1,0 +1,9 @@
+{
+  "revision_protocol": "0.4-exploratory",
+  "base_protocol": "0.2",
+  "evaluation_seeds": [3000, 3039],
+  "strategies": ["idle", "taker", "market_maker", "repricer", "scripted_spoofer", "scripted_layerer", "split_3x20", "split_6x10", "large_market_maker"],
+  "gates": ["off", "legacy", "aggregate"],
+  "cancel_threshold": 1.0,
+  "scope": "Post-review development evaluation on new market seeds. Strategies and fixes were designed after reviewing v0.2; not preregistered or independent strategy validation. Original calibration is reused unchanged. No LLM inference."
+}
