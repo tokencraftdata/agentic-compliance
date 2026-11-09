@@ -78,5 +78,10 @@
     "number": 16,
     "text": "FINRA. Rule 5210: Publication of Transactions and Quotations, including Supplementary Material .02 and .03. Rulebook, accessed November 9, 2026.",
     "url": "https://www.finra.org/rules-guidance/rulebooks/finra-rules/5210"
+  },
+  {
+    "number": 17,
+    "text": "Anri Gu et al. The Effect of Liquidity on the Spoofability of Financial Markets. ICAIF, 2024, pp. 239-247.",
+    "url": "https://doi.org/10.1145/3677052.3698634"
   }
 ]

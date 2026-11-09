@@ -1,16 +1,16 @@
 {
   "date": "2026-11-09",
-  "version": "1.5",
-  "baseline_commit": "e1d815f819203f2fc7f088b39e6348f3aebf8ef8",
-  "source_commit": "2c2808cfb44c32877c67ec4efba84f4ff7e12234",
+  "version": "1.6",
+  "baseline_commit": "02d6607fd2b28e70807d09c0139a95e2d56502be",
+  "source_commit": "81cf5402aecea7838d0072ea29f3f5d212d69440",
   "title_abstract_and_authors_unchanged": true,
-  "methods_and_results_sections_2_2_through_8_unchanged": true,
+  "methods_and_results_sections_3_through_8_unchanged": true,
   "experimental_tables_unchanged": true,
   "figure_pngs_and_svgs_unchanged": true,
   "experiment_code_tests_configs_and_results_unchanged": true,
   "conclusion_and_both_assistants_disclosure_preserved": true,
-  "references_added": 10,
-  "all_16_references_cited": true,
+  "references_added": 1,
+  "all_17_references_cited": true,
   "source_check_record": "paper/offline_study/literature_review.json",
   "tests": {
     "command": "python3 -m unittest discover -s tests -v",
@@ -18,13 +18,17 @@
     "passed": 80,
     "failed": 0
   },
-  "replay_verification": {
+  "prior_replay_verification": {
     "episodes_replayed": 360,
     "mismatches": 0,
     "csv_and_summary_recomputed": true,
     "historical_source_and_evidence_hashes_verified": true,
     "llm_episodes": 0
   },
-  "scope": "Related work and FINRA context; no new experiment, LLM result, or legal-compliance claim",
-  "pdf_sha256": "40dd36ece624b632d0b44adb80c5678121fdd6b283ceec770652bfda2e9ce320"
+  "prior_validation_commit": "02d6607fd2b28e70807d09c0139a95e2d56502be",
+  "unit_tests_and_replay_rerun": false,
+  "saved_source_and_evidence_hashes_rechecked": true,
+  "new_direct_record_claim_audit": "paper/offline_study/research_review.json",
+  "scope": "Scope clarification, prose editing, deeper literature review, and direct-record claim audit; no new trading experiment, LLM result, or legal-compliance claim",
+  "pdf_sha256": "40167a18787cf29a74dbda2144b7bace6191b700ef982375e8b73274aae54696"
 }
