@@ -1,13 +1,23 @@
 {
   "date": "2026-11-09",
-  "version": "1.4",
-  "baseline_commit": "ab3613c0b3d046f54bc4e36e792e489a21b3797a",
-  "source_commit": "a1762f0351da6e9df63f29aa27d1ee396d5e1d09",
-  "methods_and_results_sections_2_through_8_unchanged": true,
-  "all_tables_unchanged": true,
-  "figure_pngs_unchanged": true,
+  "version": "1.5",
+  "baseline_commit": "e1d815f819203f2fc7f088b39e6348f3aebf8ef8",
+  "source_commit": "2c2808cfb44c32877c67ec4efba84f4ff7e12234",
+  "title_abstract_and_authors_unchanged": true,
+  "methods_and_results_sections_2_2_through_8_unchanged": true,
+  "experimental_tables_unchanged": true,
+  "figure_pngs_and_svgs_unchanged": true,
   "experiment_code_tests_configs_and_results_unchanged": true,
-  "both_assistants_disclosure_preserved": true,
+  "conclusion_and_both_assistants_disclosure_preserved": true,
+  "references_added": 10,
+  "all_16_references_cited": true,
+  "source_check_record": "paper/offline_study/literature_review.json",
+  "tests": {
+    "command": "python3 -m unittest discover -s tests -v",
+    "interpreter": "CPython 3.9.6",
+    "passed": 80,
+    "failed": 0
+  },
   "replay_verification": {
     "episodes_replayed": 360,
     "mismatches": 0,
@@ -15,6 +25,6 @@
     "historical_source_and_evidence_hashes_verified": true,
     "llm_episodes": 0
   },
-  "scope": "Editorial compliance framing; no new experiment or legal compliance claim",
-  "pdf_sha256": "0eb4ef4bb7c042e6f7f8961345b76a98b8922a4a4581ca8e8bcfea9c3da8b6a6"
+  "scope": "Related work and FINRA context; no new experiment, LLM result, or legal-compliance claim",
+  "pdf_sha256": "40dd36ece624b632d0b44adb80c5678121fdd6b283ceec770652bfda2e9ce320"
 }
