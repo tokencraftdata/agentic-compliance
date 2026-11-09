@@ -1,0 +1,11 @@
+{
+  "files_equal": {
+    "config.json": true,
+    "episodes.csv": true,
+    "manifest.json": true,
+    "plan.json": true,
+    "summary.json": true,
+    "traces.jsonl.gz": true
+  },
+  "identical": true
+}

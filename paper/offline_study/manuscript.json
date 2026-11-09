@@ -1,0 +1,701 @@
+{
+  "title": "Order Splitting, Cancellation Timing, and the Limits of Trading Controls",
+  "subtitle": "A replayable offline study of surveillance and pre-trade gates",
+  "authors": [
+    {
+      "name": "Sandip Nandi",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "title",
+      "text": "Order Splitting, Cancellation Timing, and the Limits of Trading Controls"
+    },
+    {
+      "type": "subtitle",
+      "text": "A replayable offline study of surveillance and pre-trade gates"
+    },
+    {
+      "type": "subtitle",
+      "text": "Sandip Nandi<br/>Independent Researcher"
+    },
+    {
+      "type": "subtitle",
+      "text": "9 November 2026 | Preprint version 1.2"
+    },
+    {
+      "type": "h1",
+      "text": "Abstract"
+    },
+    {
+      "type": "body",
+      "text": "An order-level control can reject a conspicuous spoof while admitting the same displayed quantity split across smaller orders. We study this failure in a deterministic, replayable limit-order-book simulator. An initial 960-episode scripted evaluation is followed by 2,160 repair episodes, throttle-isolation and randomized-parameter probes, and a new 360-episode measurement study. Six 10-lot orders bypass both a legacy per-order gate and its original detectors in all 40 tested seeds. An aggregate gate removes the engineered response benefit for this probe, but its apparent advantage over the legacy gate on legitimate trading is largely a cancellation-throttle interaction. Matching responsive and unresponsive markets at the same gate finds no response-dependent wealth advantage in 40 randomized draws. Detection remains sensitive to legitimate quoting cadence: a 180-second window flags a patient market maker in 34 of 40 episodes when it re-quotes every 180 seconds, despite zero alerts at a 300-second cadence. These are exploratory results in a stipulated market mechanism. No LLM policy, live market, or human intent annotation is evaluated."
+    },
+    {
+      "type": "h1",
+      "text": "1. Introduction"
+    },
+    {
+      "type": "body",
+      "text": "Surveillance and pre-trade controls answer different questions. Surveillance identifies an order sequence worth reviewing; a pre-trade gate decides whether a proposed action may enter the market. A clean alert count does not establish that a gate prevents profitable manipulation. A high rejection count does not establish that the remaining orders are harmless. Both measurements need an economic comparison and a legitimate trading task."
+    },
+    {
+      "type": "body",
+      "text": "Order splitting means dividing a larger order into smaller submissions. It is not, by itself, evidence of deceptive conduct. The counterexample studied here displays the split quantity, executes a small trade on the opposite side, and cancels the remaining display. The scheduled execution controls instead use smaller orders to acquire an 80-lot position."
+    },
+    {
+      "type": "body",
+      "text": "The experiments here began as infrastructure for a study of LLM trading agents. Scripted controls exposed problems before any model was run. Dividing a large order into smaller orders defeated a gate and detector that appeared effective against the original spoofer. Adding an aggregate quantity check repaired that case. Subsequent tests showed that the gate interacted with a submission throttle and that a detection window selected on one set of legitimate strategies failed when a maker changed its quoting cadence."
+    },
+    {
+      "type": "body",
+      "text": "Our contribution is a reproducible account of these failures and their measurement. The artifact records attempted actions, accepted orders, rejection reasons, fills, detector outputs, economic outcomes, and replay checks. The study evaluates a particular testbed and several control designs. It does not estimate the prevalence of manipulation by LLMs, infer legal intent, or establish production readiness."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "2. Setting and scope"
+    },
+    {
+      "type": "h2",
+      "text": "2.1. Relation to previous work"
+    },
+    {
+      "type": "body",
+      "text": "Wang and Wellman [1] model spoofing against traders that use order-book information. Byrd [2] shows that a profit-seeking reinforcement-learning trader can discover spoofing and studies a learned recognizer used to discourage it. Wang and Wellman [3] explicitly study adversarial adaptation between manipulation and detection. Our parameterized scripts neither learn nor optimize against the detector. Their role is to expose implementation and evaluation weaknesses in a controlled setting."
+    },
+    {
+      "type": "body",
+      "text": "ABIDES [4] offers a richer simulation architecture with agents and communication latencies. The engine used here is a much smaller, purpose-built model; it is not an ABIDES calibration. Kurshan, Balch, and Byrd [5] discuss agent-based governance and a spoofing case study. We therefore make no claim to introduce agent-aware financial controls. The contribution lies in the measured counterexamples, matched comparisons, and replayable evidence."
+    },
+    {
+      "type": "h2",
+      "text": "2.2. Market mechanics"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Quantity",
+        "Implemented value"
+      ],
+      "rows": [
+        [
+          "Session / decision spacing",
+          "720 seconds / 60 seconds; no warm-up"
+        ],
+        [
+          "Matching",
+          "Single instrument, integer ticks, price/time priority, partial fills"
+        ],
+        [
+          "Exposure bound",
+          "Absolute worst-case position commitment no greater than 100 lots"
+        ],
+        [
+          "Background quotes",
+          "10 lots at each of three price levels on each side"
+        ],
+        [
+          "Fundamental",
+          "Initial 1,000 ticks; increment sampled from {-1, 0, 0, 1} every 30 seconds"
+        ],
+        [
+          "Noise flow",
+          "A pre-generated 0, 1, or 2-lot market order opportunity every 10 seconds"
+        ],
+        [
+          "Fees",
+          "0.05 tick-lots per filled lot per participant"
+        ]
+      ]
+    },
+    {
+      "type": "body",
+      "text": "Each accepted or rejected subject action consumes one simulated second. Background quotes are cancelled and replaced every second, including between actions within a decision. Unfilled market quantity expires. Subject cancellations remain available under every gate. The exogenous fundamental and noise streams are generated before the subject acts, so comparisons within a seed share the same external random inputs."
+    },
+    {
+      "type": "body",
+      "text": "In the responsive condition, the background quotes shift by two ticks in the direction of displayed imbalance when |(B-A)/(B+A)| exceeds 0.4; B and A sum the resting quantities on each side of the book. The unresponsive condition omits this shift. This rule deliberately creates an exploitable response. It is not fitted to exchange data and is not a model of strategic equilibrium. Subject quotes can also move the midpoint without activating the rule, which matters when interpreting price error."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "3. Controls, detectors, and outcomes"
+    },
+    {
+      "type": "h2",
+      "text": "3.1. Gates"
+    },
+    {
+      "type": "body",
+      "text": "Every arm enforces the 100-lot position-commitment bound. The legacy gate also caps each limit submission at twice the current external reference depth, permits at most two resting price levels per side, rejects a predicted self-match using the matching engine's price/time walk, and throttles new submissions when cancellations divided by accepted submissions exceeds 0.9 after at least 20 accepted submissions in the window. External reference depth is the median of the two external touch quantities, excluding subject orders."
+    },
+    {
+      "type": "body",
+      "text": "The aggregate gate retains those checks and caps the sum of remaining same-side subject limit quantity plus the full new quantity at twice reference depth. This is conservative: even a marketable limit is checked at its full submitted size. The check occurs at submission; it does not continuously rebalance orders when external depth changes. The throttle-off arm disables only the aggregate gate's submission throttle. The throttle window is 1,800 seconds, longer than every session studied here."
+    },
+    {
+      "type": "h2",
+      "text": "3.2. Pattern detectors"
+    },
+    {
+      "type": "body",
+      "text": "The individual spoof pattern requires a nonmarketable order of at least three times submission-time reference depth, within three ticks of touch, less than 10% filled, an intervening opposite-side subject fill, and cancellation within the detection window. The layer pattern requires qualifying cancelled orders at at least three distinct levels sharing an opposite-side fill. Each of the three levels must enter the cancelled-order candidate set."
+    },
+    {
+      "type": "body",
+      "text": "The aggregate pattern combines at least two qualifying orders live at a shared opposite-side fill, using their remaining quantities at that fill and the maximum of their submission-time reference depths. Self-matches are reported separately. A cancellation-ratio diagnostic is excluded from the conduct-alert union; its historical threshold of 1.0 is uninformative at this session length. No close-marking or cross-account wash-trading detector is implemented. The spoof, layer, and aggregate patterns share the same window parameter: changing it from 120 to 180 seconds changes all three."
+    },
+    {
+      "type": "h2",
+      "text": "3.3. Economic and operational outcomes"
+    },
+    {
+      "type": "body",
+      "text": "Terminal wealth is cash plus inventory valued at the terminal fundamental, after fees. We also report filled lots, rejection reasons, inactivity, and mean absolute midpoint-minus-fundamental error. Price error is a diagnostic, not an abuse or welfare label: legitimate makers can generate it. Economic comparisons use the same seed. We do not interpret wealth differences between seed cohorts as strategy effects."
+    },
+    {
+      "type": "body",
+      "text": "<b>Response-dependent wealth advantage:</b> D(g,d) = W(responsive, g, d) - W(unresponsive, g, d), where g is the gate and d fixes both the parameter draw and market seed. A positive D under the aggregate gate with no conduct alert is reported even if some orders were rejected. This replaces the historical summary's absolute-wealth and zero-rejection definition. The comparison isolates the response toggle within this model; it is not a legal definition of manipulation."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "4. Experimental design and provenance"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Study",
+        "Episodes",
+        "Seeds / scope"
+      ],
+      "rows": [
+        [
+          "Initial scripted evaluation",
+          "960",
+          "2000-2039; 6 strategies x 2 responses x 2 gates"
+        ],
+        [
+          "Split-order repair",
+          "2,160",
+          "3000-3039; 9 strategies x 2 responses x 3 gates"
+        ],
+        [
+          "Throttle isolation",
+          "480",
+          "4000-4039; 3 strategies x 4 gates; responsive"
+        ],
+        [
+          "Parameterized evasion, 120 s window",
+          "120",
+          "40 draws; one seed each, 5000-5039; 3 conditions"
+        ],
+        [
+          "Same evasion draws, 180 s window",
+          "120",
+          "Same draws and paths; changed detector window"
+        ],
+        [
+          "Legitimate negative controls",
+          "400",
+          "6000-6039; 5 strategies x 2 gates; responsive"
+        ],
+        [
+          "New matched gated references",
+          "40",
+          "Same 40 evasion draws; aggregate, unresponsive"
+        ],
+        [
+          "New maker cadence grid",
+          "320",
+          "6000-6039; 4 cadences x 2 gates; responsive"
+        ]
+      ]
+    },
+    {
+      "type": "caption",
+      "text": "Table 1. Evidence cohorts. These rows sum to 4,600 stored simulation episodes, not 4,600 independent cases. The 120-second and 180-second evasion cohorts repeat the same trajectories. The new 300-second maker cells repeat the existing control at a different scoring configuration. A separate 160-episode calibration and 32-episode mock-provider check are excluded from this total. The earlier exploratory discovery probe is also excluded."
+    },
+    {
+      "type": "body",
+      "text": "The initial strategies are idle, an alternating small market taker, a two-lot symmetric maker, a distant repricer, a programmed spoofer, and a programmed layerer. The repair study adds same-price splits of three 20-lot orders and six 10-lot orders, plus a legitimate maker quoting 12 lots at two levels on each side. Scripted spoof and split sequences submit displayed interest, make a two-lot opposite-side market trade, and cancel the remaining displayed orders."
+    },
+    {
+      "type": "body",
+      "text": "The evasion generator samples order count 2-8, total size 40/60/80, price spread 0-5 ticks, submission gap 0-30 seconds, full/staggered/disjoint overlap, and execution delay 0-90 seconds. It assigns one market seed to each of 40 parameter vectors. This is a randomized parameter sample within one authored strategy family, not independent strategy-family validation. The manifest records RNG seed 20261108 and the exact draws. The repository first records the generator, draws, and results together; we do not claim that Git establishes a pre-run commitment or external preregistration."
+    },
+    {
+      "type": "body",
+      "text": "The new cadence grid uses a maker quoting 16 lots at each of two levels on each side. It cancels and re-quotes every 120, 180, 240, or 300 seconds. Every cell uses the same 40 seeds. Detection is rescored at six windows, from 120 to 600 seconds. The 180-second counterexample was observed during review before this grid was specified. All window comparisons and corrected economic endpoints are therefore exploratory."
+    },
+    {
+      "type": "body",
+      "text": "We report descriptive Wilson 95% intervals for binary counts and existing paired bootstrap intervals where available. These intervals describe variability under the sampled model, not real-world prevalence. Repeated scoring of the same traces is not additional statistical replication. No confirmatory hypothesis tests or power claims are made."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "5. Order splitting defeats per-order checks"
+    },
+    {
+      "type": "body",
+      "text": "In the initial evaluation, both programmed positive controls trigger conduct alerts in all 40 ungated seeds per market response and none under the legacy gate. The four benign strategies produce no conduct alerts. For the responsive spoofer, mean wealth changes from 24.25 to -23.75 while executed volume stays at 24 lots. In the unresponsive market the ungated spoofer still alerts but earns -23.75. The alert identifies the sequence even when the stipulated payoff is absent."
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Displayed sequence",
+        "Gate",
+        "Original alerts",
+        "Extended alerts",
+        "Lots",
+        "Wealth"
+      ],
+      "rows": [
+        [
+          "One 60-lot order",
+          "off",
+          "40/40",
+          "40/40",
+          "24.00",
+          "22.05"
+        ],
+        [
+          "One 60-lot order",
+          "legacy",
+          "0/40",
+          "0/40",
+          "24.00",
+          "-25.95"
+        ],
+        [
+          "One 60-lot order",
+          "aggregate",
+          "0/40",
+          "0/40",
+          "24.00",
+          "-25.95"
+        ],
+        [
+          "Three 20-lot orders",
+          "off",
+          "0/40",
+          "40/40",
+          "24.00",
+          "22.05"
+        ],
+        [
+          "Three 20-lot orders",
+          "legacy",
+          "0/40",
+          "40/40",
+          "24.00",
+          "-2.85"
+        ],
+        [
+          "Three 20-lot orders",
+          "aggregate",
+          "0/40",
+          "0/40",
+          "24.00",
+          "-25.95"
+        ],
+        [
+          "Six 10-lot orders",
+          "off",
+          "0/40",
+          "40/40",
+          "24.00",
+          "22.05"
+        ],
+        [
+          "Six 10-lot orders",
+          "legacy",
+          "0/40",
+          "40/40",
+          "24.00",
+          "22.05"
+        ],
+        [
+          "Six 10-lot orders",
+          "aggregate",
+          "0/40",
+          "0/40",
+          "24.00",
+          "-25.95"
+        ]
+      ]
+    },
+    {
+      "type": "caption",
+      "text": "Table 2. Responsive-market repair cohort, seeds 3000-3039. Alerts are episode counts; volume and wealth are means. Wealth is in tick-lots. Extended alerts include the original detectors and the aggregate pattern. The table uses the historical 120-second window."
+    },
+    {
+      "type": "body",
+      "text": "The six-by-ten sequence is accepted by the legacy size check and occupies only one price level. No individual order meets the three-times-depth detection threshold, and one level cannot satisfy the layer detector. It therefore passes both checks in all 40 seeds. Aggregation closes this particular route: the detector flags the ungated and legacy-gated sequence, and the gate removes its response benefit while retaining the small execution leg."
+    },
+    {
+      "type": "body",
+      "text": "The three-by-twenty sequence does not pass the legacy gate consistently because noise can reduce reference depth below ten lots. Its lower mean wealth under that gate is a useful distinction: splitting size alone does not guarantee admission. The aggregate check is still related to the aggregate detector through displayed size. Their agreement is not evidence from independent detection families."
+    },
+    {
+      "type": "body",
+      "text": "The six-by-ten sequence has mean price error 0.1331 ticks versus 0.0666 for the one-by-sixty sequence. Both receive the same two-tick response and have identical wealth within each ungated seed. The split sequence holds that displacement longer because its submissions consume more simulated seconds. The price-error difference is duration, not a larger response. Likewise, 22.05 here and 24.25 in the initial cohort reflect different seed paths, not a change in economic mechanism."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "6. Trading cost depends on throttle timing"
+    },
+    {
+      "type": "body",
+      "text": "The repair cohort initially appeared to favor the aggregate gate on the large legitimate maker: mean volume was 51.40 lots, compared with 23.98 under the legacy gate. The throttle-isolation cohort explains this reversal. The legacy gate admits four new quotes per decision; the aggregate gate generally admits only one level per side. Accepted submissions therefore reach the throttle's minimum count earlier under the legacy gate."
+    },
+    {
+      "type": "caption",
+      "text": "Figure 1. Large-maker means in the throttle-isolation cohort, seeds 4000-4039. Separate panels preserve units. The ungated maker executes 59.48 lots; disabling only the aggregate gate's throttle restores volume from 50.93 to 59.05 lots."
+    },
+    {
+      "type": "body",
+      "text": "On seed 4000 the legacy arm begins rejecting new submissions at about 304 seconds; the aggregate arm reaches the same condition at about 602 seconds. Because the 1,800-second window does not expire during the 720-second session, a triggered lockout persists. Removing the throttle from the aggregate arm recovers 8.13 lots on average (paired bootstrap 95% interval 6.48-9.70). Its remaining mean difference from the ungated arm is 0.425 lots. That difference describes this maker, these paths, and this engine; it is not a universal cost of aggregate limits."
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Legitimate task",
+        "Lots, off",
+        "Lots, gate",
+        "Difference",
+        "Rejections"
+      ],
+      "rows": [
+        [
+          "Passive scheduled executor",
+          "27.38",
+          "27.38",
+          "0.00",
+          "0.00"
+        ],
+        [
+          "10-lot slice executor",
+          "30.12",
+          "30.12",
+          "0.00",
+          "0.00"
+        ],
+        [
+          "Small maker",
+          "31.05",
+          "31.05",
+          "0.00",
+          "0.00"
+        ],
+        [
+          "Large maker",
+          "56.50",
+          "48.55",
+          "-7.95",
+          "27.95"
+        ],
+        [
+          "Patient maker, 300 s",
+          "66.28",
+          "47.60",
+          "-18.68",
+          "6.03"
+        ]
+      ]
+    },
+    {
+      "type": "caption",
+      "text": "Table 3. Negative controls, seeds 6000-6039; means over 40 episodes per arm. The scheduled executor is named vwap_executor in code but uses no volume forecast or VWAP benchmark. It and the slice executor fill only 34.2% and 37.7% of their 80-lot parents in the short session. Zero gate rejections do not establish adequate execution quality."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "7. Economic attribution in parameterized probes"
+    },
+    {
+      "type": "body",
+      "text": "At the historical 120-second window, 15 of the 40 parameter draws both move the midpoint away from the fundamental and earn more wealth in the responsive market than in the ungated unresponsive reference. The original and aggregate detector union identifies 10 of these 15. Five slow draws evade both pattern families: gaps and execution delays make too little qualifying displayed quantity remain inside the cancellation window. Increasing the shared window to 180 seconds identifies all 15 on the same draws. This is a tuning result, not an independent recall estimate."
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Readout",
+        "120-second window",
+        "180-second window"
+      ],
+      "rows": [
+        [
+          "Original detector family, gate off",
+          "21/40",
+          "24/40"
+        ],
+        [
+          "Aggregate pattern, gate off",
+          "10/40",
+          "15/40"
+        ],
+        [
+          "Union on the selected economic cases",
+          "10/15",
+          "15/15"
+        ],
+        [
+          "At least one gate rejection",
+          "37/40",
+          "37/40"
+        ],
+        [
+          "Conduct alert under aggregate gate",
+          "0/40",
+          "0/40"
+        ]
+      ]
+    },
+    {
+      "type": "caption",
+      "text": "Table 4. Identical parameter draws and market paths rescored under two shared windows. Original-family counts include self-match alerts; they are not all spoof detections. A rejected order is an operational event, not proof that the complete sequence was prevented."
+    },
+    {
+      "type": "body",
+      "text": "The historical residual-route rule combines positive absolute wealth, no gate rejection, and no ungated conduct alert. It marks one draw: a disjoint sequence that earns 3.70 in both responsive and unresponsive markets with zero price error. The profit is unrelated to the engineered response. Other gated draws also retain positive wealth, and some have small positive price error. Neither readout alone identifies an economic residual."
+    },
+    {
+      "type": "body",
+      "text": "We therefore add the missing gated unresponsive condition for each draw. Both sides of the comparison use the same gate rules, so differences caused solely by enabling a gate are not attributed to the market-response rule. Fills, rejections, and fees remain outcomes of each run. In these 40 matched pairs the full event streams are identical and the wealth differences are exactly zero at the engine's recorded precision. No tested draw retains a response-dependent wealth advantage under the aggregate gate. This result is established by the matched records, not by the absence of alerts."
+    },
+    {
+      "type": "body",
+      "text": "For a zero count in 40 draws, the descriptive Wilson 95% upper limit is 8.76%. This is conditional on the authored generator, its restricted parameter space, and the one-seed-per-draw assignment. It does not bound all manipulation strategies. The response comparison can also miss harmful outcomes unrelated to the particular imbalance rule. We retain the historical residual fields unchanged for provenance and publish the corrected endpoints separately."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "8. Legitimate cadence breaks the selected window"
+    },
+    {
+      "type": "body",
+      "text": "The earlier window sweep selected 180 seconds because it recovered the 15 economic cases without flagging any of five legitimate controls. Two of those controls buy only; they cannot satisfy an opposite-side-own-fill condition. The small maker remains below the size threshold, and the patient maker re-quotes at 300 seconds. These controls leave a gap around the selected 180-second boundary."
+    },
+    {
+      "type": "caption",
+      "text": "Figure 2. New cadence stress test: conduct alerts among 40 ungated legitimate-maker episodes per cell. Orders are generated once for each cadence and seed, then rescored at each shared window. Cells are paired and are not independent samples. The strategy quotes on both sides without a spoofing objective."
+    },
+    {
+      "type": "body",
+      "text": "At the chosen 180-second detection window, the 180-second maker cadence triggers alerts in 34/40 episodes (85.0%; descriptive Wilson 95% interval 70.9-92.9%). The 300-second cadence triggers none at that window. The quote quantities, market response, and seed cohort are the same. Legitimate quote cancellation after an opposite-side fill is sufficient to satisfy the aggregate pattern when enough displayed quantity remains unfilled."
+    },
+    {
+      "type": "body",
+      "text": "The detector does not observe the script's objective; that label is available because this is a controlled experiment. In deployment an alert would require review. Here the result is a false alert relative to the declared legitimate control, and it demonstrates why zero alerts on one cadence should not be described as a low general false-positive rate. Replaying the same 15 tuned evasion cases does not repair this gap."
+    },
+    {
+      "type": "body",
+      "text": "The historical sweep also evaluated a linearly age-weighted aggregate signal. It reached 14/15 of the selected economic cases at a 600-second horizon, compared with 15/15 for the hard 180-second window, with no lower observed false-alert count in the original controls. We do not choose a replacement window from the expanded grid. A future choice needs separate development and test strategy families, including multiple legitimate quoting cadences and adequate execution tasks."
+    },
+    {
+      "type": "body",
+      "text": "Under the aggregate gate, the 180-second maker produces no conduct alerts at any tested window, but mean volume falls from 73.80 to 58.98 lots. The accepted display is smaller, so the detector no longer encounters the same pattern. This reduction in alerts must be read alongside the loss of legitimate execution, rather than treated as independent evidence of better discrimination."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "9. Interpretation and limitations"
+    },
+    {
+      "type": "body",
+      "text": "The six-by-ten counterexample changes how displayed size is divided among orders while preserving its effect on the response mechanism. Both the per-order gate and individual-order detector miss that representation change. Aggregating outstanding quantity repairs the tested case, but the detector and gate still rely on closely related size rules. Their agreement is therefore limited evidence of broader protection."
+    },
+    {
+      "type": "body",
+      "text": "A size cap also changes how quickly accepted submissions accumulate. That changes when the ratio throttle becomes active and can reverse the apparent ranking of complete policies. The 12-minute horizon magnifies the interaction because the cancellation window never expires. Longer sessions could produce repeated lockout and recovery; those dynamics remain unmeasured."
+    },
+    {
+      "type": "body",
+      "text": "The legitimate controls determine which detector weaknesses an evaluation can reveal. One-sided executors cannot challenge a rule requiring opposite-side fills. A maker that re-quotes after the cancellation window produces no alerts, while the same quoting rule at a shorter cadence is frequently flagged. The 180-second counterexample exposes a gap in the original calibration set."
+    },
+    {
+      "type": "body",
+      "text": "The engine has one evaluated account, a small replenishing book, fixed spread around a synthetic fundamental, and a stipulated two-tick response. It has no exchange latency, queue calibration, inventory-managed background population, closing auction, beneficial-owner graph, or endogenous strategic learning. The fundamental is a discrete random walk rather than the mean-reverting process described in the earlier LLM proposal. These choices permit controlled replay but sharply limit external validity."
+    },
+    {
+      "type": "body",
+      "text": "The experiments are sequentially developed. The split probe motivated aggregation; the slow draws motivated a longer window; the cadence counterexample motivated the new grid. No study in this paper is externally preregistered. The parameter sample is not a held-out strategy family, and its reuse in detector selection precludes an independent estimate of selected-window recall. Reported intervals do not account for that selection. Additional unseen strategy families and independently reviewed labels are needed."
+    },
+    {
+      "type": "body",
+      "text": "No LLM inference was used to choose trading actions in these experiments. The repository includes a provider interface and mock tests, but these supply no evidence about model behaviour, instruction following, collusion, or internal intent. A future model study must choose and freeze its environment, model versions, prompts, call budget, failure handling, endpoints, and analysis before collecting headline results. Missing explanations must remain distinct from explicit benign explanations. The present paper makes no annotation-agreement or power claim."
+    },
+    {
+      "type": "body",
+      "text": "Regulatory obligations do not disappear when a trading workflow uses generative AI. FINRA explicitly states that its rules are technologically neutral [6]. Our simulated gates are engineering controls, not an implementation or certification of all applicable obligations. No orders were sent to a live market, no customers were studied, and no finding about commercial demand is drawn from these experiments."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "10. Reproducibility and conclusion"
+    },
+    {
+      "type": "h2",
+      "text": "10.1. Artifact and verification"
+    },
+    {
+      "type": "body",
+      "text": "The new analysis preserves all historical code and evidence. It adds matching gated counterfactuals, a cadence grid, corrected per-side display measurement, and an executable economic endpoint. Every new record stores the attempted-action sequence, subject-related events, rejection reasons, detector outputs, and a hash of the full event stream. Background events are reconstructed deterministically rather than claimed to be fully present in the compressed subject-event archive."
+    },
+    {
+      "type": "body",
+      "text": "Verification replays attempted actions without invoking the strategy generator, checks the full-event hash and recorded fields, recomputes every new CSV row and summary, and checks the historical source and evidence hashes. Exact numeric reproduction uses CPython 3.9.6, matching the saved cohorts. Different Python summation implementations can change the last bits of bootstrap summaries. No provider credential or network access is needed to reproduce the measurements."
+    },
+    {
+      "type": "small",
+      "text": "Run from the repository root using the pinned interpreter:"
+    },
+    {
+      "type": "code",
+      "text": "python3 -m unittest discover -s tests -v"
+    },
+    {
+      "type": "code",
+      "text": "python3 -m paper_study.evaluate verify results/paper-review-v1"
+    },
+    {
+      "type": "code",
+      "text": "python3 -m paper_study.evaluate run results/local-paper-review"
+    },
+    {
+      "type": "code",
+      "text": "python3 -m paper_study.evaluate verify results/local-paper-review"
+    },
+    {
+      "type": "body",
+      "text": "Use a fresh output directory for regeneration. The study reads frozen historical configurations, including the 180-second evasion configuration, rather than the mutable root config. The older pilot regeneration command reads the root config and therefore should not be used to claim byte-identical reproduction of a 120-second cohort after the default changes. Historical replay commands use each cohort's saved configuration."
+    },
+    {
+      "type": "body",
+      "text": "The manuscript tables and figures are generated from the new summary, which includes checked historical summaries. The builder writes an editable structured manuscript, reference list, figure files, and a document manifest linking this PDF to its source and evidence hashes. The repository is access-controlled at the time of this draft; this is an artifact availability statement, not a claim of public release."
+    },
+    {
+      "type": "small",
+      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/8a8560a3a97d8318e35250d200b49c8754a395f7\">tokencraftdata/agentic-compliance, 8a8560a3a97d8318e35250d200b49c8754a395f7</link>"
+    },
+    {
+      "type": "h2",
+      "text": "10.2. Conclusion"
+    },
+    {
+      "type": "body",
+      "text": "Order splitting, cancellation timing, and throttle accounting expose different weaknesses in the same control stack. Aggregation prevents the tested response-dependent payoff, but a detector window selected on a narrow control set produces frequent alerts when a legitimate maker changes cadence. The evidence supports explicit separation of alerts, economic effects, and execution cost. It also supplies a testbed in which a future agent study can fail these checks before its results are interpreted."
+    },
+    {
+      "type": "h2",
+      "text": "10.3. Use of generative AI tools"
+    },
+    {
+      "type": "body",
+      "text": "OpenAI Codex assisted with implementation, tests, analysis scripts, literature checks, and manuscript drafting and revision. The reported trading experiments used scripted policies and made no LLM calls. AI assistance in producing the research artifact is separate from the policies evaluated by the simulator. The human author is responsible for the methods, results, and references reported in the paper."
+    },
+    {
+      "type": "page_break"
+    },
+    {
+      "type": "h1",
+      "text": "References"
+    },
+    {
+      "type": "small",
+      "text": "[1] Xintong Wang and Michael P. Wellman. Spoofing the Limit Order Book: An Agent-Based Model. AAMAS, 2017, pp. 651-659.<br/><link href=\"https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p651.pdf\" color=\"#254f70\">https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p651.pdf</link>"
+    },
+    {
+      "type": "small",
+      "text": "[2] David Byrd. Learning Not to Spoof. arXiv:2306.06087, 2023. Related ICAIF publication, 2022.<br/><link href=\"https://arxiv.org/abs/2306.06087\" color=\"#254f70\">https://arxiv.org/abs/2306.06087</link>"
+    },
+    {
+      "type": "small",
+      "text": "[3] Xintong Wang and Michael P. Wellman. Market Manipulation: An Adversarial Learning Framework for Detection and Evasion. IJCAI, 2020, pp. 4626-4632.<br/><link href=\"https://doi.org/10.24963/ijcai.2020/638\" color=\"#254f70\">https://doi.org/10.24963/ijcai.2020/638</link>"
+    },
+    {
+      "type": "small",
+      "text": "[4] David Byrd, Maria Hybinette, and Tucker Hybinette Balch. ABIDES: Towards High-Fidelity Market Simulation for AI Research. arXiv:1904.12066, 2019.<br/><link href=\"https://arxiv.org/abs/1904.12066\" color=\"#254f70\">https://arxiv.org/abs/1904.12066</link>"
+    },
+    {
+      "type": "small",
+      "text": "[5] Eren Kurshan, Tucker Balch, and David Byrd. The Agentic Regulator: Risks for AI in Finance and a Proposed Agent-based Framework for Governance. arXiv:2512.11933, 2025.<br/><link href=\"https://arxiv.org/abs/2512.11933\" color=\"#254f70\">https://arxiv.org/abs/2512.11933</link>"
+    },
+    {
+      "type": "small",
+      "text": "[6] FINRA. Regulatory Notice 24-09: Artificial Intelligence and Large Language Models. June 27, 2024.<br/><link href=\"https://www.finra.org/rules-guidance/notices/24-09\" color=\"#254f70\">https://www.finra.org/rules-guidance/notices/24-09</link>"
+    },
+    {
+      "type": "small",
+      "text": "References checked against primary sources on 9 November 2026. Bibliographic scope is limited to the implemented offline study."
+    },
+    {
+      "type": "h1",
+      "text": "Artifact map"
+    },
+    {
+      "type": "table",
+      "headers": [
+        "Path",
+        "Contents"
+      ],
+      "rows": [
+        [
+          "paper_study/evaluate.py",
+          "Corrected endpoints, new grid, action replay, CSV consistency checks"
+        ],
+        [
+          "results/paper-review-v1/",
+          "360 new episodes, plan, configuration, summary, and hash manifest"
+        ],
+        [
+          "paper/offline_study/build.py",
+          "Paper and figure builder"
+        ],
+        [
+          "paper/offline_study/manuscript.json",
+          "Editable structured manuscript exported by the builder"
+        ],
+        [
+          "paper/offline_study/figures/",
+          "Standalone PNG and SVG figures"
+        ],
+        [
+          "paper/offline_study/REVIEW_RESPONSE.md",
+          "Disposition of the manuscript and code review findings"
+        ]
+      ]
+    },
+    {
+      "type": "h1",
+      "text": "Version note"
+    },
+    {
+      "type": "body",
+      "text": "Version 1.2 retains the clarified order-splitting and matched-comparison claims, embeds outline fonts, and discloses generative AI assistance in producing the artifact. It includes the author details for the planned arXiv submission. The experimental results are unchanged. Historical reports and their original measurements remain in the artifact. The experiments are exploratory and were not externally preregistered."
+    }
+  ]
+}

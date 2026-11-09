@@ -1,5 +1,18 @@
 # Agentic Compliance
 
+## New standalone paper (9 November 2026)
+
+[Read the paper](output/pdf/order_splitting_and_timing.pdf): **Order Splitting,
+Cancellation Timing, and the Limits of Trading Controls**. The paper reports only
+completed offline experiments and includes the legitimate-maker cadence failure
+found during review. See [source and reproduction](paper/offline_study/README.md)
+and [review responses](paper/offline_study/REVIEW_RESPONSE.md).
+
+The new measurement package adds 360 episodes, matched economic endpoints, and a
+per-side display metric. The original pilot modules and evidence are preserved.
+Historical material below describes earlier versions; it is not a completed LLM
+study. No live LLM inference or customer-demand validation is claimed.
+
 Standalone research repository for the *Accidental Spoofers* offline pilot,
 trading-agent experiment infrastructure, and commercial-validation research.
 

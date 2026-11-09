@@ -1,0 +1,28 @@
+{
+  "status": "prepared_not_submitted",
+  "title": "Order Splitting, Cancellation Timing, and the Limits of Trading Controls",
+  "authors": [
+    {
+      "name": "Sandip Nandi",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "abstract": "An order-level control can reject a conspicuous spoof while admitting the same displayed quantity split across smaller orders. We study this failure in a deterministic, replayable limit-order-book simulator. An initial 960-episode scripted evaluation is followed by 2,160 repair episodes, throttle-isolation and randomized-parameter probes, and a new 360-episode measurement study. Six 10-lot orders bypass both a legacy per-order gate and its original detectors in all 40 tested seeds. An aggregate gate removes the engineered response benefit for this probe, but its apparent advantage over the legacy gate on legitimate trading is largely a cancellation-throttle interaction. Matching responsive and unresponsive markets at the same gate finds no response-dependent wealth advantage in 40 randomized draws. Detection remains sensitive to legitimate quoting cadence: a 180-second window flags a patient market maker in 34 of 40 episodes when it re-quotes every 180 seconds, despite zero alerts at a 300-second cadence. These are exploratory results in a stipulated market mechanism. No LLM policy, live market, or human intent annotation is evaluated.",
+  "proposed_primary_category": "q-fin.TR",
+  "cross_lists": [],
+  "comments": "11 pages, 2 figures; exploratory scripted simulation study",
+  "license": null,
+  "journal_reference": null,
+  "publication_doi": null,
+  "arxiv_identifier": null,
+  "artifact_url": "https://github.com/tokencraftdata/agentic-compliance",
+  "artifact_access": "private; no public-access claim",
+  "paper_sha256": "3cd00c3f036b34de1946fe66e21b2ef66fd62dcc4be97c11c7945ec77b9f3728",
+  "pending": [
+    "author final read-through",
+    "license selection",
+    "account and endorsement check",
+    "artifact access decision",
+    "arXiv upload and preview"
+  ]
+}
