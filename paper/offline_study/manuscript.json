@@ -1,6 +1,6 @@
 {
   "title": "Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing",
-  "subtitle": "A replayable offline study of surveillance and pre-trade gates",
+  "subtitle": "Scripted experiments on surveillance and pre-trade gates",
   "authors": [
     {
       "name": "Sandip Nandi",
@@ -14,7 +14,7 @@
     },
     {
       "type": "subtitle",
-      "text": "A replayable offline study of surveillance and pre-trade gates"
+      "text": "Scripted experiments on surveillance and pre-trade gates"
     },
     {
       "type": "subtitle",
@@ -22,7 +22,7 @@
     },
     {
       "type": "subtitle",
-      "text": "9 November 2026 | Preprint version 1.5"
+      "text": "9 November 2026"
     },
     {
       "type": "h1",
@@ -65,23 +65,23 @@
     },
     {
       "type": "body",
-      "text": "Wang and Wellman [1] model spoofing against traders that use order-book information. Wang, Hoang, Vorobeychik, and Wellman [7] extend and supersede that study, examining strategic responses and mitigation through order-book cloaking and modified learning strategies. Byrd [2] studies a reinforcement-learning trader that discovers spoofing and a learned recognizer used to discourage it. Cartea, Chang, and Garc\u00eda-Arenas [12] derive conditions under which learning algorithms manipulate an order book. Our scripts neither learn nor optimize against a detector; the experiment therefore cannot establish emergent manipulation by an agent."
+      "text": "Wang and Wellman [1] model spoofing against traders that use order-book information. Wang, Hoang, Vorobeychik, and Wellman [7] extend and supersede that study, examining strategic responses, order-book cloaking, and modified learning strategies. Byrd [2] studies a reinforcement-learning trader that discovers spoofing and a learned recognizer used to discourage it. Cartea, Chang, and Garc\u00eda-Arenas [12] derive conditions under which learning algorithms manipulate an order book. In the present experiments, trading rules are fixed programs. The results describe how controls respond to those programs."
     },
     {
       "type": "body",
-      "text": "Detection and adaptation are also established research topics. Wang and Wellman [3] study adversarial learning between manipulation and detection. Do and Putni\u0146\u0161 [13] develop empirical detectors using prosecuted cases and out-of-sample evaluation. Fabre and Challet [10] use Level-3 market data to model price responses and assess potential spoofing gains. Our labels instead come from authored scripts, and the price response is stipulated. The reported alert counts and matched wealth differences are not estimates of detection accuracy or manipulation profitability in those empirical settings."
+      "text": "Wang and Wellman [3] study adversarial learning between manipulation and detection. Do and Putni\u0146\u0161 [13] develop empirical detectors using prosecuted cases and out-of-sample evaluation. Fabre and Challet [10] use Level-3 market data to model price responses and assess potential spoofing gains. Our labels come from authored scripts, and the price response is stipulated. These choices permit controlled comparisons but do not support estimates of real-market detection accuracy or manipulation profitability."
     },
     {
       "type": "body",
-      "text": "For agent compliance, ReguSim [8] separates an LLM trader's stated reasoning, attempted orders, execution enforcement, and monitor evidence. Its trader experiment uses exogenous prices and full execution of accepted orders, without order-book interaction or market impact. This study examines split display, partial fills, cancellation timing, and response-dependent wealth in a small order book. It contributes no comparative model-performance result and does not introduce the separation of action, enforcement, and surveillance."
+      "text": "ReguSim [8] separates an LLM trader's stated reasoning, attempted orders, execution enforcement, and monitor evidence. Its trader experiment uses exogenous prices and full execution of accepted orders, without order-book interaction or market impact. The present study examines split display, partial fills, cancellation timing, and response-dependent wealth in a small order book. Its measurements concern order lifecycles and their economic effects; it contains no comparison of LLMs."
     },
     {
       "type": "body",
-      "text": "Borjigin and He [9] propose constrained reinforcement-learning execution with a runtime action shield and a cryptographic audit layer. We do not implement their method or compare performance against it. A pre-trade gate or an audit trail alone is therefore not our novelty claim. Byrd's agentic pump-and-dump study [11] combines an RL trader with LLM-generated social posts; that information channel and autonomous learning are absent here."
+      "text": "Borjigin and He [9] propose constrained reinforcement-learning execution with a runtime action shield and a cryptographic audit layer. Their full cryptographic proof pipeline is left to future work. We use the proposal as an architectural comparison, without claiming that its audit layer has been implemented or independently validated. Byrd's agentic pump-and-dump study [11] combines an RL trader with LLM-generated social posts. The simulator used here has neither that information channel nor autonomous learning."
     },
     {
       "type": "body",
-      "text": "ABIDES [4] offers a richer architecture with interacting agents and communication latencies. Our engine is a smaller purpose-built model, not an ABIDES calibration. Kurshan, Balch, and Byrd [5] discuss agent-based governance and a spoofing case study. Against this background, the contribution is the set of measured control failures: splitting defeats per-order checks, throttle timing confounds a gate comparison, and a legitimate quoting cadence defeats a selected detection window. Matched economic comparisons and replay make these particular findings inspectable; broader control effectiveness remains untested."
+      "text": "ABIDES [4] offers a richer architecture with interacting agents and communication latencies. Our engine is a smaller purpose-built model, not an ABIDES calibration. Kurshan, Balch, and Byrd [5] discuss agent-based governance and a spoofing case study. Gu et al. [17] vary market-maker liquidity and compare baseline, tuned, and reinforcement-learned spoofing strategies. Our fixed liquidity setting does not test that regime dependence. This paper adds three measured counterexamples: splitting defeats per-order checks, throttle timing confounds a gate comparison, and a legitimate quoting cadence defeats a selected detection window. Matched economic comparisons and replay make those failures inspectable. Broader control effectiveness remains untested."
     },
     {
       "type": "page_break"
@@ -89,6 +89,10 @@
     {
       "type": "h2",
       "text": "2.2. Market mechanics"
+    },
+    {
+      "type": "body",
+      "text": "All orders execute inside the simulator; no broker or exchange is connected. This is the sense of offline used here. The trading policies are separately specified as scripts: no model is trained or queried to select their actions. A future LLM study could also run offline in this environment."
     },
     {
       "type": "table",
@@ -563,7 +567,7 @@
     },
     {
       "type": "body",
-      "text": "Notice 15-09 [14] is directly relevant to the evaluation method. Its suggested practices address development and change management, testing before deployment, ongoing monitoring, and records of tests and defect remediation. It also recommends testing independently of code development. Our replay records permit inspection of a control change, but this study is developer-authored and supplies no independent validation or assessment of a firm's governance. The notice expressly cautions that applying its suggested practices alone need not satisfy all applicable obligations."
+      "text": "The suggested practices in Notice 15-09 [14] address development and change management, testing before deployment, ongoing monitoring, and records of tests and defect remediation. It also recommends testing independently of code development. Our replay records permit inspection of a control change, but this study is developer-authored and supplies no independent validation or assessment of a firm's governance. The notice expressly cautions that applying its suggested practices alone need not satisfy all applicable obligations."
     },
     {
       "type": "body",
@@ -645,7 +649,7 @@
     },
     {
       "type": "small",
-      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/2c2808cfb44c32877c67ec4efba84f4ff7e12234\">tokencraftdata/agentic-compliance, 2c2808cfb44c32877c67ec4efba84f4ff7e12234</link>"
+      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/81cf5402aecea7838d0072ea29f3f5d212d69440\">tokencraftdata/agentic-compliance, 81cf5402aecea7838d0072ea29f3f5d212d69440</link>"
     },
     {
       "type": "h2",
@@ -736,7 +740,7 @@
     },
     {
       "type": "small",
-      "text": "References checked against primary sources on 9 November 2026. Preprints and working papers are identified as such. Source-check coverage is recorded in the repository; this is a focused comparison, not a systematic literature review."
+      "text": "[17] Anri Gu et al. The Effect of Liquidity on the Spoofability of Financial Markets. ICAIF, 2024, pp. 239-247.<br/><link href=\"https://doi.org/10.1145/3677052.3698634\" color=\"#254f70\">https://doi.org/10.1145/3677052.3698634</link>"
     }
   ]
 }

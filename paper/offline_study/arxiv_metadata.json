@@ -17,7 +17,7 @@
   "arxiv_identifier": null,
   "artifact_url": "https://github.com/tokencraftdata/agentic-compliance",
   "artifact_access": "private; no public-access claim",
-  "paper_sha256": "40dd36ece624b632d0b44adb80c5678121fdd6b283ceec770652bfda2e9ce320",
+  "paper_sha256": "40167a18787cf29a74dbda2144b7bace6191b700ef982375e8b73274aae54696",
   "pending": [
     "author final read-through",
     "license selection",
@@ -25,5 +25,5 @@
     "artifact access decision",
     "arXiv upload and preview"
   ],
-  "document_version": "1.5"
+  "document_version": "1.6"
 }
