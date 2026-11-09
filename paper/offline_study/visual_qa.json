@@ -1,23 +1,24 @@
 {
   "date": "2026-11-09",
+  "document_version": "1.2",
   "pages": 11,
   "render_dpi": 100,
   "all_pages_visually_inspected": true,
   "clipping_or_overlap_observed": false,
   "placeholder_scan_passed": true,
-  "code_commit_verified_in_pdf": "6d1f008b5a40644aae6b1543047dc12165c54c12",
-  "pdf_sha256": "86b806437ca0f27e9cad8dee0873cf2e4e8d01dee66dce2fc81b4137f850adcf",
+  "code_commit_verified_in_pdf": "8a8560a3a97d8318e35250d200b49c8754a395f7",
+  "pdf_sha256": "3cd00c3f036b34de1946fe66e21b2ef66fd62dcc4be97c11c7945ec77b9f3728",
   "page_render_sha256": {
-    "page-01.png": "49d5a6af4f8a48ba927935129a036074d8ba55f0dfbfeb6ba909566e48e14036",
-    "page-02.png": "ab05be320e090c6d8bead3ea2cd6c0d28338b83908234f185b3677c54244155a",
-    "page-03.png": "87a768d90919b90cc5592ef733d771726504b142c1adbf6ab6bb85038be43250",
-    "page-04.png": "680af98945386e6403d5bbdad25cc1a129675c8c749054681fcf19f489dfcf14",
-    "page-05.png": "b37a24c7c3d2de3b161a82f814ab99f29c44fb53f64c270cac9e7f1a92c27614",
-    "page-06.png": "d8816587171daffea9d432da63c3cbd3dba8008416026d4b2546cb7ddba6de28",
-    "page-07.png": "c9bd80284a0523fc6253c6ac8502eca1f57754b5f89669317d4865ec626e72c6",
-    "page-08.png": "9661ccd16e90e52a8047bf624a9291f54aa8404238796d4f9ef8155238cf32fa",
-    "page-09.png": "11a872f7d784544dd1210a0dc7777853a59b12bb1fb245d06d700047775dbd8d",
-    "page-10.png": "3840c49b1dac3941ea51e549025f83d84dcc5d06e2baabe1fb91fab08bb58b9f",
-    "page-11.png": "23c99939879cb3c003c6eddc08101521e67cd0784fb8b15bff3cc0e6a9c7016f"
+    "page-01.png": "b9b7be9d9136e49b6a03f8132c233249631030c0d2d2b1dc35ce1a14169dacc9",
+    "page-02.png": "171511d7fae00126dc0d773ebce7da3dd0c6ccc06c134083a4a1b323feb5053f",
+    "page-03.png": "c219a2f62e2f4e8e8d84835a630d9ee968cf23e91a67498d0a6b5a071dde2280",
+    "page-04.png": "1379ae57f0ddb71c39c7e678fda564cce71780a75e439f63a0c03383e5f6ccbd",
+    "page-05.png": "5a865b32e6925c3dc7f2060712c0398462518a274d24395479cc3b5bd26b5b02",
+    "page-06.png": "18b09dc3c48ac5355337b0ad09896438d8e19d5e241b34babdf833644cc0570d",
+    "page-07.png": "360e0466383ce513861da6147648d175501fc0975c8db64a71aa263f13dc9ff9",
+    "page-08.png": "371a52d90e2eaa03b5ee10a2ba73ca9f878405652e0b0fb61c4f197f2b3dbf63",
+    "page-09.png": "ecf74fc0a80233278e4eafe1856fafedebd9308138b7b73c7ff0bc6ca9ea765f",
+    "page-10.png": "5ed01ef3b2a9407443d1ce9b9358ece0318c2dd26d4ead89e7fdc57f5946704d",
+    "page-11.png": "b787a51bcbd994ec2bdd338ad0b919fd0bf650c2bbc6377d02241437d6880f61"
   }
 }

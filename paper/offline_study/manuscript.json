@@ -1,6 +1,12 @@
 {
   "title": "Order Splitting, Cancellation Timing, and the Limits of Trading Controls",
   "subtitle": "A replayable offline study of surveillance and pre-trade gates",
+  "authors": [
+    {
+      "name": "Sandip Nandi",
+      "affiliation": "Independent Researcher"
+    }
+  ],
   "blocks": [
     {
       "type": "title",
@@ -12,7 +18,11 @@
     },
     {
       "type": "subtitle",
-      "text": "Anonymous review manuscript | 9 November 2026 | Version 1.0"
+      "text": "Sandip Nandi<br/>Independent Researcher"
+    },
+    {
+      "type": "subtitle",
+      "text": "9 November 2026 | Preprint version 1.2"
     },
     {
       "type": "h1",
@@ -29,6 +39,10 @@
     {
       "type": "body",
       "text": "Surveillance and pre-trade controls answer different questions. Surveillance identifies an order sequence worth reviewing; a pre-trade gate decides whether a proposed action may enter the market. A clean alert count does not establish that a gate prevents profitable manipulation. A high rejection count does not establish that the remaining orders are harmless. Both measurements need an economic comparison and a legitimate trading task."
+    },
+    {
+      "type": "body",
+      "text": "Order splitting means dividing a larger order into smaller submissions. It is not, by itself, evidence of deceptive conduct. The counterexample studied here displays the split quantity, executes a small trade on the opposite side, and cancels the remaining display. The scheduled execution controls instead use smaller orders to acquire an 80-lot position."
     },
     {
       "type": "body",
@@ -464,7 +478,7 @@
     },
     {
       "type": "body",
-      "text": "We therefore add the missing gated unresponsive condition for each draw. Comparing each gated responsive run with its gated unresponsive counterpart holds self-match prevention, rejected orders, and associated fee effects constant. All 40 wealth differences are exactly zero at the engine's recorded precision. Thus no tested draw retains a response-dependent wealth advantage under the aggregate gate, whether or not it triggered a rejection. The new result is recomputed from records rather than inferred from the absence of alerts."
+      "text": "We therefore add the missing gated unresponsive condition for each draw. Both sides of the comparison use the same gate rules, so differences caused solely by enabling a gate are not attributed to the market-response rule. Fills, rejections, and fees remain outcomes of each run. In these 40 matched pairs the full event streams are identical and the wealth differences are exactly zero at the engine's recorded precision. No tested draw retains a response-dependent wealth advantage under the aggregate gate. This result is established by the matched records, not by the absence of alerts."
     },
     {
       "type": "body",
@@ -510,15 +524,15 @@
     },
     {
       "type": "body",
-      "text": "The strongest result is the shared blind spot between an action-level restriction and an order-level detector. The six-by-ten counterexample changes the representation of displayed size while preserving its role in the response mechanism. Aggregating outstanding quantity repairs that representation problem in the tested scripts. It does not establish that size aggregation is a complete manipulation defense, and the detector remains structurally related to the gate."
+      "text": "The six-by-ten counterexample changes how displayed size is divided among orders while preserving its effect on the response mechanism. Both the per-order gate and individual-order detector miss that representation change. Aggregating outstanding quantity repairs the tested case, but the detector and gate still rely on closely related size rules. Their agreement is therefore limited evidence of broader protection."
     },
     {
       "type": "body",
-      "text": "The throttle result concerns implementation composition. A size cap changes submission counts; submission counts determine when a ratio throttle becomes active. Comparing complete policies without isolating that interaction can reverse an apparent ranking of control costs. The 12-minute horizon magnifies the effect because the cancellation window never expires. A longer session could produce repeated lockout and recovery; that behavior has not been measured here."
+      "text": "A size cap also changes how quickly accepted submissions accumulate. That changes when the ratio throttle becomes active and can reverse the apparent ranking of complete policies. The 12-minute horizon magnifies the interaction because the cancellation window never expires. Longer sessions could produce repeated lockout and recovery; those dynamics remain unmeasured."
     },
     {
       "type": "body",
-      "text": "The detector result concerns the support of the negative controls. One-sided executors cannot challenge a rule requiring opposite-side fills. A long-lived maker can sit outside a cancellation window and appear safe, while the same maker at a different cadence is frequently flagged. The 180-second case therefore belongs in the main results, not only in a list of future checks. It materially limits the interpretation of the earlier calibration."
+      "text": "The legitimate controls determine which detector weaknesses an evaluation can reveal. One-sided executors cannot challenge a rule requiring opposite-side fills. A maker that re-quotes after the cancellation window produces no alerts, while the same quoting rule at a shorter cadence is frequently flagged. The 180-second counterexample exposes a gap in the original calibration set."
     },
     {
       "type": "body",
@@ -530,7 +544,7 @@
     },
     {
       "type": "body",
-      "text": "No LLM inference was performed. The repository includes a provider interface and mock tests, but these supply no evidence about model behaviour, instruction following, collusion, or internal intent. A future model study must choose and freeze its environment, model versions, prompts, call budget, failure handling, endpoints, and analysis before collecting headline results. Missing explanations must remain distinct from explicit benign explanations. The present paper makes no annotation-agreement or power claim."
+      "text": "No LLM inference was used to choose trading actions in these experiments. The repository includes a provider interface and mock tests, but these supply no evidence about model behaviour, instruction following, collusion, or internal intent. A future model study must choose and freeze its environment, model versions, prompts, call budget, failure handling, endpoints, and analysis before collecting headline results. Missing explanations must remain distinct from explicit benign explanations. The present paper makes no annotation-agreement or power claim."
     },
     {
       "type": "body",
@@ -585,7 +599,7 @@
     },
     {
       "type": "small",
-      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/6d1f008b5a40644aae6b1543047dc12165c54c12\">tokencraftdata/agentic-compliance, 6d1f008b5a40644aae6b1543047dc12165c54c12</link>"
+      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/8a8560a3a97d8318e35250d200b49c8754a395f7\">tokencraftdata/agentic-compliance, 8a8560a3a97d8318e35250d200b49c8754a395f7</link>"
     },
     {
       "type": "h2",
@@ -594,6 +608,14 @@
     {
       "type": "body",
       "text": "Order splitting, cancellation timing, and throttle accounting expose different weaknesses in the same control stack. Aggregation prevents the tested response-dependent payoff, but a detector window selected on a narrow control set produces frequent alerts when a legitimate maker changes cadence. The evidence supports explicit separation of alerts, economic effects, and execution cost. It also supplies a testbed in which a future agent study can fail these checks before its results are interpreted."
+    },
+    {
+      "type": "h2",
+      "text": "10.3. Use of generative AI tools"
+    },
+    {
+      "type": "body",
+      "text": "OpenAI Codex assisted with implementation, tests, analysis scripts, literature checks, and manuscript drafting and revision. The reported trading experiments used scripted policies and made no LLM calls. AI assistance in producing the research artifact is separate from the policies evaluated by the simulator. The human author is responsible for the methods, results, and references reported in the paper."
     },
     {
       "type": "page_break"
@@ -673,7 +695,7 @@
     },
     {
       "type": "body",
-      "text": "This standalone paper supersedes the completed-study framing of the earlier full-paper draft. Historical reports remain in the repository as versioned records. The new economic endpoint and cadence grid are additions, not retroactive changes to the original evidence. This manuscript is an anonymous research draft; the experiments are exploratory and were not externally preregistered."
+      "text": "Version 1.2 retains the clarified order-splitting and matched-comparison claims, embeds outline fonts, and discloses generative AI assistance in producing the artifact. It includes the author details for the planned arXiv submission. The experimental results are unchanged. Historical reports and their original measurements remain in the artifact. The experiments are exploratory and were not externally preregistered."
     }
   ]
 }
