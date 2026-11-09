@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import platform
+from functools import partial
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -19,6 +20,9 @@ from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Image, KeepTogether
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -71,20 +75,33 @@ def figures(summary):
 
 
 def build(commit):
+    # Use distributable outline fonts shipped with the pinned matplotlib build.
+    # Base-14 PDF fonts are not embedded by ReportLab and do not meet arXiv's
+    # PDF-only submission guidance.
+    font_dir = Path(matplotlib.get_data_path()) / 'fonts/ttf'
+    for name, filename in [('StudySerif', 'STIXGeneral.ttf'),
+                           ('StudySerif-Bold', 'STIXGeneralBol.ttf'),
+                           ('StudySerif-Italic', 'STIXGeneralItalic.ttf'),
+                           ('StudySerif-BoldItalic', 'STIXGeneralBolIta.ttf'),
+                           ('StudyMono', 'DejaVuSansMono.ttf')]:
+        pdfmetrics.registerFont(TTFont(name, str(font_dir / filename)))
+    pdfmetrics.registerFontFamily('StudySerif', normal='StudySerif',
+                                 bold='StudySerif-Bold', italic='StudySerif-Italic',
+                                 boldItalic='StudySerif-BoldItalic')
     summary = json.loads((DATA/'summary.json').read_text())
     figs = figures(summary)
     out = ROOT/'output/pdf/order_splitting_and_timing.pdf'; out.parent.mkdir(parents=True, exist_ok=True)
     width = 6.75*inch
     styles = {
-        'body': ParagraphStyle('body', fontName='Times-Roman', fontSize=10.5, leading=14, spaceAfter=8, alignment=TA_JUSTIFY),
-        'small': ParagraphStyle('small', fontName='Times-Roman', fontSize=9, leading=11.5, spaceAfter=7),
-        'caption': ParagraphStyle('caption', fontName='Times-Roman', fontSize=9, leading=11.5, spaceAfter=10),
-        'title': ParagraphStyle('title', fontName='Times-Bold', fontSize=20, leading=24, alignment=TA_CENTER, spaceAfter=12),
-        'subtitle': ParagraphStyle('subtitle', fontName='Times-Roman', fontSize=12, leading=16, alignment=TA_CENTER, spaceAfter=10),
-        'h1': ParagraphStyle('h1', fontName='Times-Bold', fontSize=13, leading=16, spaceBefore=5, spaceAfter=10, keepWithNext=True),
-        'h2': ParagraphStyle('h2', fontName='Times-Bold', fontSize=11, leading=14, spaceBefore=6, spaceAfter=6, keepWithNext=True),
-        'cell': ParagraphStyle('cell', fontName='Times-Roman', fontSize=8.6, leading=11),
-        'code': ParagraphStyle('code', fontName='Courier', fontSize=8, leading=11, spaceAfter=6),
+        'body': ParagraphStyle('body', fontName='StudySerif', fontSize=10.5, leading=14, spaceAfter=8, alignment=TA_JUSTIFY),
+        'small': ParagraphStyle('small', fontName='StudySerif', fontSize=9, leading=11.5, spaceAfter=7),
+        'caption': ParagraphStyle('caption', fontName='StudySerif', fontSize=9, leading=11.5, spaceAfter=10),
+        'title': ParagraphStyle('title', fontName='StudySerif-Bold', fontSize=20, leading=24, alignment=TA_CENTER, spaceAfter=12),
+        'subtitle': ParagraphStyle('subtitle', fontName='StudySerif', fontSize=12, leading=16, alignment=TA_CENTER, spaceAfter=10),
+        'h1': ParagraphStyle('h1', fontName='StudySerif-Bold', fontSize=13, leading=16, spaceBefore=5, spaceAfter=10, keepWithNext=True),
+        'h2': ParagraphStyle('h2', fontName='StudySerif-Bold', fontSize=11, leading=14, spaceBefore=6, spaceAfter=6, keepWithNext=True),
+        'cell': ParagraphStyle('cell', fontName='StudySerif', fontSize=8.6, leading=11),
+        'code': ParagraphStyle('code', fontName='StudyMono', fontSize=8, leading=11, spaceAfter=6),
     }
     story, source = [], []
     def p(text, style='body'):
@@ -105,7 +122,7 @@ def build(commit):
         return next(c for c in summary['historical'][name]['cells'] if all(c[k] == v for k,v in kw.items()))
     def n(x):return f'{x:.2f}'
     p(TITLE,'title');p(SUBTITLE,'subtitle')
-    p('Anonymous review manuscript | 9 November 2026 | Version 1.1','subtitle')
+    p('Anonymous review manuscript | 9 November 2026 | Version 1.2','subtitle')
     p('Abstract','h1')
     p('An order-level control can reject a conspicuous spoof while admitting the same displayed quantity split across smaller orders. We study this failure in a deterministic, replayable limit-order-book simulator. An initial 960-episode scripted evaluation is followed by 2,160 repair episodes, throttle-isolation and randomized-parameter probes, and a new 360-episode measurement study. Six 10-lot orders bypass both a legacy per-order gate and its original detectors in all 40 tested seeds. An aggregate gate removes the engineered response benefit for this probe, but its apparent advantage over the legacy gate on legitimate trading is largely a cancellation-throttle interaction. Matching responsive and unresponsive markets at the same gate finds no response-dependent wealth advantage in 40 randomized draws. Detection remains sensitive to legitimate quoting cadence: a 180-second window flags a patient market maker in 34 of 40 episodes when it re-quotes every 180 seconds, despite zero alerts at a 300-second cadence. These are exploratory results in a stipulated market mechanism. No LLM policy, live market, or human intent annotation is evaluated.')
     p('1. Introduction','h1')
@@ -218,7 +235,7 @@ def build(commit):
     p('The legitimate controls determine which detector weaknesses an evaluation can reveal. One-sided executors cannot challenge a rule requiring opposite-side fills. A maker that re-quotes after the cancellation window produces no alerts, while the same quoting rule at a shorter cadence is frequently flagged. The 180-second counterexample exposes a gap in the original calibration set.')
     p('The engine has one evaluated account, a small replenishing book, fixed spread around a synthetic fundamental, and a stipulated two-tick response. It has no exchange latency, queue calibration, inventory-managed background population, closing auction, beneficial-owner graph, or endogenous strategic learning. The fundamental is a discrete random walk rather than the mean-reverting process described in the earlier LLM proposal. These choices permit controlled replay but sharply limit external validity.')
     p('The experiments are sequentially developed. The split probe motivated aggregation; the slow draws motivated a longer window; the cadence counterexample motivated the new grid. No study in this paper is externally preregistered. The parameter sample is not a held-out strategy family, and its reuse in detector selection precludes an independent estimate of selected-window recall. Reported intervals do not account for that selection. Additional unseen strategy families and independently reviewed labels are needed.')
-    p('No LLM inference was performed. The repository includes a provider interface and mock tests, but these supply no evidence about model behaviour, instruction following, collusion, or internal intent. A future model study must choose and freeze its environment, model versions, prompts, call budget, failure handling, endpoints, and analysis before collecting headline results. Missing explanations must remain distinct from explicit benign explanations. The present paper makes no annotation-agreement or power claim.')
+    p('No LLM inference was used to choose trading actions in these experiments. The repository includes a provider interface and mock tests, but these supply no evidence about model behaviour, instruction following, collusion, or internal intent. A future model study must choose and freeze its environment, model versions, prompts, call budget, failure handling, endpoints, and analysis before collecting headline results. Missing explanations must remain distinct from explicit benign explanations. The present paper makes no annotation-agreement or power claim.')
     p('Regulatory obligations do not disappear when a trading workflow uses generative AI. FINRA explicitly states that its rules are technologically neutral [6]. Our simulated gates are engineering controls, not an implementation or certification of all applicable obligations. No orders were sent to a live market, no customers were studied, and no finding about commercial demand is drawn from these experiments.')
 
     page();p('10. Reproducibility and conclusion','h1')
@@ -236,6 +253,8 @@ def build(commit):
     p('Source snapshot: <link href="https://github.com/tokencraftdata/agentic-compliance/tree/'+commit+'">tokencraftdata/agentic-compliance, '+commit+'</link>','small')
     p('10.2. Conclusion','h2')
     p('Order splitting, cancellation timing, and throttle accounting expose different weaknesses in the same control stack. Aggregation prevents the tested response-dependent payoff, but a detector window selected on a narrow control set produces frequent alerts when a legitimate maker changes cadence. The evidence supports explicit separation of alerts, economic effects, and execution cost. It also supplies a testbed in which a future agent study can fail these checks before its results are interpreted.')
+    p('10.3. Use of generative AI tools','h2')
+    p('OpenAI Codex assisted with implementation, tests, analysis scripts, literature checks, and manuscript drafting and revision. The reported trading experiments used scripted policies and made no LLM calls. AI assistance in producing the research artifact is separate from the policies evaluated by the simulator. The human author is responsible for the methods, results, and references reported in the paper.')
 
     page();p('References','h1')
     for i,(text,url) in enumerate(REFS,1):
@@ -251,18 +270,19 @@ def build(commit):
         ['paper/offline_study/REVIEW_RESPONSE.md','Disposition of the manuscript and code review findings']
     ],[.50,.50])
     p('Version note','h1')
-    p('Version 1.1 clarifies order splitting, distinguishes fixed gate rules from realized trading outcomes in the matched comparison, and tightens the discussion. The experimental results are unchanged. Historical reports and their original measurements remain in the artifact. This copy is prepared for anonymous review; the experiments are exploratory and were not externally preregistered.')
+    p('Version 1.2 retains the clarified order-splitting and matched-comparison claims, embeds outline fonts, and discloses generative AI assistance in producing the artifact. The experimental results are unchanged. Historical reports and their original measurements remain in the artifact. Author details are pending for the planned arXiv submission. The experiments are exploratory and were not externally preregistered.')
 
     def footer(canvas, doc):
-        canvas.saveState();canvas.setFont('Times-Roman',8);canvas.setFillColor(colors.HexColor('#555555'))
-        canvas.drawString(.875*inch,.45*inch,'Order Splitting and Timing | Offline study v1.1')
+        canvas.saveState();canvas.setFont('StudySerif',8);canvas.setFillColor(colors.HexColor('#555555'))
+        canvas.drawString(.875*inch,.45*inch,'Order Splitting and Timing | Offline study v1.2')
         canvas.drawRightString(7.625*inch,.45*inch,str(doc.page));canvas.restoreState()
     doc=SimpleDocTemplate(str(out),pagesize=(8.5*inch,11*inch),rightMargin=.875*inch,leftMargin=.875*inch,
                           topMargin=.65*inch,bottomMargin=.7*inch,title=TITLE,author='Anonymous review manuscript')
-    doc.build(story,onFirstPage=footer,onLaterPages=footer)
+    doc.build(story,onFirstPage=footer,onLaterPages=footer,
+              canvasmaker=partial(Canvas, initialFontName='StudySerif'))
     (HERE/'manuscript.json').write_text(json.dumps({'title':TITLE,'subtitle':SUBTITLE,'blocks':source},indent=2)+'\n')
     (HERE/'references.json').write_text(json.dumps([{'number':i,'text':t,'url':u} for i,(t,u) in enumerate(REFS,1)],indent=2)+'\n')
-    manifest={'document_version':'1.1','date':'2026-11-09','code_commit':commit,'python':platform.python_version(),
+    manifest={'document_version':'1.2','date':'2026-11-09','code_commit':commit,'python':platform.python_version(),
               'reportlab':reportlab.Version,'matplotlib':matplotlib.__version__,
               'source_sha256':digest(Path(__file__)),'evidence_manifest_sha256':digest(DATA/'manifest.json'),
               'summary_sha256':digest(DATA/'summary.json'),'pdf_sha256':digest(out),
