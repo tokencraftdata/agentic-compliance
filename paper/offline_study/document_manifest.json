@@ -1,14 +1,14 @@
 {
-  "document_version": "1.4",
+  "document_version": "1.5",
   "date": "2026-11-09",
-  "code_commit": "a1762f0351da6e9df63f29aa27d1ee396d5e1d09",
+  "code_commit": "2c2808cfb44c32877c67ec4efba84f4ff7e12234",
   "python": "3.12.14",
   "reportlab": "4.4.9",
   "matplotlib": "3.10.8",
-  "source_sha256": "332ed57abdf0aa6296c0d9371f703ed0605a0448b4e5b4fb5cbc7f8a2cf85c4b",
+  "source_sha256": "b10fe7744476a0b60bacedf50e332e25517063005d37554dfbb653510481b50b",
   "evidence_manifest_sha256": "eef25402a5862fa1f48947741bfb4317013d7da0a19863f8bf2224938209645f",
   "summary_sha256": "9176bf200ecb438a8217e9f9acce1d105f8781408acd223cabea3c0a7523c368",
-  "pdf_sha256": "0eb4ef4bb7c042e6f7f8961345b76a98b8922a4a4581ca8e8bcfea9c3da8b6a6",
-  "pdf_bytes": 211372,
-  "manuscript_sha256": "14c84695e8326d30d977a6cee3907e0c1f660da934ff9b52dcc5e850b6a676d1"
+  "pdf_sha256": "40dd36ece624b632d0b44adb80c5678121fdd6b283ceec770652bfda2e9ce320",
+  "pdf_bytes": 218117,
+  "manuscript_sha256": "745e5ef30c3a93c70dabb33840f9b4cb44c86c51421d24484a6a92793921a6fc"
 }
