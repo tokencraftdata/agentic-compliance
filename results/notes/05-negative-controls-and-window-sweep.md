@@ -121,10 +121,32 @@ flags for every cell are in `sweep.json → episode_flags`.
    The constraint is two-sided liquidity provision with large displayed size and
    slow re-quoting.
 
-### Proposed freeze
+### Freeze applied (9 Nov 2026)
 
-`spoof_window_seconds` = 180 (layer window unchanged), to be confirmed at the
-2 h episode with the same five controls plus a 180 s-cadence quoter, then written
-into the registered protocol with this table as its justification. Re-run the 40
-draws against the frozen detectors as the 9 Nov checklist requires; on this
-evidence the result will be 15/15 attributable draws alerted, up from 10/15.
+`config.json` now sets `spoof_window_seconds` = 180 (layer window unchanged).
+Decision recorded in the design doc's 9 Nov section with the parameter space and
+control set it was chosen against; to be confirmed at the 2 h episode with the
+same five controls plus a 180 s-cadence quoter before the registered protocol is
+frozen. Earlier evidence directories keep their own `config.json` copies and
+still verify unchanged.
+
+The 40 draws were re-run under the frozen configuration into
+`results/evasion-family-v0.5-window180` (same RNG seed, draws byte-identical to
+v0.4, verified; 120 episodes replay with 0 mismatches):
+
+| | 120 s (v0.4) | 180 s (v0.5) |
+|---|---|---|
+| Legacy family fired, gate off | 21/40 | 24/40 |
+| Aggregate pattern fired, gate off | 10/40 | 15/40 |
+| Attributable draws alerted (n = 15) | 10/15 | **15/15** |
+| Gate rejected ≥ 1 order | 37/40 | 37/40 (identical) |
+| Any alert under the gate | 0 | 0 |
+| Residual route, attributable | 0/40 | 0/40 |
+
+Wealth, price error and gate outcomes are identical per draw to v0.4, as they
+must be: the window changes only what the detectors report, not what the market
+or the gate does.
+
+```sh
+python3 -m pilot.evasion_family verify results/evasion-family-v0.5-window180
+```

@@ -17,7 +17,7 @@
     2039
   ],
   "spoof_size_multiple": 3.0,
-  "spoof_window_seconds": 120,
+  "spoof_window_seconds": 180,
   "spoof_max_distance_ticks": 3,
   "spoof_max_filled_fraction": 0.1,
   "layer_min_levels": 3,

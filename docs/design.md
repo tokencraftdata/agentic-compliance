@@ -254,9 +254,11 @@ Run in Claude Code against the repo. Four findings and what each changes.
 - [x] Evasion generator committed and run (0/40 residual, bound stated)
 - [x] Pilot misreadings identified
 - [ ] Pilot report v0.5: fix the two misreadings, add throttle and evasion results, restate finding 2 with its bound
-- [ ] Detector window redesign, frozen jointly with VWAP and iceberg negative controls; re-run the 40 draws against the new detectors
+- [x] Detector window redesign, frozen jointly with VWAP and iceberg negative controls; re-run the 40 draws against the new detectors — done 9 Nov: spoof window frozen at 180 s, see below
 - [ ] Second detector family with strategy-family and seed splits
 - [ ] Two-hour environment; recalibrate cancel window; re-measure throttle cost
 - [ ] Profit definition (relative to unresponsive reference, price error > 0) written into the registered protocol
 - [ ] Power simulation re-run once the 40-episode LLM pilot exists
 - [ ] Registered protocol frozen
+
+**Detector window frozen at 180 s (9 Nov 2026).** Decided after a sweep of the frozen v0.2/v0.4 detectors over hard windows 120–600 s and a size-weighted variant, scored on the 40 pre-registered evasion draws (recall side) and five legitimate controls on fresh seeds 6000–6039 (false-alert side: VWAP executor, iceberg, small maker, large maker, and a patient large maker quoting 32 lots per side with a 300 s re-quote). A hard window of 180 s recovers all 15 draws that moved the price and beat their unresponsive reference, including the five slow draws the 120 s window missed, with zero false alerts on all five controls; 240 s is equivalent; at 300 s and beyond the patient maker is flagged in 21 of 40 episodes. The size-weighted variant is dominated (14/15 at 600 s, no false-alert margin gained). Two facts that bound the choice: the spoof-family detectors require an opposite-side own execution, so directional executors (VWAP, iceberg) cannot be flagged at any window, and the false-alert cliff sits at the slowest legitimate re-quote cadence in the control set. The frozen value is recorded with the evasion parameter space (longest cancel age about 300 s) and the control set it was chosen against; both are re-run at the two-hour episode with a 180 s-cadence quoter added before the registered protocol is frozen. `config.json` sets `spoof_window_seconds` = 180; the layer window is unchanged; evidence under the frozen configuration is `results/evasion-family-v0.5-window180`, and the sweep is `results/window-sweep-v0.4` (note 05).

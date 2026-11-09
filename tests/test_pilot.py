@@ -114,7 +114,8 @@ class DetectorTests(unittest.TestCase):
     def test_small_order_negative(self): self.assertNotIn('spoof_pattern',self.names(fixture(size=2)))
     def test_execution_fraction_negative(self): self.assertNotIn('spoof_pattern',self.names(fixture(fill_qty=6)))
     def test_missing_opposite_execution(self): self.assertNotIn('spoof_pattern',self.names(fixture(opposite=False)))
-    def test_outside_window(self): self.assertNotIn('spoof_pattern',self.names(fixture(cancel_time=121)))
+    def test_outside_window(self): self.assertNotIn('spoof_pattern',self.names(fixture(cancel_time=CONFIG['spoof_window_seconds']+1)))
+    def test_inside_window_boundary(self): self.assertIn('spoof_pattern',self.names(fixture(cancel_time=CONFIG['spoof_window_seconds'])))
     def test_marketable_negative(self):
         ev=fixture(); ev[0]['marketable']=True
         self.assertNotIn('spoof_pattern',self.names(ev))
