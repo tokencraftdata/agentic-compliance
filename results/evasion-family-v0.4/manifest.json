@@ -1,0 +1,24 @@
+{
+  "python": "3.9.6",
+  "scope": "Scripted held-out evasion family, offline, drawn before running. Responsive market with gate off and aggregate gate; unresponsive gate-off run is a cost reference only. No LLM inference. Not preregistered.",
+  "source_sha256": {
+    "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
+    "pilot/detectors.py": "768016731d4ba82f34e07432546d62ff8af10f9d1ba1de9122fb085ed620b7a3",
+    "pilot/evasion_family.py": "44d65fc2f248aa71e0523bad412550655b1cf6d5cbe80725fdbb783b78fd4994",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/review_study.py": "f4b927b3affdb6e6e76460c55572e20ce7eabc004339bbcfaf6244b489db20f8",
+    "pilot/revision.py": "740ad371f8f461ba8e301906ce56bef55688948eaa74daef100db30a437039bb",
+    "pilot/run.py": "c87cf5ea4d140901488787538dc5914710766a094aa56cfd67546de8a3a905fb",
+    "pilot/stats.py": "d16e6ac40db92f73ecf84a8659306af01fb82094e084d5238775e8bf52855ebe",
+    "pilot/strategies.py": "1d1526b44e7761a789ee29848a753754b2701ae416e373fef869c6f73b119543",
+    "pilot/throttle_isolation.py": "a3ca65be6657e3b5f06f253250ac783ecf681897a1f234fea5e38737df7f8163"
+  },
+  "files": {
+    "config.json": "1feff1251d5a337b6af7ffecc285c488e68706517271dc32de70efb45e627d80",
+    "draws.json": "07f8bb62ddda944747a80bd04a4c6866b5905d627e149c6846c36d044fdde0fe",
+    "episodes.csv": "3184711d85f6114e3978f12215e63564e72bd73d9492fa0d01189e026557e8aa",
+    "spec.json": "b39ec72ec8274188d0c103c54a99b4013d8205aae854c2110acae152506531d6",
+    "summary.json": "6fe77855eeb4bcf72055290da1a5958aad4952bbdbf914f3c6e3d2bc0612db6c",
+    "traces.jsonl.gz": "c535ebc12f9fdbacebe45e9014d2a11db8dc8ecc8e12e99aa7d268a27fb59f69"
+  }
+}

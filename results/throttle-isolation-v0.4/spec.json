@@ -1,0 +1,24 @@
+{
+  "protocol": "0.4-throttle-isolation",
+  "book_aware": true,
+  "cancel_threshold": 1.0,
+  "strategies": [
+    "large_market_maker",
+    "split_3x20",
+    "split_6x10"
+  ],
+  "gates": [
+    "off",
+    "legacy",
+    "aggregate",
+    "aggregate_throttle_off"
+  ],
+  "evaluation_seeds": [
+    4000,
+    4039
+  ],
+  "throttle_off_override": {
+    "cancel_min_submissions": 1000000000
+  },
+  "scope": "Scripted, offline, post-hoc mechanism check. Fresh market seeds for these strategies; seeds 4000-4001 were previously used only by the mock LLM plumbing smoke test. Not preregistered. No LLM inference."
+}
