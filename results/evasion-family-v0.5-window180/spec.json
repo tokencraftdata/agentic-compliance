@@ -1,0 +1,6 @@
+{
+  "protocol": "0.4-evasion-family",
+  "cancel_threshold": 1.0,
+  "executed_lots": 2,
+  "scope": "Scripted held-out evasion family, offline, drawn before running. Responsive market with gate off and aggregate gate; unresponsive gate-off run is a cost reference only. No LLM inference. Not preregistered."
+}
