@@ -10,7 +10,17 @@ evaluation. It changes the title and framing, with no new experiments or results
 The paper separates the tested engineering controls from legal compliance,
 human review workflows, and oversight of LLM trading agents.
 
+Version 1.5 addresses the subsequent literature and regulatory-positioning review.
+It adds ten references, compares the nearest agent-compliance and constrained
+execution work, and distinguishes FINRA context from the tested engineering
+policies. No new experiment or legal-compliance finding is reported.
+
 ## Verdict
+
+With the focused related-work and FINRA revision completed, the manuscript is
+prepared for an arXiv submission within its stated exploratory scope, subject to
+the author and account steps below. This assessment does not predict moderation
+or substitute for external scientific review.
 
 The scientific claims are adequately supported for the paper's stated offline,
 scripted scope. The manuscript is ready to circulate as a technical report and is
@@ -24,6 +34,11 @@ market, and an independent detector or expert-adjudicated comparison. The curren
 window study is post-hoc and its 15-case recall result is tuning performance.
 
 ## Checks completed
+
+Version 1.5 checks include source verification, comparison of unchanged experimental
+sections and measurements against version 1.4, numeric replay, and inspection of
+every page of the rebuilt PDF. Current machine-readable records accompany the PDF.
+
 
 - Re-ran all 80 tests successfully.
 - Replayed all 360 new episodes with no mismatches; recomputed CSV rows and summary.

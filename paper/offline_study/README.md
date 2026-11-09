@@ -3,7 +3,7 @@
 **Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
 
 This manuscript reports completed scripted experiments only. It replaces the
-completed-LLM-study framing of the earlier full-paper draft. Version 1.4 is a
+completed-LLM-study framing of the earlier full-paper draft. Version 1.5 is a
 preprint prepared for arXiv with the confirmed author, Sandip Nandi (Independent
 Researcher). Preparation is not a claim of submission, public release,
 preregistration, or peer review.
@@ -11,9 +11,15 @@ preregistration, or peer review.
 The compliance focus is evaluation of candidate technical controls: which
 scripted sequences are flagged, whether a gate removes their response-dependent
 payoff, and what legitimate execution it obstructs. Version 1.4 makes this purpose
-explicit in the title, abstract, introduction, discussion, and conclusion. The
-measurements and experiment code are unchanged. Legal compliance, human review
+explicit in the title, abstract, introduction, discussion, and conclusion. Version 1.5 adds the closest agent-compliance,
+execution-control, and empirical spoofing literature, and a specific FINRA
+discussion. The measurements and experiment code are unchanged. Legal compliance, human review
 workflows, and LLM trading behaviour have not been evaluated.
+
+The FINRA discussion distinguishes regulatory context from experimental policy
+choices and identifies coverage missing from the simulator. Source-check scope
+and URLs are in `literature_review.json`; `compliance_revision_check.json` records
+the comparison with the previous release.
 
 The rendered paper is `output/pdf/order_splitting_and_timing.pdf` at the repository
 root. `build.py` is the authoring source; it generates tables and figures from

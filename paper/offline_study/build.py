@@ -34,7 +34,17 @@ REFS = [
     ('Xintong Wang and Michael P. Wellman. Market Manipulation: An Adversarial Learning Framework for Detection and Evasion. IJCAI, 2020, pp. 4626-4632.', 'https://doi.org/10.24963/ijcai.2020/638'),
     ('David Byrd, Maria Hybinette, and Tucker Hybinette Balch. ABIDES: Towards High-Fidelity Market Simulation for AI Research. arXiv:1904.12066, 2019.', 'https://arxiv.org/abs/1904.12066'),
     ('Eren Kurshan, Tucker Balch, and David Byrd. The Agentic Regulator: Risks for AI in Finance and a Proposed Agent-based Framework for Governance. arXiv:2512.11933, 2025.', 'https://arxiv.org/abs/2512.11933'),
-    ('FINRA. Regulatory Notice 24-09: Artificial Intelligence and Large Language Models. June 27, 2024.', 'https://www.finra.org/rules-guidance/notices/24-09')
+    ('FINRA. Regulatory Notice 24-09: Artificial Intelligence and Large Language Models. June 27, 2024.', 'https://www.finra.org/rules-guidance/notices/24-09'),
+    ('Xintong Wang, Christopher Hoang, Yevgeniy Vorobeychik, and Michael P. Wellman. Spoofing the Limit Order Book: A Strategic Agent-Based Analysis. Games 12(2), 46, 2021.', 'https://doi.org/10.3390/g12020046'),
+    ('Yiyang Luo et al. ReguSim: Evaluating LLM Agent Rule Grounding in Financial Compliance. arXiv:2608.19974, version 2, 2026.', 'https://arxiv.org/abs/2608.19974v2'),
+    ('Ailiya Borjigin and Cong He. Safe and Compliant Cross-Market Trade Execution via Constrained RL and Zero-Knowledge Audits. arXiv:2510.04952, version 2, 2025.', 'https://arxiv.org/abs/2510.04952v2'),
+    ('Timothée Fabre and Damien Challet. Learning the Spoofability of Limit Order Books With Interpretable Probabilistic Neural Networks. arXiv:2504.15908, 2025.', 'https://arxiv.org/abs/2504.15908'),
+    ('David Byrd. The Accidental Pump and Dump: When Agentic AI Meets Autonomous Trading. ICAIF, 2025, pp. 88-95.', 'https://doi.org/10.1145/3768292.3770424'),
+    ('Álvaro Cartea, Patrick Chang, and Gabriel García-Arenas. Spoofing and Manipulating Order Books with Learning Algorithms. SSRN 4639959, 2023; revised February 17, 2025.', 'https://doi.org/10.2139/ssrn.4639959'),
+    ('Bao Linh Do and Tālis J. Putniņš. Detecting Layering and Spoofing in Markets. SSRN 4525036, 2023.', 'https://doi.org/10.2139/ssrn.4525036'),
+    ('FINRA. Regulatory Notice 15-09: Guidance on Effective Supervision and Control Practices for Firms Engaging in Algorithmic Trading Strategies. March 26, 2015.', 'https://www.finra.org/rules-guidance/notices/15-09'),
+    ('FINRA. Rule 3110: Supervision. Rulebook, accessed November 9, 2026.', 'https://www.finra.org/rules-guidance/rulebooks/finra-rules/3110'),
+    ('FINRA. Rule 5210: Publication of Transactions and Quotations, including Supplementary Material .02 and .03. Rulebook, accessed November 9, 2026.', 'https://www.finra.org/rules-guidance/rulebooks/finra-rules/5210')
 ]
 
 
@@ -122,19 +132,24 @@ def build(commit):
     def n(x):return f'{x:.2f}'
     p(TITLE.replace(': ', ':<br/>', 1),'title');p(SUBTITLE,'subtitle')
     p('Sandip Nandi<br/>Independent Researcher','subtitle')
-    p('9 November 2026 | Preprint version 1.4','subtitle')
+    p('9 November 2026 | Preprint version 1.5','subtitle')
     p('Abstract','h1')
     p('We evaluate technical controls for trading compliance in a deterministic, replayable limit-order-book simulator, measuring detection, economic effects, and legitimate execution. An initial 960-episode scripted evaluation is followed by 2,160 repair episodes, throttle-isolation and randomized-parameter probes, and a new 360-episode measurement study. Six 10-lot orders bypass both a legacy per-order gate and its original detectors in all 40 tested seeds. An aggregate gate removes the engineered response benefit for this probe, but its apparent advantage over the legacy gate on legitimate trading is largely a cancellation-throttle interaction. Matching responsive and unresponsive markets at the same gate finds no response-dependent wealth advantage in 40 randomized draws. Detection remains sensitive to legitimate quoting cadence: a 180-second window flags a patient market maker in 34 of 40 episodes when it re-quotes every 180 seconds, despite zero alerts at a 300-second cadence. These exploratory results concern candidate controls in a stipulated market mechanism. They do not establish legal compliance. No LLM policy, live market, or human intent annotation is evaluated.')
     p('1. Introduction','h1')
     p('This study asks whether candidate controls for trading compliance can flag or constrain scripted spoofing-like sequences while preserving legitimate trading. Surveillance identifies sequences for review; pre-trade gates decide whether proposed actions may enter the market. Their evaluation must separate alerts, rejected actions, economic effects, and execution cost. An absence of alerts or a high rejection count alone cannot establish that a control removed the tested harmful payoff.')
     p('Order splitting means dividing a larger order into smaller submissions. It is not, by itself, evidence of deceptive conduct. The counterexample studied here displays the split quantity, executes a small trade on the opposite side, and cancels the remaining display. The scheduled execution controls instead use smaller orders to acquire an 80-lot position.')
     p('The experiments began as infrastructure for the Agentic Compliance project\'s planned study of LLM trading agents. Scripted tests exposed weaknesses before any model was run: split orders bypassed per-order checks, an aggregate cap interacted with a submission throttle, and a selected detection window flagged legitimate market making at a different quoting cadence. These findings motivate evaluating the control system before interpreting an agent\'s behaviour.')
-    p('Our contribution is a reproducible evaluation of these candidate controls, with matched economic comparisons and legitimate trading tasks. Recorded actions, rejection reasons, fills, alerts, and replay checks make the tested decisions inspectable. Here compliance is the intended use of the controls; the experiments do not map legal obligations into executable rules, infer legal intent, or establish production readiness. LLM behaviour and human compliance-review workflows remain unevaluated.')
+    p("Our contribution is a reproducible evaluation of these candidate controls, with matched economic comparisons and legitimate trading tasks. FINRA guidance on algorithm testing and supervision [14,15] motivates this use, while Rule 5210 [16] provides market-conduct context. The experiments test neither those requirements as a whole nor a firm's compliance with them. Recorded actions, rejection reasons, fills, and alerts make the simulated decisions inspectable. LLM behaviour and human compliance-review workflows remain unevaluated.")
 
     page();p('2. Setting and scope','h1')
     p('2.1. Relation to previous work','h2')
-    p('Wang and Wellman [1] model spoofing against traders that use order-book information. Byrd [2] shows that a profit-seeking reinforcement-learning trader can discover spoofing and studies a learned recognizer used to discourage it. Wang and Wellman [3] explicitly study adversarial adaptation between manipulation and detection. Our parameterized scripts neither learn nor optimize against the detector. Their role is to expose implementation and evaluation weaknesses in a controlled setting.')
-    p('ABIDES [4] offers a richer simulation architecture with agents and communication latencies. The engine used here is a much smaller, purpose-built model; it is not an ABIDES calibration. Kurshan, Balch, and Byrd [5] discuss agent-based governance and a spoofing case study. We therefore make no claim to introduce agent-aware financial controls. The contribution lies in the measured counterexamples, matched comparisons, and replayable evidence.')
+    p('Wang and Wellman [1] model spoofing against traders that use order-book information. Wang, Hoang, Vorobeychik, and Wellman [7] extend and supersede that study, examining strategic responses and mitigation through order-book cloaking and modified learning strategies. Byrd [2] studies a reinforcement-learning trader that discovers spoofing and a learned recognizer used to discourage it. Cartea, Chang, and García-Arenas [12] derive conditions under which learning algorithms manipulate an order book. Our scripts neither learn nor optimize against a detector; the experiment therefore cannot establish emergent manipulation by an agent.')
+    p('Detection and adaptation are also established research topics. Wang and Wellman [3] study adversarial learning between manipulation and detection. Do and Putniņš [13] develop empirical detectors using prosecuted cases and out-of-sample evaluation. Fabre and Challet [10] use Level-3 market data to model price responses and assess potential spoofing gains. Our labels instead come from authored scripts, and the price response is stipulated. The reported alert counts and matched wealth differences are not estimates of detection accuracy or manipulation profitability in those empirical settings.')
+    p("For agent compliance, ReguSim [8] separates an LLM trader's stated reasoning, attempted orders, execution enforcement, and monitor evidence. Its trader experiment uses exogenous prices and full execution of accepted orders, without order-book interaction or market impact. This study examines split display, partial fills, cancellation timing, and response-dependent wealth in a small order book. It contributes no comparative model-performance result and does not introduce the separation of action, enforcement, and surveillance.")
+    p("Borjigin and He [9] propose constrained reinforcement-learning execution with a runtime action shield and a cryptographic audit layer. We do not implement their method or compare performance against it. A pre-trade gate or an audit trail alone is therefore not our novelty claim. Byrd's agentic pump-and-dump study [11] combines an RL trader with LLM-generated social posts; that information channel and autonomous learning are absent here.")
+    p('ABIDES [4] offers a richer architecture with interacting agents and communication latencies. Our engine is a smaller purpose-built model, not an ABIDES calibration. Kurshan, Balch, and Byrd [5] discuss agent-based governance and a spoofing case study. Against this background, the contribution is the set of measured control failures: splitting defeats per-order checks, throttle timing confounds a gate comparison, and a legitimate quoting cadence defeats a selected detection window. Matched economic comparisons and replay make these particular findings inspectable; broader control effectiveness remains untested.')
+
+    page()
     p('2.2. Market mechanics','h2')
     table(['Quantity','Implemented value'],[
         ['Session / decision spacing','720 seconds / 60 seconds; no warm-up'],
@@ -234,10 +249,17 @@ def build(commit):
     p('Execution cost must be measured separately from alert reduction. A size cap changes how quickly accepted submissions accumulate and when the cancellation-ratio throttle activates, reversing the apparent ranking of complete policies. The 12-minute horizon magnifies this interaction because the throttle window never expires. Longer sessions could produce repeated lockout and recovery; those dynamics remain unmeasured.')
     p('Surveillance evaluation also needs legitimate strategies capable of triggering the pattern being tested. One-sided executors cannot challenge a rule requiring opposite-side fills. At the selected 180-second window, changing the legitimate maker\'s re-quote cadence from 300 to 180 seconds changes the alert count from zero to 34/40. This is a false-alert result relative to the declared control, not a legal classification of its orders. Analyst workload and investigation quality were not measured.')
     p('The replay artifact could support review of a control change by showing attempted actions, gate decisions, fills, and subsequent alerts. Its demonstrated property is reproducibility of these simulated records. We did not evaluate a human review process, regulatory reporting, record-retention requirements, or tamper resistance; replayability alone does not establish those capabilities.')
+    p('9.1. Connection to FINRA supervision and market conduct','h2')
+    p("The regulatory connection is to market-conduct supervision of algorithmic trading by FINRA member firms. Rule 3110 [15] requires a supervisory system and written procedures appropriate to the firm's activities; it also leaves supervisory responsibility with the member. This simulator tests candidate technical controls within that wider process. It does not assess staffing, supervisory procedures, or a firm's overall compliance.")
+    p("Notice 15-09 [14] is directly relevant to the evaluation method. Its suggested practices address development and change management, testing before deployment, ongoing monitoring, and records of tests and defect remediation. It also recommends testing independently of code development. Our replay records permit inspection of a control change, but this study is developer-authored and supplies no independent validation or assessment of a firm's governance. The notice expressly cautions that applying its suggested practices alone need not satisfy all applicable obligations.")
+    p("Rule 5210.03 [16] addresses frequent patterns of disruptive quoting and trading. Its Type 1 pattern includes display at multiple price levels, a change in supply and demand, opposite-side execution, and cancellation of the display. Our layering script resembles parts of that sequence; the same-price split probe does not reproduce its multiple-price-level condition. The detectors do not implement the rule's complete pattern requirements or cross-venue coverage. Nor does the same-account self-match check establish the beneficial-ownership and related-algorithm review contemplated by Rule 5210.02.")
+    p('Our size caps, cancellation ratio, and 120- or 180-second windows are experimental choices, not FINRA-prescribed thresholds. An alert is evidence for investigation, not a legal finding, and a rejected action is not proof of overall compliance. Notice 24-09 [6] confirms that existing obligations continue to apply when member firms use generative AI; it creates no new requirements. It motivates the planned agent study without turning these scripted results into evidence about LLM oversight.')
+
+    page();p('9.2. Limitations and the next agent study','h1')
     p('The engine has one evaluated account, a small replenishing book, fixed spread around a synthetic fundamental, and a stipulated two-tick response. It has no exchange latency, queue calibration, inventory-managed background population, closing auction, beneficial-owner graph, or endogenous strategic learning. The fundamental is a discrete random walk rather than the mean-reverting process described in the earlier LLM proposal. These choices permit controlled replay but sharply limit external validity.')
     p('The experiments are sequentially developed. The split probe motivated aggregation; the slow draws motivated a longer window; the cadence counterexample motivated the new grid. No study in this paper is externally preregistered. The parameter sample is not a held-out strategy family, and its reuse in detector selection precludes an independent estimate of selected-window recall. Reported intervals do not account for that selection. Additional unseen strategy families and independently reviewed labels are needed.')
     p('No LLM inference was used to choose trading actions in these experiments. The repository includes a provider interface and mock tests, but these supply no evidence about model behaviour, instruction following, collusion, or internal intent. A future model study must choose and freeze its environment, model versions, prompts, call budget, failure handling, endpoints, and analysis before collecting headline results. Missing explanations must remain distinct from explicit benign explanations. The present paper makes no annotation-agreement or power claim.')
-    p('FINRA\'s notice states that existing obligations continue to apply when member firms use generative AI [6]. That context motivates the compliance purpose of this work; it does not validate our quantity caps or detector windows. Those are experimental design choices, not a translation of specific legal duties. No orders were sent to a live market, no customers were studied, and no finding about commercial demand is drawn from these experiments.')
+    p('A follow-up study should test whether controls remain effective as an agent varies order representation and timing, while measuring legitimate task completion. It needs separate development and test strategy families, fixed policy thresholds, and evidence-matched comparisons of instructions, external enforcement, and any review agent. Those comparisons are proposed work. No orders were sent to a live market, no customers were studied, and no finding about commercial demand is drawn from these experiments.')
 
     page();p('10. Reproducibility and conclusion','h1')
     p('10.1. Artifact and verification','h2')
@@ -259,23 +281,14 @@ def build(commit):
 
     page();p('References','h1')
     for i,(text,url) in enumerate(REFS,1):
-        p(f'[{i}] {escape(text)}<br/><link href="{url}" color="#254f70">{escape(url)}</link>','small')
-    p('References checked against primary sources on 9 November 2026. Bibliographic scope is limited to the implemented offline study.','small')
-    p('Artifact map','h1')
-    table(['Path','Contents'],[
-        ['paper_study/evaluate.py','Corrected endpoints, new grid, action replay, CSV consistency checks'],
-        ['results/paper-review-v1/','360 new episodes, plan, configuration, summary, and hash manifest'],
-        ['paper/offline_study/build.py','Paper and figure builder'],
-        ['paper/offline_study/manuscript.json','Editable structured manuscript exported by the builder'],
-        ['paper/offline_study/figures/','Standalone PNG and SVG figures'],
-        ['paper/offline_study/REVIEW_RESPONSE.md','Disposition of the manuscript and code review findings']
-    ],[.50,.50])
-    p('Version note','h1')
-    p('Version 1.4 makes the trading-compliance purpose explicit in the title, abstract, introduction, discussion, and conclusion. It preserves version 1.3\'s disclosure naming both coding assistants. The experiments, measurements, and numerical results are unchanged; the revision distinguishes evaluation of candidate technical controls from evidence of legal compliance. Historical reports remain in the artifact. The experiments are exploratory and were not externally preregistered.')
+        reference = f'[{i}] {escape(text)}<br/><link href="{url}" color="#254f70">{escape(url)}</link>'
+        story.append(KeepTogether([Paragraph(reference, styles['small'])]))
+        source.append({'type':'small', 'text':reference})
+    p('References checked against primary sources on 9 November 2026. Preprints and working papers are identified as such. Source-check coverage is recorded in the repository; this is a focused comparison, not a systematic literature review.','small')
 
     def footer(canvas, doc):
         canvas.saveState();canvas.setFont('StudySerif',8);canvas.setFillColor(colors.HexColor('#555555'))
-        canvas.drawString(.875*inch,.45*inch,'Controls for Trading Compliance | Offline study v1.4')
+        canvas.drawString(.875*inch,.45*inch,'Controls for Trading Compliance | Offline study v1.5')
         canvas.drawRightString(7.625*inch,.45*inch,str(doc.page));canvas.restoreState()
     doc=SimpleDocTemplate(str(out),pagesize=(8.5*inch,11*inch),rightMargin=.875*inch,leftMargin=.875*inch,
                           topMargin=.65*inch,bottomMargin=.7*inch,title=TITLE,author='Sandip Nandi',
@@ -285,7 +298,7 @@ def build(commit):
         'authors':[{'name':'Sandip Nandi','affiliation':'Independent Researcher'}],
         'blocks':source},indent=2)+'\n')
     (HERE/'references.json').write_text(json.dumps([{'number':i,'text':t,'url':u} for i,(t,u) in enumerate(REFS,1)],indent=2)+'\n')
-    manifest={'document_version':'1.4','date':'2026-11-09','code_commit':commit,'python':platform.python_version(),
+    manifest={'document_version':'1.5','date':'2026-11-09','code_commit':commit,'python':platform.python_version(),
               'reportlab':reportlab.Version,'matplotlib':matplotlib.__version__,
               'source_sha256':digest(Path(__file__)),'evidence_manifest_sha256':digest(DATA/'manifest.json'),
               'summary_sha256':digest(DATA/'summary.json'),'pdf_sha256':digest(out),

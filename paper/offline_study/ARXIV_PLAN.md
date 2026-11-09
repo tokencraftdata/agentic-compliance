@@ -6,12 +6,14 @@ review, completed customer study, or promise of arXiv acceptance.
 ## Recommendation
 
 Current title: **Evaluating Controls for Trading Compliance: An Offline Study of
-Order Splitting and Cancellation Timing** (version 1.4). The compliance framing
+Order Splitting and Cancellation Timing** (version 1.5). The compliance framing
 concerns evaluation of candidate technical controls, with the existing scripted
 measurements and limitations preserved.
 
 Submit this work as an exploratory computational market-microstructure study
-after the author and submission details are finalized. Its contribution is a
+after the author and submission details are finalized. Version 1.5 completes the
+focused related-work and FINRA-positioning revision identified in the latest
+review; it does not add experiments. Its contribution is a
 replayable set of control failures and measurement corrections: split display,
 cancellation-throttle interaction, matched economic comparisons, and a legitimate
 quoting-cadence counterexample. It does not establish emergent LLM manipulation,
@@ -58,13 +60,23 @@ See the [official category taxonomy](https://arxiv.org/category_taxonomy).
    outline fonts, and no JavaScript. If converted to TeX, submit TeX source rather
    than only its output PDF. See [PDF guidance](https://info.arxiv.org/help/submit_pdf.html).
 8. Match title, abstract, and author metadata to the final PDF. Suggested
-   comments: "11 pages, 2 figures; exploratory scripted simulation
+   comments: "13 pages, 2 figures; exploratory scripted simulation
    study." Verify the page count again after adding authors. Leave journal
    reference and publication DOI empty unless they actually exist.
 9. The author completes submission and checks the confirmation/status. arXiv
    moderates submissions and may reclassify or decline them; posting is not
    peer review. After announcement, record the identifier and version in the
    repository. See the [submission overview](https://info.arxiv.org/help/submit/index.html).
+
+## Research direction after the literature review
+
+Keep the project focused on market-conduct control evaluation for autonomous
+trading agents. ReguSim already separates agent actions from enforcement and
+monitoring; constrained execution with runtime shields also exists. The next
+study should test control effectiveness under changes in order representation,
+timing, and market conditions, jointly with legitimate execution cost. The
+current offline findings supply a baseline, not evidence about LLM behaviour.
+See the manuscript references and `literature_review.json` for the primary sources.
 
 ## Next research decisions
 

@@ -16,6 +16,9 @@
 | Missing manuscript source | Include the paper builder, complete structured text, bibliography, figures, and hash manifest. |
 | Compliance purpose obscured by a mechanics-only title and framing | Version 1.4 names trading compliance in the title and links surveillance, gates, economic outcomes, execution cost, and replay evidence to control evaluation. The abstract, introduction, discussion, and conclusion distinguish this intended use from legal compliance or validated LLM oversight. Experimental methods and results are unchanged. |
 
+| Missing close prior work | Version 1.5 adds the 2021 study superseding the cited 2017 spoofing paper, ReguSim, constrained execution with a runtime shield, empirical detection and gain modelling, learning-based manipulation, and the agentic pump-and-dump study. The comparison narrows the contribution to the measured control counterexamples and replayable evaluation. |
+| FINRA connection too general | Version 1.5 connects the purpose to Notices 15-09 and 24-09 and Rules 3110 and 5210; it identifies unimplemented pattern, cross-venue, ownership, and governance requirements. Experimental thresholds are explicitly not FINRA-prescribed. |
+
 The new cadence grid follows the review diagnostic and reuses the negative-control
 seeds. Neither it nor the corrected endpoint is described as confirmatory or
 independent external validation. Zero observed response advantage remains limited
