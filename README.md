@@ -1,4 +1,27 @@
-# Current review revision (0.4)
+# Agentic Compliance
+
+Standalone research repository for the *Accidental Spoofers* offline pilot,
+trading-agent experiment infrastructure, and commercial-validation research.
+
+This project is independent of [TrustBound](https://github.com/tokencraftdata/trustbound)
+and [Agent Wallet Policy Privacy](https://github.com/tokencraftdata/agent-wallet-policy-privacy),
+which are separate research projects with separate repositories.
+
+- [Corrected pilot PDF](output/pdf/agentic_compliance_corrected.pdf)
+- [Review findings and reproducibility commands](REVIEW_REVISION.md)
+- [Experiment framework and remaining live-study work](experiments/README.md)
+- [Market assessment and customer-validation plan](COMMERCIAL_VALIDATION.md)
+
+All commands below run from this repository's root. Saved experiments are offline;
+no live LLM results or validated customer demand are claimed.
+
+The project was separated on 8 November 2026. Existing manuscripts and manifests
+retain their historical source references. See [migration provenance](REPOSITORY_MIGRATION.json)
+and the [pre-separation README](provenance/README.pre-separation.md). The old
+TrustBound paths in the PDF refer to the archived source snapshot; this repository
+is the home for further Compliance work.
+
+## Current review revision (0.4)
 
 The corrected pilot is in `output/pdf/agentic_compliance_corrected.pdf`. See
 [review changes and reproduction](REVIEW_REVISION.md),
@@ -10,7 +33,7 @@ uses mock responses only. No LLM inference or customer validation is claimed.
 
 ---
 
-# Agentic compliance order book pilot
+## Agentic compliance order book pilot
 
 A reproducible **offline, scripted simulation pilot** for the research question in
 *Accidental Spoofers*. It validates experiment infrastructure and exposes control
@@ -18,8 +41,8 @@ tradeoffs. It does **not** measure emergent behavior by an LLM, establish legal
 market abuse, or validate a production surveillance system.
 
 The revised manuscript is in `paper/`. The original supplied PDF is preserved
-outside this repository. This research folder is independent of the repository's
-payment-completeness work; neither project's findings validate the other.
+outside this repository. This repository contains only the Compliance project;
+its findings do not validate TrustBound or the Wallet project.
 
 ## Reproduce without network access
 
