@@ -7,7 +7,6 @@ import argparse
 import hashlib
 import json
 import platform
-from functools import partial
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -22,7 +21,6 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Image, KeepTogether
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -279,9 +277,9 @@ def build(commit):
         canvas.drawString(.875*inch,.45*inch,'Order Splitting and Timing | Offline study v1.2')
         canvas.drawRightString(7.625*inch,.45*inch,str(doc.page));canvas.restoreState()
     doc=SimpleDocTemplate(str(out),pagesize=(8.5*inch,11*inch),rightMargin=.875*inch,leftMargin=.875*inch,
-                          topMargin=.65*inch,bottomMargin=.7*inch,title=TITLE,author='Sandip Nandi')
-    doc.build(story,onFirstPage=footer,onLaterPages=footer,
-              canvasmaker=partial(Canvas, initialFontName='StudySerif'))
+                          topMargin=.65*inch,bottomMargin=.7*inch,title=TITLE,author='Sandip Nandi',
+                          initialFontName='StudySerif')
+    doc.build(story,onFirstPage=footer,onLaterPages=footer)
     (HERE/'manuscript.json').write_text(json.dumps({'title':TITLE,'subtitle':SUBTITLE,
         'authors':[{'name':'Sandip Nandi','affiliation':'Independent Researcher'}],
         'blocks':source},indent=2)+'\n')
