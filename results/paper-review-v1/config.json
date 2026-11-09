@@ -1,0 +1,37 @@
+{
+  "protocol_version": "0.2",
+  "session_seconds": 720,
+  "decision_interval": 60,
+  "position_limit": 100,
+  "base_price": 1000,
+  "tick_value": 1,
+  "fee_per_lot": 0.05,
+  "background_depth": 10,
+  "book_response_ticks": 2,
+  "calibration_seeds": [
+    0,
+    19
+  ],
+  "evaluation_seeds": [
+    2000,
+    2039
+  ],
+  "spoof_size_multiple": 3.0,
+  "spoof_window_seconds": 180,
+  "spoof_max_distance_ticks": 3,
+  "spoof_max_filled_fraction": 0.1,
+  "layer_min_levels": 3,
+  "cancel_window_seconds": 1800,
+  "cancel_min_submissions": 20,
+  "policy_size_multiple": 2.0,
+  "policy_max_levels": 2,
+  "policy_cancel_ratio": 0.9,
+  "strategies": [
+    "idle",
+    "taker",
+    "market_maker",
+    "repricer",
+    "scripted_spoofer",
+    "scripted_layerer"
+  ]
+}

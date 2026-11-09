@@ -1,0 +1,59 @@
+# Standalone offline research paper
+
+**Order Splitting, Cancellation Timing, and the Limits of Trading Controls**
+
+This manuscript reports completed scripted experiments only. It replaces the
+completed-LLM-study framing of the earlier full-paper draft. It is an anonymous
+review draft, not a claim of public release, preregistration, or peer review.
+
+The rendered paper is `output/pdf/order_splitting_and_timing.pdf` at the repository
+root. `build.py` is the authoring source; it generates tables and figures from
+`results/paper-review-v1/summary.json`. `manuscript.json` is a readable structured
+export of the complete paper. Change prose in `build.py` and rebuild, rather than
+editing only the generated export. References and PNG/SVG figures are included.
+
+## Reproduce the new evidence
+
+Run from the repository root with **CPython 3.9.6**, the interpreter used for the
+historical and new numeric evidence. The simulator uses the standard library.
+
+```sh
+python3 -m unittest discover -s tests -v
+python3 -m paper_study.evaluate verify results/paper-review-v1
+python3 -m paper_study.evaluate run results/local-paper-review
+python3 -m paper_study.evaluate verify results/local-paper-review
+```
+
+The new study contains 40 gated unresponsive counterfactuals and 320 legitimate
+maker episodes: four re-quote cadences x two gates x 40 reused seeds. It is
+explicitly post-hoc. It checks historical hashes, uses frozen configurations,
+and never overwrites evidence. Verification replays recorded actions, checks
+full-event hashes, and recomputes CSV rows and summaries. The two endpoints are
+separate: any gate rejection and response-dependent wealth advantage at the same
+gate. A partially rejected but still profitable sequence is not excluded.
+
+Historical `pilot/*.py` modules and results remain byte-identical. The new metric
+`max_displayed_per_side` fixes the historical helper's combination of bid and ask
+quantity without rewriting old evidence. All three pattern detectors share the
+window parameter; the paper documents that behavior rather than inventing an
+unchanged independent layering window.
+
+## Build the paper
+
+The rendering environment is separate from the numeric interpreter. Use the
+pinned rendering dependencies in `requirements.txt` (and the full environment
+snapshot in `requirements-render.lock`). The checked artifact uses Python 3.12.
+
+```sh
+python3 -m pip install -r paper/offline_study/requirements-render.lock
+python3 paper/offline_study/build.py --code-commit FULL_SOURCE_COMMIT_SHA
+```
+
+Use the full source commit recorded in `document_manifest.json`, not a branch
+name. The manifest links the source, summary, evidence manifest, structured text,
+and PDF by SHA-256. Numeric reproduction is deterministic in the pinned numeric
+environment; office/PDF rendering across operating systems is not assumed to be
+byte-identical. The PDF is checked by rendering and inspecting every page.
+
+The earlier full LLM study remains future work. This paper does not select a model
+panel, claim intent annotations, or report customer-demand validation.

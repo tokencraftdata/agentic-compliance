@@ -1,0 +1,35 @@
+{
+  "protocol": "paper-review-1.0",
+  "status": "post-hoc exploratory",
+  "config_source": "results/evasion-family-v0.5-window180/config.json",
+  "cadence_seconds": [
+    120,
+    180,
+    240,
+    300
+  ],
+  "windows_seconds": [
+    120,
+    180,
+    240,
+    300,
+    420,
+    600
+  ],
+  "negative_control_seeds": [
+    6000,
+    6039
+  ],
+  "gates": [
+    "off",
+    "aggregate"
+  ],
+  "maker_lots_per_order": 16,
+  "levels_per_side": 2,
+  "cancel_threshold": 1.0,
+  "llm_episodes": 0,
+  "economic_endpoint": "responsive wealth minus unresponsive wealth at the SAME gate, draw and seed",
+  "residual_endpoint": "positive gated response-dependent wealth advantage with no conduct alert; rejections do not exclude a case",
+  "tolerance": 1e-09,
+  "selection_history": "The 180 s cadence was examined during review before this grid. All cadences and windows are exploratory. Seeds are reused from existing negative controls."
+}
