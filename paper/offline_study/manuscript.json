@@ -1,5 +1,5 @@
 {
-  "title": "Order Splitting, Cancellation Timing, and the Limits of Trading Controls",
+  "title": "Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing",
   "subtitle": "A replayable offline study of surveillance and pre-trade gates",
   "authors": [
     {
@@ -10,7 +10,7 @@
   "blocks": [
     {
       "type": "title",
-      "text": "Order Splitting, Cancellation Timing, and the Limits of Trading Controls"
+      "text": "Evaluating Controls for Trading Compliance:<br/>An Offline Study of Order Splitting and Cancellation Timing"
     },
     {
       "type": "subtitle",
@@ -22,7 +22,7 @@
     },
     {
       "type": "subtitle",
-      "text": "9 November 2026 | Preprint version 1.3"
+      "text": "9 November 2026 | Preprint version 1.4"
     },
     {
       "type": "h1",
@@ -30,7 +30,7 @@
     },
     {
       "type": "body",
-      "text": "An order-level control can reject a conspicuous spoof while admitting the same displayed quantity split across smaller orders. We study this failure in a deterministic, replayable limit-order-book simulator. An initial 960-episode scripted evaluation is followed by 2,160 repair episodes, throttle-isolation and randomized-parameter probes, and a new 360-episode measurement study. Six 10-lot orders bypass both a legacy per-order gate and its original detectors in all 40 tested seeds. An aggregate gate removes the engineered response benefit for this probe, but its apparent advantage over the legacy gate on legitimate trading is largely a cancellation-throttle interaction. Matching responsive and unresponsive markets at the same gate finds no response-dependent wealth advantage in 40 randomized draws. Detection remains sensitive to legitimate quoting cadence: a 180-second window flags a patient market maker in 34 of 40 episodes when it re-quotes every 180 seconds, despite zero alerts at a 300-second cadence. These are exploratory results in a stipulated market mechanism. No LLM policy, live market, or human intent annotation is evaluated."
+      "text": "We evaluate technical controls for trading compliance in a deterministic, replayable limit-order-book simulator, measuring detection, economic effects, and legitimate execution. An initial 960-episode scripted evaluation is followed by 2,160 repair episodes, throttle-isolation and randomized-parameter probes, and a new 360-episode measurement study. Six 10-lot orders bypass both a legacy per-order gate and its original detectors in all 40 tested seeds. An aggregate gate removes the engineered response benefit for this probe, but its apparent advantage over the legacy gate on legitimate trading is largely a cancellation-throttle interaction. Matching responsive and unresponsive markets at the same gate finds no response-dependent wealth advantage in 40 randomized draws. Detection remains sensitive to legitimate quoting cadence: a 180-second window flags a patient market maker in 34 of 40 episodes when it re-quotes every 180 seconds, despite zero alerts at a 300-second cadence. These exploratory results concern candidate controls in a stipulated market mechanism. They do not establish legal compliance. No LLM policy, live market, or human intent annotation is evaluated."
     },
     {
       "type": "h1",
@@ -38,7 +38,7 @@
     },
     {
       "type": "body",
-      "text": "Surveillance and pre-trade controls answer different questions. Surveillance identifies an order sequence worth reviewing; a pre-trade gate decides whether a proposed action may enter the market. A clean alert count does not establish that a gate prevents profitable manipulation. A high rejection count does not establish that the remaining orders are harmless. Both measurements need an economic comparison and a legitimate trading task."
+      "text": "This study asks whether candidate controls for trading compliance can flag or constrain scripted spoofing-like sequences while preserving legitimate trading. Surveillance identifies sequences for review; pre-trade gates decide whether proposed actions may enter the market. Their evaluation must separate alerts, rejected actions, economic effects, and execution cost. An absence of alerts or a high rejection count alone cannot establish that a control removed the tested harmful payoff."
     },
     {
       "type": "body",
@@ -46,11 +46,11 @@
     },
     {
       "type": "body",
-      "text": "The experiments here began as infrastructure for a study of LLM trading agents. Scripted controls exposed problems before any model was run. Dividing a large order into smaller orders defeated a gate and detector that appeared effective against the original spoofer. Adding an aggregate quantity check repaired that case. Subsequent tests showed that the gate interacted with a submission throttle and that a detection window selected on one set of legitimate strategies failed when a maker changed its quoting cadence."
+      "text": "The experiments began as infrastructure for the Agentic Compliance project's planned study of LLM trading agents. Scripted tests exposed weaknesses before any model was run: split orders bypassed per-order checks, an aggregate cap interacted with a submission throttle, and a selected detection window flagged legitimate market making at a different quoting cadence. These findings motivate evaluating the control system before interpreting an agent's behaviour."
     },
     {
       "type": "body",
-      "text": "Our contribution is a reproducible account of these failures and their measurement. The artifact records attempted actions, accepted orders, rejection reasons, fills, detector outputs, economic outcomes, and replay checks. The study evaluates a particular testbed and several control designs. It does not estimate the prevalence of manipulation by LLMs, infer legal intent, or establish production readiness."
+      "text": "Our contribution is a reproducible evaluation of these candidate controls, with matched economic comparisons and legitimate trading tasks. Recorded actions, rejection reasons, fills, alerts, and replay checks make the tested decisions inspectable. Here compliance is the intended use of the controls; the experiments do not map legal obligations into executable rules, infer legal intent, or establish production readiness. LLM behaviour and human compliance-review workflows remain unevaluated."
     },
     {
       "type": "page_break"
@@ -520,19 +520,23 @@
     },
     {
       "type": "h1",
-      "text": "9. Interpretation and limitations"
+      "text": "9. Implications for compliance control evaluation"
     },
     {
       "type": "body",
-      "text": "The six-by-ten counterexample changes how displayed size is divided among orders while preserving its effect on the response mechanism. Both the per-order gate and individual-order detector miss that representation change. Aggregating outstanding quantity repairs the tested case, but the detector and gate still rely on closely related size rules. Their agreement is therefore limited evidence of broader protection."
+      "text": "The results identify three questions for evaluating technical controls intended to support trading compliance: does surveillance flag the tested sequence, does a gate remove its response-dependent payoff, and how much legitimate trading does the gate obstruct? The six-by-ten probe passes both per-order checks while preserving the engineered response. Aggregating quantity repairs this case, but the gate and detector share related size rules. Their agreement provides limited evidence of broader protection."
     },
     {
       "type": "body",
-      "text": "A size cap also changes how quickly accepted submissions accumulate. That changes when the ratio throttle becomes active and can reverse the apparent ranking of complete policies. The 12-minute horizon magnifies the interaction because the cancellation window never expires. Longer sessions could produce repeated lockout and recovery; those dynamics remain unmeasured."
+      "text": "Execution cost must be measured separately from alert reduction. A size cap changes how quickly accepted submissions accumulate and when the cancellation-ratio throttle activates, reversing the apparent ranking of complete policies. The 12-minute horizon magnifies this interaction because the throttle window never expires. Longer sessions could produce repeated lockout and recovery; those dynamics remain unmeasured."
     },
     {
       "type": "body",
-      "text": "The legitimate controls determine which detector weaknesses an evaluation can reveal. One-sided executors cannot challenge a rule requiring opposite-side fills. A maker that re-quotes after the cancellation window produces no alerts, while the same quoting rule at a shorter cadence is frequently flagged. The 180-second counterexample exposes a gap in the original calibration set."
+      "text": "Surveillance evaluation also needs legitimate strategies capable of triggering the pattern being tested. One-sided executors cannot challenge a rule requiring opposite-side fills. At the selected 180-second window, changing the legitimate maker's re-quote cadence from 300 to 180 seconds changes the alert count from zero to 34/40. This is a false-alert result relative to the declared control, not a legal classification of its orders. Analyst workload and investigation quality were not measured."
+    },
+    {
+      "type": "body",
+      "text": "The replay artifact could support review of a control change by showing attempted actions, gate decisions, fills, and subsequent alerts. Its demonstrated property is reproducibility of these simulated records. We did not evaluate a human review process, regulatory reporting, record-retention requirements, or tamper resistance; replayability alone does not establish those capabilities."
     },
     {
       "type": "body",
@@ -548,7 +552,7 @@
     },
     {
       "type": "body",
-      "text": "Regulatory obligations do not disappear when a trading workflow uses generative AI. FINRA explicitly states that its rules are technologically neutral [6]. Our simulated gates are engineering controls, not an implementation or certification of all applicable obligations. No orders were sent to a live market, no customers were studied, and no finding about commercial demand is drawn from these experiments."
+      "text": "FINRA's notice states that existing obligations continue to apply when member firms use generative AI [6]. That context motivates the compliance purpose of this work; it does not validate our quantity caps or detector windows. Those are experimental design choices, not a translation of specific legal duties. No orders were sent to a live market, no customers were studied, and no finding about commercial demand is drawn from these experiments."
     },
     {
       "type": "page_break"
@@ -599,7 +603,7 @@
     },
     {
       "type": "small",
-      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/2235c2f53c4b6587576780b7f47c08822965643e\">tokencraftdata/agentic-compliance, 2235c2f53c4b6587576780b7f47c08822965643e</link>"
+      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/a1762f0351da6e9df63f29aa27d1ee396d5e1d09\">tokencraftdata/agentic-compliance, a1762f0351da6e9df63f29aa27d1ee396d5e1d09</link>"
     },
     {
       "type": "h2",
@@ -607,7 +611,7 @@
     },
     {
       "type": "body",
-      "text": "Order splitting, cancellation timing, and throttle accounting expose different weaknesses in the same control stack. Aggregation prevents the tested response-dependent payoff, but a detector window selected on a narrow control set produces frequent alerts when a legitimate maker changes cadence. The evidence supports explicit separation of alerts, economic effects, and execution cost. It also supplies a testbed in which a future agent study can fail these checks before its results are interpreted."
+      "text": "Evaluating controls for trading compliance requires examining detection, economic prevention, and legitimate execution separately. In this scripted testbed, order splitting defeats per-order checks; aggregation removes the tested response-dependent payoff; and cancellation timing exposes both throttle costs and false alerts on legitimate market making. These results support a reproducible method for examining candidate controls within the stated simulator. They do not establish legal compliance or effective oversight of LLM trading agents. A future agent study must first test its controls against broader, independently evaluated trading strategies."
     },
     {
       "type": "h2",
@@ -695,7 +699,7 @@
     },
     {
       "type": "body",
-      "text": "Version 1.3 corrects the generative AI disclosure to name both coding assistants used to produce the artifact; version 1.2 named only one. Version 1.2 retained the clarified order-splitting and matched-comparison claims, embedded outline fonts, and added the author details for the planned arXiv submission. The experimental results are unchanged. Historical reports and their original measurements remain in the artifact. The experiments are exploratory and were not externally preregistered."
+      "text": "Version 1.4 makes the trading-compliance purpose explicit in the title, abstract, introduction, discussion, and conclusion. It preserves version 1.3's disclosure naming both coding assistants. The experiments, measurements, and numerical results are unchanged; the revision distinguishes evaluation of candidate technical controls from evidence of legal compliance. Historical reports remain in the artifact. The experiments are exploratory and were not externally preregistered."
     }
   ]
 }

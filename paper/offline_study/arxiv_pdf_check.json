@@ -3,7 +3,8 @@
   "pages": 11,
   "author": "Sandip Nandi",
   "author_confirmed": true,
-  "code_commit": "2235c2f53c4b6587576780b7f47c08822965643e",
+  "title_matches_metadata": true,
+  "code_commit": "a1762f0351da6e9df63f29aa27d1ee396d5e1d09",
   "code_commit_verified_in_pdf": true,
   "ai_disclosure": true,
   "all_fonts_embedded": true,
@@ -24,5 +25,5 @@
       "embedded": true
     }
   },
-  "pdf_sha256": "8198e00347879b06c57440b9137104bcc0bbaf1da1712f0ea9c6859501e4dba5"
+  "pdf_sha256": "0eb4ef4bb7c042e6f7f8961345b76a98b8922a4a4581ca8e8bcfea9c3da8b6a6"
 }
