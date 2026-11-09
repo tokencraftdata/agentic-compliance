@@ -4,12 +4,15 @@
 
 [Read the paper](output/pdf/order_splitting_and_timing.pdf): **Evaluating Controls
 for Trading Compliance: An Offline Study of Order Splitting and Cancellation
-Timing** (version 1.4). The paper evaluates candidate surveillance and pre-trade
+Timing** (version 1.5). The paper evaluates candidate surveillance and pre-trade
 controls through completed scripted experiments, including the legitimate-maker
 cadence failure found during review. It separates detection, response-dependent
 economic effects, and legitimate execution cost; it does not establish legal
 compliance or LLM trading behaviour. See [source and reproduction](paper/offline_study/README.md)
-and [review responses](paper/offline_study/REVIEW_RESPONSE.md).
+and [review responses](paper/offline_study/REVIEW_RESPONSE.md). Version 1.5 adds
+related research and a bounded FINRA connection: Notices 15-09 and 24-09, and
+Rules 3110 and 5210. These are context for control evaluation, not a claim that
+the implemented gates satisfy the rules.
 
 The new measurement package adds 360 episodes, matched economic endpoints, and a
 per-side display metric. The original pilot modules and evidence are preserved.
