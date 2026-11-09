@@ -3,7 +3,7 @@
 **Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
 
 This manuscript reports completed scripted experiments only. It replaces the
-completed-LLM-study framing of the earlier full-paper draft. Version 1.5 is a
+completed-LLM-study framing of the earlier full-paper draft. Version 1.6 is a
 preprint prepared for arXiv with the confirmed author, Sandip Nandi (Independent
 Researcher). Preparation is not a claim of submission, public release,
 preregistration, or peer review.
@@ -20,6 +20,23 @@ The FINRA discussion distinguishes regulatory context from experimental policy
 choices and identifies coverage missing from the simulator. Source-check scope
 and URLs are in `literature_review.json`; `compliance_revision_check.json` records
 the comparison with the previous release.
+
+Offline refers to orders executing only in the simulator, with synthetic market
+paths. Scripted refers to the predefined programs choosing trading actions. An
+LLM could also trade inside an offline simulator, but that experiment has not
+been run here. Version 1.6 makes this distinction explicit in section 2.2 and
+labels the subtitle as scripted experiments. The paper is not an offline-RL
+training study or a historical-market backtest.
+
+For the additional research review, `audit_claims.py` independently aggregates
+saved records for five central claims and writes `research_review.json`. It does
+not rerun strategies or establish external validity. Run it with the numeric
+interpreter: `python3 paper/offline_study/audit_claims.py`. The literature review
+now includes 17 sources, including liquidity-dependent spoofing research.
+
+`arxiv_submission.txt` contains the copyable upload fields and the remaining
+author/account decisions. Upload the single PDF; the text sheet and repository
+files are supporting material for preparation, not extra PDF-upload files.
 
 The rendered paper is `output/pdf/order_splitting_and_timing.pdf` at the repository
 root. `build.py` is the authoring source; it generates tables and figures from

@@ -19,6 +19,12 @@
 | Missing close prior work | Version 1.5 adds the 2021 study superseding the cited 2017 spoofing paper, ReguSim, constrained execution with a runtime shield, empirical detection and gain modelling, learning-based manipulation, and the agentic pump-and-dump study. The comparison narrows the contribution to the measured control counterexamples and replayable evaluation. |
 | FINRA connection too general | Version 1.5 connects the purpose to Notices 15-09 and 24-09 and Rules 3110 and 5210; it identifies unimplemented pattern, cross-venue, ownership, and governance requirements. Experimental thresholds are explicitly not FINRA-prescribed. |
 
+| Offline scope ambiguous | Version 1.6 defines offline as simulated order execution, separately identifies scripted policy selection, and explains that a future LLM study can also be offline. The subtitle now explicitly says scripted experiments. Experimental findings and the AI-assistance disclosure are unchanged. |
+
+| Prose feels repetitive or formulaic | Version 1.6 tightens the related-work comparisons and removes generic transitions and redundant caveats. The authorial responsibility and accurate AI-assistance disclosure are preserved. Writing style is not used to infer authorship. |
+
+| Deeper research and claim audit | Version 1.6 adds the liquidity study by Gu et al., checks five central claims directly from saved episode records, and clarifies that the cited cryptographic audit pipeline is proposed rather than fully implemented. Evidence and remaining scientific limits are recorded in research_review.json. |
+
 The new cadence grid follows the review diagnostic and reuses the negative-control
 seeds. Neither it nor the corrected endpoint is described as confirmatory or
 independent external validation. Zero observed response advantage remains limited

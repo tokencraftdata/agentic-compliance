@@ -6,7 +6,7 @@ review, completed customer study, or promise of arXiv acceptance.
 ## Recommendation
 
 Current title: **Evaluating Controls for Trading Compliance: An Offline Study of
-Order Splitting and Cancellation Timing** (version 1.5). The compliance framing
+Order Splitting and Cancellation Timing** (version 1.6). The compliance framing
 concerns evaluation of candidate technical controls, with the existing scripted
 measurements and limitations preserved.
 
@@ -24,6 +24,11 @@ Microstructure)**, whose scope includes automated trading, agent-based modeling,
 and market-making. This is a recommendation based on the paper, not a decision
 by arXiv. A cs.AI label is not justified merely by the project's future LLM work.
 See the [official category taxonomy](https://arxiv.org/category_taxonomy).
+
+Version 1.6 defines offline execution and scripted policy selection separately.
+The title, abstract, numerical claims, and proposed category are unchanged.
+Use `arxiv_submission.txt` for the final copyable metadata; its fields must match
+the submitted PDF. Preparation remains distinct from actual submission.
 
 ## Before upload
 
