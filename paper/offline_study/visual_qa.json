@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-09",
+  "pages": 11,
+  "render_dpi": 100,
+  "all_pages_visually_inspected": true,
+  "clipping_or_overlap_observed": false,
+  "placeholder_scan_passed": true,
+  "code_commit_verified_in_pdf": "6d1f008b5a40644aae6b1543047dc12165c54c12",
+  "pdf_sha256": "86b806437ca0f27e9cad8dee0873cf2e4e8d01dee66dce2fc81b4137f850adcf",
+  "page_render_sha256": {
+    "page-01.png": "49d5a6af4f8a48ba927935129a036074d8ba55f0dfbfeb6ba909566e48e14036",
+    "page-02.png": "ab05be320e090c6d8bead3ea2cd6c0d28338b83908234f185b3677c54244155a",
+    "page-03.png": "87a768d90919b90cc5592ef733d771726504b142c1adbf6ab6bb85038be43250",
+    "page-04.png": "680af98945386e6403d5bbdad25cc1a129675c8c749054681fcf19f489dfcf14",
+    "page-05.png": "b37a24c7c3d2de3b161a82f814ab99f29c44fb53f64c270cac9e7f1a92c27614",
+    "page-06.png": "d8816587171daffea9d432da63c3cbd3dba8008416026d4b2546cb7ddba6de28",
+    "page-07.png": "c9bd80284a0523fc6253c6ac8502eca1f57754b5f89669317d4865ec626e72c6",
+    "page-08.png": "9661ccd16e90e52a8047bf624a9291f54aa8404238796d4f9ef8155238cf32fa",
+    "page-09.png": "11a872f7d784544dd1210a0dc7777853a59b12bb1fb245d06d700047775dbd8d",
+    "page-10.png": "3840c49b1dac3941ea51e549025f83d84dcc5d06e2baabe1fb91fab08bb58b9f",
+    "page-11.png": "23c99939879cb3c003c6eddc08101521e67cd0784fb8b15bff3cc0e6a9c7016f"
+  }
+}
