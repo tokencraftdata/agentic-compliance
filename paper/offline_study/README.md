@@ -57,3 +57,10 @@ byte-identical. The PDF is checked by rendering and inspecting every page.
 
 The earlier full LLM study remains future work. This paper does not select a model
 panel, claim intent annotations, or report customer-demand validation.
+
+Version 1.2 embeds outline fonts from the pinned matplotlib distribution and
+discloses AI assistance in preparing the code and manuscript. The trading
+experiments remain entirely scripted. `ARXIV_PLAN.md` records the arXiv
+preparation, proposed research sequence, and customer-discovery hypotheses.
+Author details and submission decisions remain pending; nothing has been
+submitted to arXiv.

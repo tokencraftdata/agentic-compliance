@@ -1,8 +1,9 @@
 # Final submission assessment — 9 November 2026
 
-Assessed as an exploratory technical report or workshop-style methods paper; no
-specific venue has been selected. This is an internal technical and editorial
-review, not external peer review.
+Assessed as an exploratory technical report or workshop-style methods paper.
+The author now plans an arXiv preprint. This is an internal technical and
+editorial review, not external peer review. The arXiv preparation and research
+plan is in `ARXIV_PLAN.md`.
 
 ## Verdict
 
@@ -36,16 +37,25 @@ window study is post-hoc and its 15-case recall result is tuning performance.
 The prose is specific to the implementation and observed failures. This review
 does not infer authorship from writing style or claim to predict an AI detector.
 
-## Before a venue submission
+## Before the arXiv submission
 
-1. Select the venue and apply its template, page limit, and submission category.
-2. Supply the required author details, or use the venue's anonymization rules.
-   The current manuscript is labeled anonymous but contains an identifying
-   GitHub repository link; it is not yet a prepared double-blind submission.
-3. Give reviewers access to the artifact through an appropriate archive or
-   anonymized bundle. The repository remains private; its visibility was not changed.
-4. Check the selected venue's current rules for AI assistance and include any
-   required disclosure. No claim of human-only preparation is made.
+1. Supply the exact author list and affiliations, replacing the anonymous
+   label. Confirm all listed authors approve the content and submission.
+2. Use q-fin.TR as the proposed primary category; check account endorsement
+   status. Category selection remains subject to arXiv moderation.
+3. Decide how readers can access the artifact. The repository remains private;
+   its visibility was not changed. Public artifact availability is a recommended
+   reproducibility improvement, not stated here as an arXiv acceptance rule.
+4. Review the AI assistance disclosure added in version 1.2. arXiv requires
+   significant generative AI use to be reported. The disclosure must accurately
+   describe the assistance, not claim that no AI was used to prepare the paper.
+5. Choose the distribution license and complete arXiv's upload/preview checks.
+   Version 1.2 embeds outline fonts for the PDF submission route. This paper is
+   generated with ReportLab, not TeX; any later TeX version must include its source.
+
+For a later double-blind venue, prepare a separate anonymized artifact and apply
+that venue's template and disclosure rules. This manuscript's GitHub owner link
+identifies the project and is not appropriate for a fully anonymized submission.
 
 No additional experiment is claimed to have been run during this final wording
 pass. Existing data, detector algorithms, and historical reports are preserved.
