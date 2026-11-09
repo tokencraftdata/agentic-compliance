@@ -39,8 +39,9 @@ does not infer authorship from writing style or claim to predict an AI detector.
 
 ## Before the arXiv submission
 
-1. Supply the exact author list and affiliations, replacing the anonymous
-   label. Confirm all listed authors approve the content and submission.
+1. Author details are now confirmed: Sandip Nandi, Independent Researcher.
+   Version 1.2 replaces the anonymous label. The author should read the final
+   paper and confirm its content before submission.
 2. Use q-fin.TR as the proposed primary category; check account endorsement
    status. Category selection remains subject to arXiv moderation.
 3. Decide how readers can access the artifact. The repository remains private;

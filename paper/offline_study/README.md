@@ -3,8 +3,10 @@
 **Order Splitting, Cancellation Timing, and the Limits of Trading Controls**
 
 This manuscript reports completed scripted experiments only. It replaces the
-completed-LLM-study framing of the earlier full-paper draft. It is an anonymous
-review draft, not a claim of public release, preregistration, or peer review.
+completed-LLM-study framing of the earlier full-paper draft. Version 1.2 is a
+preprint prepared for arXiv with the confirmed author, Sandip Nandi (Independent
+Researcher). Preparation is not a claim of submission, public release,
+preregistration, or peer review.
 
 The rendered paper is `output/pdf/order_splitting_and_timing.pdf` at the repository
 root. `build.py` is the authoring source; it generates tables and figures from
@@ -62,5 +64,6 @@ Version 1.2 embeds outline fonts from the pinned matplotlib distribution and
 discloses AI assistance in preparing the code and manuscript. The trading
 experiments remain entirely scripted. `ARXIV_PLAN.md` records the arXiv
 preparation, proposed research sequence, and customer-discovery hypotheses.
-Author details and submission decisions remain pending; nothing has been
+The author details are confirmed. License selection, account/endorsement checks,
+and the author's final review remain before submission; nothing has been
 submitted to arXiv.
