@@ -1,12 +1,19 @@
 # Standalone offline research paper
 
-**Order Splitting, Cancellation Timing, and the Limits of Trading Controls**
+**Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
 
 This manuscript reports completed scripted experiments only. It replaces the
-completed-LLM-study framing of the earlier full-paper draft. Version 1.3 is a
+completed-LLM-study framing of the earlier full-paper draft. Version 1.4 is a
 preprint prepared for arXiv with the confirmed author, Sandip Nandi (Independent
 Researcher). Preparation is not a claim of submission, public release,
 preregistration, or peer review.
+
+The compliance focus is evaluation of candidate technical controls: which
+scripted sequences are flagged, whether a gate removes their response-dependent
+payoff, and what legitimate execution it obstructs. Version 1.4 makes this purpose
+explicit in the title, abstract, introduction, discussion, and conclusion. The
+measurements and experiment code are unchanged. Legal compliance, human review
+workflows, and LLM trading behaviour have not been evaluated.
 
 The rendered paper is `output/pdf/order_splitting_and_timing.pdf` at the repository
 root. `build.py` is the authoring source; it generates tables and figures from

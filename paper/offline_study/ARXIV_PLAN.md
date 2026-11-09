@@ -5,6 +5,11 @@ review, completed customer study, or promise of arXiv acceptance.
 
 ## Recommendation
 
+Current title: **Evaluating Controls for Trading Compliance: An Offline Study of
+Order Splitting and Cancellation Timing** (version 1.4). The compliance framing
+concerns evaluation of candidate technical controls, with the existing scripted
+measurements and limitations preserved.
+
 Submit this work as an exploratory computational market-microstructure study
 after the author and submission details are finalized. Its contribution is a
 replayable set of control failures and measurement corrections: split display,

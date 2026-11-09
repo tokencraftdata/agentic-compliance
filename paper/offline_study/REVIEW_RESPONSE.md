@@ -14,6 +14,7 @@
 | Historical regeneration follows mutable root config | New study reads frozen cohort configs. Document the limitation of historical regeneration; preserve the working historical replay procedures. |
 | Template instructions and unresolved author citations | New prose, actual tables/figures, a short verified primary-source bibliography, no placeholder results or editorial instructions. |
 | Missing manuscript source | Include the paper builder, complete structured text, bibliography, figures, and hash manifest. |
+| Compliance purpose obscured by a mechanics-only title and framing | Version 1.4 names trading compliance in the title and links surveillance, gates, economic outcomes, execution cost, and replay evidence to control evaluation. The abstract, introduction, discussion, and conclusion distinguish this intended use from legal compliance or validated LLM oversight. Experimental methods and results are unchanged. |
 
 The new cadence grid follows the review diagnostic and reuses the negative-control
 seeds. Neither it nor the corrected endpoint is described as confirmatory or
