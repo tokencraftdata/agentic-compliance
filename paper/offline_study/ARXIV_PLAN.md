@@ -50,7 +50,7 @@ See the [official category taxonomy](https://arxiv.org/category_taxonomy).
    outline fonts, and no JavaScript. If converted to TeX, submit TeX source rather
    than only its output PDF. See [PDF guidance](https://info.arxiv.org/help/submit_pdf.html).
 8. Match title, abstract, and author metadata to the final PDF. Suggested
-   comments: "11 pages, 2 figures, 4 tables; exploratory scripted simulation
+   comments: "11 pages, 2 figures; exploratory scripted simulation
    study." Verify the page count again after adding authors. Leave journal
    reference and publication DOI empty unless they actually exist.
 9. The author completes submission and checks the confirmation/status. arXiv
