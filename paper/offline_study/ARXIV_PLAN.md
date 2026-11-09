@@ -26,9 +26,12 @@ See the [official category taxonomy](https://arxiv.org/category_taxonomy).
 2. Have the human author read the paper and inspect the result tables and cited
    sources. The code audit passed 80 tests and replayed 360 new episodes without
    mismatches, but this is not independent scientific peer review.
-3. Review section 10.3's AI assistance disclosure. It states that Codex assisted
-   with code, tests, analysis scripts, literature checks, and manuscript work;
-   the trading policies themselves were scripted. Significant generative AI use
+3. Review section 10.3's AI assistance disclosure. Version 1.3 names both
+   coding assistants used on the artifact (Anthropic Claude Code for the
+   throttle-isolation, evasion-family, negative-control and window-sweep modules
+   and notes; OpenAI Codex for the matched-counterfactual and cadence-grid study,
+   the builder, literature checks and manuscript work); the trading policies
+   themselves were scripted. Significant generative AI use
    must be reported, and the authors retain responsibility for the paper under
    [arXiv's policy](https://info.arxiv.org/help/moderation/index.html#policy-for-authors-use-of-generative-ai-language-tools).
 4. Register or check the author's account and endorsement status for q-fin.TR.

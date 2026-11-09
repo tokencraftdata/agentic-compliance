@@ -47,7 +47,8 @@ does not infer authorship from writing style or claim to predict an AI detector.
 3. Decide how readers can access the artifact. The repository remains private;
    its visibility was not changed. Public artifact availability is a recommended
    reproducibility improvement, not stated here as an arXiv acceptance rule.
-4. Review the AI assistance disclosure added in version 1.2. arXiv requires
+4. Review the AI assistance disclosure added in version 1.2 and corrected in
+   version 1.3 to name both coding assistants used. arXiv requires
    significant generative AI use to be reported. The disclosure must accurately
    describe the assistance, not claim that no AI was used to prepare the paper.
 5. Choose the distribution license and complete arXiv's upload/preview checks.
