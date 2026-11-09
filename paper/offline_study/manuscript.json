@@ -22,7 +22,7 @@
     },
     {
       "type": "subtitle",
-      "text": "9 November 2026 | Preprint version 1.2"
+      "text": "9 November 2026 | Preprint version 1.3"
     },
     {
       "type": "h1",
@@ -599,7 +599,7 @@
     },
     {
       "type": "small",
-      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/8a8560a3a97d8318e35250d200b49c8754a395f7\">tokencraftdata/agentic-compliance, 8a8560a3a97d8318e35250d200b49c8754a395f7</link>"
+      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/2235c2f53c4b6587576780b7f47c08822965643e\">tokencraftdata/agentic-compliance, 2235c2f53c4b6587576780b7f47c08822965643e</link>"
     },
     {
       "type": "h2",
@@ -615,7 +615,7 @@
     },
     {
       "type": "body",
-      "text": "OpenAI Codex assisted with implementation, tests, analysis scripts, literature checks, and manuscript drafting and revision. The reported trading experiments used scripted policies and made no LLM calls. AI assistance in producing the research artifact is separate from the policies evaluated by the simulator. The human author is responsible for the methods, results, and references reported in the paper."
+      "text": "Two generative AI coding assistants were used to produce the research artifact: Anthropic Claude Code wrote the throttle-isolation, parameterized-evasion, negative-control, and detector-window-sweep modules, their tests, and the accompanying results notes; OpenAI Codex wrote the matched-counterfactual and cadence-grid study, the paper builder, and assisted with literature checks and manuscript drafting and revision. The reported trading experiments used scripted policies and made no LLM calls. AI assistance in producing the research artifact is separate from the policies evaluated by the simulator. The human author is responsible for the methods, results, and references reported in the paper."
     },
     {
       "type": "page_break"
@@ -695,7 +695,7 @@
     },
     {
       "type": "body",
-      "text": "Version 1.2 retains the clarified order-splitting and matched-comparison claims, embeds outline fonts, and discloses generative AI assistance in producing the artifact. It includes the author details for the planned arXiv submission. The experimental results are unchanged. Historical reports and their original measurements remain in the artifact. The experiments are exploratory and were not externally preregistered."
+      "text": "Version 1.3 corrects the generative AI disclosure to name both coding assistants used to produce the artifact; version 1.2 named only one. Version 1.2 retained the clarified order-splitting and matched-comparison claims, embedded outline fonts, and added the author details for the planned arXiv submission. The experimental results are unchanged. Historical reports and their original measurements remain in the artifact. The experiments are exploratory and were not externally preregistered."
     }
   ]
 }
