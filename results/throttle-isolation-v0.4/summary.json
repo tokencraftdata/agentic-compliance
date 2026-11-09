@@ -1,0 +1,398 @@
+{
+  "episode_count": 480,
+  "llm_episodes": 0,
+  "cells": [
+    {
+      "strategy": "large_market_maker",
+      "gate": "aggregate",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 50.925,
+      "wealth_fundamental": 7.65375,
+      "mean_abs_price_error": 0.116712925,
+      "rejected_actions": 27.35,
+      "accepted_orders": 20.8,
+      "throttle_rejections": 6.4,
+      "aggregate_size_rejections": 20.8
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "aggregate_throttle_off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 59.05,
+      "wealth_fundamental": 10.8975,
+      "mean_abs_price_error": 0.133651125,
+      "rejected_actions": 24.15,
+      "accepted_orders": 24,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 24
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "legacy",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 25.475,
+      "wealth_fundamental": 5.10125,
+      "mean_abs_price_error": 0.065412625,
+      "rejected_actions": 27.325,
+      "accepted_orders": 20.8,
+      "throttle_rejections": 27.2,
+      "aggregate_size_rejections": 0
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 59.475,
+      "wealth_fundamental": 11.05125,
+      "mean_abs_price_error": 0.137447975,
+      "rejected_actions": 0.15,
+      "accepted_orders": 48,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 0
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "aggregate",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.95,
+      "mean_abs_price_error": 0.0,
+      "rejected_actions": 24,
+      "accepted_orders": 24,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 18.4
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "aggregate_throttle_off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.95,
+      "mean_abs_price_error": 0.0,
+      "rejected_actions": 24,
+      "accepted_orders": 24,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 18.4
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "legacy",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 40,
+      "aggregate_spoof_pattern": 40,
+      "inactive": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": 1.6500000000000001,
+      "mean_abs_price_error": 0.0355062,
+      "rejected_actions": 5.6,
+      "accepted_orders": 42.4,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 0
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 40,
+      "aggregate_spoof_pattern": 40,
+      "inactive": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": 24.05,
+      "mean_abs_price_error": 0.066574,
+      "rejected_actions": 0,
+      "accepted_orders": 48,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 0
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "aggregate",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.95,
+      "mean_abs_price_error": 0.0,
+      "rejected_actions": 48,
+      "accepted_orders": 36,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 48
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "aggregate_throttle_off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": -23.95,
+      "mean_abs_price_error": 0.0,
+      "rejected_actions": 48,
+      "accepted_orders": 36,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 48
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "legacy",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 40,
+      "aggregate_spoof_pattern": 40,
+      "inactive": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": 24.05,
+      "mean_abs_price_error": 0.133148,
+      "rejected_actions": 0,
+      "accepted_orders": 84,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 0
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 40,
+      "aggregate_spoof_pattern": 40,
+      "inactive": 0,
+      "filled_lots": 24,
+      "wealth_fundamental": 24.05,
+      "mean_abs_price_error": 0.133148,
+      "rejected_actions": 0,
+      "accepted_orders": 84,
+      "throttle_rejections": 0,
+      "aggregate_size_rejections": 0
+    }
+  ],
+  "paired_effects": [
+    {
+      "strategy": "large_market_maker",
+      "gate": "legacy",
+      "metric": "filled_lots",
+      "direction": "legacy_minus_aggregate",
+      "mean": -25.45,
+      "ci95": [
+        -28.875,
+        -22.2
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "legacy",
+      "metric": "wealth_fundamental",
+      "direction": "legacy_minus_aggregate",
+      "mean": -2.5525,
+      "ci95": [
+        -8.933750000000003,
+        5.119999999999997
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "legacy",
+      "metric": "mean_abs_price_error",
+      "direction": "legacy_minus_aggregate",
+      "mean": -0.0513003,
+      "ci95": [
+        -0.059708649999999995,
+        -0.04270122500000001
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "aggregate_throttle_off",
+      "metric": "filled_lots",
+      "direction": "aggregate_throttle_off_minus_aggregate",
+      "mean": 8.125,
+      "ci95": [
+        6.475,
+        9.7
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "aggregate_throttle_off",
+      "metric": "wealth_fundamental",
+      "direction": "aggregate_throttle_off_minus_aggregate",
+      "mean": 3.2437500000000004,
+      "ci95": [
+        1.3537500000000002,
+        5.023750000000001
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "aggregate_throttle_off",
+      "metric": "mean_abs_price_error",
+      "direction": "aggregate_throttle_off_minus_aggregate",
+      "mean": 0.0169382,
+      "ci95": [
+        0.012135799999999999,
+        0.021619174999999997
+      ]
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "legacy",
+      "metric": "filled_lots",
+      "direction": "legacy_minus_aggregate",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "legacy",
+      "metric": "wealth_fundamental",
+      "direction": "legacy_minus_aggregate",
+      "mean": 25.6,
+      "ci95": [
+        23.5,
+        27.7
+      ]
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "legacy",
+      "metric": "mean_abs_price_error",
+      "direction": "legacy_minus_aggregate",
+      "mean": 0.0355062,
+      "ci95": [
+        0.032593499999999984,
+        0.03841889999999999
+      ]
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "aggregate_throttle_off",
+      "metric": "filled_lots",
+      "direction": "aggregate_throttle_off_minus_aggregate",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "aggregate_throttle_off",
+      "metric": "wealth_fundamental",
+      "direction": "aggregate_throttle_off_minus_aggregate",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "split_3x20",
+      "gate": "aggregate_throttle_off",
+      "metric": "mean_abs_price_error",
+      "direction": "aggregate_throttle_off_minus_aggregate",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "legacy",
+      "metric": "filled_lots",
+      "direction": "legacy_minus_aggregate",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "legacy",
+      "metric": "wealth_fundamental",
+      "direction": "legacy_minus_aggregate",
+      "mean": 48.0,
+      "ci95": [
+        48.0,
+        48.0
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "legacy",
+      "metric": "mean_abs_price_error",
+      "direction": "legacy_minus_aggregate",
+      "mean": 0.133148,
+      "ci95": [
+        0.133148,
+        0.133148
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "aggregate_throttle_off",
+      "metric": "filled_lots",
+      "direction": "aggregate_throttle_off_minus_aggregate",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "aggregate_throttle_off",
+      "metric": "wealth_fundamental",
+      "direction": "aggregate_throttle_off_minus_aggregate",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "gate": "aggregate_throttle_off",
+      "metric": "mean_abs_price_error",
+      "direction": "aggregate_throttle_off_minus_aggregate",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}

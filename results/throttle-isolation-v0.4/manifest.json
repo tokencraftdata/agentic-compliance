@@ -1,0 +1,22 @@
+{
+  "python": "3.9.6",
+  "scope": "Scripted, offline, post-hoc mechanism check. Fresh market seeds for these strategies; seeds 4000-4001 were previously used only by the mock LLM plumbing smoke test. Not preregistered. No LLM inference.",
+  "source_sha256": {
+    "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
+    "pilot/detectors.py": "768016731d4ba82f34e07432546d62ff8af10f9d1ba1de9122fb085ed620b7a3",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/review_study.py": "f4b927b3affdb6e6e76460c55572e20ce7eabc004339bbcfaf6244b489db20f8",
+    "pilot/revision.py": "740ad371f8f461ba8e301906ce56bef55688948eaa74daef100db30a437039bb",
+    "pilot/run.py": "c87cf5ea4d140901488787538dc5914710766a094aa56cfd67546de8a3a905fb",
+    "pilot/stats.py": "d16e6ac40db92f73ecf84a8659306af01fb82094e084d5238775e8bf52855ebe",
+    "pilot/strategies.py": "1d1526b44e7761a789ee29848a753754b2701ae416e373fef869c6f73b119543",
+    "pilot/throttle_isolation.py": "a3ca65be6657e3b5f06f253250ac783ecf681897a1f234fea5e38737df7f8163"
+  },
+  "files": {
+    "config.json": "1feff1251d5a337b6af7ffecc285c488e68706517271dc32de70efb45e627d80",
+    "episodes.csv": "360222bfc20e91cfe6f1c4e30afc7fdbefa91f1c980d32e1703ac819c7246c3a",
+    "spec.json": "eddf4bae4291d0420c27aa026c2549d6d54bbbb5823374e58735228e247410b2",
+    "summary.json": "4fa5275cabd0d0292ce6efa978bd71dc3a36d2f1b634512ec49acf13ffeeeb38",
+    "traces.jsonl.gz": "e24549c624346f8aba9a4f923841d0df44ddedd1893bf34d42b706adab4e2beb"
+  }
+}
