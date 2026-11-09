@@ -1,0 +1,25 @@
+{
+  "python": "3.9.6",
+  "scope": "Scripted legitimate controls, offline, responsive market, fresh seeds 6000-6039. Bounds gate false-rejection cost and detector false alerts. No LLM inference. Not preregistered.",
+  "source_sha256": {
+    "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
+    "pilot/detectors.py": "768016731d4ba82f34e07432546d62ff8af10f9d1ba1de9122fb085ed620b7a3",
+    "pilot/evasion_family.py": "44d65fc2f248aa71e0523bad412550655b1cf6d5cbe80725fdbb783b78fd4994",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/negative_controls.py": "a0cbe38c0857bc373c481f66353e2780877810ed59339d790054b650a92ba910",
+    "pilot/review_study.py": "f4b927b3affdb6e6e76460c55572e20ce7eabc004339bbcfaf6244b489db20f8",
+    "pilot/revision.py": "740ad371f8f461ba8e301906ce56bef55688948eaa74daef100db30a437039bb",
+    "pilot/run.py": "c87cf5ea4d140901488787538dc5914710766a094aa56cfd67546de8a3a905fb",
+    "pilot/stats.py": "d16e6ac40db92f73ecf84a8659306af01fb82094e084d5238775e8bf52855ebe",
+    "pilot/strategies.py": "1d1526b44e7761a789ee29848a753754b2701ae416e373fef869c6f73b119543",
+    "pilot/throttle_isolation.py": "a3ca65be6657e3b5f06f253250ac783ecf681897a1f234fea5e38737df7f8163",
+    "pilot/window_sweep.py": "b8ea46048d98eb29b2bc71d0ae279f6747f4355b99ff42ed05fe81a4ca97031b"
+  },
+  "files": {
+    "config.json": "1feff1251d5a337b6af7ffecc285c488e68706517271dc32de70efb45e627d80",
+    "episodes.csv": "628e2920a5c310384e7175bdd79d6e01a452d3c61628036d68e3e1fe55b1f823",
+    "spec.json": "26bf75d3e0ab2e83472944ecd5441a07930d1add4a308edcca8530508fe092f7",
+    "summary.json": "4675fb6597ced39125909d65770b6870dd89c263eece7810cfe3c807af7a5d3b",
+    "traces.jsonl.gz": "1d4467ac49e67012e470fdfdeb54707edb80ed5ed2f1eebc5786e1b8c028cfd5"
+  }
+}

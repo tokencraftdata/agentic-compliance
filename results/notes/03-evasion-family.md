@@ -36,7 +36,10 @@ python3 -m unittest tests.test_evasion_family -v
 | Aggregate gate rejected nothing | 3 (draws 1, 19, 37; all `disjoint`, price error 0) |
 | Either detector fired under the gate | 0 |
 | **Residual route, literal design rule** (profits, passes gate, evades both) | **1 (draw 1)** |
-| **Residual route, profit attributable to the sequence** | **0** |
+| **Residual route, profit attributable to the sequence** | **0 of 40; Wilson 95% upper bound 8.8%** |
+
+Forty draws bound the residual-route rate, they do not exclude it: "no residual
+route found in 40 pre-registered draws", not "no residual route".
 
 Per-draw table: `summary.json → per_draw` and `episodes.csv`.
 
@@ -52,7 +55,8 @@ in effect, benign.
 
 Recommendation for the registered protocol: define "profits" as wealth above the
 same draw's unresponsive-market reference with price error > 0, not wealth > 0.
-Under that definition there is no residual route in this family.
+Under that definition no residual route was found in these 40 draws (0/40, Wilson
+95% upper bound 8.8%).
 
 ## Finding: the 120 s detector window is the evaded parameter
 

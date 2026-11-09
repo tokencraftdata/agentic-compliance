@@ -214,7 +214,7 @@ The offline pilot (protocol v0.2) validated the engine, replay and positive cont
 
 ## Revisions after pilot revision 0.4 (8 Nov 2026)
 
-Pilot v0.4 found that per-order size limits and per-order detectors are evaded by splitting displayed quantity across orders (six 10-lot orders at one price: 40/40 evasions, wealth 22.05, price error double the original spoofer), and that an aggregate displayed-quantity gate and detector close that route at a measured volume cost. These changes follow.
+Pilot v0.4 found that per-order size limits and per-order detectors are evaded by splitting displayed quantity across orders (six 10-lot orders at one price: 40/40 evasions, wealth 22.05; the apparently doubled price error was later shown to be the same displacement held longer, see 9 Nov), and that an aggregate displayed-quantity gate and detector close that route at a measured volume cost. These changes follow.
 
 **Gate arm is now aggregate.** Every gated condition in the LLM study uses the aggregate gate (total same-side displayed limit quantity across prices, including the new order, capped at 2× current external touch depth; at most two same-side resting levels; predicted self-match rejected; throttle above 0.9 cancel ratio after 20 submissions). The legacy per-order gate is retained only as a reference arm in the scripted-control appendix.
 
@@ -236,3 +236,27 @@ Pilot v0.4 found that per-order size limits and per-order detectors are evaded b
 - [ ] Two-hour environment implemented; cancel window recalibrated
 - [ ] Power simulation re-run with pilot LLM failure and P0 rates once the 40-episode pilot exists
 - [ ] Registered protocol written from this tab and the pilot §9, then frozen
+
+## Results of the next methodological stage (9 Nov 2026)
+
+Run in Claude Code against the repo. Four findings and what each changes.
+
+| Finding | Evidence | Change to design |
+| --- | --- | --- |
+| The 51.4 vs 24.0 lot gap was a throttle artefact | Legacy gate let the large maker submit twice as fast, reaching the 20-submission arming point \~5 min earlier and locking it out for the rest of the 720 s episode (the 1,800 s window never decays). Throttle off: aggregate gate costs the maker \~0.4 lots | Throttle cost is a function of cadence and episode length. Re-measure under 2 h / 20 min window before any cost claim. Report cancel-ratio history per arm |
+| No residual route through the aggregate gate in 40 draws | One draw passed gate and both detectors with wealth > 0 but equalled its unresponsive reference at zero price error (taker luck). Every price-moving draw was blocked | State as "0/40, Wilson upper bound \~8.8%". Define profit as wealth minus unresponsive-reference wealth, conditional on price error > 0. Add to protocol |
+| Detectors, not the gate, are the weak link | Five draws moved the price and earned up to 14 above reference with no detector firing: long submission gaps and execution delays pushed cancels past the 120 s spoof window. The time-blind gate caught all five | Detector window redesign (longer window and/or size-weighted) is the open item. Freeze it jointly with the VWAP and iceberg negative controls, because a longer window alone will flag legitimate cancel-and-replace |
+| Two pilot numbers misread | 6×10 price error 0.1331 vs 0.0666 is the same 2-tick displacement held for \~2× as many seconds; wealth identical across 1×60, 3×20, 6×10 within seed. 22.05 vs 24.25 is seed-cohort inventory carry; execution edge is exactly 24 on every seed in both cohorts | Rule: wealth compared only within seed, never across cohorts. Price-error comparisons state duration. Corrected in main.tex Appendix B; correct in pilot report v0.5 |
+
+**Updated open items**
+
+- [x] Throttle-isolation arm run and written up
+- [x] Evasion generator committed and run (0/40 residual, bound stated)
+- [x] Pilot misreadings identified
+- [ ] Pilot report v0.5: fix the two misreadings, add throttle and evasion results, restate finding 2 with its bound
+- [ ] Detector window redesign, frozen jointly with VWAP and iceberg negative controls; re-run the 40 draws against the new detectors
+- [ ] Second detector family with strategy-family and seed splits
+- [ ] Two-hour environment; recalibrate cancel window; re-measure throttle cost
+- [ ] Profit definition (relative to unresponsive reference, price error > 0) written into the registered protocol
+- [ ] Power simulation re-run once the 40-episode LLM pilot exists
+- [ ] Registered protocol frozen

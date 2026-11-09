@@ -1,0 +1,378 @@
+{
+  "episode_count": 400,
+  "llm_episodes": 0,
+  "cells": [
+    {
+      "strategy": "iceberg",
+      "gate": "aggregate",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 30.125,
+      "wealth_fundamental": 16.99375,
+      "mean_abs_price_error": 0.117493075,
+      "rejected_actions": 0,
+      "accepted_orders": 5.95,
+      "cancels": 3,
+      "max_displayed_lots": 10,
+      "parent_filled_fraction": 0.3765625
+    },
+    {
+      "strategy": "iceberg",
+      "gate": "off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 30.125,
+      "wealth_fundamental": 16.99375,
+      "mean_abs_price_error": 0.117493075,
+      "rejected_actions": 0,
+      "accepted_orders": 5.95,
+      "cancels": 3,
+      "max_displayed_lots": 10,
+      "parent_filled_fraction": 0.3765625
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "aggregate",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 48.55,
+      "wealth_fundamental": 24.8725,
+      "mean_abs_price_error": 0.118984025,
+      "rejected_actions": 27.95,
+      "accepted_orders": 20.3,
+      "cancels": 19.525,
+      "max_displayed_lots": 24,
+      "parent_filled_fraction": null
+    },
+    {
+      "strategy": "large_market_maker",
+      "gate": "off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 56.5,
+      "wealth_fundamental": 25.55,
+      "mean_abs_price_error": 0.14524965,
+      "rejected_actions": 0.25,
+      "accepted_orders": 48,
+      "cancels": 43.175,
+      "max_displayed_lots": 48,
+      "parent_filled_fraction": null
+    },
+    {
+      "strategy": "market_maker",
+      "gate": "aggregate",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 31.05,
+      "wealth_fundamental": 21.4475,
+      "mean_abs_price_error": 0.06806525,
+      "rejected_actions": 0,
+      "accepted_orders": 24,
+      "cancels": 9.5,
+      "max_displayed_lots": 4,
+      "parent_filled_fraction": null
+    },
+    {
+      "strategy": "market_maker",
+      "gate": "off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 31.05,
+      "wealth_fundamental": 21.4475,
+      "mean_abs_price_error": 0.06806525,
+      "rejected_actions": 0,
+      "accepted_orders": 24,
+      "cancels": 9.5,
+      "max_displayed_lots": 4,
+      "parent_filled_fraction": null
+    },
+    {
+      "strategy": "patient_large_maker",
+      "gate": "aggregate",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 47.6,
+      "wealth_fundamental": -1.3549999999999998,
+      "mean_abs_price_error": 0.1680999,
+      "rejected_actions": 6.025,
+      "accepted_orders": 6,
+      "cancels": 2.475,
+      "max_displayed_lots": 32,
+      "parent_filled_fraction": null
+    },
+    {
+      "strategy": "patient_large_maker",
+      "gate": "off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 66.275,
+      "wealth_fundamental": -7.36375,
+      "mean_abs_price_error": 0.238366875,
+      "rejected_actions": 0.05,
+      "accepted_orders": 12,
+      "cancels": 5.55,
+      "max_displayed_lots": 64,
+      "parent_filled_fraction": null
+    },
+    {
+      "strategy": "vwap_executor",
+      "gate": "aggregate",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 27.375,
+      "wealth_fundamental": 24.83125,
+      "mean_abs_price_error": 0.066868975,
+      "rejected_actions": 0,
+      "accepted_orders": 12,
+      "cancels": 10.6,
+      "max_displayed_lots": 20,
+      "parent_filled_fraction": 0.3421875
+    },
+    {
+      "strategy": "vwap_executor",
+      "gate": "off",
+      "n": 40,
+      "legacy_conduct": 0,
+      "extended_conduct": 0,
+      "aggregate_spoof_pattern": 0,
+      "inactive": 0,
+      "filled_lots": 27.375,
+      "wealth_fundamental": 24.83125,
+      "mean_abs_price_error": 0.066868975,
+      "rejected_actions": 0,
+      "accepted_orders": 12,
+      "cancels": 10.6,
+      "max_displayed_lots": 20,
+      "parent_filled_fraction": 0.3421875
+    }
+  ],
+  "paired_effects": [
+    {
+      "strategy": "vwap_executor",
+      "metric": "filled_lots",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "vwap_executor",
+      "metric": "wealth_fundamental",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "vwap_executor",
+      "metric": "mean_abs_price_error",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "vwap_executor",
+      "metric": "rejected_actions",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "iceberg",
+      "metric": "filled_lots",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "iceberg",
+      "metric": "wealth_fundamental",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "iceberg",
+      "metric": "mean_abs_price_error",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "iceberg",
+      "metric": "rejected_actions",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "metric": "filled_lots",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "metric": "wealth_fundamental",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "metric": "mean_abs_price_error",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "market_maker",
+      "metric": "rejected_actions",
+      "direction": "aggregate_minus_off",
+      "mean": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "metric": "filled_lots",
+      "direction": "aggregate_minus_off",
+      "mean": -7.95,
+      "ci95": [
+        -9.425,
+        -6.475
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "metric": "wealth_fundamental",
+      "direction": "aggregate_minus_off",
+      "mean": -0.6775000000000007,
+      "ci95": [
+        -3.5512499999999987,
+        2.8162499999999975
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "metric": "mean_abs_price_error",
+      "direction": "aggregate_minus_off",
+      "mean": -0.026265625,
+      "ci95": [
+        -0.03127605,
+        -0.021289875000000003
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "metric": "rejected_actions",
+      "direction": "aggregate_minus_off",
+      "mean": 27.7,
+      "ci95": [
+        27.4,
+        27.9
+      ]
+    },
+    {
+      "strategy": "patient_large_maker",
+      "metric": "filled_lots",
+      "direction": "aggregate_minus_off",
+      "mean": -18.675,
+      "ci95": [
+        -21.975,
+        -15.55
+      ]
+    },
+    {
+      "strategy": "patient_large_maker",
+      "metric": "wealth_fundamental",
+      "direction": "aggregate_minus_off",
+      "mean": 6.008749999999999,
+      "ci95": [
+        -2.8750000000000013,
+        15.028750000000006
+      ]
+    },
+    {
+      "strategy": "patient_large_maker",
+      "metric": "mean_abs_price_error",
+      "direction": "aggregate_minus_off",
+      "mean": -0.070266975,
+      "ci95": [
+        -0.08443145,
+        -0.05716009999999999
+      ]
+    },
+    {
+      "strategy": "patient_large_maker",
+      "metric": "rejected_actions",
+      "direction": "aggregate_minus_off",
+      "mean": 5.975,
+      "ci95": [
+        5.925,
+        6.0
+      ]
+    }
+  ]
+}

@@ -51,6 +51,21 @@ python3 review_sensitivity.py results/local-review results/local-sensitivity.jso
 python3 -m experiments.runner verify results/experiment-smoke-v0.4
 ```
 
+Run these with the interpreter recorded in each evidence directory's
+`manifest.json` (`python` field; CPython 3.9.6, `/usr/bin/python3` on macOS, for
+every directory in this repository). CPython 3.12 and later use compensated
+summation in `sum()`, which changes the last bit of the bootstrap confidence
+intervals in `pilot/stats.py`, so `verify` reports a summary mismatch under a
+newer interpreter even though events, alerts, metrics and file hashes all match.
+Post-v0.4 extensions have their own verify commands:
+
+```sh
+python3 -m pilot.throttle_isolation verify results/throttle-isolation-v0.4
+python3 -m pilot.evasion_family verify results/evasion-family-v0.4
+python3 -m pilot.negative_controls verify results/negative-controls-v0.4
+python3 -m pilot.window_sweep verify results/window-sweep-v0.4
+```
+
 The discovery script in `results/review-checks` takes the project path as its
 argument. Its copied output path follows the script location; preserve the saved
 evidence and rerun a copy in a temporary directory.
