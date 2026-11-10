@@ -3,7 +3,7 @@
 **Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
 
 This manuscript reports completed scripted experiments only. It replaces the
-completed-LLM-study framing of the earlier full-paper draft. Version 1.7 is a
+completed-LLM-study framing of the earlier full-paper draft. Version 1.8 is a
 preprint prepared for arXiv with the confirmed author, Sandip Nandi (Independent
 Researcher). Preparation is not a claim of submission, public release,
 preregistration, or peer review.
@@ -75,6 +75,27 @@ Historical `pilot/*.py` modules and results remain byte-identical. The new metri
 quantity without rewriting old evidence. All three pattern detectors share the
 window parameter; the paper documents that behavior rather than inventing an
 unchanged independent layering window.
+
+## Replay and historical regeneration details
+
+Each new record stores attempted actions, subject events, rejection reasons,
+detector output, and the full event-stream hash. Replay reconstructs the
+background events deterministically; the compressed archive does not contain
+all background events. Exact numeric reproduction requires CPython 3.9.6;
+different Python summation implementations can affect the last bits of
+bootstrap summaries. No provider credential or network access is required.
+
+Regenerate into a fresh directory. The new study uses frozen historical cohort
+configurations, including the 180-second evasion configuration. The older pilot
+regeneration command reads the mutable root configuration; after its default
+window changes, it cannot establish byte-identical reproduction of the original
+120-second cohort. Historical replay uses each cohort's saved configuration.
+
+Version 1.8 rewrites the framing around the observed failures and reduces
+section 10.1 to a short artifact-availability statement. Detailed setup and
+replay instructions remain here. No appendix was added. Methods, numerical
+results, FINRA coverage, and the assistance disclosure are preserved.
+Publication-status checks are recorded in `publication_review.json`.
 
 ## Build the paper
 
