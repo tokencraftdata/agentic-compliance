@@ -1,6 +1,6 @@
 {
   "status": "prepared_exploratory_technical_report_not_submitted",
-  "document_version": "2.0",
+  "document_version": "2.1",
   "title": "Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing",
   "authors": [
     {
@@ -18,7 +18,7 @@
   "arxiv_identifier": null,
   "artifact_url": "https://github.com/tokencraftdata/agentic-compliance",
   "artifact_access": "private; no public-access claim",
-  "paper_sha256": "14a988bd8c13195a5f1a3dfb4b52e7e8b8f518be7dc5447025f6c096069f67d7",
+  "paper_sha256": "9c9997171bde51105b2d2c69e2a8f26aa890fbbb6fc65d9e682901d9d5b5a84a",
   "assessment": "Suitable for release only as a bounded exploratory methods report; independent strategy validation, market calibration, and LLM evidence remain absent.",
   "pending": [
     "human author final read-through",

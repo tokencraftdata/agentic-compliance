@@ -1,4 +1,4 @@
-arXiv submission fields - version 2.0, prepared but not submitted
+arXiv submission fields - version 2.1, prepared but not submitted
 
 Title
 Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing
@@ -26,7 +26,7 @@ Leave empty: no journal publication is claimed for this manuscript.
 
 Upload file
 output/pdf/order_splitting_and_timing.pdf
-SHA-256: 14a988bd8c13195a5f1a3dfb4b52e7e8b8f518be7dc5447025f6c096069f67d7
+SHA-256: 9c9997171bde51105b2d2c69e2a8f26aa890fbbb6fc65d9e682901d9d5b5a84a
 
 Submission route
 This document was created with ReportLab, not TeX. Use the single-PDF route,
