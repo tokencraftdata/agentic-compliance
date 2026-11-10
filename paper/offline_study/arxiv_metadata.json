@@ -1,6 +1,6 @@
 {
   "status": "prepared_exploratory_technical_report_not_submitted",
-  "document_version": "2.1",
+  "document_version": "2.2",
   "title": "Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing",
   "authors": [
     {
@@ -8,17 +8,17 @@
       "affiliation": "Independent Researcher"
     }
   ],
-  "abstract": "An order-level size limit can admit a large displayed quantity when it is split across small orders. We study the evaluation of this failure and its repair in a scripted limit-order-book simulator. Six 10-lot orders pass the original gate and detectors in all 40 tested seeds. An aggregate cap removes their response-dependent gain at the original settings, but that result depends on the market-response threshold. In a separate cap-threshold grid with the cancellation throttle disabled, the same 20-lot cap yields a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at threshold 0.2. Throttle tests over 12-minute and one-hour sessions distinguish persistent lockout from recovery after old submissions leave the window. The full aggregate policy reduces maker volume by 14.1% and 28.2% in two short-session controls and by 75.2% in the one-hour test. Finally, a legitimate maker produces alerts in 34 of 40 episodes when its re-quote cadence meets the detector's 180-second window. These are configuration-dependent regression cases for compliance-control testing. The study uses synthetic prices and fixed trading scripts; it does not estimate real-market detection accuracy or evaluate LLM traders.",
+  "abstract": "Testing a trading-compliance control requires separating surveillance alerts, economic effects, and costs to legitimate execution. We examine these outcomes in a scripted limit-order-book simulator. Six 10-lot orders pass the original order-level size gate and detectors in all 40 tested seeds. An aggregate cap removes their response-dependent gain at the original settings, but that result depends on the market-response threshold. In a separate cap-threshold grid with the cancellation throttle disabled, the same 20-lot cap yields a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at threshold 0.2. Throttle tests over 12-minute and one-hour sessions distinguish persistent lockout from recovery after old submissions leave the window. The full aggregate policy reduces maker volume by 14.1% and 28.2% in two short-session controls and by 75.2% in the one-hour test. Finally, a legitimate maker produces alerts in 34 of 40 episodes when its re-quote cadence meets the detector's 180-second window. These comparisons provide regression cases for testing interacting compliance controls. The study uses synthetic prices and fixed trading scripts; it does not estimate real-market detection accuracy. The proposed LLM-agent evaluation remains pending.",
   "proposed_primary_category": "q-fin.TR",
   "cross_lists": [],
-  "comments": "11 pages, 3 figures; exploratory scripted simulation study",
+  "comments": "12 pages, 3 figures; exploratory scripted simulation study",
   "license": null,
   "journal_reference": null,
   "publication_doi": null,
   "arxiv_identifier": null,
   "artifact_url": "https://github.com/tokencraftdata/agentic-compliance",
   "artifact_access": "private; no public-access claim",
-  "paper_sha256": "9c9997171bde51105b2d2c69e2a8f26aa890fbbb6fc65d9e682901d9d5b5a84a",
+  "paper_sha256": "71e1fa5cbc3d41970e5df1b720f3d80d7d1331291ea5ade00bf738421962cae3",
   "assessment": "Suitable for release only as a bounded exploratory methods report; independent strategy validation, market calibration, and LLM evidence remain absent.",
   "pending": [
     "human author final read-through",

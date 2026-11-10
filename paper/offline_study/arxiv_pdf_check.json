@@ -1,20 +1,30 @@
 {
   "date": "2026-11-10",
-  "document_version": "2.1",
-  "pages": 11,
+  "document_version": "2.2",
+  "pages": 12,
   "author": "Sandip Nandi",
   "author_confirmed": true,
   "title_matches_metadata": true,
   "abstract_matches_metadata": true,
   "all_manuscript_text_present_in_pdf": true,
   "all_tables_unbroken": true,
+  "table_pages": [
+    3,
+    4,
+    5,
+    5,
+    6,
+    7,
+    8
+  ],
   "text_within_page_margins": true,
-  "code_commit": "469818bac837bf4c9fd9cd6e071aee27df36d0b6",
+  "code_commit": "66ab3635f803f2f3b6b619902de046b391d41326",
   "source_commit_link_verified_in_pdf": true,
   "ai_disclosure": true,
   "all_fonts_embedded": true,
   "no_type3_fonts": true,
   "no_javascript": true,
+  "javascript_check": "PDF object graph, not compressed-stream byte patterns",
   "placeholder_scan_passed": true,
   "fonts": {
     "/AAAAAA+STIXGeneral-Regular": {
@@ -26,14 +36,15 @@
       "embedded": true
     }
   },
-  "pdf_sha256": "9c9997171bde51105b2d2c69e2a8f26aa890fbbb6fc65d9e682901d9d5b5a84a",
+  "pdf_sha256": "71e1fa5cbc3d41970e5df1b720f3d80d7d1331291ea5ade00bf738421962cae3",
   "not_encrypted": true,
   "embedded_figures": 3,
   "no_open_action": true,
   "figure_captions_on_figure_pages": true,
   "references_heading_with_first_entry": true,
   "appendix_count": 0,
-  "reference_count": 24,
+  "reference_count": 29,
   "all_references_cited": true,
+  "llm_results": "pending; no model-selected trades reported",
   "submission_status": "not submitted; author decisions pending"
 }

@@ -16,17 +16,17 @@ Cross-lists
 None proposed for this scripted simulation study.
 
 Abstract
-An order-level size limit can admit a large displayed quantity when it is split across small orders. We study the evaluation of this failure and its repair in a scripted limit-order-book simulator. Six 10-lot orders pass the original gate and detectors in all 40 tested seeds. An aggregate cap removes their response-dependent gain at the original settings, but that result depends on the market-response threshold. In a separate cap-threshold grid with the cancellation throttle disabled, the same 20-lot cap yields a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at threshold 0.2. Throttle tests over 12-minute and one-hour sessions distinguish persistent lockout from recovery after old submissions leave the window. The full aggregate policy reduces maker volume by 14.1% and 28.2% in two short-session controls and by 75.2% in the one-hour test. Finally, a legitimate maker produces alerts in 34 of 40 episodes when its re-quote cadence meets the detector's 180-second window. These are configuration-dependent regression cases for compliance-control testing. The study uses synthetic prices and fixed trading scripts; it does not estimate real-market detection accuracy or evaluate LLM traders.
+Testing a trading-compliance control requires separating surveillance alerts, economic effects, and costs to legitimate execution. We examine these outcomes in a scripted limit-order-book simulator. Six 10-lot orders pass the original order-level size gate and detectors in all 40 tested seeds. An aggregate cap removes their response-dependent gain at the original settings, but that result depends on the market-response threshold. In a separate cap-threshold grid with the cancellation throttle disabled, the same 20-lot cap yields a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at threshold 0.2. Throttle tests over 12-minute and one-hour sessions distinguish persistent lockout from recovery after old submissions leave the window. The full aggregate policy reduces maker volume by 14.1% and 28.2% in two short-session controls and by 75.2% in the one-hour test. Finally, a legitimate maker produces alerts in 34 of 40 episodes when its re-quote cadence meets the detector's 180-second window. These comparisons provide regression cases for testing interacting compliance controls. The study uses synthetic prices and fixed trading scripts; it does not estimate real-market detection accuracy. The proposed LLM-agent evaluation remains pending.
 
 Comments
-11 pages, 3 figures; exploratory scripted simulation study
+12 pages, 3 figures; exploratory scripted simulation study
 
 Journal reference / publication DOI
 Leave empty: no journal publication is claimed for this manuscript.
 
 Upload file
 output/pdf/order_splitting_and_timing.pdf
-SHA-256: 9c9997171bde51105b2d2c69e2a8f26aa890fbbb6fc65d9e682901d9d5b5a84a
+SHA-256: 71e1fa5cbc3d41970e5df1b720f3d80d7d1331291ea5ade00bf738421962cae3
 
 Submission route
 This document was created with ReportLab, not TeX. Use the single-PDF route,
@@ -34,6 +34,9 @@ including all figures and text. Do not upload the reproduction ZIP as a second
 manuscript file. Any ancillary material must follow arXiv's separate guidance.
 
 Assessment
+Version 2.2 adds five published agent/compliance references and clarifies the
+control-evaluation contribution. Actual-LLM results remain pending.
+
 The paper is a bounded exploratory methods report on evaluation pitfalls. It
 reports 2,140 post-review sensitivity episodes, with matched replay, in addition
 to the earlier scripted evidence. No LLM trading study, independent test-family

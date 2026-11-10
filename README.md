@@ -29,7 +29,8 @@ threshold. Recovery in one-hour sessions also leaves substantial maker costs.
 The paper evaluates scripted regression cases, not LLM traders, real-market
 accuracy, or legal compliance.
 
-All 2,140 new episodes replay without mismatches; 82 tests pass. Existing pilot
+All 2,140 new episodes replay without mismatches; the current suite passes 106 tests,
+including the next-phase infrastructure checks. Existing pilot
 code and historical evidence are preserved. See [source and reproduction](paper/offline_study/README.md),
 [review assessment](paper/offline_study/SUBMISSION_REVIEW.md), and
 [review response](paper/offline_study/MAJOR_REVIEW_RESPONSE.md).

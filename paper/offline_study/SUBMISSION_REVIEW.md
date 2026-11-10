@@ -71,6 +71,11 @@ external validity or novelty.
 
 ## Validation and release status
 
+- Version 2.2 passes all 106 current tests. The central numbers were rechecked
+  against 2,140 saved sensitivity episodes. Tables, captions, figure files,
+  experiment code and numerical evidence are unchanged from v2.1. The 12-page
+  PDF contains 29 cited references; all pages were rendered and inspected.
+  See `revision_v2_2_check.json` for the scope of these checks.
 - The original 82 unit/integration tests passed, including the strict threshold boundary and
   separation of aggregate and individual size limits.
 - 40 original event hashes matched before the new study ran.
