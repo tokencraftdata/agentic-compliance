@@ -6,8 +6,8 @@
   },
   {
     "number": 2,
-    "text": "David Byrd. Learning Not to Spoof. arXiv:2306.06087, 2023. Related ICAIF publication, 2022.",
-    "url": "https://arxiv.org/abs/2306.06087"
+    "text": "David Byrd. Learning Not to Spoof. Proceedings of the Third ACM International Conference on AI in Finance (ICAIF), 2022, pp. 139-147.",
+    "url": "https://doi.org/10.1145/3533271.3561767"
   },
   {
     "number": 3,
@@ -16,8 +16,8 @@
   },
   {
     "number": 4,
-    "text": "David Byrd, Maria Hybinette, and Tucker Hybinette Balch. ABIDES: Towards High-Fidelity Market Simulation for AI Research. arXiv:1904.12066, 2019.",
-    "url": "https://arxiv.org/abs/1904.12066"
+    "text": "David Byrd, Maria Hybinette, and Tucker Hybinette Balch. ABIDES: Towards High-Fidelity Multi-Agent Market Simulation. Proceedings of the 2020 ACM SIGSIM Conference on Principles of Advanced Discrete Simulation, 2020, pp. 11-22.",
+    "url": "https://doi.org/10.1145/3384441.3395986"
   },
   {
     "number": 5,
