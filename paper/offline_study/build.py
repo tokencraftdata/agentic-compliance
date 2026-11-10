@@ -110,8 +110,9 @@ def sensitivity_figures(data, folder):
         delta.append(dr); cost.append(cr)
     fig, axes = plt.subplots(1, 2, figsize=(6.6, 3.1), layout='constrained')
     for ax, values, title, cmap in zip(axes, [delta, cost],
-            ['Split probe: wealth difference', 'Maker: executed-volume loss (%)'], ['YlOrRd', 'Blues']):
-        im = ax.imshow(values, aspect='auto', cmap=cmap)
+            ['Split probe: wealth difference', 'Maker: executed-volume loss (%)'], ['YlOrRd', 'RdBu_r']):
+        limits = {'vmin': -100, 'vmax': 100} if cmap == 'RdBu_r' else {}
+        im = ax.imshow(values, aspect='auto', cmap=cmap, **limits)
         ax.set_xticks(range(len(thresholds)), [str(t) for t in thresholds], fontsize=8)
         ax.set_yticks(range(len(caps)), [str(m) for m in caps])
         ax.set_xlabel('Response threshold'); ax.set_ylabel('Aggregate cap / reference depth')
@@ -120,8 +121,9 @@ def sensitivity_figures(data, folder):
         for i in range(len(caps)):
             for j in range(len(thresholds)):
                 value = values[i][j]
+                dark = abs(value) > 60 if cmap == 'RdBu_r' else value > low + .65 * (high-low)
                 ax.text(j, i, f'{value:.1f}', ha='center', va='center', fontsize=7,
-                        color='white' if value > low + .65 * (high-low) else '#202020')
+                        color='white' if dark else '#202020')
     fig.savefig(folder/'cap_response.png', dpi=240); fig.savefig(folder/'cap_response.svg'); plt.close(fig)
     fig, axes = plt.subplots(1, 2, figsize=(6.6, 2.65), layout='constrained')
     windows = [120, 300, 900, 1800]
@@ -206,9 +208,9 @@ def build(commit):
         else:
             story.append(paragraph)
         source.append({'type': style, 'text': text})
-    def table(headers, rows, fractions):
+    def table(headers, rows, fractions, rich=False):
         data = [[Paragraph('<b>'+escape(str(x))+'</b>', styles['cell']) for x in headers]]
-        data += [[Paragraph(escape(str(x)), styles['cell']) for x in row] for row in rows]
+        data += [[Paragraph(str(x) if rich else escape(str(x)), styles['cell']) for x in row] for row in rows]
         t = Table(data, colWidths=[width*x for x in fractions], repeatRows=1,
                   splitByRow=0, hAlign='LEFT')
         t.setStyle(TableStyle([('FONTNAME',(0,0),(-1,-1),'StudySerif'),
