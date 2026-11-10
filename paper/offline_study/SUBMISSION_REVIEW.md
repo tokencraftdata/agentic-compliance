@@ -35,6 +35,14 @@ are compared against version 1.6. Only page-break directives, subsection styling
 and the source snapshot identifier differ in the structured manuscript. This is
 a presentation revision; it does not add scientific validation.
 
+Version 1.8 revises the abstract, introduction, related-work discussion, general
+control discussion, and conclusion around the observed failures. It shortens
+section 10.1 and moves implementation/replay instructions to the repository.
+No appendix is added. The market mechanics, methods and results (sections 2.2-8),
+FINRA subsection, limitations, and assistance disclosure remain unchanged.
+Published ACM versions replace references 2 and 4; the remaining publication
+checks and access limitations are recorded in `publication_review.json`.
+
 ## Verdict
 
 With the focused related-work and FINRA revision completed, the manuscript is

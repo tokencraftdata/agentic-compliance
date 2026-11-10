@@ -1,0 +1,218 @@
+{
+  "date": "2026-11-09",
+  "document_version": "1.8",
+  "scope": "Check all eight references previously cited primarily as arXiv or SSRN for published versions; retain reference numbering.",
+  "updates": [
+    2,
+    4
+  ],
+  "references": [
+    {
+      "reference": 2,
+      "title": "Learning Not to Spoof",
+      "status": "published_conference",
+      "action": "Replace arXiv citation with ACM ICAIF 2022, pp. 139-147",
+      "doi": "10.1145/3533271.3561767",
+      "sources": [
+        "https://api.crossref.org/works/10.1145/3533271.3561767",
+        "https://tildesites.bowdoin.edu/~d.byrd/research.html"
+      ],
+      "note": "Publisher-deposited Crossref metadata and author publication list agree."
+    },
+    {
+      "reference": 4,
+      "title": "ABIDES: Towards High-Fidelity Multi-Agent Market Simulation",
+      "status": "published_conference",
+      "action": "Use the published title and ACM SIGSIM-PADS 2020, pp. 11-22",
+      "doi": "10.1145/3384441.3395986",
+      "sources": [
+        "https://api.crossref.org/works/10.1145/3384441.3395986",
+        "https://par.nsf.gov/servlets/purl/10185795"
+      ],
+      "note": "Published subtitle differs from the 2019 arXiv title. The deposited conference paper and Crossref metadata identify the publication."
+    },
+    {
+      "reference": 5,
+      "title": "The Agentic Regulator",
+      "status": "workshop_presentation_reported_archival_publication_unverified",
+      "action": "Retain arXiv citation; do not label as a main-conference or journal publication",
+      "sources": [
+        "https://arxiv.org/abs/2512.11933",
+        "https://sites.google.com/view/erenkurshanwebpage/publications",
+        "https://www.linkedin.com/posts/tuckerbalch_im-at-the-iclr-workshop-on-advances-on-financial-activity-7454596602939404288-rA3z",
+        "https://sites.google.com/view/iclr2026finai/home"
+      ],
+      "note": "Balch reports an ICLR 2026 financial-AI workshop poster; Kurshan lists an ICML AI in Finance workshop without a year. The official ICLR site confirms the workshop, but not this paper. OpenReview forum/PDF/API access was blocked, and Crossref returned its SSRN posting. Workshop presentation is not treated as proof of archival publication."
+    },
+    {
+      "reference": 8,
+      "title": "ReguSim",
+      "status": "no_conference_or_journal_version_verified",
+      "action": "Retain arXiv v2, 2026",
+      "sources": [
+        "https://arxiv.org/abs/2608.19974v2"
+      ],
+      "note": "Author-deposited record has no journal reference. Exact-title searches and Crossref search did not yield a matching published record."
+    },
+    {
+      "reference": 9,
+      "title": "Safe and Compliant Cross-Market Trade Execution via Constrained RL and Zero-Knowledge Audits",
+      "status": "no_conference_or_journal_version_verified",
+      "action": "Retain arXiv v2, 2025",
+      "sources": [
+        "https://arxiv.org/abs/2510.04952v2"
+      ],
+      "note": "No journal or conference record verified from the author-deposited record and title searches. Crossref search was rate-limited; not interpreted as negative evidence."
+    },
+    {
+      "reference": 10,
+      "title": "Learning the Spoofability of Limit Order Books With Interpretable Probabilistic Neural Networks",
+      "status": "no_conference_or_journal_version_verified",
+      "action": "Retain arXiv, 2025",
+      "sources": [
+        "https://arxiv.org/abs/2504.15908"
+      ],
+      "note": "The arXiv record has no journal reference. Exact-title searches returned preprint and working-paper records. HAL page was inaccessible and Crossref search rate-limited."
+    },
+    {
+      "reference": 12,
+      "title": "Spoofing and Manipulating Order Books with Learning Algorithms",
+      "status": "working_paper_conference_presentation_not_archival_publication",
+      "action": "Retain SSRN 4639959 and its February 2025 revision date",
+      "sources": [
+        "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4639959",
+        "https://papers.ssrn.com/sol3/cf_dev/AbsByAuth.cfm?per_id=349872",
+        "https://wp.lancs.ac.uk/ffmm2024/programme/"
+      ],
+      "note": "Author and SSRN records retain a working-paper citation. A conference presentation alone does not establish proceedings publication. Crossref search was rate-limited."
+    },
+    {
+      "reference": 13,
+      "title": "Detecting Layering and Spoofing in Markets",
+      "status": "no_conference_or_journal_version_verified",
+      "action": "Retain SSRN 4525036, 2023",
+      "sources": [
+        "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4525036",
+        "https://web-tools.uts.edu.au/publications/search.cfm?unitId=554&year=2023"
+      ],
+      "note": "SSRN and the institutional record identify the working paper. The exact Crossref title match is posted-content, not a journal or proceedings article."
+    }
+  ],
+  "bibliography_counts": {
+    "conference_or_journal_papers": 7,
+    "preprints_or_working_papers": 6,
+    "official_FINRA_sources": 4,
+    "total": 17
+  },
+  "limitations": "No verified publication means no such version was established in these checks, not proof that none exists. Presentation, acceptance, and archival publication are distinct. Metadata improvements do not validate the experiments.",
+  "crossref_publisher_records": [
+    {
+      "title": [
+        "Learning Not to Spoof"
+      ],
+      "DOI": "10.1145/3533271.3561767",
+      "container-title": [
+        "Proceedings of the Third ACM International Conference on AI in Finance"
+      ],
+      "page": "139-147",
+      "published": {
+        "date-parts": [
+          [
+            2022,
+            10,
+            26
+          ]
+        ]
+      },
+      "type": "proceedings-article",
+      "author": [
+        {
+          "given": "David",
+          "family": "Byrd",
+          "sequence": "first",
+          "affiliation": [
+            {
+              "name": "Bowdoin College, US"
+            }
+          ],
+          "role": [
+            {
+              "vocabulary": "crossref",
+              "role": "author"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": [
+        "ABIDES"
+      ],
+      "DOI": "10.1145/3384441.3395986",
+      "container-title": [
+        "Proceedings of the 2020 ACM SIGSIM Conference on Principles of Advanced Discrete Simulation"
+      ],
+      "page": "11-22",
+      "published": {
+        "date-parts": [
+          [
+            2020,
+            6,
+            15
+          ]
+        ]
+      },
+      "type": "proceedings-article",
+      "author": [
+        {
+          "given": "David",
+          "family": "Byrd",
+          "sequence": "first",
+          "affiliation": [
+            {
+              "name": "Georgia Institute of Technology, Atlanta, GA, USA"
+            }
+          ],
+          "role": [
+            {
+              "vocabulary": "crossref",
+              "role": "author"
+            }
+          ]
+        },
+        {
+          "given": "Maria",
+          "family": "Hybinette",
+          "sequence": "additional",
+          "affiliation": [
+            {
+              "name": "University of Georgia, Athens, GA, USA"
+            }
+          ],
+          "role": [
+            {
+              "vocabulary": "crossref",
+              "role": "author"
+            }
+          ]
+        },
+        {
+          "given": "Tucker Hybinette",
+          "family": "Balch",
+          "sequence": "additional",
+          "affiliation": [
+            {
+              "name": "J.P. Morgan AI Research, New York, NY, USA"
+            }
+          ],
+          "role": [
+            {
+              "vocabulary": "crossref",
+              "role": "author"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

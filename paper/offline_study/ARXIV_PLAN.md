@@ -6,7 +6,7 @@ review, completed customer study, or promise of arXiv acceptance.
 ## Recommendation
 
 Current title: **Evaluating Controls for Trading Compliance: An Offline Study of
-Order Splitting and Cancellation Timing** (version 1.7). The compliance framing
+Order Splitting and Cancellation Timing** (version 1.8). The compliance framing
 concerns evaluation of candidate technical controls, with the existing scripted
 measurements and limitations preserved.
 
@@ -65,7 +65,7 @@ the submitted PDF. Preparation remains distinct from actual submission.
    outline fonts, and no JavaScript. If converted to TeX, submit TeX source rather
    than only its output PDF. See [PDF guidance](https://info.arxiv.org/help/submit_pdf.html).
 8. Match title, abstract, and author metadata to the final PDF. Suggested
-   comments: "12 pages, 2 figures; exploratory scripted simulation
+   comments: "11 pages, 2 figures; exploratory scripted simulation
    study." Verify the page count again if the document is edited. Leave journal
    reference and publication DOI empty unless they actually exist.
 9. The author completes submission and checks the confirmation/status. arXiv

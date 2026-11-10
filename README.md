@@ -4,7 +4,7 @@
 
 [Read the paper](output/pdf/order_splitting_and_timing.pdf): **Evaluating Controls
 for Trading Compliance: An Offline Study of Order Splitting and Cancellation
-Timing** (version 1.7). The paper evaluates candidate surveillance and pre-trade
+Timing** (version 1.8). The paper evaluates candidate surveillance and pre-trade
 controls through completed scripted experiments, including the legitimate-maker
 cadence failure found during review. It separates detection, response-dependent
 economic effects, and legitimate execution cost; it does not establish legal
@@ -15,7 +15,9 @@ Rules 3110 and 5210. These are context for control evaluation, not a claim that
 the implemented gates satisfy the rules. Version 1.6 clarifies that offline
 means simulated execution, while scripted describes how trading actions are
 chosen. Version 1.7 restores the continuous academic article layout without
-changing the findings. Copyable arXiv fields are in
+changing the findings. Version 1.8 rewrites the framing, shortens the artifact
+section, and cites published ACM versions of Learning Not to Spoof and ABIDES.
+Copyable arXiv fields are in
 [the submission sheet](paper/offline_study/arxiv_submission.txt).
 
 The new measurement package adds 360 episodes, matched economic endpoints, and a
