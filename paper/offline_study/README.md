@@ -3,7 +3,7 @@
 **Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
 
 This manuscript reports completed scripted experiments only. It replaces the
-completed-LLM-study framing of the earlier full-paper draft. Version 1.6 is a
+completed-LLM-study framing of the earlier full-paper draft. Version 1.7 is a
 preprint prepared for arXiv with the confirmed author, Sandip Nandi (Independent
 Researcher). Preparation is not a claim of submission, public release,
 preregistration, or peer review.
@@ -33,6 +33,12 @@ saved records for five central claims and writes `research_review.json`. It does
 not rerun strategies or establish external validity. Run it with the numeric
 interpreter: `python3 paper/offline_study/audit_claims.py`. The literature review
 now includes 17 sources, including liquidity-dependent spoofing research.
+
+Version 1.7 restores a continuous single-column academic layout, with an inset
+abstract, indented body paragraphs, and centered page numbers. Tables and figure
+captions stay with their associated material. The full version 1.6 manuscript
+text, references, measurements, and assistance disclosure are preserved; only
+the source-snapshot identifier and presentation change.
 
 `arxiv_submission.txt` contains the copyable upload fields and the remaining
 author/account decisions. Upload the single PDF; the text sheet and repository
