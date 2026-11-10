@@ -51,7 +51,9 @@ REFS = [
     ('Xuan Tao, Andrew Day, Lan Ling, and Samuel Drapeau. On detecting spoofing strategies in high-frequency trading. Quantitative Finance 22(8), 2022, pp. 1405-1425.', 'https://doi.org/10.1080/14697688.2022.2059390'),
     ('Jianqiang Chen, Pei-Fang Hsieh, and J. Jimmy Yang. Order spoofing, price impact, and market quality. Pacific-Basin Finance Journal 97, 2026, article 103077.', 'https://doi.org/10.1016/j.pacfin.2026.103077'),
     ('Commodity Futures Trading Commission. Antidisruptive Practices Authority: Interpretive guidance and policy statement. Federal Register 78, 2013, pp. 31890-31897.', 'https://www.cftc.gov/LawRegulation/FederalRegister/FinalRules/2013-12365.html'),
-    ('European Commission. Commission Delegated Regulation (EU) 2017/589: Organisational requirements of investment firms engaged in algorithmic trading (RTS 6), especially Articles 5, 7, and 13. Official Journal L 87, 2017, pp. 417-448.', 'https://eur-lex.europa.eu/eli/reg_del/2017/589/oj/eng')
+    ('European Commission. Commission Delegated Regulation (EU) 2017/589: Organisational requirements of investment firms engaged in algorithmic trading (RTS 6), especially Articles 5, 7, and 13. Official Journal L 87, 2017, pp. 417-448.', 'https://eur-lex.europa.eu/eli/reg_del/2017/589/oj/eng'),
+    ("Robinhood. Robinhood Puts the Power of Hedge Funds in Every Trader's Pocket. Company announcement, September 29, 2026. Accessed November 10, 2026.", 'https://robinhood.com/newsroom/hood-summit-2026/'),
+    ('Robinhood. Trading with your agent. Product documentation, accessed November 10, 2026.', 'https://robinhood.com/us/en/support/articles/trading-with-your-agent/')
 ]
 
 
@@ -259,7 +261,7 @@ def build(commit):
         'authors':[{'name':'Sandip Nandi','affiliation':'Independent Researcher'}],
         'blocks':source},indent=2)+'\n')
     (HERE/'references.json').write_text(json.dumps([{'number':i,'text':t,'url':u} for i,(t,u) in enumerate(REFS,1)],indent=2)+'\n')
-    manifest={'document_version':'2.0','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
+    manifest={'document_version':'2.1','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
               'reportlab':reportlab.Version,'matplotlib':matplotlib.__version__,
               'source_sha256':digest(Path(__file__)),'content_source_sha256':digest(HERE/'content.py'),'evidence_manifest_sha256':digest(DATA/'manifest.json'),
               'summary_sha256':digest(DATA/'summary.json'),

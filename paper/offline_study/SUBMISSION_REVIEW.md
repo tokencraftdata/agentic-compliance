@@ -1,7 +1,15 @@
 # Submission assessment - 10 November 2026
 
-Version 2.0 has been reassessed as an exploratory computational methods report.
+Version 2.1 retains the assessment of version 2.0 as an exploratory computational methods report.
 The paper is not a validated agentic-compliance system or an LLM trading study.
+
+## Scope of version 2.1
+
+Adds Robinhood as a dated industry example using two official company sources,
+and explains how the scripted cases could support control regression testing.
+The company citations motivate the study; they do not validate its methods or
+establish demand. No experiment, result, detector definition, table, or figure
+has changed. No Robinhood system or customer activity has been evaluated.
 
 ## Scientific assessment
 
@@ -29,7 +37,8 @@ Version 2.0 addresses these issues with new comparisons and narrower claims:
   organized around three findings rather than an experiment-development log.
 - Three published journal articles and CFTC/EU sources broaden the literature
   and regulatory discussion. The bibliography has 10 journal/conference papers,
-  4 arXiv preprints, 2 SSRN working papers, and 6 official regulatory sources.
+  4 arXiv preprints, 2 SSRN working papers, 6 official regulatory sources, and
+  2 official company sources for the motivating example.
 
 ## Remaining limitations
 
