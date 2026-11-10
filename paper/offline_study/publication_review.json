@@ -1,6 +1,6 @@
 {
   "date": "2026-11-09",
-  "document_version": "2.0",
+  "document_version": "2.1",
   "scope": "Check all eight references previously cited primarily as arXiv or SSRN for published versions; retain reference numbering.",
   "updates": [
     2,
@@ -103,7 +103,8 @@
     "arxiv_preprints": 4,
     "SSRN_working_papers": 2,
     "official_regulatory_sources": 6,
-    "total": 22
+    "total": 24,
+    "official_company_sources": 2
   },
   "limitations": "No verified publication means no such version was established in these checks, not proof that none exists. Presentation, acceptance, and archival publication are distinct. Metadata improvements do not validate the experiments.",
   "crossref_publisher_records": [
@@ -284,5 +285,27 @@
       "url": "https://eur-lex.europa.eu/eli/reg_del/2017/589/oj/eng"
     }
   ],
-  "expanded_review_scope": "Primary publisher and author/institutional records verified publication and the relevant methods. Some full-text publisher pages were inaccessible; the comparisons use accessible publisher abstracts, article previews and author descriptions, not an unperformed audit of their code."
+  "expanded_review_scope": "Primary publisher and author/institutional records verified publication and the relevant methods. Some full-text publisher pages were inaccessible; the comparisons use accessible publisher abstracts, article previews and author descriptions, not an unperformed audit of their code.",
+  "industry_motivation_check": {
+    "date": "2026-11-10",
+    "references": [
+      {
+        "reference": 23,
+        "status": "official_company_announcement",
+        "source": "https://robinhood.com/newsroom/hood-summit-2026/",
+        "published": "2026-09-29",
+        "supports": "Announcement of built-in trading agents."
+      },
+      {
+        "reference": 24,
+        "status": "official_product_documentation",
+        "source": "https://robinhood.com/us/en/support/articles/trading-with-your-agent/",
+        "accessed": "2026-11-10",
+        "supports": "Order placement and cancellation; built-in approval default and eligible trades without per-order confirmation when disabled.",
+        "scope_note": "Built-in and external-agent defaults differ. The paper only describes the built-in default."
+      }
+    ],
+    "use": "Industry motivation only; not peer-reviewed evidence, a product evaluation, customer-demand validation, or new experimental results.",
+    "omitted": "Adoption counts, tool-call counts, upcoming weekend trading, and Loops are not needed for the paper claim."
+  }
 }

@@ -4,9 +4,12 @@
 
 [Read the paper](output/pdf/order_splitting_and_timing.pdf): **Evaluating Controls
 for Trading Compliance: An Offline Study of Order Splitting and Cancellation
-Timing** (version 2.0).
+Timing** (version 2.1).
 
-The revision adds 2,140 exploratory sensitivity episodes, formal detector
+Version 2.1 adds a Robinhood example, two official company references, and a
+clearer explanation of practical testing uses. Numerical evidence is unchanged.
+
+The version 2.0 revision added 2,140 exploratory sensitivity episodes, formal detector
 conditions, and three published finance-journal papers. It organizes the results
 around cap/response dependence, throttle cost and recovery, and detector timing.
 The aggregate cap's original zero-gain result does not survive every response
