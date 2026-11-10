@@ -1,21 +1,28 @@
 {
   "date": "2026-11-09",
-  "version": "1.7",
-  "baseline_commit": "582e5ca9e38832a47c9dcf0cde9c5385c7eecf81",
-  "source_commit": "37815c16a9e43d1cd57201f742a9bac41dc73feb",
-  "complete_manuscript_text_preserved_except_source_snapshot": true,
-  "structured_changes": [
-    "remove forced page-break blocks",
-    "correct subsection 9.2 to h2",
-    "update source snapshot commit"
+  "version": "1.8",
+  "baseline_commit": "2781e7c24c6820247b5b15a27957c782ae844830",
+  "source_commit": "8a19bfd0bcd562130169e1f2fb9c228c24ce5817",
+  "revised_sections": [
+    "Abstract",
+    "1 Introduction",
+    "2.1 Related work",
+    "9 General discussion",
+    "10.1 Artifact and verification",
+    "10.2 Conclusion"
   ],
-  "title_abstract_and_authors_unchanged": true,
+  "title_and_authors_unchanged": true,
+  "market_mechanics_methods_and_results_sections_2_2_through_8_unchanged": true,
+  "FINRA_subsection_limitations_and_assistance_disclosure_unchanged": true,
   "experimental_tables_unchanged": true,
   "figure_pngs_and_svgs_unchanged": true,
   "experiment_code_tests_configs_and_results_unchanged": true,
-  "conclusion_and_both_assistants_disclosure_preserved": true,
-  "references_added": 0,
+  "reference_numbers_updated_to_published_versions": [
+    2,
+    4
+  ],
   "all_17_references_cited": true,
+  "publication_review": "paper/offline_study/publication_review.json",
   "tests": {
     "command": "python3 -m unittest discover -s tests -v",
     "interpreter": "CPython 3.9.6",
@@ -31,6 +38,6 @@
   },
   "prior_validation_commit": "02d6607fd2b28e70807d09c0139a95e2d56502be",
   "unit_tests_and_replay_rerun": false,
-  "scope": "Presentation-only revision with complete content comparison against version 1.6. No additional trading experiment or scientific validation.",
-  "pdf_sha256": "b0bef544bc668341b793c41e3cac59d42b90daaeff39ed9cf72fed3ecbb57c3a"
+  "scope": "Editorial revision and publication-status verification. Detailed reproduction instructions moved to repository; no appendix added, new trading experiment, or new scientific validation.",
+  "pdf_sha256": "b08399483a271ffb1cf4e7c32a9cad255732e7cc7cb3f64a34f79d483604e7eb"
 }

@@ -30,7 +30,7 @@
     },
     {
       "type": "body",
-      "text": "We evaluate technical controls for trading compliance in a deterministic, replayable limit-order-book simulator, measuring detection, economic effects, and legitimate execution. An initial 960-episode scripted evaluation is followed by 2,160 repair episodes, throttle-isolation and randomized-parameter probes, and a new 360-episode measurement study. Six 10-lot orders bypass both a legacy per-order gate and its original detectors in all 40 tested seeds. An aggregate gate removes the engineered response benefit for this probe, but its apparent advantage over the legacy gate on legitimate trading is largely a cancellation-throttle interaction. Matching responsive and unresponsive markets at the same gate finds no response-dependent wealth advantage in 40 randomized draws. Detection remains sensitive to legitimate quoting cadence: a 180-second window flags a patient market maker in 34 of 40 episodes when it re-quotes every 180 seconds, despite zero alerts at a 300-second cadence. These exploratory results concern candidate controls in a stipulated market mechanism. They do not establish legal compliance. No LLM policy, live market, or human intent annotation is evaluated."
+      "text": "An order-level size check can admit a large displayed quantity when it arrives as several small orders. We examine this failure and its repair in a replayable limit-order-book simulator. Six 10-lot orders pass the legacy pre-trade gate and its original detectors in all 40 tested seeds. A cap on total same-side quantity removes the benefit from the model's imbalance response for this probe. Its apparent advantage over the legacy gate on legitimate market making, however, largely reflects when a cancellation throttle activates. In a separate comparison of 40 parameterized probes, responsive and unresponsive markets produce identical event streams under the aggregate gate, with zero wealth differences. Detector tuning exposes another weakness: a 180-second window flags a legitimate maker in 34 of 40 episodes when it re-quotes every 180 seconds, compared with none at a 300-second cadence. The experiments show how order representation and timing can undermine the evaluation of trading-compliance controls. They use fixed scripts in a synthetic market; they neither establish legal compliance nor evaluate LLM trading."
     },
     {
       "type": "h1",
@@ -38,19 +38,19 @@
     },
     {
       "type": "body",
-      "text": "This study asks whether candidate controls for trading compliance can flag or constrain scripted spoofing-like sequences while preserving legitimate trading. Surveillance identifies sequences for review; pre-trade gates decide whether proposed actions may enter the market. Their evaluation must separate alerts, rejected actions, economic effects, and execution cost. An absence of alerts or a high rejection count alone cannot establish that a control removed the tested harmful payoff."
+      "text": "The legacy gate rejects the 60-lot displayed order used in this study. Splitting it into six 10-lot orders makes the intended display admissible: each order falls below the size cap, and the sequence occupies only one price level. The script then trades on the opposite side and cancels the remaining display without triggering the original detectors. The control has checked each order, but missed the sequence that matters to the market response."
     },
     {
       "type": "body",
-      "text": "Order splitting means dividing a larger order into smaller submissions. It is not, by itself, evidence of deceptive conduct. The counterexample studied here displays the split quantity, executes a small trade on the opposite side, and cancels the remaining display. The scheduled execution controls instead use smaller orders to acquire an 80-lot position."
+      "text": "Order splitting is also part of ordinary execution. Our legitimate execution scripts divide an 80-lot purchase into smaller orders. The spoofing-like script uses displayed quantity to induce a price response before trading on the other side. Both submit and cancel orders, so a useful control must be tested against both. The script definitions supply the labels in this study; the order patterns alone do not establish a trader's intent."
     },
     {
       "type": "body",
-      "text": "The experiments began as infrastructure for the Agentic Compliance project's planned study of LLM trading agents. Scripted tests exposed weaknesses before any model was run: split orders bypassed per-order checks, an aggregate cap interacted with a submission throttle, and a selected detection window flagged legitimate market making at a different quoting cadence. These findings motivate evaluating the control system before interpreting an agent's behaviour."
+      "text": "We examine surveillance rules, which flag completed patterns, and pre-trade gates, which accept or reject proposed actions. Adding a cap on aggregate display repairs the split-order case, but also changes legitimate execution and the point at which a cancellation throttle activates. A longer surveillance window catches slow variants of the scripted sequence, then flags a legitimate maker that quotes at a different cadence. These interactions require comparisons of the recorded trades and wealth, as well as the alerts."
     },
     {
       "type": "body",
-      "text": "Our contribution is a reproducible evaluation of these candidate controls, with matched economic comparisons and legitimate trading tasks. FINRA guidance on algorithm testing and supervision [14,15] motivates this use, while Rule 5210 [16] provides market-conduct context. The experiments test neither those requirements as a whole nor a firm's compliance with them. Recorded actions, rejection reasons, fills, and alerts make the simulated decisions inspectable. LLM behaviour and human compliance-review workflows remain unevaluated."
+      "text": "The simulator was built for the Agentic Compliance project's planned study of LLM trading agents. Testing it with fixed scripts exposed these failures before any model was run. The present paper reports that control evaluation. FINRA guidance on algorithm testing and supervision [14,15], together with Rule 5210's market-conduct provisions [16], supplies its regulatory context. The connection is to testing components of a supervisory system, not certifying a firm's compliance. Section 9.1 sets out the specific connections and gaps."
     },
     {
       "type": "h1",
@@ -62,23 +62,23 @@
     },
     {
       "type": "body",
-      "text": "Wang and Wellman [1] model spoofing against traders that use order-book information. Wang, Hoang, Vorobeychik, and Wellman [7] extend and supersede that study, examining strategic responses, order-book cloaking, and modified learning strategies. Byrd [2] studies a reinforcement-learning trader that discovers spoofing and a learned recognizer used to discourage it. Cartea, Chang, and Garc\u00eda-Arenas [12] derive conditions under which learning algorithms manipulate an order book. In the present experiments, trading rules are fixed programs. The results describe how controls respond to those programs."
+      "text": "Agent-based studies have examined how spoofing exploits traders' use of order-book information. Wang and Wellman [1] model that interaction; Wang, Hoang, Vorobeychik, and Wellman [7] extend and supersede the earlier study with strategic responses, book cloaking, and modified learning strategies. Byrd [2] shows a reinforcement-learning trader discovering spoofing and uses a learned recognizer to discourage it. Cartea, Chang, and Garc\u00eda-Arenas [12] derive conditions under which learning algorithms manipulate an order book. Here the trading programs are fixed, allowing us to examine control failures without a learning policy changing at the same time."
     },
     {
       "type": "body",
-      "text": "Wang and Wellman [3] study adversarial learning between manipulation and detection. Do and Putni\u0146\u0161 [13] develop empirical detectors using prosecuted cases and out-of-sample evaluation. Fabre and Challet [10] use Level-3 market data to model price responses and assess potential spoofing gains. Our labels come from authored scripts, and the price response is stipulated. These choices permit controlled comparisons but do not support estimates of real-market detection accuracy or manipulation profitability."
+      "text": "The detection literature uses several kinds of evidence. Wang and Wellman [3] study adversarial learning between manipulation and detection. Do and Putni\u0146\u0161 [13] use prosecuted cases and out-of-sample evaluation, while Fabre and Challet [10] use Level-3 market data to estimate price responses and potential spoofing gains. Our synthetic response and script-based labels serve a narrower purpose: controlled comparisons of changes to the gate and detector. They cannot yield real-market accuracy or profitability estimates."
     },
     {
       "type": "body",
-      "text": "ReguSim [8] separates an LLM trader's stated reasoning, attempted orders, execution enforcement, and monitor evidence. Its trader experiment uses exogenous prices and full execution of accepted orders, without order-book interaction or market impact. The present study examines split display, partial fills, cancellation timing, and response-dependent wealth in a small order book. Its measurements concern order lifecycles and their economic effects; it contains no comparison of LLMs."
+      "text": "ReguSim [8] is a close comparison for agent compliance. It records an LLM trader's stated reasoning and attempted orders separately from enforcement and monitoring. Its trader experiment uses exogenous prices and full execution of accepted orders, without order-book interaction or market impact. Our simulator adds partial fills and cancellations to a small order book, so the tests can follow a displayed order through opposite-side execution and withdrawal. The experiments in this paper do not compare LLMs."
     },
     {
       "type": "body",
-      "text": "Borjigin and He [9] propose constrained reinforcement-learning execution with a runtime action shield and a cryptographic audit layer. Their full cryptographic proof pipeline is left to future work. We use the proposal as an architectural comparison, without claiming that its audit layer has been implemented or independently validated. Byrd's agentic pump-and-dump study [11] combines an RL trader with LLM-generated social posts. The simulator used here has neither that information channel nor autonomous learning."
+      "text": "Other work addresses execution constraints and governance. Borjigin and He [9] propose constrained reinforcement learning with a runtime action shield and cryptographic auditing; the full proof pipeline remains future work. Kurshan, Balch, and Byrd [5] propose an agent-based governance architecture and discuss a spoofing case. Byrd's pump-and-dump study [11] combines an RL trader with LLM-generated social posts, an information channel absent from our environment."
     },
     {
       "type": "body",
-      "text": "ABIDES [4] offers a richer architecture with interacting agents and communication latencies. Our engine is a smaller purpose-built model, not an ABIDES calibration. Kurshan, Balch, and Byrd [5] discuss agent-based governance and a spoofing case study. Gu et al. [17] vary market-maker liquidity and compare baseline, tuned, and reinforcement-learned spoofing strategies. Our fixed liquidity setting does not test that regime dependence. This paper adds three measured counterexamples: splitting defeats per-order checks, throttle timing confounds a gate comparison, and a legitimate quoting cadence defeats a selected detection window. Matched economic comparisons and replay make those failures inspectable. Broader control effectiveness remains untested."
+      "text": "Market design also limits what a simulation can establish. ABIDES [4] supports interacting agents and communication latencies. Gu et al. [17] vary market-maker liquidity and compare baseline, tuned, and reinforcement-learned spoofing strategies. Our engine is purpose-built, with fixed background liquidity and no calibration to ABIDES or exchange data. It isolates order-level control failures but leaves their sensitivity to richer market conditions unresolved."
     },
     {
       "type": "h2",
@@ -516,19 +516,19 @@
     },
     {
       "type": "body",
-      "text": "The results identify three questions for evaluating technical controls intended to support trading compliance: does surveillance flag the tested sequence, does a gate remove its response-dependent payoff, and how much legitimate trading does the gate obstruct? The six-by-ten probe passes both per-order checks while preserving the engineered response. Aggregating quantity repairs this case, but the gate and detector share related size rules. Their agreement provides limited evidence of broader protection."
+      "text": "The split-order failure comes from a mismatch in what the rules observe. The legacy gate limits each submission, while the simulated price response depends on displayed quantity across the book. Several small orders can therefore induce the response that one rejected order would have induced. Aggregation aligns the gate with this particular mechanism. Because the revised gate and detector both depend on displayed size, agreement between them is weak evidence against other forms of manipulation."
     },
     {
       "type": "body",
-      "text": "Execution cost must be measured separately from alert reduction. A size cap changes how quickly accepted submissions accumulate and when the cancellation-ratio throttle activates, reversing the apparent ranking of complete policies. The 12-minute horizon magnifies this interaction because the throttle window never expires. Longer sessions could produce repeated lockout and recovery; those dynamics remain unmeasured."
+      "text": "The throttle comparison shows why a complete policy cannot be assessed by inspecting its size cap alone. Changing how many quotes are admitted changes how quickly the cancellation ratio reaches its activation threshold. A stricter display cap can consequently leave a legitimate maker trading for longer. In a 12-minute session, that ordering dominates the cost comparison because the throttle window never expires. Sessions long enough to include expiry and recovery are needed before drawing a broader conclusion about execution cost."
     },
     {
       "type": "body",
-      "text": "Surveillance evaluation also needs legitimate strategies capable of triggering the pattern being tested. One-sided executors cannot challenge a rule requiring opposite-side fills. At the selected 180-second window, changing the legitimate maker's re-quote cadence from 300 to 180 seconds changes the alert count from zero to 34/40. This is a false-alert result relative to the declared control, not a legal classification of its orders. Analyst workload and investigation quality were not measured."
+      "text": "The cadence result exposes a gap in the negative controls. A buy-only executor cannot trigger a pattern requiring opposite-side fills, and a maker quoting below the size threshold cannot challenge the aggregate rule. Even the larger patient maker misses the critical timing boundary at its original cadence. Changing that cadence produces false alerts without changing the script's legitimate objective. Choosing another window on the expanded grid would repeat the same selection problem; evaluation on separate strategy families is the next test."
     },
     {
       "type": "body",
-      "text": "The replay artifact could support review of a control change by showing attempted actions, gate decisions, fills, and subsequent alerts. Its demonstrated property is reproducibility of these simulated records. We did not evaluate a human review process, regulatory reporting, record-retention requirements, or tamper resistance; replayability alone does not establish those capabilities."
+      "text": "Recorded action sequences made these comparisons possible. They let us identify the first throttle rejection, rescore the same orders, and compare responsive and unresponsive event streams under identical gate rules. Such records could help an analyst investigate a control change. The study has not measured that review process, analyst workload, regulatory reporting, retention compliance, or tamper resistance."
     },
     {
       "type": "h2",
@@ -580,43 +580,11 @@
     },
     {
       "type": "body",
-      "text": "The new analysis preserves all historical code and evidence. It adds matching gated counterfactuals, a cadence grid, corrected per-side display measurement, and an executable economic endpoint. Every new record stores the attempted-action sequence, subject-related events, rejection reasons, detector outputs, and a hash of the full event stream. Background events are reconstructed deterministically rather than claimed to be fully present in the compressed subject-event archive."
-    },
-    {
-      "type": "body",
-      "text": "Verification replays attempted actions without invoking the strategy generator, checks the full-event hash and recorded fields, recomputes every new CSV row and summary, and checks the historical source and evidence hashes. Exact numeric reproduction uses CPython 3.9.6, matching the saved cohorts. Different Python summation implementations can change the last bits of bootstrap summaries. No provider credential or network access is needed to reproduce the measurements."
+      "text": "The repository contains the simulator, frozen configurations, saved traces, and commands for replay and regeneration. Verification replays recorded actions without calling the strategy, checks full-event hashes, and recomputes the reported rows and summaries. Exact numerical reproduction uses CPython 3.9.6. Tables and figures are generated from the checked summary; a manifest records hashes of the source, evidence, manuscript, and PDF. Detailed setup instructions and the limitations of historical regeneration are in the repository README. The repository is currently access-controlled."
     },
     {
       "type": "small",
-      "text": "Run from the repository root using the pinned interpreter:"
-    },
-    {
-      "type": "code",
-      "text": "python3 -m unittest discover -s tests -v"
-    },
-    {
-      "type": "code",
-      "text": "python3 -m paper_study.evaluate verify results/paper-review-v1"
-    },
-    {
-      "type": "code",
-      "text": "python3 -m paper_study.evaluate run results/local-paper-review"
-    },
-    {
-      "type": "code",
-      "text": "python3 -m paper_study.evaluate verify results/local-paper-review"
-    },
-    {
-      "type": "body",
-      "text": "Use a fresh output directory for regeneration. The study reads frozen historical configurations, including the 180-second evasion configuration, rather than the mutable root config. The older pilot regeneration command reads the root config and therefore should not be used to claim byte-identical reproduction of a 120-second cohort after the default changes. Historical replay commands use each cohort's saved configuration."
-    },
-    {
-      "type": "body",
-      "text": "The manuscript tables and figures are generated from the new summary, which includes checked historical summaries. The builder writes an editable structured manuscript, reference list, figure files, and a document manifest linking this PDF to its source and evidence hashes. The repository is access-controlled at the time of this draft; this is an artifact availability statement, not a claim of public release."
-    },
-    {
-      "type": "small",
-      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/37815c16a9e43d1cd57201f742a9bac41dc73feb\">tokencraftdata/agentic-compliance, 37815c16a9e43d1cd57201f742a9bac41dc73feb</link>"
+      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/8a19bfd0bcd562130169e1f2fb9c228c24ce5817\">tokencraftdata/agentic-compliance, 8a19bfd0bcd562130169e1f2fb9c228c24ce5817</link>"
     },
     {
       "type": "h2",
@@ -624,7 +592,7 @@
     },
     {
       "type": "body",
-      "text": "Evaluating controls for trading compliance requires examining detection, economic prevention, and legitimate execution separately. In this scripted testbed, order splitting defeats per-order checks; aggregation removes the tested response-dependent payoff; and cancellation timing exposes both throttle costs and false alerts on legitimate market making. These results support a reproducible method for examining candidate controls within the stated simulator. They do not establish legal compliance or effective oversight of LLM trading agents. A future agent study must first test its controls against broader, independently evaluated trading strategies."
+      "text": "The aggregate gate fixes the split-order probe in this simulator: the tested scripts lose the wealth advantage caused by the engineered price response. That repair does not settle the evaluation. Throttle timing changes the apparent cost of the gate, and a legitimate quoting cadence defeats the selected detector window. The resulting traces provide concrete regression cases for further control development. Before introducing LLM traders, the next study should test these controls on separate strategy families and market conditions, with legitimate execution measured alongside suspicious activity."
     },
     {
       "type": "h2",
@@ -644,7 +612,7 @@
     },
     {
       "type": "small",
-      "text": "[2] David Byrd. Learning Not to Spoof. arXiv:2306.06087, 2023. Related ICAIF publication, 2022.<br/><link href=\"https://arxiv.org/abs/2306.06087\" color=\"#254f70\">https://arxiv.org/abs/2306.06087</link>"
+      "text": "[2] David Byrd. Learning Not to Spoof. Proceedings of the Third ACM International Conference on AI in Finance (ICAIF), 2022, pp. 139-147.<br/><link href=\"https://doi.org/10.1145/3533271.3561767\" color=\"#254f70\">https://doi.org/10.1145/3533271.3561767</link>"
     },
     {
       "type": "small",
@@ -652,7 +620,7 @@
     },
     {
       "type": "small",
-      "text": "[4] David Byrd, Maria Hybinette, and Tucker Hybinette Balch. ABIDES: Towards High-Fidelity Market Simulation for AI Research. arXiv:1904.12066, 2019.<br/><link href=\"https://arxiv.org/abs/1904.12066\" color=\"#254f70\">https://arxiv.org/abs/1904.12066</link>"
+      "text": "[4] David Byrd, Maria Hybinette, and Tucker Hybinette Balch. ABIDES: Towards High-Fidelity Multi-Agent Market Simulation. Proceedings of the 2020 ACM SIGSIM Conference on Principles of Advanced Discrete Simulation, 2020, pp. 11-22.<br/><link href=\"https://doi.org/10.1145/3384441.3395986\" color=\"#254f70\">https://doi.org/10.1145/3384441.3395986</link>"
     },
     {
       "type": "small",
