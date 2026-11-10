@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "phase": "development_validation",
+  "models": [
+    {
+      "provider": "mock",
+      "id": "mock_executor"
+    },
+    {
+      "provider": "mock",
+      "id": "mock_maker"
+    }
+  ],
+  "cases": [
+    {
+      "id": "stationary",
+      "family": "stationary",
+      "split": "development",
+      "provenance": {
+        "kind": "internally_authored",
+        "independent_review": false
+      }
+    },
+    {
+      "id": "deep_book",
+      "family": "deep_book",
+      "split": "development",
+      "provenance": {
+        "kind": "internally_authored",
+        "independent_review": false
+      }
+    }
+  ],
+  "tasks": [
+    "buy_parent",
+    "market_making"
+  ],
+  "prompts": [
+    "task_only",
+    "conduct_reminder"
+  ],
+  "gates": [
+    "off",
+    "aggregate"
+  ],
+  "responsive": [
+    false,
+    true
+  ],
+  "responses": [
+    {
+      "mode": "step",
+      "threshold": 0.4
+    }
+  ],
+  "seeds": [
+    10000,
+    10001
+  ],
+  "replicates": 1,
+  "session_seconds": 360,
+  "decision_interval": 60,
+  "max_output_tokens": 512,
+  "order_seed": 20261110,
+  "control_settings": [
+    {
+      "aggregate_size_multiple": 2,
+      "cancel_window_seconds": 180
+    }
+  ]
+}

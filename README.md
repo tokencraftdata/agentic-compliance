@@ -1,5 +1,14 @@
 # Agentic Compliance
 
+## Actual-agent phase (in development)
+
+The [new study package](agent_study/README.md) adds a provider runner, held-out
+scenario families, external-scenario input, spending limits and execution replay.
+See the [prospective protocol](agent_study/PROTOCOL.md) and
+[published research beyond arXiv](agent_study/PUBLISHED_RESEARCH.md).
+Only mock software checks have run; provider access is pending. The first paid
+validation is limited to US$10. No actual-LLM findings are added to the paper.
+
 ## Revised compliance methods paper (10 November 2026)
 
 [Read the paper](output/pdf/order_splitting_and_timing.pdf): **Evaluating Controls
