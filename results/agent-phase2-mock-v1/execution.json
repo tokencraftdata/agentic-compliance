@@ -1,0 +1,7 @@
+{
+  "max_calls": 768,
+  "max_usd": null,
+  "allow_live": false,
+  "sampling": "provider defaults; no provider random seed is assumed",
+  "max_output_tokens": 512
+}
