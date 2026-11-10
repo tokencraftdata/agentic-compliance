@@ -1,17 +1,21 @@
 {
   "date": "2026-11-09",
-  "version": "1.6",
-  "baseline_commit": "02d6607fd2b28e70807d09c0139a95e2d56502be",
-  "source_commit": "81cf5402aecea7838d0072ea29f3f5d212d69440",
+  "version": "1.7",
+  "baseline_commit": "582e5ca9e38832a47c9dcf0cde9c5385c7eecf81",
+  "source_commit": "37815c16a9e43d1cd57201f742a9bac41dc73feb",
+  "complete_manuscript_text_preserved_except_source_snapshot": true,
+  "structured_changes": [
+    "remove forced page-break blocks",
+    "correct subsection 9.2 to h2",
+    "update source snapshot commit"
+  ],
   "title_abstract_and_authors_unchanged": true,
-  "methods_and_results_sections_3_through_8_unchanged": true,
   "experimental_tables_unchanged": true,
   "figure_pngs_and_svgs_unchanged": true,
   "experiment_code_tests_configs_and_results_unchanged": true,
   "conclusion_and_both_assistants_disclosure_preserved": true,
-  "references_added": 1,
+  "references_added": 0,
   "all_17_references_cited": true,
-  "source_check_record": "paper/offline_study/literature_review.json",
   "tests": {
     "command": "python3 -m unittest discover -s tests -v",
     "interpreter": "CPython 3.9.6",
@@ -27,8 +31,6 @@
   },
   "prior_validation_commit": "02d6607fd2b28e70807d09c0139a95e2d56502be",
   "unit_tests_and_replay_rerun": false,
-  "saved_source_and_evidence_hashes_rechecked": true,
-  "new_direct_record_claim_audit": "paper/offline_study/research_review.json",
-  "scope": "Scope clarification, prose editing, deeper literature review, and direct-record claim audit; no new trading experiment, LLM result, or legal-compliance claim",
-  "pdf_sha256": "40167a18787cf29a74dbda2144b7bace6191b700ef982375e8b73274aae54696"
+  "scope": "Presentation-only revision with complete content comparison against version 1.6. No additional trading experiment or scientific validation.",
+  "pdf_sha256": "b0bef544bc668341b793c41e3cac59d42b90daaeff39ed9cf72fed3ecbb57c3a"
 }

@@ -19,14 +19,14 @@ Abstract
 We evaluate technical controls for trading compliance in a deterministic, replayable limit-order-book simulator, measuring detection, economic effects, and legitimate execution. An initial 960-episode scripted evaluation is followed by 2,160 repair episodes, throttle-isolation and randomized-parameter probes, and a new 360-episode measurement study. Six 10-lot orders bypass both a legacy per-order gate and its original detectors in all 40 tested seeds. An aggregate gate removes the engineered response benefit for this probe, but its apparent advantage over the legacy gate on legitimate trading is largely a cancellation-throttle interaction. Matching responsive and unresponsive markets at the same gate finds no response-dependent wealth advantage in 40 randomized draws. Detection remains sensitive to legitimate quoting cadence: a 180-second window flags a patient market maker in 34 of 40 episodes when it re-quotes every 180 seconds, despite zero alerts at a 300-second cadence. These exploratory results concern candidate controls in a stipulated market mechanism. They do not establish legal compliance. No LLM policy, live market, or human intent annotation is evaluated.
 
 Comments
-13 pages, 2 figures; exploratory scripted simulation study
+12 pages, 2 figures; exploratory scripted simulation study
 
 Journal reference / publication DOI
 Leave empty: no journal publication is claimed.
 
 Upload file
 output/pdf/order_splitting_and_timing.pdf
-SHA-256: 40167a18787cf29a74dbda2144b7bace6191b700ef982375e8b73274aae54696
+SHA-256: b0bef544bc668341b793c41e3cac59d42b90daaeff39ed9cf72fed3ecbb57c3a
 
 Submission route
 Upload the single PDF containing all text and figures. This document was created
