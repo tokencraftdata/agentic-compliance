@@ -1,6 +1,6 @@
 {
   "date": "2026-11-09",
-  "document_version": "2.1",
+  "document_version": "2.2",
   "scope": "Check all eight references previously cited primarily as arXiv or SSRN for published versions; retain reference numbering.",
   "updates": [
     2,
@@ -99,11 +99,11 @@
     }
   ],
   "bibliography_counts": {
-    "conference_or_journal_papers": 10,
+    "conference_or_journal_papers": 15,
     "arxiv_preprints": 4,
     "SSRN_working_papers": 2,
     "official_regulatory_sources": 6,
-    "total": 24,
+    "total": 29,
     "official_company_sources": 2
   },
   "limitations": "No verified publication means no such version was established in these checks, not proof that none exists. Presentation, acceptance, and archival publication are distinct. Metadata improvements do not validate the experiments.",
@@ -307,5 +307,73 @@
     ],
     "use": "Industry motivation only; not peer-reviewed evidence, a product evaluation, customer-demand validation, or new experimental results.",
     "omitted": "Adoption counts, tool-call counts, upcoming weekend trading, and Loops are not needed for the paper claim."
+  },
+  "agent_research_update": {
+    "date": "2026-11-10",
+    "added_references": [
+      {
+        "reference": 25,
+        "text": "Avinash Kumar Pandey and Swati Rajwal. Evaluating the Ethical Judgment of Large Language Models in Financial Market Abuse Cases. Proceedings of the 6th ACM International Conference on AI in Finance (ICAIF), 2025, pp. 132-140.",
+        "url": "https://doi.org/10.1145/3768292.3770439",
+        "venue": "ACM ICAIF 2025",
+        "status": "published_conference",
+        "sources": [
+          "https://doi.org/10.1145/3768292.3770439"
+        ],
+        "review_scope": "Publisher text and bibliographic record; narrative judgments, not an execution-book experiment."
+      },
+      {
+        "reference": 26,
+        "text": "Wenliang Huang, Junkai Li, Zengyi Yu, and Xiangjie Kong. RISCTrade: A Dynamic Multi-Market Benchmark for Risk-Mandate Compliance of Large Language Models in Closed-Loop Trading. Advanced Intelligent Computing Technology and Applications (ICIC 2026), LNCS 16648, Springer, 2027, pp. 360-370. First online July 14, 2026.",
+        "url": "https://doi.org/10.1007/978-981-92-3400-4_30",
+        "venue": "ICIC 2026, LNCS 16648, Springer (citation year 2027)",
+        "status": "published_conference",
+        "sources": [
+          "https://link.springer.com/chapter/10.1007/978-981-92-3400-4_30"
+        ],
+        "first_online": "2026-07-14",
+        "review_scope": "Publisher abstract and metadata; full chapter not reviewed. Citation year retained as 2027 rather than silently substituted with online year 2026."
+      },
+      {
+        "reference": 27,
+        "text": "Haohang Li et al. INVESTORBENCH: A Benchmark for Financial Decision-Making Tasks with LLM-based Agent. Proceedings of ACL 2025, Volume 1: Long Papers, pp. 2509-2525.",
+        "url": "https://doi.org/10.18653/v1/2025.acl-long.126",
+        "venue": "ACL 2025, Volume 1: Long Papers",
+        "status": "published_conference",
+        "sources": [
+          "https://aclanthology.org/2025.acl-long.126/"
+        ],
+        "review_scope": "Official publication record and abstract."
+      },
+      {
+        "reference": 28,
+        "text": "Wentao Zhang et al. A Multimodal Foundation Agent for Financial Trading: Tool-Augmented, Diversified, and Generalist. Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD), 2024.",
+        "url": "https://doi.org/10.1145/3637528.3671801",
+        "venue": "ACM KDD 2024",
+        "status": "published_conference",
+        "sources": [
+          "https://personal.ntu.edu.sg/boan/papers/KDD24_FinAgent.pdf",
+          "https://doi.org/10.1145/3637528.3671801"
+        ],
+        "review_scope": "Published paper at author site and proceedings citation."
+      },
+      {
+        "reference": 29,
+        "text": "Haochen Luo et al. QFinZero: A Unified Financial Toolchain for LLM-Based Trading Agents. Proceedings of ACL 2026, Volume 3: System Demonstrations, pp. 68-77.",
+        "url": "https://doi.org/10.18653/v1/2026.acl-demo.7",
+        "venue": "ACL 2026, Volume 3: System Demonstrations",
+        "status": "published_conference_system_demo",
+        "sources": [
+          "https://aclanthology.org/2026.acl-demo.7/"
+        ],
+        "review_scope": "Official publication record and abstract; system-demo track kept explicit."
+      }
+    ],
+    "already_present": [
+      19,
+      20
+    ],
+    "contribution": "Controlled comparisons of cap-response dependence, throttle cost/recovery and detector timing; actual-LLM adaptation evaluation remains pending.",
+    "numerical_evidence_changed": false
   }
 }

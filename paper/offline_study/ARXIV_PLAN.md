@@ -5,7 +5,7 @@ review, completed customer study, or promise of arXiv acceptance.
 
 ## Recommendation
 
-Current version: **2.1**, revised 10 November 2026. Use it as an exploratory
+Current version: **2.2**, revised 10 November 2026. Use it as an exploratory
 technical report on trading-control evaluation, with the bounded claims in
 `SUBMISSION_REVIEW.md`. It includes the cap/response and throttle/horizon checks;
 no LLM trader, calibrated market, or independent strategy-family validation is

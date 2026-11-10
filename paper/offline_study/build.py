@@ -53,7 +53,12 @@ REFS = [
     ('Commodity Futures Trading Commission. Antidisruptive Practices Authority: Interpretive guidance and policy statement. Federal Register 78, 2013, pp. 31890-31897.', 'https://www.cftc.gov/LawRegulation/FederalRegister/FinalRules/2013-12365.html'),
     ('European Commission. Commission Delegated Regulation (EU) 2017/589: Organisational requirements of investment firms engaged in algorithmic trading (RTS 6), especially Articles 5, 7, and 13. Official Journal L 87, 2017, pp. 417-448.', 'https://eur-lex.europa.eu/eli/reg_del/2017/589/oj/eng'),
     ("Robinhood. Robinhood Puts the Power of Hedge Funds in Every Trader's Pocket. Company announcement, September 29, 2026. Accessed November 10, 2026.", 'https://robinhood.com/newsroom/hood-summit-2026/'),
-    ('Robinhood. Trading with your agent. Product documentation, accessed November 10, 2026.', 'https://robinhood.com/us/en/support/articles/trading-with-your-agent/')
+    ('Robinhood. Trading with your agent. Product documentation, accessed November 10, 2026.', 'https://robinhood.com/us/en/support/articles/trading-with-your-agent/'),
+    ('Avinash Kumar Pandey and Swati Rajwal. Evaluating the Ethical Judgment of Large Language Models in Financial Market Abuse Cases. Proceedings of the 6th ACM International Conference on AI in Finance (ICAIF), 2025, pp. 132-140.', 'https://doi.org/10.1145/3768292.3770439'),
+    ('Wenliang Huang, Junkai Li, Zengyi Yu, and Xiangjie Kong. RISCTrade: A Dynamic Multi-Market Benchmark for Risk-Mandate Compliance of Large Language Models in Closed-Loop Trading. Advanced Intelligent Computing Technology and Applications (ICIC 2026), LNCS 16648, Springer, 2027, pp. 360-370. First online July 14, 2026.', 'https://doi.org/10.1007/978-981-92-3400-4_30'),
+    ('Haohang Li et al. INVESTORBENCH: A Benchmark for Financial Decision-Making Tasks with LLM-based Agent. Proceedings of ACL 2025, Volume 1: Long Papers, pp. 2509-2525.', 'https://doi.org/10.18653/v1/2025.acl-long.126'),
+    ('Wentao Zhang et al. A Multimodal Foundation Agent for Financial Trading: Tool-Augmented, Diversified, and Generalist. Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD), 2024.', 'https://doi.org/10.1145/3637528.3671801'),
+    ('Haochen Luo et al. QFinZero: A Unified Financial Toolchain for LLM-Based Trading Agents. Proceedings of ACL 2026, Volume 3: System Demonstrations, pp. 68-77.', 'https://doi.org/10.18653/v1/2026.acl-demo.7')
 ]
 
 
@@ -261,7 +266,7 @@ def build(commit):
         'authors':[{'name':'Sandip Nandi','affiliation':'Independent Researcher'}],
         'blocks':source},indent=2)+'\n')
     (HERE/'references.json').write_text(json.dumps([{'number':i,'text':t,'url':u} for i,(t,u) in enumerate(REFS,1)],indent=2)+'\n')
-    manifest={'document_version':'2.1','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
+    manifest={'document_version':'2.2','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
               'reportlab':reportlab.Version,'matplotlib':matplotlib.__version__,
               'source_sha256':digest(Path(__file__)),'content_source_sha256':digest(HERE/'content.py'),'evidence_manifest_sha256':digest(DATA/'manifest.json'),
               'summary_sha256':digest(DATA/'summary.json'),
