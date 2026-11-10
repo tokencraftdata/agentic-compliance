@@ -1,7 +1,7 @@
 # Trading-agent study: implementation and next run
 
 This package prepares the actual-LLM phase of the compliance study. No live LLM
-results have been collected. The current paper (v2.1) still reports scripted
+results have been collected. The current paper (v2.2) still reports scripted
 experiments only. Provider access is pending; the first validation run has a
 US$10 spending limit. The larger study has not been funded or registered.
 
@@ -10,7 +10,9 @@ order patterns, and how controls change their behavior and execution outcomes.
 An alert is an observation about a rule, not a finding of unlawful conduct.
 
 Read the [study protocol](PROTOCOL.md) and [published research review](PUBLISHED_RESEARCH.md).
-The existing paper and historical experiment packages are unchanged.
+The paper's numerical evidence and historical experiment packages are unchanged.
+Version 2.2 incorporates the published references and clarifies the proposed
+agent study while leaving its results pending.
 
 ## What is implemented
 

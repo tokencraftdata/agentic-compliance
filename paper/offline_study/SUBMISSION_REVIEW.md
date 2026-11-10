@@ -1,9 +1,23 @@
 # Submission assessment - 10 November 2026
 
-Version 2.1 retains the assessment of version 2.0 as an exploratory computational methods report.
+Version 2.2 retains the assessment of version 2.0 as an exploratory computational methods report.
 The paper is not a validated agentic-compliance system or an LLM trading study.
 
-## Scope of version 2.1
+## Scope of version 2.2
+
+Adds five published papers: Pandey and Rajwal (ICAIF 2025), RISCTrade (ICIC 2026,
+Springer proceedings citation year 2027, first online July 2026), InvestorBench
+(ACL 2025 long paper), FinAgent (KDD 2024), and QFinZero (ACL 2026 system demo).
+The two relevant finance-journal articles remain references 19 and 20.
+
+The abstract, introduction, related work, practical discussion, limitations and
+conclusion now identify the contribution as controlled comparisons of interacting
+compliance controls and their execution costs. The paper does not claim the first
+LLM-compliance benchmark. Actual-agent adaptation is a proposed extension with
+results explicitly pending. Mock software checks are not included as LLM findings.
+The tables, figures, numerical claims and underlying experiment sources are unchanged.
+
+## Scope of the preceding version 2.1
 
 Adds Robinhood as a dated industry example using two official company sources,
 and explains how the scripted cases could support control regression testing.
@@ -36,7 +50,7 @@ Version 2.0 addresses these issues with new comparisons and narrower claims:
 - Compact formal detector conditions replace ambiguous prose. Results are
   organized around three findings rather than an experiment-development log.
 - Three published journal articles and CFTC/EU sources broaden the literature
-  and regulatory discussion. The bibliography has 10 journal/conference papers,
+  and regulatory discussion. The version 2.2 bibliography has 15 journal/conference papers,
   4 arXiv preprints, 2 SSRN working papers, 6 official regulatory sources, and
   2 official company sources for the motivating example.
 
@@ -57,7 +71,7 @@ external validity or novelty.
 
 ## Validation and release status
 
-- 82 unit/integration tests passed, including the strict threshold boundary and
+- The original 82 unit/integration tests passed, including the strict threshold boundary and
   separation of aggregate and individual size limits.
 - 40 original event hashes matched before the new study ran.
 - 2,140 new episodes replayed without a record mismatch; summaries recomputed.

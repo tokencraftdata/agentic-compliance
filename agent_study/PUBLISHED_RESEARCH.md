@@ -85,6 +85,7 @@ selection and independent behavior review would materially strengthen it.
 
 Use the published venues and DOIs above when revising the paper's related work.
 Keep workshop, main-conference, journal and preprint status distinct. Do not
-silently upgrade a preprint based on a similarly titled paper. The current
-v2.1 manuscript has not been changed by this infrastructure branch; these sources
-and the new results should be integrated together in the expanded version.
+silently upgrade a preprint based on a similarly titled paper. Manuscript version
+2.2 integrates items 1-5 above as references 25-29; items 6-7 were already cited
+as references 19-20. The paper clarifies its current contribution and describes
+the actual-agent evaluation as pending. No LLM results have been added.
