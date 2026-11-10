@@ -1,4 +1,4 @@
-arXiv draft fields - research review pending; not ready to submit
+arXiv submission fields - version 2.0, prepared but not submitted
 
 Title
 Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing
@@ -13,48 +13,44 @@ Proposed primary category
 q-fin.TR (Trading and Market Microstructure)
 
 Cross-lists
-None proposed for this scripted simulation paper.
+None proposed for this scripted simulation study.
 
 Abstract
-An order-level size check can admit a large displayed quantity when it arrives as several small orders. We examine this failure and its repair in a replayable limit-order-book simulator. Six 10-lot orders pass the legacy pre-trade gate and its original detectors in all 40 tested seeds. A cap on total same-side quantity removes the benefit from the model's imbalance response for this probe. Its apparent advantage over the legacy gate on legitimate market making, however, largely reflects when a cancellation throttle activates. In a separate comparison of 40 parameterized probes, responsive and unresponsive markets produce identical event streams under the aggregate gate, with zero wealth differences. Detector tuning exposes another weakness: a 180-second window flags a legitimate maker in 34 of 40 episodes when it re-quotes every 180 seconds, compared with none at a 300-second cadence. The experiments show how order representation and timing can undermine the evaluation of trading-compliance controls. They use fixed scripts in a synthetic market; they neither establish legal compliance nor evaluate LLM trading.
+An order-level size limit can admit a large displayed quantity when it is split across small orders. We study the evaluation of this failure and its repair in a scripted limit-order-book simulator. Six 10-lot orders pass the original gate and detectors in all 40 tested seeds. An aggregate cap removes their response-dependent gain at the original settings, but that result depends on the market-response threshold. In a separate cap-threshold grid with the cancellation throttle disabled, the same 20-lot cap yields a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at threshold 0.2. Throttle tests over 12-minute and one-hour sessions distinguish persistent lockout from recovery after old submissions leave the window. The full aggregate policy reduces maker volume by 14.1% and 28.2% in two short-session controls and by 75.2% in the one-hour test. Finally, a legitimate maker produces alerts in 34 of 40 episodes when its re-quote cadence meets the detector's 180-second window. These are configuration-dependent regression cases for compliance-control testing. The study uses synthetic prices and fixed trading scripts; it does not estimate real-market detection accuracy or evaluate LLM traders.
 
 Comments
-11 pages, 2 figures; exploratory scripted simulation study
+11 pages, 3 figures; exploratory scripted simulation study
 
 Journal reference / publication DOI
-Leave empty: no journal publication is claimed.
+Leave empty: no journal publication is claimed for this manuscript.
 
 Upload file
 output/pdf/order_splitting_and_timing.pdf
-SHA-256: 6c5cb7ea644ecd8ce37355a5081853c418b8469dedb56f81531ebff8e1a22b23
+SHA-256: 14a988bd8c13195a5f1a3dfb4b52e7e8b8f518be7dc5447025f6c096069f67d7
 
 Submission route
-Upload the single PDF containing all text and figures. This document was created
-with ReportLab, not TeX. The repository and this text sheet are supporting
-preparation material; do not attach them as extra files in the PDF-only route.
+This document was created with ReportLab, not TeX. Use the single-PDF route,
+including all figures and text. Do not upload the reproduction ZIP as a second
+manuscript file. Any ancillary material must follow arXiv's separate guidance.
 
-Research revision required before submission
-- Resolve the response-threshold and throttle-horizon concerns in MAJOR_REVIEW_RESPONSE.md.
-- Add sensitivity analyses, clarify rule-boundary findings, and foreground legitimate cost.
-- This format-only revision does not resolve those scientific concerns.
+Assessment
+The paper is a bounded exploratory methods report on evaluation pitfalls. It
+reports 2,140 post-review sensitivity episodes, with matched replay, in addition
+to the earlier scripted evidence. No LLM trading study, independent test-family
+validation, market calibration, or legal-compliance certification is claimed.
+Formatting and numerical checks do not guarantee moderation or peer review.
 
 Author decisions remaining
-- Read and approve the complete manuscript and its AI-assistance disclosure.
-- Choose the distribution license in arXiv; no license is selected here.
+- Read the complete paper, results, cited sources, and AI-assistance disclosure.
+- Choose a distribution license for the paper; none is selected here.
 - Check account registration and any category endorsement requirement.
-- Decide artifact access: the GitHub repository is currently private, and the
-  manuscript states this accurately. Public reproducibility is recommended.
+- Decide artifact access. The repository remains private, as the paper states.
+  A reviewed public snapshot or reviewer access enables external reproduction.
 - Complete arXiv's upload preview and final submission confirmation.
 
-Scope
-Offline means orders execute in a simulator. Scripted describes the programs
-choosing trading actions. No LLM trading experiment or legal-compliance
-certification is reported. This is an exploratory simulation draft under substantive review,
-not an arXiv acceptance decision or submission receipt.
-
-Official guidance checked 9 November 2026
-https://info.arxiv.org/help/submit/index.html
+Official guidance checked 10 November 2026
 https://info.arxiv.org/help/submit_pdf.html
-https://info.arxiv.org/help/moderation/index.html
+https://arxiv.org/category_taxonomy
+https://info.arxiv.org/help/moderation/index.html#policy-for-authors-use-of-generative-ai-language-tools
 https://info.arxiv.org/help/endorsement.html
 https://info.arxiv.org/help/license/index.html

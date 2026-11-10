@@ -51,7 +51,7 @@ session horizon and crossing parameter vectors with multiple seeds do not supply
 independent strategy families or market calibration. See `SUBMISSION_REVIEW.md`
 for the remaining research limits and `arxiv_submission.txt` for draft metadata.
 
-## Reproduce the new evidence
+## Reproduce the earlier counterfactual and cadence evidence
 
 Run from the repository root with **CPython 3.9.6**, the interpreter used for the
 historical and new numeric evidence. The simulator uses the standard library.
@@ -63,7 +63,7 @@ python3 -m paper_study.evaluate run results/local-paper-review
 python3 -m paper_study.evaluate verify results/local-paper-review
 ```
 
-The new study contains 40 gated unresponsive counterfactuals and 320 legitimate
+This earlier study contains 40 gated unresponsive counterfactuals and 320 legitimate
 maker episodes: four re-quote cadences x two gates x 40 reused seeds. It is
 explicitly post-hoc. It checks historical hashes, uses frozen configurations,
 and never overwrites evidence. Verification replays recorded actions, checks
@@ -92,12 +92,6 @@ regeneration command reads the mutable root configuration; after its default
 window changes, it cannot establish byte-identical reproduction of the original
 120-second cohort. Historical replay uses each cohort's saved configuration.
 
-Version 1.8 rewrites the framing around the observed failures and reduces
-section 10.1 to a short artifact-availability statement. Detailed setup and
-replay instructions remain here. No appendix was added. Methods, numerical
-results, FINRA coverage, and the assistance disclosure are preserved.
-Publication-status checks are recorded in `publication_review.json`.
-
 ## Build the paper
 
 The rendering environment is separate from the numeric interpreter. Use the
@@ -118,12 +112,8 @@ byte-identical. The PDF is checked by rendering and inspecting every page.
 The earlier full LLM study remains future work. This paper does not select a model
 panel, claim intent annotations, or report customer-demand validation.
 
-Version 1.2 embeds outline fonts from the pinned matplotlib distribution and
-discloses AI assistance in preparing the code and manuscript; version 1.3
-corrects that disclosure to name both coding assistants used (Anthropic Claude
-Code and OpenAI Codex). The trading
-experiments remain entirely scripted. `ARXIV_PLAN.md` records the arXiv
-preparation, proposed research sequence, and customer-discovery hypotheses.
-The author details are confirmed. License selection, account/endorsement checks,
-and the author's final review remain before submission; nothing has been
-submitted to arXiv.
+The PDF embeds outline fonts. Section 10.2 discloses assistance from Anthropic
+Claude Code and OpenAI Codex; the trading experiments remain entirely scripted.
+`ARXIV_PLAN.md` records the proposed submission and future research. Author
+details are confirmed. License selection, account/endorsement checks, artifact
+access, and the author's final read-through remain before submission.

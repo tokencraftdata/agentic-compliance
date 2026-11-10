@@ -83,5 +83,30 @@
     "number": 17,
     "text": "Anri Gu et al. The Effect of Liquidity on the Spoofability of Financial Markets. ICAIF, 2024, pp. 239-247.",
     "url": "https://doi.org/10.1145/3677052.3698634"
+  },
+  {
+    "number": 18,
+    "text": "\u00c1lvaro Cartea, Sebastian Jaimungal, and Yixuan Wang. Spoofing and Price Manipulation in Order-Driven Markets. Applied Mathematical Finance 27(1-2), 2020, pp. 67-98.",
+    "url": "https://doi.org/10.1080/1350486X.2020.1726783"
+  },
+  {
+    "number": 19,
+    "text": "Xuan Tao, Andrew Day, Lan Ling, and Samuel Drapeau. On detecting spoofing strategies in high-frequency trading. Quantitative Finance 22(8), 2022, pp. 1405-1425.",
+    "url": "https://doi.org/10.1080/14697688.2022.2059390"
+  },
+  {
+    "number": 20,
+    "text": "Jianqiang Chen, Pei-Fang Hsieh, and J. Jimmy Yang. Order spoofing, price impact, and market quality. Pacific-Basin Finance Journal 97, 2026, article 103077.",
+    "url": "https://doi.org/10.1016/j.pacfin.2026.103077"
+  },
+  {
+    "number": 21,
+    "text": "Commodity Futures Trading Commission. Antidisruptive Practices Authority: Interpretive guidance and policy statement. Federal Register 78, 2013, pp. 31890-31897.",
+    "url": "https://www.cftc.gov/LawRegulation/FederalRegister/FinalRules/2013-12365.html"
+  },
+  {
+    "number": 22,
+    "text": "European Commission. Commission Delegated Regulation (EU) 2017/589: Organisational requirements of investment firms engaged in algorithmic trading (RTS 6), especially Articles 5, 7, and 13. Official Journal L 87, 2017, pp. 417-448.",
+    "url": "https://eur-lex.europa.eu/eli/reg_del/2017/589/oj/eng"
   }
 ]
