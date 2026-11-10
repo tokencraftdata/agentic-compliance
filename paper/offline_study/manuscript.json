@@ -53,9 +53,6 @@
       "text": "Our contribution is a reproducible evaluation of these candidate controls, with matched economic comparisons and legitimate trading tasks. FINRA guidance on algorithm testing and supervision [14,15] motivates this use, while Rule 5210 [16] provides market-conduct context. The experiments test neither those requirements as a whole nor a firm's compliance with them. Recorded actions, rejection reasons, fills, and alerts make the simulated decisions inspectable. LLM behaviour and human compliance-review workflows remain unevaluated."
     },
     {
-      "type": "page_break"
-    },
-    {
       "type": "h1",
       "text": "2. Setting and scope"
     },
@@ -82,9 +79,6 @@
     {
       "type": "body",
       "text": "ABIDES [4] offers a richer architecture with interacting agents and communication latencies. Our engine is a smaller purpose-built model, not an ABIDES calibration. Kurshan, Balch, and Byrd [5] discuss agent-based governance and a spoofing case study. Gu et al. [17] vary market-maker liquidity and compare baseline, tuned, and reinforcement-learned spoofing strategies. Our fixed liquidity setting does not test that regime dependence. This paper adds three measured counterexamples: splitting defeats per-order checks, throttle timing confounds a gate comparison, and a legitimate quoting cadence defeats a selected detection window. Matched economic comparisons and replay make those failures inspectable. Broader control effectiveness remains untested."
-    },
-    {
-      "type": "page_break"
     },
     {
       "type": "h2",
@@ -140,9 +134,6 @@
       "text": "In the responsive condition, the background quotes shift by two ticks in the direction of displayed imbalance when |(B-A)/(B+A)| exceeds 0.4; B and A sum the resting quantities on each side of the book. The unresponsive condition omits this shift. This rule deliberately creates an exploitable response. It is not fitted to exchange data and is not a model of strategic equilibrium. Subject quotes can also move the midpoint without activating the rule, which matters when interpreting price error."
     },
     {
-      "type": "page_break"
-    },
-    {
       "type": "h1",
       "text": "3. Controls, detectors, and outcomes"
     },
@@ -181,9 +172,6 @@
     {
       "type": "body",
       "text": "<b>Response-dependent wealth advantage:</b> D(g,d) = W(responsive, g, d) - W(unresponsive, g, d), where g is the gate and d fixes both the parameter draw and market seed. A positive D under the aggregate gate with no conduct alert is reported even if some orders were rejected. This replaces the historical summary's absolute-wealth and zero-rejection definition. The comparison isolates the response toggle within this model; it is not a legal definition of manipulation."
-    },
-    {
-      "type": "page_break"
     },
     {
       "type": "h1",
@@ -258,9 +246,6 @@
     {
       "type": "body",
       "text": "We report descriptive Wilson 95% intervals for binary counts and existing paired bootstrap intervals where available. These intervals describe variability under the sampled model, not real-world prevalence. Repeated scoring of the same traces is not additional statistical replication. No confirmatory hypothesis tests or power claims are made."
-    },
-    {
-      "type": "page_break"
     },
     {
       "type": "h1",
@@ -372,9 +357,6 @@
       "text": "The six-by-ten sequence has mean price error 0.1331 ticks versus 0.0666 for the one-by-sixty sequence. Both receive the same two-tick response and have identical wealth within each ungated seed. The split sequence holds that displacement longer because its submissions consume more simulated seconds. The price-error difference is duration, not a larger response. Likewise, 22.05 here and 24.25 in the initial cohort reflect different seed paths, not a change in economic mechanism."
     },
     {
-      "type": "page_break"
-    },
-    {
       "type": "h1",
       "text": "6. Trading cost depends on throttle timing"
     },
@@ -442,9 +424,6 @@
       "text": "Table 3. Negative controls, seeds 6000-6039; means over 40 episodes per arm. The scheduled executor is named vwap_executor in code but uses no volume forecast or VWAP benchmark. It and the slice executor fill only 34.2% and 37.7% of their 80-lot parents in the short session. Zero gate rejections do not establish adequate execution quality."
     },
     {
-      "type": "page_break"
-    },
-    {
       "type": "h1",
       "text": "7. Economic attribution in parameterized probes"
     },
@@ -504,9 +483,6 @@
       "text": "For a zero count in 40 draws, the descriptive Wilson 95% upper limit is 8.76%. This is conditional on the authored generator, its restricted parameter space, and the one-seed-per-draw assignment. It does not bound all manipulation strategies. The response comparison can also miss harmful outcomes unrelated to the particular imbalance rule. We retain the historical residual fields unchanged for provenance and publish the corrected endpoints separately."
     },
     {
-      "type": "page_break"
-    },
-    {
       "type": "h1",
       "text": "8. Legitimate cadence breaks the selected window"
     },
@@ -533,9 +509,6 @@
     {
       "type": "body",
       "text": "Under the aggregate gate, the 180-second maker produces no conduct alerts at any tested window, but mean volume falls from 73.80 to 58.98 lots. The accepted display is smaller, so the detector no longer encounters the same pattern. This reduction in alerts must be read alongside the loss of legitimate execution, rather than treated as independent evidence of better discrimination."
-    },
-    {
-      "type": "page_break"
     },
     {
       "type": "h1",
@@ -578,10 +551,7 @@
       "text": "Our size caps, cancellation ratio, and 120- or 180-second windows are experimental choices, not FINRA-prescribed thresholds. An alert is evidence for investigation, not a legal finding, and a rejected action is not proof of overall compliance. Notice 24-09 [6] confirms that existing obligations continue to apply when member firms use generative AI; it creates no new requirements. It motivates the planned agent study without turning these scripted results into evidence about LLM oversight."
     },
     {
-      "type": "page_break"
-    },
-    {
-      "type": "h1",
+      "type": "h2",
       "text": "9.2. Limitations and the next agent study"
     },
     {
@@ -599,9 +569,6 @@
     {
       "type": "body",
       "text": "A follow-up study should test whether controls remain effective as an agent varies order representation and timing, while measuring legitimate task completion. It needs separate development and test strategy families, fixed policy thresholds, and evidence-matched comparisons of instructions, external enforcement, and any review agent. Those comparisons are proposed work. No orders were sent to a live market, no customers were studied, and no finding about commercial demand is drawn from these experiments."
-    },
-    {
-      "type": "page_break"
     },
     {
       "type": "h1",
@@ -649,7 +616,7 @@
     },
     {
       "type": "small",
-      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/81cf5402aecea7838d0072ea29f3f5d212d69440\">tokencraftdata/agentic-compliance, 81cf5402aecea7838d0072ea29f3f5d212d69440</link>"
+      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/37815c16a9e43d1cd57201f742a9bac41dc73feb\">tokencraftdata/agentic-compliance, 37815c16a9e43d1cd57201f742a9bac41dc73feb</link>"
     },
     {
       "type": "h2",
@@ -666,9 +633,6 @@
     {
       "type": "body",
       "text": "Two generative AI coding assistants were used to produce the research artifact: Anthropic Claude Code wrote the throttle-isolation, parameterized-evasion, negative-control, and detector-window-sweep modules, their tests, and the accompanying results notes; OpenAI Codex wrote the matched-counterfactual and cadence-grid study, the paper builder, and assisted with literature checks and manuscript drafting and revision. The reported trading experiments used scripted policies and made no LLM calls. AI assistance in producing the research artifact is separate from the policies evaluated by the simulator. The human author is responsible for the methods, results, and references reported in the paper."
-    },
-    {
-      "type": "page_break"
     },
     {
       "type": "h1",

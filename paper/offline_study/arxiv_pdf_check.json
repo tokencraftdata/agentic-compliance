@@ -1,12 +1,13 @@
 {
   "date": "2026-11-09",
-  "document_version": "1.6",
-  "pages": 13,
+  "document_version": "1.7",
+  "pages": 12,
   "author": "Sandip Nandi",
   "author_confirmed": true,
   "title_matches_metadata": true,
   "abstract_matches_metadata": true,
-  "code_commit": "81cf5402aecea7838d0072ea29f3f5d212d69440",
+  "all_manuscript_text_present_in_pdf": true,
+  "code_commit": "37815c16a9e43d1cd57201f742a9bac41dc73feb",
   "code_commit_verified_in_pdf": true,
   "ai_disclosure": true,
   "all_fonts_embedded": true,
@@ -27,8 +28,10 @@
       "embedded": true
     }
   },
-  "pdf_sha256": "40167a18787cf29a74dbda2144b7bace6191b700ef982375e8b73274aae54696",
+  "pdf_sha256": "b0bef544bc668341b793c41e3cac59d42b90daaeff39ed9cf72fed3ecbb57c3a",
   "not_encrypted": true,
   "embedded_figures": 2,
-  "no_open_action": true
+  "no_open_action": true,
+  "figure_captions_on_figure_pages": true,
+  "market_mechanics_table_unbroken": true
 }
