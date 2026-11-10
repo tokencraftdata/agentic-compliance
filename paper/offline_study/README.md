@@ -2,54 +2,54 @@
 
 **Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
 
-This manuscript reports completed scripted experiments only. It replaces the
-completed-LLM-study framing of the earlier full-paper draft. Version 1.9 has the
-confirmed author, Sandip Nandi (Independent Researcher), and a concise repository
-availability statement. Following the substantive review, submission is on hold
-pending additional analysis; see `MAJOR_REVIEW_RESPONSE.md`. PDF formatting and
-correct arithmetic do not establish scientific readiness or peer review.
+Version 2.0 is a revised exploratory methods paper by Sandip Nandi, Independent
+Researcher. It adds cap/response and throttle/horizon sensitivity analyses in
+response to the scientific review. The latest findings narrow the protection
+claim and foreground legitimate execution costs. It is not a completed LLM study
+or a real-market compliance validation.
 
-The compliance focus is evaluation of candidate technical controls: which
-scripted sequences are flagged, whether a gate removes their response-dependent
-payoff, and what legitimate execution it obstructs. Version 1.4 makes this purpose
-explicit in the title, abstract, introduction, discussion, and conclusion. Version 1.5 adds the closest agent-compliance,
-execution-control, and empirical spoofing literature, and a specific FINRA
-discussion. The measurements and experiment code are unchanged. Legal compliance, human review
-workflows, and LLM trading behaviour have not been evaluated.
+The bibliography now contains ten journal/conference papers, four arXiv preprints,
+two SSRN working papers, and six official regulatory sources. Published versions
+are cited where verified. `publication_review.json` records publication checks,
+new journal papers, and access limitations.
 
-The FINRA discussion distinguishes regulatory context from experimental policy
-choices and identifies coverage missing from the simulator. Source-check scope
-and URLs are in `literature_review.json`; `compliance_revision_check.json` records
-the comparison with the previous release.
+`build.py` defines the layout, references, and figures; `content.py` contains the
+prose and evidence-derived tables. They produce `manuscript.json` and the PDF at
+`output/pdf/order_splitting_and_timing.pdf`. Source, evidence, and output hashes
+are recorded in `document_manifest.json`. No appendix or long reproduction
+section is included in the paper; the instructions are here.
 
-Offline refers to orders executing only in the simulator, with synthetic market
-paths. Scripted refers to the predefined programs choosing trading actions. An
-LLM could also trade inside an offline simulator, but that experiment has not
-been run here. Version 1.6 makes this distinction explicit in section 2.2 and
-labels the subtitle as scripted experiments. The paper is not an offline-RL
-training study or a historical-market backtest.
+## Reproduce the sensitivity evidence
 
-For the additional research review, `audit_claims.py` independently aggregates
-saved records for five central claims and writes `research_review.json`. It does
-not rerun strategies or establish external validity. Run it with the numeric
-interpreter: `python3 paper/offline_study/audit_claims.py`. The literature review
-now includes 17 sources, including liquidity-dependent spoofing research.
+Use **CPython 3.9.6**, from the repository root:
 
-Version 1.7 restores a continuous single-column academic layout, with an inset
-abstract, indented body paragraphs, and centered page numbers. Tables and figure
-captions stay with their associated material. The full version 1.6 manuscript
-text, references, measurements, and assistance disclosure are preserved; only
-the source-snapshot identifier and presentation change.
+```sh
+python3 -m unittest discover -s tests -v
+python3 -m paper_study.sensitivity verify results/sensitivity-v1
+python3 paper/offline_study/audit_sensitivity.py
+```
 
-`arxiv_submission.txt` contains the copyable upload fields and the remaining
-author/account decisions. Upload the single PDF; the text sheet and repository
-files are supporting material for preparation, not extra PDF-upload files.
+To regenerate, select a fresh output directory:
 
-The rendered paper is `output/pdf/order_splitting_and_timing.pdf` at the repository
-root. `build.py` is the authoring source; it generates tables and figures from
-`results/paper-review-v1/summary.json`. `manuscript.json` is a readable structured
-export of the complete paper. Change prose in `build.py` and rebuild, rather than
-editing only the generated export. References and PNG/SVG figures are included.
+```sh
+python3 -m paper_study.sensitivity plan results/local-sensitivity
+python3 -m paper_study.sensitivity run results/local-sensitivity
+python3 -m paper_study.sensitivity verify results/local-sensitivity
+```
+
+The source and plan were committed at `a5f4cb5` before execution. This is a
+post-review, internally fixed plan, not preregistration. The new engine first
+reproduces all 40 historical gated responsive event hashes at the original
+settings. It then runs 1,440 cap-grid episodes, 480 parameter-replication episodes,
+and 220 throttle/horizon episodes. Verification replays recorded actions without
+calling the strategy and checks complete records and full-event hashes. Results
+and the independent central-number aggregation are in `verification.json` and
+`research_review_v2.json`, respectively. No live market or LLM provider is used.
+
+No old experiment sources or historical results are rewritten. Extending the
+session horizon and crossing parameter vectors with multiple seeds do not supply
+independent strategy families or market calibration. See `SUBMISSION_REVIEW.md`
+for the remaining research limits and `arxiv_submission.txt` for draft metadata.
 
 ## Reproduce the new evidence
 

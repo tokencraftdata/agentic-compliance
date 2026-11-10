@@ -5,30 +5,16 @@ review, completed customer study, or promise of arXiv acceptance.
 
 ## Recommendation
 
-Current title: **Evaluating Controls for Trading Compliance: An Offline Study of
-Order Splitting and Cancellation Timing** (version 1.8). The compliance framing
-concerns evaluation of candidate technical controls, with the existing scripted
-measurements and limitations preserved.
+Current version: **2.0**, revised 10 November 2026. Use it as an exploratory
+technical report on trading-control evaluation, with the bounded claims in
+`SUBMISSION_REVIEW.md`. It includes the cap/response and throttle/horizon checks;
+no LLM trader, calibrated market, or independent strategy-family validation is
+claimed. It has not been submitted or accepted.
 
-Submit this work as an exploratory computational market-microstructure study
-after the author and submission details are finalized. Version 1.5 completes the
-focused related-work and FINRA-positioning revision identified in the latest
-review; it does not add experiments. Its contribution is a
-replayable set of control failures and measurement corrections: split display,
-cancellation-throttle interaction, matched economic comparisons, and a legitimate
-quoting-cadence counterexample. It does not establish emergent LLM manipulation,
-real-world compliance, or commercial demand.
-
-The recommended primary category is **q-fin.TR (Trading and Market
-Microstructure)**, whose scope includes automated trading, agent-based modeling,
-and market-making. This is a recommendation based on the paper, not a decision
-by arXiv. A cs.AI label is not justified merely by the project's future LLM work.
-See the [official category taxonomy](https://arxiv.org/category_taxonomy).
-
-Version 1.6 defines offline execution and scripted policy selection separately.
-The title, abstract, numerical claims, and proposed category are unchanged.
-Use `arxiv_submission.txt` for the final copyable metadata; its fields must match
-the submitted PDF. Preparation remains distinct from actual submission.
+The proposed primary category remains **q-fin.TR (Trading and Market
+Microstructure)**. Check the [official taxonomy](https://arxiv.org/category_taxonomy)
+and the live submission form. Metadata in `arxiv_submission.txt` must match the
+final PDF. Repository access and licensing remain author decisions.
 
 ## Before upload
 
@@ -36,12 +22,12 @@ the submitted PDF. Preparation remains distinct from actual submission.
    1.2 replaces the anonymous label. Confirm the final content before submission;
    the current paper has not been submitted.
 2. Have the human author read the paper and inspect the result tables and cited
-   sources. The code audit passed 80 tests and replayed 360 new episodes without
+   sources. The code audit passed 82 tests and replayed 2,140 new sensitivity episodes without
    mismatches, but this is not independent scientific peer review.
-3. Review section 10.3's AI assistance disclosure. Version 1.3 names both
+3. Review section 10.2's AI assistance disclosure. Version 1.3 names both
    coding assistants used on the artifact (Anthropic Claude Code for the
    throttle-isolation, evasion-family, negative-control and window-sweep modules
-   and notes; OpenAI Codex for the matched-counterfactual and cadence-grid study,
+   and notes; OpenAI Codex for the matched-counterfactual, cadence-grid, and sensitivity studies,
    the builder, literature checks and manuscript work); the trading policies
    themselves were scripted. Significant generative AI use
    must be reported, and the authors retain responsibility for the paper under
@@ -64,9 +50,8 @@ the submitted PDF. Preparation remains distinct from actual submission.
    use the PDF route: one machine-readable PDF, included figures, embedded
    outline fonts, and no JavaScript. If converted to TeX, submit TeX source rather
    than only its output PDF. See [PDF guidance](https://info.arxiv.org/help/submit_pdf.html).
-8. Match title, abstract, and author metadata to the final PDF. Suggested
-   comments: "11 pages, 2 figures; exploratory scripted simulation
-   study." Verify the page count again if the document is edited. Leave journal
+8. Match title, abstract, and author metadata to the final PDF. Use the current page and figure counts in `arxiv_submission.txt`; do not reuse
+   counts from an earlier PDF. Leave journal
    reference and publication DOI empty unless they actually exist.
 9. The author completes submission and checks the confirmation/status. arXiv
    moderates submissions and may reclassify or decline them; posting is not
@@ -92,7 +77,7 @@ It is a proposed work sequence, not completed work or a fixed delivery promise.
 | --- | --- | --- |
 | Independent review | Obtain a market-microstructure and a surveillance-methods critique; record disagreements and corrections. | Reviewers can reproduce the central tables and understand the narrow novelty claim. |
 | Held-out validation | Freeze endpoints, detector thresholds, and analysis before generating new test data. Use new strategy families as well as new seeds; broaden legitimate execution and maker cadences. Keep development and test families separate. | Report detection, response-dependent wealth, and legitimate execution loss together, including failures. Repeated rescoring is not extra replication. |
-| Stronger environment | Add longer sessions covering throttle expiry, variable liquidity, fees and latency, and a calibrated or independent simulator comparison. | Establish which failures survive changes to the stipulated market response. Document disagreements rather than pooling incompatible environments. |
+| Stronger environment | Build on the completed one-hour throttle tests with variable liquidity, fees and latency, and a calibrated or independent simulator comparison. | Establish which failures survive changes to the stipulated market response. Document disagreements rather than pooling incompatible environments. |
 | Model study | Only after the evaluation is credible, freeze actual provider/model versions, prompts, tools, call budget, error handling, and analysis. Compare with scripted baselines and keep invalid calls/missing explanations separate. | Real provider calls and saved traces are required for any LLM finding. Mock calls cannot support it. Obtain a working local credential and agree on spend before execution. |
 | Peer-reviewed paper | Select a suitable workshop or journal based on the completed contribution and current venue rules. | A clear claim beyond this exploratory case study, independent evaluation, and venue-specific formatting/disclosure. |
 

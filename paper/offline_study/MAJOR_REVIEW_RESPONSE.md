@@ -1,3 +1,26 @@
+# Revision status - version 2.0, 10 November 2026
+
+The review below is preserved as the record that motivated the revision.
+Version 2.0 adds 2,140 sensitivity episodes, with full recorded-action replay;
+82 tests pass. The cap/threshold sweep, multi-seed parameter replication, longer
+throttle sessions, formal detector definitions, explicit maker costs, three-finding
+structure, and CFTC/RTS 6 discussion are now implemented. The cap-response and
+parameter comparisons disable the throttle and retain the individual limit at 2x.
+Their conditions are stated in the paper.
+
+The new results limit rather than rescue the original protection claim: lower
+response thresholds admit positive gains, and throttle recovery can coexist
+with large execution losses. The cadence finding is explicitly a rule-boundary
+counterexample. Section 10.1 remains just a pinned repository link and access note.
+Three additional published journal papers are cited; no preprint is mislabeled
+as a journal article. See `SUBMISSION_REVIEW.md` for the current assessment.
+
+Still unresolved: independent strategy families and labels, market calibration,
+LLM trading evidence, and external artifact access. These are not claimed as
+completed. No anonymous mirror or public repository release has occurred.
+
+---
+
 # Substantive review response - 9 November 2026
 
 Status: further research revision required before recommending arXiv submission.
