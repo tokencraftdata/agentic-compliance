@@ -1,43 +1,25 @@
 {
   "date": "2026-11-09",
-  "version": "1.8",
-  "baseline_commit": "2781e7c24c6820247b5b15a27957c782ae844830",
-  "source_commit": "8a19bfd0bcd562130169e1f2fb9c228c24ce5817",
+  "version": "1.9",
+  "baseline_commit": "f94553dfbf35139049c5926d99a2e8e74d06a2a8",
+  "source_commit": "f04e465a8357a1e0eee130e0655d14ea2cda29f8",
   "revised_sections": [
-    "Abstract",
-    "1 Introduction",
-    "2.1 Related work",
-    "9 General discussion",
-    "10.1 Artifact and verification",
-    "10.2 Conclusion"
+    "10.1 Code and data availability"
   ],
-  "title_and_authors_unchanged": true,
-  "market_mechanics_methods_and_results_sections_2_2_through_8_unchanged": true,
-  "FINRA_subsection_limitations_and_assistance_disclosure_unchanged": true,
+  "all_other_manuscript_blocks_unchanged": true,
   "experimental_tables_unchanged": true,
   "figure_pngs_and_svgs_unchanged": true,
-  "experiment_code_tests_configs_and_results_unchanged": true,
-  "reference_numbers_updated_to_published_versions": [
-    2,
-    4
-  ],
-  "all_17_references_cited": true,
+  "historical_experiment_code_tests_configs_and_results_unchanged": true,
+  "references_unchanged_from_v1_8": true,
   "publication_review": "paper/offline_study/publication_review.json",
-  "tests": {
-    "command": "python3 -m unittest discover -s tests -v",
-    "interpreter": "CPython 3.9.6",
-    "passed": 80,
-    "failed": 0
+  "review_diagnostic": {
+    "path": "results/reviewer-diagnostics-v1.json",
+    "replayed_episodes": 40,
+    "full_event_hash_mismatches": 0,
+    "response_activations": 0,
+    "largest_observed_abs_imbalance": 0.28205128205128205
   },
-  "prior_replay_verification": {
-    "episodes_replayed": 360,
-    "mismatches": 0,
-    "csv_and_summary_recomputed": true,
-    "historical_source_and_evidence_hashes_verified": true,
-    "llm_episodes": 0
-  },
-  "prior_validation_commit": "02d6607fd2b28e70807d09c0139a95e2d56502be",
-  "unit_tests_and_replay_rerun": false,
-  "scope": "Editorial revision and publication-status verification. Detailed reproduction instructions moved to repository; no appendix added, new trading experiment, or new scientific validation.",
-  "pdf_sha256": "b08399483a271ffb1cf4e7c32a9cad255732e7cc7cb3f64a34f79d483604e7eb"
+  "unit_test_suite_rerun": false,
+  "scope": "Availability statement shortened; separate read-only replay diagnostic and research-readiness correction. No sensitivity sweep or LLM study completed.",
+  "pdf_sha256": "6c5cb7ea644ecd8ce37355a5081853c418b8469dedb56f81531ebff8e1a22b23"
 }

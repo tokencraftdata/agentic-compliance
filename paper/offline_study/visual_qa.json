@@ -1,14 +1,14 @@
 {
   "date": "2026-11-09",
-  "document_version": "1.8",
+  "document_version": "1.9",
   "pages": 11,
   "render_dpi": 110,
   "all_pages_visually_inspected": true,
   "clipping_or_overlap_observed": false,
   "placeholder_scan_passed": true,
-  "code_commit_verified_in_pdf": "8a19bfd0bcd562130169e1f2fb9c228c24ce5817",
-  "pdf_sha256": "b08399483a271ffb1cf4e7c32a9cad255732e7cc7cb3f64a34f79d483604e7eb",
-  "layout": "continuous single-column academic article; short availability statement; no appendix",
+  "source_commit_link_verified_in_pdf": "f04e465a8357a1e0eee130e0655d14ea2cda29f8",
+  "pdf_sha256": "6c5cb7ea644ecd8ce37355a5081853c418b8469dedb56f81531ebff8e1a22b23",
+  "layout": "continuous single-column academic article; repository link and private-access note in section 10.1; no appendix",
   "tables_unbroken": true,
   "figure_aspect_ratios_preserved": true,
   "references_heading_with_first_entry": true,
@@ -22,7 +22,7 @@
     "page-07.png": "b15b121b13800e4625dd57973b8aaed0f7584143356718d08899566c803ca871",
     "page-08.png": "abc73984a953ad49caea8cd1a484ff34a75c6de15fb6b8589387c320230426a4",
     "page-09.png": "7a7b0bb84e9b744d73ae418362beb2836992451dffdb084edea22cd357733799",
-    "page-10.png": "f459a45ee88fe4b633f2cce20bfff003d6bf8b159749d2a288d61d2ad684aab3",
-    "page-11.png": "f3bc0a6da724e5e6b8b7771bfa286a462000af9d642efbeb0868fcca236b7c7b"
+    "page-10.png": "cc1e753abfec1fc99ef2861942988e968e1330d26b329162631bc679e87c36bc",
+    "page-11.png": "ed60a38eca193e04f5c51b0726ce96b0747aa9cb178ed4e712e6e7e1fcc5360a"
   }
 }
