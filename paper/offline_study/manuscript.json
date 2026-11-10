@@ -42,7 +42,11 @@
     },
     {
       "type": "body",
-      "text": "We examine that question in a small, replayable trading simulator. The study separates three outcomes: whether a surveillance rule flags a sequence, whether a pre-trade gate removes its benefit from the simulated price response, and how much legitimate execution the gate obstructs. An alert and an order rejection measure different events. Neither, by itself, establishes economic prevention or legal compliance."
+      "text": "Retail agent trading provides a practical setting for these questions. Robinhood announced built-in trading agents on September 29, 2026 [23]. Its documentation lists tools for placing and canceling orders. Trade approvals default to on for built-in agents; switching them off permits eligible trades without individual confirmation [24]. The example illustrates the distinction between authorizing an agent and evaluating its trading behavior. We do not evaluate Robinhood's agents, controls, or customer activity."
+    },
+    {
+      "type": "body",
+      "text": "We examine the order-splitting gap in a small, replayable trading simulator. The study separates three outcomes: whether a surveillance rule flags a sequence, whether a pre-trade gate removes its benefit from the simulated price response, and how much legitimate execution the gate obstructs. An alert and an order rejection measure different events. Neither, by itself, establishes economic prevention or legal compliance."
     },
     {
       "type": "body",
@@ -486,7 +490,11 @@
     },
     {
       "type": "h1",
-      "text": "8. Regulatory context"
+      "text": "8. Practical use and regulatory context"
+    },
+    {
+      "type": "body",
+      "text": "The cases offer a starting point for regression tests of trading controls. They check aggregate exposure, response dependence, throttle recovery, execution cost, and alerts on ordinary quoting. Teams could rerun the scripts after a control change and compare executions, rejections, and alerts. Replays reproduce recorded actions; they cannot establish how an agent would adapt to a rejection."
     },
     {
       "type": "body",
@@ -526,11 +534,11 @@
     },
     {
       "type": "body",
-      "text": "The contribution supported by these experiments is a control-evaluation case study. It supplies reproducible examples of size aggregation, response dependence, throttle interaction, and weak negative controls. Published work already treats spoofing incentives, detection, and market effects. The paper does not claim a new spoofing mechanism, a validated detector, or a generally effective defense."
+      "text": "These experiments supply regression cases for control evaluation. They do not establish a new spoofing mechanism, a validated detector, or a generally effective defense."
     },
     {
       "type": "body",
-      "text": "A subsequent LLM study should begin only after the intended environment and control settings are fixed. It would compare model-selected attempted actions, enforcement, and monitoring against scripted baselines, while measuring legitimate task completion. Models, prompts, tool access, error handling, and analysis would need to be specified before collecting headline results. No model selected a trading action here; no customer-demand or analyst-workflow study was performed."
+      "text": "An agent extension would assign legitimate execution tasks, record attempted orders, and compare alerts and task completion with the scripted baselines. Models, prompts, tools, error handling, and analysis should be fixed in advance. Independent strategies and better-grounded markets would be needed to test generalization. The reported experiments contain no model-selected trades, customer-demand study, or analyst-workflow evaluation."
     },
     {
       "type": "h1",
@@ -538,7 +546,7 @@
     },
     {
       "type": "body",
-      "text": "The aggregate limit closes the illustrated order-splitting gap, but its economic effect depends on the assumed price response. Its legitimate cost also depends on how accepted-order counts interact with a cancellation throttle. Detector timing introduces a different failure: a legitimate maker can satisfy the same pattern when its cadence falls inside the scoring window. These cases support testing economic effects, recovery, and legitimate execution separately. They support a bounded methods study, with market calibration and independent strategy evaluation still required for broader claims."
+      "text": "The aggregate limit closes the illustrated order-splitting gap, but its economic effect depends on the assumed price response. Its legitimate cost also depends on how accepted-order counts interact with a cancellation throttle. Detector timing introduces a different failure: a legitimate maker can satisfy the same pattern when its cadence falls inside the scoring window. These cases support testing economic effects, recovery, and legitimate execution separately. They can supply regression checks for changes to trading gates and surveillance rules, while market calibration and independent strategy evaluation remain necessary for deployment claims."
     },
     {
       "type": "h2",
@@ -546,7 +554,7 @@
     },
     {
       "type": "body",
-      "text": "Code, saved results, and reproduction instructions: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/f9bab948e63a352f586bd4314ed466a560990e3e\" color=\"#254f70\">github.com/tokencraftdata/agentic-compliance</link>. The repository is currently private."
+      "text": "Code, saved results, and reproduction instructions: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/469818bac837bf4c9fd9cd6e071aee27df36d0b6\" color=\"#254f70\">github.com/tokencraftdata/agentic-compliance</link>. The repository is currently private."
     },
     {
       "type": "h2",
@@ -647,6 +655,14 @@
     {
       "type": "small",
       "text": "[22] European Commission. Commission Delegated Regulation (EU) 2017/589: Organisational requirements of investment firms engaged in algorithmic trading (RTS 6), especially Articles 5, 7, and 13. Official Journal L 87, 2017, pp. 417-448.<br/><link href=\"https://eur-lex.europa.eu/eli/reg_del/2017/589/oj/eng\" color=\"#254f70\">https://eur-lex.europa.eu/eli/reg_del/2017/589/oj/eng</link>"
+    },
+    {
+      "type": "small",
+      "text": "[23] Robinhood. Robinhood Puts the Power of Hedge Funds in Every Trader's Pocket. Company announcement, September 29, 2026. Accessed November 10, 2026.<br/><link href=\"https://robinhood.com/newsroom/hood-summit-2026/\" color=\"#254f70\">https://robinhood.com/newsroom/hood-summit-2026/</link>"
+    },
+    {
+      "type": "small",
+      "text": "[24] Robinhood. Trading with your agent. Product documentation, accessed November 10, 2026.<br/><link href=\"https://robinhood.com/us/en/support/articles/trading-with-your-agent/\" color=\"#254f70\">https://robinhood.com/us/en/support/articles/trading-with-your-agent/</link>"
     }
   ]
 }
