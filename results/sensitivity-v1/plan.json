@@ -1,0 +1,237 @@
+{
+  "spec": {
+    "status": "Exploratory post-review sensitivity analysis, not preregistered or externally validated",
+    "cap_multiples": [
+      1,
+      2,
+      3,
+      4,
+      6
+    ],
+    "response_thresholds": [
+      0.1,
+      0.2,
+      0.25,
+      0.3,
+      0.4,
+      0.5
+    ],
+    "cap_seeds": [
+      8000,
+      8001,
+      8002,
+      8003,
+      8004,
+      8005,
+      8006,
+      8007,
+      8008,
+      8009
+    ],
+    "cap_strategies": [
+      "split_6x10",
+      "large_market_maker"
+    ],
+    "throttle_windows": [
+      120,
+      300,
+      900,
+      1800
+    ],
+    "session_horizons": [
+      720,
+      3600
+    ],
+    "throttle_seeds": [
+      8200,
+      8201,
+      8202,
+      8203,
+      8204,
+      8205,
+      8206,
+      8207,
+      8208,
+      8209
+    ],
+    "parameter_draw_seed": 20261110,
+    "parameter_draw_count": 12,
+    "parameter_market_seeds": [
+      8100,
+      8101,
+      8102,
+      8103,
+      8104
+    ],
+    "parameter_settings": [
+      [
+        2,
+        0.2
+      ],
+      [
+        2,
+        0.4
+      ]
+    ],
+    "notes": [
+      "Cap grid and parameter study disable only the cancellation throttle.",
+      "Only aggregate cap multiple varies; individual limit cap stays 2x, level count stays 2.",
+      "Parameter vectors use the existing authored generator; they are not independent strategy families.",
+      "Shared seeds pair conditions; multiple conditions and draws are not independent samples.",
+      "The response remains a stipulated two-tick step with no market-data calibration."
+    ]
+  },
+  "config": {
+    "protocol_version": "0.2",
+    "session_seconds": 720,
+    "decision_interval": 60,
+    "position_limit": 100,
+    "base_price": 1000,
+    "tick_value": 1,
+    "fee_per_lot": 0.05,
+    "background_depth": 10,
+    "book_response_ticks": 2,
+    "calibration_seeds": [
+      0,
+      19
+    ],
+    "evaluation_seeds": [
+      2000,
+      2039
+    ],
+    "spoof_size_multiple": 3.0,
+    "spoof_window_seconds": 180,
+    "spoof_max_distance_ticks": 3,
+    "spoof_max_filled_fraction": 0.1,
+    "layer_min_levels": 3,
+    "cancel_window_seconds": 1800,
+    "cancel_min_submissions": 20,
+    "policy_size_multiple": 2.0,
+    "policy_max_levels": 2,
+    "policy_cancel_ratio": 0.9,
+    "strategies": [
+      "idle",
+      "taker",
+      "market_maker",
+      "repricer",
+      "scripted_spoofer",
+      "scripted_layerer"
+    ]
+  },
+  "parameters": [
+    {
+      "n_orders": 4,
+      "lots_total": 80,
+      "price_spread_ticks": 1,
+      "submission_gap_s": 18,
+      "lifetime_overlap": "disjoint",
+      "execution_delay_s": 60
+    },
+    {
+      "n_orders": 7,
+      "lots_total": 80,
+      "price_spread_ticks": 2,
+      "submission_gap_s": 10,
+      "lifetime_overlap": "full",
+      "execution_delay_s": 71
+    },
+    {
+      "n_orders": 4,
+      "lots_total": 40,
+      "price_spread_ticks": 2,
+      "submission_gap_s": 17,
+      "lifetime_overlap": "disjoint",
+      "execution_delay_s": 51
+    },
+    {
+      "n_orders": 6,
+      "lots_total": 40,
+      "price_spread_ticks": 2,
+      "submission_gap_s": 22,
+      "lifetime_overlap": "disjoint",
+      "execution_delay_s": 57
+    },
+    {
+      "n_orders": 7,
+      "lots_total": 60,
+      "price_spread_ticks": 5,
+      "submission_gap_s": 7,
+      "lifetime_overlap": "full",
+      "execution_delay_s": 72
+    },
+    {
+      "n_orders": 7,
+      "lots_total": 60,
+      "price_spread_ticks": 4,
+      "submission_gap_s": 6,
+      "lifetime_overlap": "full",
+      "execution_delay_s": 20
+    },
+    {
+      "n_orders": 3,
+      "lots_total": 60,
+      "price_spread_ticks": 5,
+      "submission_gap_s": 2,
+      "lifetime_overlap": "full",
+      "execution_delay_s": 39
+    },
+    {
+      "n_orders": 5,
+      "lots_total": 40,
+      "price_spread_ticks": 0,
+      "submission_gap_s": 5,
+      "lifetime_overlap": "disjoint",
+      "execution_delay_s": 49
+    },
+    {
+      "n_orders": 7,
+      "lots_total": 40,
+      "price_spread_ticks": 3,
+      "submission_gap_s": 28,
+      "lifetime_overlap": "full",
+      "execution_delay_s": 11
+    },
+    {
+      "n_orders": 3,
+      "lots_total": 80,
+      "price_spread_ticks": 3,
+      "submission_gap_s": 13,
+      "lifetime_overlap": "full",
+      "execution_delay_s": 79
+    },
+    {
+      "n_orders": 8,
+      "lots_total": 40,
+      "price_spread_ticks": 0,
+      "submission_gap_s": 2,
+      "lifetime_overlap": "staggered",
+      "execution_delay_s": 45
+    },
+    {
+      "n_orders": 3,
+      "lots_total": 40,
+      "price_spread_ticks": 5,
+      "submission_gap_s": 25,
+      "lifetime_overlap": "staggered",
+      "execution_delay_s": 38
+    }
+  ],
+  "source_sha256": {
+    "paper_study/sensitivity.py": "78556cdf2f08eb2f1b516e693620ec0da3cb087a20a98a943b049ee47d0e22e4",
+    "config.json": "8a0422b72fdcbebbef86719b59106f6f5b5bd685a5038c00fb7d0d93f99028c3",
+    "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
+    "pilot/detectors.py": "768016731d4ba82f34e07432546d62ff8af10f9d1ba1de9122fb085ed620b7a3",
+    "pilot/evasion_family.py": "44d65fc2f248aa71e0523bad412550655b1cf6d5cbe80725fdbb783b78fd4994",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/negative_controls.py": "a0cbe38c0857bc373c481f66353e2780877810ed59339d790054b650a92ba910",
+    "pilot/review_study.py": "f4b927b3affdb6e6e76460c55572e20ce7eabc004339bbcfaf6244b489db20f8",
+    "pilot/revision.py": "740ad371f8f461ba8e301906ce56bef55688948eaa74daef100db30a437039bb",
+    "pilot/run.py": "c87cf5ea4d140901488787538dc5914710766a094aa56cfd67546de8a3a905fb",
+    "pilot/stats.py": "d16e6ac40db92f73ecf84a8659306af01fb82094e084d5238775e8bf52855ebe",
+    "pilot/strategies.py": "1d1526b44e7761a789ee29848a753754b2701ae416e373fef869c6f73b119543",
+    "pilot/throttle_isolation.py": "a3ca65be6657e3b5f06f253250ac783ecf681897a1f234fea5e38737df7f8163",
+    "pilot/window_sweep.py": "b8ea46048d98eb29b2bc71d0ae279f6747f4355b99ff42ed05fe81a4ca97031b"
+  },
+  "python": "3.9.6",
+  "planned_episodes": 2140
+}
