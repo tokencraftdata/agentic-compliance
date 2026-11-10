@@ -1,6 +1,6 @@
 {
   "date": "2026-11-09",
-  "document_version": "1.8",
+  "document_version": "1.9",
   "scope": "Check all eight references previously cited primarily as arXiv or SSRN for published versions; retain reference numbering.",
   "updates": [
     2,
@@ -214,5 +214,19 @@
         }
       ]
     }
-  ]
+  ],
+  "repeat_check": {
+    "date": "2026-11-09",
+    "result": "No additional archival conference or journal versions verified; citations 2 and 4 already use published ACM versions.",
+    "sources_rechecked": [
+      "https://arxiv.org/abs/2608.19974v2",
+      "https://arxiv.org/abs/2510.04952v2",
+      "https://arxiv.org/abs/2504.15908",
+      "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4639959",
+      "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4525036",
+      "https://tildesites.bowdoin.edu/~d.byrd/research.html",
+      "https://www.linkedin.com/posts/tuckerbalch_im-at-the-iclr-workshop-on-advances-on-financial-activity-7454596602939404288-rA3z"
+    ],
+    "limitations": "ACM full page, Crossref API, and one SSRN direct page were inaccessible in the browser tool. Earlier verified publisher-deposited metadata is retained; SSRN search-indexed records still cite working papers. No verified later publication is not proof that none exists."
+  }
 }

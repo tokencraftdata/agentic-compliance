@@ -45,21 +45,21 @@ checks and access limitations are recorded in `publication_review.json`.
 
 ## Verdict
 
-With the focused related-work and FINRA revision completed, the manuscript is
-prepared for an arXiv submission within its stated exploratory scope, subject to
-the author and account steps below. This assessment does not predict moderation
-or substitute for external scientific review.
+**Revised assessment after substantive review: do not submit this draft yet.**
+The earlier readiness judgment gave too much weight to arithmetic consistency,
+replay, and disclosure. The economic endpoint is heavily conditioned by the
+engine's activation threshold; the cadence result follows the detector's timing
+condition; and the throttle window exceeds every studied session. These are
+useful regression examples but insufficient support for broader control claims.
+See `MAJOR_REVIEW_RESPONSE.md` for verified findings and the analyses still needed.
 
-The scientific claims are adequately supported for the paper's stated offline,
-scripted scope. The manuscript is ready to circulate as a technical report and is
-a plausible workshop submission after venue preparation. It should not be
-submitted as evidence of emergent LLM manipulation or as a broadly validated
-production defense.
-
-For a stronger full research submission, the main gaps are independent strategy
-families and negative controls, evaluation in a richer or externally calibrated
-market, and an independent detector or expert-adjudicated comparison. The current
-window study is post-hoc and its 15-case recall result is tuning performance.
+Version 1.9 only shortens section 10.1 to a pinned repository link and private-access
+note. It does not claim to resolve the methodological review. The conclusion,
+methods, results, references, and AI-assistance disclosure are otherwise unchanged.
+The repository now includes a separate diagnostic that replays the 40 gated
+responsive parameter cases and checks their full-event hashes while observing
+response activation. This is a diagnostic of existing evidence, not held-out
+validation or a completed sensitivity sweep.
 
 ## Checks completed
 

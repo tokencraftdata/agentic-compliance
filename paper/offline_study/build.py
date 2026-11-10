@@ -304,10 +304,8 @@ def build(commit):
     p('A follow-up study should test whether controls remain effective as an agent varies order representation and timing, while measuring legitimate task completion. It needs separate development and test strategy families, fixed policy thresholds, and evidence-matched comparisons of instructions, external enforcement, and any review agent. Those comparisons are proposed work. No orders were sent to a live market, no customers were studied, and no finding about commercial demand is drawn from these experiments.')
 
     p('10. Reproducibility and conclusion','h1')
-    p('10.1. Artifact and verification','h2')
-    p('The repository contains the simulator, frozen configurations, saved traces, and commands for replay and regeneration. Verification replays recorded actions without calling the strategy, checks full-event hashes, and recomputes the reported rows and summaries. Exact numerical reproduction uses CPython 3.9.6. Tables and figures are generated from the checked summary; a manifest records hashes of the source, evidence, manuscript, and PDF. Detailed setup instructions and the limitations of historical regeneration are in the repository README. The repository is currently access-controlled.')
-
-    p('Source snapshot: <link href="https://github.com/tokencraftdata/agentic-compliance/tree/'+commit+'">tokencraftdata/agentic-compliance, '+commit+'</link>','small')
+    p('10.1. Code and data availability','h2')
+    p('Code, saved results, and reproduction instructions: <link href="https://github.com/tokencraftdata/agentic-compliance/tree/'+commit+'" color="#254f70">github.com/tokencraftdata/agentic-compliance</link>. The repository is currently private.')
 
     p('10.2. Conclusion','h2')
     p('The aggregate gate fixes the split-order probe in this simulator: the tested scripts lose the wealth advantage caused by the engineered price response. That repair does not settle the evaluation. Throttle timing changes the apparent cost of the gate, and a legitimate quoting cadence defeats the selected detector window. The resulting traces provide concrete regression cases for further control development. Before introducing LLM traders, the next study should test these controls on separate strategy families and market conditions, with legitimate execution measured alongside suspicious activity.')
@@ -336,7 +334,7 @@ def build(commit):
         'authors':[{'name':'Sandip Nandi','affiliation':'Independent Researcher'}],
         'blocks':source},indent=2)+'\n')
     (HERE/'references.json').write_text(json.dumps([{'number':i,'text':t,'url':u} for i,(t,u) in enumerate(REFS,1)],indent=2)+'\n')
-    manifest={'document_version':'1.8','date':'2026-11-09','code_commit':commit,'python':platform.python_version(),
+    manifest={'document_version':'1.9','date':'2026-11-09','code_commit':commit,'python':platform.python_version(),
               'reportlab':reportlab.Version,'matplotlib':matplotlib.__version__,
               'source_sha256':digest(Path(__file__)),'evidence_manifest_sha256':digest(DATA/'manifest.json'),
               'summary_sha256':digest(DATA/'summary.json'),'pdf_sha256':digest(out),
