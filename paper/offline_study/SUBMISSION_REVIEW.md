@@ -1,118 +1,64 @@
-# Final submission assessment — 9 November 2026
+# Submission assessment - 10 November 2026
 
-Assessed as an exploratory technical report or workshop-style methods paper.
-The author now plans an arXiv preprint. This is an internal technical and
-editorial review, not external peer review. The arXiv preparation and research
-plan is in `ARXIV_PLAN.md`.
+Version 2.0 has been reassessed as an exploratory computational methods report.
+The paper is not a validated agentic-compliance system or an LLM trading study.
 
-Version 1.4 makes trading compliance the explicit purpose of the candidate-control
-evaluation. It changes the title and framing, with no new experiments or results.
-The paper separates the tested engineering controls from legal compliance,
-human review workflows, and oversight of LLM trading agents.
+## Scientific assessment
 
-Version 1.5 addresses the subsequent literature and regulatory-positioning review.
-It adds ten references, compares the nearest agent-compliance and constrained
-execution work, and distinguishes FINRA context from the tested engineering
-policies. No new experiment or legal-compliance finding is reported.
+The previous positive judgment was too strong because the original zero-gain
+result was largely determined by the response threshold, the throttle could not
+expire within a session, and legitimate execution losses were underplayed.
+Version 2.0 addresses these issues with new comparisons and narrower claims:
 
-Version 1.6 has been reviewed again for submission. It defines offline execution
-and scripted policies separately, keeps the experimental findings unchanged,
-and supplies a copyable arXiv submission sheet. The final prose pass removes
-generic transitions and repeated novelty disclaimers from the related-work
-discussion while preserving its substantive comparisons. The internal release version is
-kept in the repository rather than presented as an assigned arXiv version.
+- The cap-threshold grid shows that the same 20-lot cap yields zero response
+  benefit at threshold 0.4 but 48 tick-lots at 0.2 for the fixed split probe.
+  That 48 is itself predictable from 12 cycles x 2 lots x 2 ticks; the paper
+  explicitly interprets this as model dependence, not market validation.
+- Twelve fresh parameter vectors are each crossed with five market seeds.
+  At threshold 0.2, 30/60 aggregate-gated pairs retain positive response-dependent
+  wealth without an alert; at 0.4 none do. Throttling is disabled in these
+  comparisons to isolate the cap-response interaction.
+- A one-hour horizon allows all ten aggregate-gated cases at the 1,800-second
+  throttle window to recover submissions at least once, yet mean volume falls
+  from 300.6 to 74.4 lots (75.2%). Recovery is not absence of material cost.
+- The existing 14.1% and 28.2% legitimate-maker costs and the new 75.2% cost are
+  in the abstract. Rejection measures and gate arms are explicitly labeled.
+- The cadence staircase is presented as a property of the rule and an authored
+  legitimate counterexample, not an operational false-positive-rate estimate.
+- Compact formal detector conditions replace ambiguous prose. Results are
+  organized around three findings rather than an experiment-development log.
+- Three published journal articles and CFTC/EU sources broaden the literature
+  and regulatory discussion. The bibliography has 10 journal/conference papers,
+  4 arXiv preprints, 2 SSRN working papers, and 6 official regulatory sources.
 
-The deeper research review additionally checks five central claims directly
-against saved episode records (`audit_claims.py` and `research_review.json`), adds
-Gu et al. (ICAIF 2024) on liquidity dependence, and distinguishes a proposed
-cryptographic audit pipeline from an implemented one in the cited execution work.
-No numerical mismatch was found. The remaining weaknesses are scientific scope
-limits, listed below, rather than hidden completed experiments.
+## Remaining limitations
 
-Version 1.7 changes the formatting to a continuous academic article layout.
-The complete manuscript text, references, experiment code, and recorded results
-are compared against version 1.6. Only page-break directives, subsection styling,
-and the source snapshot identifier differ in the structured manuscript. This is
-a presentation revision; it does not add scientific validation.
+The added tests do not resolve one-account modeling, the stipulated step response,
+lack of calibration or strategic background agents, author-designed labels,
+absence of genuinely separate test strategy families, or absence of LLM trading.
+The new vectors are from the same generator. Shared seeds are paired inputs, not
+extra independent samples. The paper states these limits and makes no population
+accuracy or production-defense claim.
 
-Version 1.8 revises the abstract, introduction, related-work discussion, general
-control discussion, and conclusion around the observed failures. It shortens
-section 10.1 and moves implementation/replay instructions to the repository.
-No appendix is added. The market mechanics, methods and results (sections 2.2-8),
-FINRA subsection, limitations, and assistance disclosure remain unchanged.
-Published ACM versions replace references 2 and 4; the remaining publication
-checks and access limitations are recorded in `publication_review.json`.
+The contribution is modest: a transparent case study of pitfalls in evaluating
+interacting controls. It can be released as an exploratory technical report with
+these claims. I would not present it as a strong standalone empirical-finance or
+agentic-AI result. More peer-reviewed references strengthen its context, not its
+external validity or novelty.
 
-## Verdict
+## Validation and release status
 
-**Revised assessment after substantive review: do not submit this draft yet.**
-The earlier readiness judgment gave too much weight to arithmetic consistency,
-replay, and disclosure. The economic endpoint is heavily conditioned by the
-engine's activation threshold; the cadence result follows the detector's timing
-condition; and the throttle window exceeds every studied session. These are
-useful regression examples but insufficient support for broader control claims.
-See `MAJOR_REVIEW_RESPONSE.md` for verified findings and the analyses still needed.
+- 82 unit/integration tests passed, including the strict threshold boundary and
+  separation of aggregate and individual size limits.
+- 40 original event hashes matched before the new study ran.
+- 2,140 new episodes replayed without a record mismatch; summaries recomputed.
+- Central paper numbers independently aggregated from saved records.
+- PDF and metadata checks are recorded in `arxiv_pdf_check.json`; visual checks
+  are recorded in `visual_qa.json` after rendering.
 
-Version 1.9 only shortens section 10.1 to a pinned repository link and private-access
-note. It does not claim to resolve the methodological review. The conclusion,
-methods, results, references, and AI-assistance disclosure are otherwise unchanged.
-The repository now includes a separate diagnostic that replays the 40 gated
-responsive parameter cases and checks their full-event hashes while observing
-response activation. This is a diagnostic of existing evidence, not held-out
-validation or a completed sensitivity sweep.
-
-## Checks completed
-
-For version 1.6, the unchanged experiment code, saved evidence, figures, and
-quantitative manuscript sections were compared with version 1.5. The 80-test and
-360-episode replay results below are from that preceding validation; they were
-not rerun for the scope clarification. Source/evidence hashes and the rebuilt
-PDF were checked anew.
-
-
-Version 1.5 checks include source verification, comparison of unchanged experimental
-sections and measurements against version 1.4, numeric replay, and inspection of
-every page of the rebuilt PDF. Current machine-readable records accompany the PDF.
-
-
-- Re-ran all 80 tests successfully.
-- Replayed all 360 new episodes with no mismatches; recomputed CSV rows and summary.
-- Checked the original pilot source hashes and all new study evidence hashes.
-- Audited the six-by-ten result, the 40 matched economic comparisons, and the
-  four cadence rows at the 180-second window against saved measurements.
-- Confirmed that all 40 matched gated responsive/unresponsive full-event hashes
-  are equal, as well as their reported wealth.
-- Confirmed that the aggregate gate's rules are identical in the two conditions;
-  clarified that this does not generally force realized fills or fees to be equal.
-- Replaced repetitive discussion openings with direct explanations. Added an
-  explicit distinction between legitimate order splitting and the tested script.
-- Checked the final PDF by rendering every page. No placeholder results or
-  drafting instructions remain.
-
-The prose is specific to the implementation and observed failures. This review
-does not infer authorship from writing style or claim to predict an AI detector.
-
-## Before the arXiv submission
-
-1. Author details are now confirmed: Sandip Nandi, Independent Researcher.
-   Version 1.2 replaces the anonymous label. The author should read the final
-   paper and confirm its content before submission.
-2. Use q-fin.TR as the proposed primary category; check account endorsement
-   status. Category selection remains subject to arXiv moderation.
-3. Decide how readers can access the artifact. The repository remains private;
-   its visibility was not changed. Public artifact availability is a recommended
-   reproducibility improvement, not stated here as an arXiv acceptance rule.
-4. Review the AI assistance disclosure added in version 1.2 and corrected in
-   version 1.3 to name both coding assistants used. arXiv requires
-   significant generative AI use to be reported. The disclosure must accurately
-   describe the assistance, not claim that no AI was used to prepare the paper.
-5. Choose the distribution license and complete arXiv's upload/preview checks.
-   Version 1.2 embeds outline fonts for the PDF submission route. This paper is
-   generated with ReportLab, not TeX; any later TeX version must include its source.
-
-For a later double-blind venue, prepare a separate anonymized artifact and apply
-that venue's template and disclosure rules. This manuscript's GitHub owner link
-identifies the project and is not appropriate for a fully anonymized submission.
-
-No additional experiment is claimed to have been run during this final wording
-pass. Existing data, detector algorithms, and historical reports are preserved.
+No arXiv submission has been made. The human author still needs to read the final
+paper, choose a distribution license, and check account/endorsement requirements.
+The repository remains private. A public reviewed snapshot or reviewer access is
+needed for independent reproduction; an anonymous mirror is an option only if a
+later venue requires blind review. No public-access claim or visibility change
+has been made. Artifact availability is distinct from arXiv's submission rules.

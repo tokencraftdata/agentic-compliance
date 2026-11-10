@@ -1,29 +1,26 @@
 # Agentic Compliance
 
-## New standalone paper (9 November 2026)
+## Revised compliance methods paper (10 November 2026)
 
 [Read the paper](output/pdf/order_splitting_and_timing.pdf): **Evaluating Controls
 for Trading Compliance: An Offline Study of Order Splitting and Cancellation
-Timing** (version 1.9). **Research review pending: not recommended for submission
-yet.** See the [substantive review response](paper/offline_study/MAJOR_REVIEW_RESPONSE.md).
-The paper evaluates candidate surveillance and pre-trade
-controls through completed scripted experiments, including the legitimate-maker
-cadence failure found during review. It separates detection, response-dependent
-economic effects, and legitimate execution cost; it does not establish legal
-compliance or LLM trading behaviour. See [source and reproduction](paper/offline_study/README.md)
-and [review responses](paper/offline_study/REVIEW_RESPONSE.md). Version 1.5 adds
-related research and a bounded FINRA connection: Notices 15-09 and 24-09, and
-Rules 3110 and 5210. These are context for control evaluation, not a claim that
-the implemented gates satisfy the rules. Version 1.6 clarifies that offline
-means simulated execution, while scripted describes how trading actions are
-chosen. Version 1.7 restores the continuous academic article layout without
-changing the findings. Version 1.8 rewrites the framing, shortens the artifact
-section, and cites published ACM versions of Learning Not to Spoof and ABIDES.
-Version 1.9 reduces section 10.1 to a repository link and access note. A separate
-review diagnostic verifies that the response never activates in the 40 gated
-parameter draws; this limits the interpretation of their zero wealth difference.
-Copyable arXiv fields are in
-[the submission sheet](paper/offline_study/arxiv_submission.txt).
+Timing** (version 2.0).
+
+The revision adds 2,140 exploratory sensitivity episodes, formal detector
+conditions, and three published finance-journal papers. It organizes the results
+around cap/response dependence, throttle cost and recovery, and detector timing.
+The aggregate cap's original zero-gain result does not survive every response
+threshold. Recovery in one-hour sessions also leaves substantial maker costs.
+The paper evaluates scripted regression cases, not LLM traders, real-market
+accuracy, or legal compliance.
+
+All 2,140 new episodes replay without mismatches; 82 tests pass. Existing pilot
+code and historical evidence are preserved. See [source and reproduction](paper/offline_study/README.md),
+[review assessment](paper/offline_study/SUBMISSION_REVIEW.md), and
+[review response](paper/offline_study/MAJOR_REVIEW_RESPONSE.md).
+The PDF is prepared for an exploratory technical-report release; independent
+market validation and public artifact access remain unresolved. Nothing has been
+submitted to arXiv, and repository visibility has not changed.
 
 The new measurement package adds 360 episodes, matched economic endpoints, and a
 per-side display metric. The original pilot modules and evidence are preserved.
