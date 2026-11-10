@@ -26,7 +26,7 @@ Leave empty: no journal publication is claimed.
 
 Upload file
 output/pdf/order_splitting_and_timing.pdf
-SHA-256: b08399483a271ffb1cf4e7c32a9cad255732e7cc7cb3f64a34f79d483604e7eb
+SHA-256: 6c5cb7ea644ecd8ce37355a5081853c418b8469dedb56f81531ebff8e1a22b23
 
 Submission route
 Upload the single PDF containing all text and figures. This document was created

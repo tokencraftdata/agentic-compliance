@@ -576,15 +576,11 @@
     },
     {
       "type": "h2",
-      "text": "10.1. Artifact and verification"
+      "text": "10.1. Code and data availability"
     },
     {
       "type": "body",
-      "text": "The repository contains the simulator, frozen configurations, saved traces, and commands for replay and regeneration. Verification replays recorded actions without calling the strategy, checks full-event hashes, and recomputes the reported rows and summaries. Exact numerical reproduction uses CPython 3.9.6. Tables and figures are generated from the checked summary; a manifest records hashes of the source, evidence, manuscript, and PDF. Detailed setup instructions and the limitations of historical regeneration are in the repository README. The repository is currently access-controlled."
-    },
-    {
-      "type": "small",
-      "text": "Source snapshot: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/8a19bfd0bcd562130169e1f2fb9c228c24ce5817\">tokencraftdata/agentic-compliance, 8a19bfd0bcd562130169e1f2fb9c228c24ce5817</link>"
+      "text": "Code, saved results, and reproduction instructions: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/f04e465a8357a1e0eee130e0655d14ea2cda29f8\" color=\"#254f70\">github.com/tokencraftdata/agentic-compliance</link>. The repository is currently private."
     },
     {
       "type": "h2",
