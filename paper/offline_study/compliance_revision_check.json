@@ -1,25 +1,33 @@
 {
-  "date": "2026-11-09",
-  "version": "1.9",
-  "baseline_commit": "f94553dfbf35139049c5926d99a2e8e74d06a2a8",
-  "source_commit": "f04e465a8357a1e0eee130e0655d14ea2cda29f8",
-  "revised_sections": [
-    "10.1 Code and data availability"
-  ],
-  "all_other_manuscript_blocks_unchanged": true,
-  "experimental_tables_unchanged": true,
-  "figure_pngs_and_svgs_unchanged": true,
-  "historical_experiment_code_tests_configs_and_results_unchanged": true,
-  "references_unchanged_from_v1_8": true,
-  "publication_review": "paper/offline_study/publication_review.json",
-  "review_diagnostic": {
-    "path": "results/reviewer-diagnostics-v1.json",
-    "replayed_episodes": 40,
-    "full_event_hash_mismatches": 0,
-    "response_activations": 0,
-    "largest_observed_abs_imbalance": 0.28205128205128205
+  "date": "2026-11-10",
+  "version": "2.0",
+  "baseline_commit": "2925c4853be42fa6acfac6e98207293e54fb58f5",
+  "source_commit": "f9bab948e63a352f586bd4314ed466a560990e3e",
+  "scope": "New sensitivity evidence, formal definitions, three-finding structure, published journal research and broader regulatory context",
+  "original_pilot_sources_and_results_preserved": true,
+  "new_sensitivity_episodes": 2140,
+  "historical_compatibility": {
+    "episodes": 40,
+    "mismatches": 0
   },
-  "unit_test_suite_rerun": false,
-  "scope": "Availability statement shortened; separate read-only replay diagnostic and research-readiness correction. No sensitivity sweep or LLM study completed.",
-  "pdf_sha256": "6c5cb7ea644ecd8ce37355a5081853c418b8469dedb56f81531ebff8e1a22b23"
+  "replay_verification": {
+    "episodes_replayed": 2140,
+    "record_mismatches": 0,
+    "summary_recomputed": true,
+    "source_and_evidence_hashes_verified": true
+  },
+  "tests": {
+    "passed": 82,
+    "failed": 0,
+    "interpreter": "CPython 3.9.6"
+  },
+  "independent_saved_record_aggregation": "paper/offline_study/research_review_v2.json",
+  "publication_review": "paper/offline_study/publication_review.json",
+  "bibliography_counts": {
+    "journal_or_conference": 10,
+    "arxiv_preprints": 4,
+    "SSRN_working_papers": 2,
+    "official_regulatory_sources": 6
+  },
+  "pdf_sha256": "14a988bd8c13195a5f1a3dfb4b52e7e8b8f518be7dc5447025f6c096069f67d7"
 }

@@ -1,13 +1,15 @@
 {
-  "date": "2026-11-09",
-  "document_version": "1.9",
+  "date": "2026-11-10",
+  "document_version": "2.0",
   "pages": 11,
   "author": "Sandip Nandi",
   "author_confirmed": true,
   "title_matches_metadata": true,
   "abstract_matches_metadata": true,
   "all_manuscript_text_present_in_pdf": true,
-  "code_commit": "f04e465a8357a1e0eee130e0655d14ea2cda29f8",
+  "all_tables_unbroken": true,
+  "text_within_page_margins": true,
+  "code_commit": "f9bab948e63a352f586bd4314ed466a560990e3e",
   "source_commit_link_verified_in_pdf": true,
   "ai_disclosure": true,
   "all_fonts_embedded": true,
@@ -24,12 +26,14 @@
       "embedded": true
     }
   },
-  "pdf_sha256": "6c5cb7ea644ecd8ce37355a5081853c418b8469dedb56f81531ebff8e1a22b23",
+  "pdf_sha256": "14a988bd8c13195a5f1a3dfb4b52e7e8b8f518be7dc5447025f6c096069f67d7",
   "not_encrypted": true,
-  "embedded_figures": 2,
+  "embedded_figures": 3,
   "no_open_action": true,
   "figure_captions_on_figure_pages": true,
   "references_heading_with_first_entry": true,
   "appendix_count": 0,
-  "research_ready_for_submission": false
+  "reference_count": 22,
+  "all_references_cited": true,
+  "submission_status": "not submitted; author decisions pending"
 }
