@@ -1,0 +1,335 @@
+{
+  "scope": "Post-review diagnostic, not new independent validation or a sensitivity sweep",
+  "python": "3.9.6",
+  "source_and_input_sha256": {
+    "paper_study/reviewer_diagnostics.py": "0fef6bd8a5c888054604026b443c63efeafa7a579db66e3535328e99aa787230",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/revision.py": "740ad371f8f461ba8e301906ce56bef55688948eaa74daef100db30a437039bb",
+    "results/evasion-family-v0.5-window180/config.json": "8a0422b72fdcbebbef86719b59106f6f5b5bd685a5038c00fb7d0d93f99028c3",
+    "results/evasion-family-v0.5-window180/traces.jsonl.gz": "a915cae68f65fda0ed84cebfcd9d8d9139162b51511044d5be3d8ea7673656d1",
+    "results/negative-controls-v0.4/summary.json": "4675fb6597ced39125909d65770b6870dd89c263eece7810cfe3c807af7a5d3b"
+  },
+  "replayed_episodes": 40,
+  "full_event_hash_mismatches": 0,
+  "response_activations": 0,
+  "largest_observed_abs_imbalance": 0.28205128205128205,
+  "static_balanced_book": {
+    "depth_per_level": 10,
+    "levels_per_side": 3,
+    "aggregate_cap": 20,
+    "imbalance_at_cap": 0.25,
+    "condition": "Symmetric intact background, display on one side only; not a global invariant"
+  },
+  "allowed_market_order_counterexample": {
+    "seed": 5000,
+    "action": {
+      "type": "market",
+      "side": "buy",
+      "qty": 30
+    },
+    "rejection_reasons": [],
+    "response_input": {
+      "time": 1,
+      "bids": 30,
+      "asks": 0,
+      "imbalance": 1.0
+    },
+    "interpretation": "Ordinary book depletion activates the response; not evidence of spoofing or profit"
+  },
+  "legitimate_maker_costs": [
+    {
+      "strategy": "large_market_maker",
+      "ungated_lots": 56.5,
+      "aggregate_lots": 48.55,
+      "percent_volume_loss": 14.070796460176995
+    },
+    {
+      "strategy": "patient_large_maker",
+      "ungated_lots": 66.275,
+      "aggregate_lots": 47.6,
+      "percent_volume_loss": 28.178046020369678
+    }
+  ],
+  "draws": [
+    {
+      "draw": 0,
+      "seed": 5000,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2328767123287671,
+      "response_activations": 0
+    },
+    {
+      "draw": 1,
+      "seed": 5001,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.13846153846153847,
+      "response_activations": 0
+    },
+    {
+      "draw": 2,
+      "seed": 5002,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.034482758620689655,
+      "response_activations": 0
+    },
+    {
+      "draw": 3,
+      "seed": 5003,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2328767123287671,
+      "response_activations": 0
+    },
+    {
+      "draw": 4,
+      "seed": 5004,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2328767123287671,
+      "response_activations": 0
+    },
+    {
+      "draw": 5,
+      "seed": 5005,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.28205128205128205,
+      "response_activations": 0
+    },
+    {
+      "draw": 6,
+      "seed": 5006,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2631578947368421,
+      "response_activations": 0
+    },
+    {
+      "draw": 7,
+      "seed": 5007,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.24324324324324326,
+      "response_activations": 0
+    },
+    {
+      "draw": 8,
+      "seed": 5008,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.17647058823529413,
+      "response_activations": 0
+    },
+    {
+      "draw": 9,
+      "seed": 5009,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2,
+      "response_activations": 0
+    },
+    {
+      "draw": 10,
+      "seed": 5010,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2,
+      "response_activations": 0
+    },
+    {
+      "draw": 11,
+      "seed": 5011,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.1111111111111111,
+      "response_activations": 0
+    },
+    {
+      "draw": 12,
+      "seed": 5012,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.24324324324324326,
+      "response_activations": 0
+    },
+    {
+      "draw": 13,
+      "seed": 5013,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2222222222222222,
+      "response_activations": 0
+    },
+    {
+      "draw": 14,
+      "seed": 5014,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.28205128205128205,
+      "response_activations": 0
+    },
+    {
+      "draw": 15,
+      "seed": 5015,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.28205128205128205,
+      "response_activations": 0
+    },
+    {
+      "draw": 16,
+      "seed": 5016,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2,
+      "response_activations": 0
+    },
+    {
+      "draw": 17,
+      "seed": 5017,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2222222222222222,
+      "response_activations": 0
+    },
+    {
+      "draw": 18,
+      "seed": 5018,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.28205128205128205,
+      "response_activations": 0
+    },
+    {
+      "draw": 19,
+      "seed": 5019,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2,
+      "response_activations": 0
+    },
+    {
+      "draw": 20,
+      "seed": 5020,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.28205128205128205,
+      "response_activations": 0
+    },
+    {
+      "draw": 21,
+      "seed": 5021,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.07142857142857142,
+      "response_activations": 0
+    },
+    {
+      "draw": 22,
+      "seed": 5022,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.28205128205128205,
+      "response_activations": 0
+    },
+    {
+      "draw": 23,
+      "seed": 5023,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.034482758620689655,
+      "response_activations": 0
+    },
+    {
+      "draw": 24,
+      "seed": 5024,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.28205128205128205,
+      "response_activations": 0
+    },
+    {
+      "draw": 25,
+      "seed": 5025,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.24324324324324326,
+      "response_activations": 0
+    },
+    {
+      "draw": 26,
+      "seed": 5026,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2222222222222222,
+      "response_activations": 0
+    },
+    {
+      "draw": 27,
+      "seed": 5027,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.15151515151515152,
+      "response_activations": 0
+    },
+    {
+      "draw": 28,
+      "seed": 5028,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.1111111111111111,
+      "response_activations": 0
+    },
+    {
+      "draw": 29,
+      "seed": 5029,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2631578947368421,
+      "response_activations": 0
+    },
+    {
+      "draw": 30,
+      "seed": 5030,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.034482758620689655,
+      "response_activations": 0
+    },
+    {
+      "draw": 31,
+      "seed": 5031,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2328767123287671,
+      "response_activations": 0
+    },
+    {
+      "draw": 32,
+      "seed": 5032,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.034482758620689655,
+      "response_activations": 0
+    },
+    {
+      "draw": 33,
+      "seed": 5033,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2,
+      "response_activations": 0
+    },
+    {
+      "draw": 34,
+      "seed": 5034,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2631578947368421,
+      "response_activations": 0
+    },
+    {
+      "draw": 35,
+      "seed": 5035,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.2328767123287671,
+      "response_activations": 0
+    },
+    {
+      "draw": 36,
+      "seed": 5036,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.17647058823529413,
+      "response_activations": 0
+    },
+    {
+      "draw": 37,
+      "seed": 5037,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.17647058823529413,
+      "response_activations": 0
+    },
+    {
+      "draw": 38,
+      "seed": 5038,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.1111111111111111,
+      "response_activations": 0
+    },
+    {
+      "draw": 39,
+      "seed": 5039,
+      "full_event_hash_verified": true,
+      "max_abs_imbalance": 0.28205128205128205,
+      "response_activations": 0
+    }
+  ]
+}

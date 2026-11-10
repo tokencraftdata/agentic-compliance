@@ -3,10 +3,11 @@
 **Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
 
 This manuscript reports completed scripted experiments only. It replaces the
-completed-LLM-study framing of the earlier full-paper draft. Version 1.8 is a
-preprint prepared for arXiv with the confirmed author, Sandip Nandi (Independent
-Researcher). Preparation is not a claim of submission, public release,
-preregistration, or peer review.
+completed-LLM-study framing of the earlier full-paper draft. Version 1.9 has the
+confirmed author, Sandip Nandi (Independent Researcher), and a concise repository
+availability statement. Following the substantive review, submission is on hold
+pending additional analysis; see `MAJOR_REVIEW_RESPONSE.md`. PDF formatting and
+correct arithmetic do not establish scientific readiness or peer review.
 
 The compliance focus is evaluation of candidate technical controls: which
 scripted sequences are flagged, whether a gate removes their response-dependent

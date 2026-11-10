@@ -1,4 +1,4 @@
-arXiv submission fields - prepared, not submitted
+arXiv draft fields - research review pending; not ready to submit
 
 Title
 Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing
@@ -33,6 +33,11 @@ Upload the single PDF containing all text and figures. This document was created
 with ReportLab, not TeX. The repository and this text sheet are supporting
 preparation material; do not attach them as extra files in the PDF-only route.
 
+Research revision required before submission
+- Resolve the response-threshold and throttle-horizon concerns in MAJOR_REVIEW_RESPONSE.md.
+- Add sensitivity analyses, clarify rule-boundary findings, and foreground legitimate cost.
+- This format-only revision does not resolve those scientific concerns.
+
 Author decisions remaining
 - Read and approve the complete manuscript and its AI-assistance disclosure.
 - Choose the distribution license in arXiv; no license is selected here.
@@ -44,7 +49,7 @@ Author decisions remaining
 Scope
 Offline means orders execute in a simulator. Scripted describes the programs
 choosing trading actions. No LLM trading experiment or legal-compliance
-certification is reported. This is a prepared exploratory simulation preprint,
+certification is reported. This is an exploratory simulation draft under substantive review,
 not an arXiv acceptance decision or submission receipt.
 
 Official guidance checked 9 November 2026

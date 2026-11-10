@@ -4,7 +4,9 @@
 
 [Read the paper](output/pdf/order_splitting_and_timing.pdf): **Evaluating Controls
 for Trading Compliance: An Offline Study of Order Splitting and Cancellation
-Timing** (version 1.8). The paper evaluates candidate surveillance and pre-trade
+Timing** (version 1.9). **Research review pending: not recommended for submission
+yet.** See the [substantive review response](paper/offline_study/MAJOR_REVIEW_RESPONSE.md).
+The paper evaluates candidate surveillance and pre-trade
 controls through completed scripted experiments, including the legitimate-maker
 cadence failure found during review. It separates detection, response-dependent
 economic effects, and legitimate execution cost; it does not establish legal
@@ -17,6 +19,9 @@ means simulated execution, while scripted describes how trading actions are
 chosen. Version 1.7 restores the continuous academic article layout without
 changing the findings. Version 1.8 rewrites the framing, shortens the artifact
 section, and cites published ACM versions of Learning Not to Spoof and ABIDES.
+Version 1.9 reduces section 10.1 to a repository link and access note. A separate
+review diagnostic verifies that the response never activates in the 40 gated
+parameter draws; this limits the interpretation of their zero wealth difference.
 Copyable arXiv fields are in
 [the submission sheet](paper/offline_study/arxiv_submission.txt).
 
