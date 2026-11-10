@@ -29,6 +29,12 @@ cryptographic audit pipeline from an implemented one in the cited execution work
 No numerical mismatch was found. The remaining weaknesses are scientific scope
 limits, listed below, rather than hidden completed experiments.
 
+Version 1.7 changes the formatting to a continuous academic article layout.
+The complete manuscript text, references, experiment code, and recorded results
+are compared against version 1.6. Only page-break directives, subsection styling,
+and the source snapshot identifier differ in the structured manuscript. This is
+a presentation revision; it does not add scientific validation.
+
 ## Verdict
 
 With the focused related-work and FINRA revision completed, the manuscript is
