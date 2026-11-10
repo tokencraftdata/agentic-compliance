@@ -1,0 +1,15 @@
+{
+  "episodes_replayed": 128,
+  "mismatches": 0,
+  "requests_actions_metrics_verified": true,
+  "evidence_type": "offline_plumbing",
+  "llm_episodes": 0,
+  "tests_passed": 106,
+  "python_version": "3.9.6",
+  "test_log_sha256": "e6172aff63dea91d1b9dd591dac2ca5833e9870a57dfcbe60156a3fdf117cb59",
+  "source_commit": "49a75afd0794e83799315e07e788278278ba5c61",
+  "provider_calls": 0,
+  "scripted_decisions": 768,
+  "provider_spend_usd": "0",
+  "historical_code_and_paper_unchanged_since": "18cbfc029bd50c6feb9b1d0eb5dd4e98a11990a8"
+}
