@@ -1,0 +1,832 @@
+{
+  "adversary": [
+    {
+      "control": "none",
+      "response": "step_t0.4",
+      "best_params": {
+        "n_orders": 5,
+        "lots_total": 50,
+        "price_spread_ticks": 4,
+        "submission_gap_s": 0,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 5
+      },
+      "train_score": 0.0,
+      "evaluations": 51,
+      "test": {
+        "n": 100,
+        "mean_D": 0.0,
+        "D_ci95": [
+          0.0,
+          0.0
+        ],
+        "positive_D": 0,
+        "alerts": 0,
+        "positive_D_no_alert": 0,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 0
+      }
+    },
+    {
+      "control": "none",
+      "response": "step_t0.2",
+      "best_params": {
+        "n_orders": 4,
+        "lots_total": 80,
+        "price_spread_ticks": 3,
+        "submission_gap_s": 0,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 1
+      },
+      "train_score": 48.0,
+      "evaluations": 50,
+      "test": {
+        "n": 100,
+        "mean_D": 48.0,
+        "D_ci95": [
+          48.0,
+          48.0
+        ],
+        "positive_D": 100,
+        "alerts": 0,
+        "positive_D_no_alert": 100,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "none",
+      "response": "linear_k1",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 80,
+        "price_spread_ticks": 4,
+        "submission_gap_s": 2,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 2
+      },
+      "train_score": 10.2,
+      "evaluations": 50,
+      "test": {
+        "n": 100,
+        "mean_D": 9.78,
+        "D_ci95": [
+          9.26,
+          10.3
+        ],
+        "positive_D": 100,
+        "alerts": 0,
+        "positive_D_no_alert": 100,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "none",
+      "response": "linear_k2",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 20,
+        "price_spread_ticks": 1,
+        "submission_gap_s": 5,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 5
+      },
+      "train_score": 15.2,
+      "evaluations": 56,
+      "test": {
+        "n": 100,
+        "mean_D": 12.28,
+        "D_ci95": [
+          11.16,
+          13.4
+        ],
+        "positive_D": 97,
+        "alerts": 0,
+        "positive_D_no_alert": 97,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "none",
+      "response": "fitted_aapl_upper",
+      "best_params": {
+        "n_orders": 3,
+        "lots_total": 60,
+        "price_spread_ticks": 4,
+        "submission_gap_s": 2,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 5
+      },
+      "train_score": 0.6,
+      "evaluations": 60,
+      "test": {
+        "n": 100,
+        "mean_D": 0.34,
+        "D_ci95": [
+          0.2,
+          0.5
+        ],
+        "positive_D": 16,
+        "alerts": 0,
+        "positive_D_no_alert": 16,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 81
+      }
+    },
+    {
+      "control": "legacy",
+      "response": "step_t0.4",
+      "best_params": {
+        "n_orders": 8,
+        "lots_total": 10,
+        "price_spread_ticks": 1,
+        "submission_gap_s": 2,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 5
+      },
+      "train_score": 0.0,
+      "evaluations": 50,
+      "test": {
+        "n": 100,
+        "mean_D": 0.0,
+        "D_ci95": [
+          0.0,
+          0.0
+        ],
+        "positive_D": 0,
+        "alerts": 0,
+        "positive_D_no_alert": 0,
+        "mean_filled_lots": 25.11,
+        "mean_rejected": 0,
+        "episodes_with_response": 0
+      }
+    },
+    {
+      "control": "legacy",
+      "response": "step_t0.2",
+      "best_params": {
+        "n_orders": 3,
+        "lots_total": 60,
+        "price_spread_ticks": 3,
+        "submission_gap_s": 1,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 0
+      },
+      "train_score": 48.0,
+      "evaluations": 51,
+      "test": {
+        "n": 100,
+        "mean_D": 48.0,
+        "D_ci95": [
+          48.0,
+          48.0
+        ],
+        "positive_D": 100,
+        "alerts": 0,
+        "positive_D_no_alert": 100,
+        "mean_filled_lots": 24,
+        "mean_rejected": 12,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "legacy",
+      "response": "linear_k1",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 40,
+        "price_spread_ticks": 3,
+        "submission_gap_s": 5,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 10
+      },
+      "train_score": 8.4,
+      "evaluations": 55,
+      "test": {
+        "n": 100,
+        "mean_D": 8.24,
+        "D_ci95": [
+          7.62,
+          8.88
+        ],
+        "positive_D": 100,
+        "alerts": 0,
+        "positive_D_no_alert": 100,
+        "mean_filled_lots": 24,
+        "mean_rejected": 5.75,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "legacy",
+      "response": "linear_k2",
+      "best_params": {
+        "n_orders": 5,
+        "lots_total": 70,
+        "price_spread_ticks": 4,
+        "submission_gap_s": 5,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 1
+      },
+      "train_score": 18.8,
+      "evaluations": 62,
+      "test": {
+        "n": 100,
+        "mean_D": 15.16,
+        "D_ci95": [
+          14.08,
+          16.2
+        ],
+        "positive_D": 100,
+        "alerts": 0,
+        "positive_D_no_alert": 100,
+        "mean_filled_lots": 24,
+        "mean_rejected": 36,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "legacy",
+      "response": "fitted_aapl_upper",
+      "best_params": {
+        "n_orders": 3,
+        "lots_total": 20,
+        "price_spread_ticks": 2,
+        "submission_gap_s": 5,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 40
+      },
+      "train_score": 0.58,
+      "evaluations": 51,
+      "test": {
+        "n": 100,
+        "mean_D": -0.03,
+        "D_ci95": [
+          -0.15,
+          0.0705
+        ],
+        "positive_D": 2,
+        "alerts": 0,
+        "positive_D_no_alert": 2,
+        "mean_filled_lots": 10.75,
+        "mean_rejected": 7.5,
+        "episodes_with_response": 92
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "step_t0.4",
+      "best_params": {
+        "n_orders": 7,
+        "lots_total": 40,
+        "price_spread_ticks": 3,
+        "submission_gap_s": 1,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 1
+      },
+      "train_score": 0.0,
+      "evaluations": 52,
+      "test": {
+        "n": 100,
+        "mean_D": 0.0,
+        "D_ci95": [
+          0.0,
+          0.0
+        ],
+        "positive_D": 0,
+        "alerts": 0,
+        "positive_D_no_alert": 0,
+        "mean_filled_lots": 24,
+        "mean_rejected": 48,
+        "episodes_with_response": 0
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "step_t0.2",
+      "best_params": {
+        "n_orders": 3,
+        "lots_total": 50,
+        "price_spread_ticks": 5,
+        "submission_gap_s": 1,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 0
+      },
+      "train_score": 48.0,
+      "evaluations": 50,
+      "test": {
+        "n": 100,
+        "mean_D": 48.0,
+        "D_ci95": [
+          48.0,
+          48.0
+        ],
+        "positive_D": 100,
+        "alerts": 0,
+        "positive_D_no_alert": 100,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "linear_k1",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 40,
+        "price_spread_ticks": 1,
+        "submission_gap_s": 10,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 0
+      },
+      "train_score": 7.6,
+      "evaluations": 50,
+      "test": {
+        "n": 100,
+        "mean_D": 6.14,
+        "D_ci95": [
+          5.6,
+          6.7
+        ],
+        "positive_D": 97,
+        "alerts": 0,
+        "positive_D_no_alert": 97,
+        "mean_filled_lots": 24,
+        "mean_rejected": 12,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "linear_k2",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 20,
+        "price_spread_ticks": 0,
+        "submission_gap_s": 0,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 2
+      },
+      "train_score": 14.0,
+      "evaluations": 48,
+      "test": {
+        "n": 100,
+        "mean_D": 12.08,
+        "D_ci95": [
+          10.96,
+          13.24
+        ],
+        "positive_D": 97,
+        "alerts": 0,
+        "positive_D_no_alert": 97,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "fitted_aapl_upper",
+      "best_params": {
+        "n_orders": 4,
+        "lots_total": 30,
+        "price_spread_ticks": 1,
+        "submission_gap_s": 10,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 5
+      },
+      "train_score": 1.38,
+      "evaluations": 52,
+      "test": {
+        "n": 100,
+        "mean_D": 0.0975,
+        "D_ci95": [
+          -0.2225,
+          0.3565
+        ],
+        "positive_D": 9,
+        "alerts": 0,
+        "positive_D_no_alert": 9,
+        "mean_filled_lots": 20.2,
+        "mean_rejected": 27.08,
+        "episodes_with_response": 96
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "step_t0.4",
+      "best_params": {
+        "n_orders": 7,
+        "lots_total": 70,
+        "price_spread_ticks": 4,
+        "submission_gap_s": 0,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 0
+      },
+      "train_score": 0.0,
+      "evaluations": 50,
+      "test": {
+        "n": 100,
+        "mean_D": 0.0,
+        "D_ci95": [
+          0.0,
+          0.0
+        ],
+        "positive_D": 0,
+        "alerts": 0,
+        "positive_D_no_alert": 0,
+        "mean_filled_lots": 24,
+        "mean_rejected": 72,
+        "episodes_with_response": 0
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "step_t0.2",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 30,
+        "price_spread_ticks": 1,
+        "submission_gap_s": 20,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 2
+      },
+      "train_score": 0.0,
+      "evaluations": 50,
+      "test": {
+        "n": 100,
+        "mean_D": 0.0,
+        "D_ci95": [
+          0.0,
+          0.0
+        ],
+        "positive_D": 0,
+        "alerts": 0,
+        "positive_D_no_alert": 0,
+        "mean_filled_lots": 24,
+        "mean_rejected": 24,
+        "episodes_with_response": 0
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "linear_k1",
+      "best_params": {
+        "n_orders": 4,
+        "lots_total": 20,
+        "price_spread_ticks": 3,
+        "submission_gap_s": 1,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 5
+      },
+      "train_score": 4.6,
+      "evaluations": 52,
+      "test": {
+        "n": 100,
+        "mean_D": 3.32,
+        "D_ci95": [
+          2.86,
+          3.8
+        ],
+        "positive_D": 82,
+        "alerts": 0,
+        "positive_D_no_alert": 82,
+        "mean_filled_lots": 24,
+        "mean_rejected": 24,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "linear_k2",
+      "best_params": {
+        "n_orders": 6,
+        "lots_total": 30,
+        "price_spread_ticks": 4,
+        "submission_gap_s": 0,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 20
+      },
+      "train_score": 8.0,
+      "evaluations": 52,
+      "test": {
+        "n": 100,
+        "mean_D": 7.32,
+        "D_ci95": [
+          6.4,
+          8.28
+        ],
+        "positive_D": 86,
+        "alerts": 0,
+        "positive_D_no_alert": 86,
+        "mean_filled_lots": 24,
+        "mean_rejected": 48,
+        "episodes_with_response": 100
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "fitted_aapl_upper",
+      "best_params": {
+        "n_orders": 6,
+        "lots_total": 50,
+        "price_spread_ticks": 3,
+        "submission_gap_s": 2,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 10
+      },
+      "train_score": 0.6,
+      "evaluations": 51,
+      "test": {
+        "n": 100,
+        "mean_D": 0.12,
+        "D_ci95": [
+          0.04,
+          0.22
+        ],
+        "positive_D": 6,
+        "alerts": 0,
+        "positive_D_no_alert": 6,
+        "mean_filled_lots": 24,
+        "mean_rejected": 60,
+        "episodes_with_response": 80
+      }
+    }
+  ],
+  "confirm": [
+    {
+      "strategy": "split_6x10",
+      "control": "aggregate_2x",
+      "response": "step_t0.4",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 0.0,
+      "D_ci95": [
+        0.0,
+        0.0
+      ],
+      "positive_D": 0,
+      "alerts": 0,
+      "positive_D_no_alert": 0,
+      "mean_filled_lots": 24,
+      "mean_rejected": 48,
+      "episodes_with_response": 0,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "control": "aggregate_2x",
+      "response": "step_t0.2",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 48.0,
+      "D_ci95": [
+        48.0,
+        48.0
+      ],
+      "positive_D": 100,
+      "alerts": 0,
+      "positive_D_no_alert": 100,
+      "mean_filled_lots": 24,
+      "mean_rejected": 48,
+      "episodes_with_response": 100,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "control": "aggregate_2x",
+      "response": "linear_k1",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 6.08,
+      "D_ci95": [
+        5.46,
+        6.68
+      ],
+      "positive_D": 97,
+      "alerts": 0,
+      "positive_D_no_alert": 97,
+      "mean_filled_lots": 24,
+      "mean_rejected": 48,
+      "episodes_with_response": 100,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "control": "aggregate_2x",
+      "response": "linear_k2",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 12.16,
+      "D_ci95": [
+        10.92,
+        13.4
+      ],
+      "positive_D": 97,
+      "alerts": 0,
+      "positive_D_no_alert": 97,
+      "mean_filled_lots": 24,
+      "mean_rejected": 48,
+      "episodes_with_response": 100,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "control": "aggregate_2x",
+      "response": "fitted_aapl_upper",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 0.52,
+      "D_ci95": [
+        0.34,
+        0.72
+      ],
+      "positive_D": 24,
+      "alerts": 0,
+      "positive_D_no_alert": 24,
+      "mean_filled_lots": 24,
+      "mean_rejected": 48,
+      "episodes_with_response": 65,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "control": "none",
+      "response": "step_t0.4",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 48.0,
+      "D_ci95": [
+        48.0,
+        48.0
+      ],
+      "positive_D": 100,
+      "alerts": 100,
+      "positive_D_no_alert": 0,
+      "mean_filled_lots": 24,
+      "mean_rejected": 0,
+      "episodes_with_response": 100,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "control": "none",
+      "response": "step_t0.2",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 48.0,
+      "D_ci95": [
+        48.0,
+        48.0
+      ],
+      "positive_D": 100,
+      "alerts": 100,
+      "positive_D_no_alert": 0,
+      "mean_filled_lots": 24,
+      "mean_rejected": 0,
+      "episodes_with_response": 100,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "control": "none",
+      "response": "linear_k1",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 12.06,
+      "D_ci95": [
+        11.38,
+        12.72
+      ],
+      "positive_D": 100,
+      "alerts": 100,
+      "positive_D_no_alert": 0,
+      "mean_filled_lots": 24,
+      "mean_rejected": 0,
+      "episodes_with_response": 100,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "control": "none",
+      "response": "linear_k2",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 24.12,
+      "D_ci95": [
+        22.76,
+        25.44
+      ],
+      "positive_D": 100,
+      "alerts": 100,
+      "positive_D_no_alert": 0,
+      "mean_filled_lots": 24,
+      "mean_rejected": 0,
+      "episodes_with_response": 100,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "split_6x10",
+      "control": "none",
+      "response": "fitted_aapl_upper",
+      "throttle": false,
+      "n": 100,
+      "mean_D": 0.78,
+      "D_ci95": [
+        0.54,
+        1.04
+      ],
+      "positive_D": 31,
+      "alerts": 100,
+      "positive_D_no_alert": 0,
+      "mean_filled_lots": 24,
+      "mean_rejected": 0,
+      "episodes_with_response": 84,
+      "filled_lots_ci95": [
+        24,
+        24
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "control": "none",
+      "response": "step_t0.4",
+      "throttle": true,
+      "n": 100,
+      "mean_D": 0.0,
+      "D_ci95": [
+        0.0,
+        0.0
+      ],
+      "positive_D": 0,
+      "alerts": 0,
+      "positive_D_no_alert": 0,
+      "mean_filled_lots": 57.87,
+      "mean_rejected": 0.25,
+      "episodes_with_response": 0,
+      "filled_lots_ci95": [
+        55.52,
+        60.19
+      ]
+    },
+    {
+      "strategy": "large_market_maker",
+      "control": "aggregate_2x",
+      "response": "step_t0.4",
+      "throttle": true,
+      "n": 100,
+      "mean_D": 0.0,
+      "D_ci95": [
+        0.0,
+        0.0
+      ],
+      "positive_D": 0,
+      "alerts": 0,
+      "positive_D_no_alert": 0,
+      "mean_filled_lots": 49.14,
+      "mean_rejected": 27.64,
+      "episodes_with_response": 0,
+      "filled_lots_ci95": [
+        46.74,
+        51.65
+      ]
+    }
+  ],
+  "llm_episodes": 0,
+  "inference_scope": "Bootstrap 95% intervals over held-out market seeds for fixed policies; seeds vary market paths, not strategy families."
+}

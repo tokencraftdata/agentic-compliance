@@ -10,7 +10,8 @@ run with it, and the paper that reports them.
 **Read the paper:** [TradeGauntlet: Testing the Limits of Trading Compliance Controls](output/pdf/order_splitting_and_timing.pdf)
 (v2.4, 10 November 2026, exploratory technical report).
 
-> **Status.** Every trade in the reported experiments comes from a fixed script.
+> **Status.** Every trade in the reported experiments comes from a fixed script or a
+> seeded search over split-order schedules (`paper_study.adversary`).
 > The LLM-agent study is built and passes its software checks, but no real model has
 > been run yet. Nothing here measures real-market detection accuracy or establishes
 > legal compliance.
@@ -84,6 +85,8 @@ The saved results the paper relies on are:
 | `results/boundary-v1` | 560 | Checks on either side of the response and cadence boundaries |
 | `results/reporting-v2_3.json` | derived | Means, ranges and rejection causes reported in the paper |
 | `results/offline-v2` | 1,120 | Original v0.2 pilot (160 calibration, 960 evaluation) |
+| `results/adversary-v1` | 20 searches, 6,400 held-out and confirmation episodes | Adaptive adversary and 100-seed confirmations with bootstrap intervals |
+| `results/lobster-calibration-v1` | derived | Imbalance-to-price slopes fitted to the LOBSTER AAPL sample (data not included) |
 | `results/agent-phase2-mock-v1` | 128 | Software check of the LLM runner with scripted mock policies (no LLM calls) |
 
 ## Reproducing the results
@@ -107,6 +110,7 @@ $PY -m unittest discover -s tests -v
 $PY -m paper_study.sensitivity verify results/sensitivity-v1
 $PY -m paper_study.boundary verify results/boundary-v1
 $PY -m paper_study.reporting results/reporting-v2_3.json --verify
+$PY -m paper_study.adversary verify results/adversary-v1   # about 5 minutes on 4 cores
 
 # Verify the original pilot and the bounded invariant check
 $PY -m scripts.verify_package
