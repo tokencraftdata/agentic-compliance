@@ -1,186 +1,177 @@
-# Agentic Compliance
+# TradeGauntlet: testing the limits of trading compliance controls
 
-## Actual-agent phase (in development)
+Trading platforms are starting to let AI agents place and cancel orders on a
+customer's behalf. Before that happens at scale, someone has to ask whether the
+usual safeguards still work: the pre-trade gates that reject risky orders and the
+surveillance rules that flag spoofing or layering. This repository contains a small,
+fully reproducible simulator built to stress-test those safeguards, the experiments
+run with it, and the paper that reports them.
 
-The [new study package](agent_study/README.md) adds a provider runner, held-out
-scenario families, external-scenario input, spending limits and execution replay.
-See the [prospective protocol](agent_study/PROTOCOL.md) and
-[published research beyond arXiv](agent_study/PUBLISHED_RESEARCH.md).
-Only mock software checks have run; provider access is pending. The first paid
-validation is limited to US$10. No actual-LLM findings are added to the paper.
+**Read the paper:** [TradeGauntlet: Testing the Limits of Trading Compliance Controls](output/pdf/order_splitting_and_timing.pdf)
+(v2.4, 10 November 2026, exploratory technical report).
 
-## Revised compliance methods paper (10 November 2026)
+> **Status.** Every trade in the reported experiments comes from a fixed script.
+> The LLM-agent study is built and passes its software checks, but no real model has
+> been run yet. Nothing here measures real-market detection accuracy or establishes
+> legal compliance.
 
-[Read the paper](output/pdf/order_splitting_and_timing.pdf): **TradeGauntlet:
-Testing the Limits of Trading Compliance Controls** (version 2.4).
+## What we found
 
-Version 2.4 puts **TradeGauntlet** in the main title and simulator section heading.
-It renames the workflow introduced as ConductLab in v2.3; experiments, results,
-references and scientific claims are unchanged. See the
-[workflow guide](TRADEGAUNTLET.md).
+TradeGauntlet compares controls on identical simulated market paths and keeps three
+things separate: whether a rule raises an alert, whether a gate removes the gain a
+trader gets from moving the price, and how much legitimate trading the gate blocks.
+Looking at all three exposes problems that alert counts alone hide.
 
-Version 2.3 names the custom simulator and replay workflow **ConductLab**,
-adds 560 checks on either side of rule boundaries, separates rejection causes,
-and reports observed ranges beside result means. It also revises the prose for
-more direct academic writing. See the [workflow guide](TRADEGAUNTLET.md) and
-[review response](paper/offline_study/REVIEW_RESPONSE_v2_3.md).
+1. **Splitting orders slips past a per-order limit.** A gate that rejects one 60-lot
+   order accepts six 10-lot orders at the same price, with no conduct alert, in all
+   40 tested seeds. An aggregate cap closes that gap, but whether it removes the gain
+   depends on how strongly prices are assumed to react. With the same 20-lot cap, the
+   mean gain is 0.00 tick-lots at response threshold 0.4 and 48.00 at threshold 0.2.
+2. **Controls are expensive for honest traders.** The full policy cuts a large market
+   maker's volume by 14.1% and a patient maker's by 28.2%, mostly because of the
+   cancellation throttle. In a one-hour session, trading resumes after the lockout but
+   volume stays 75.2% below the ungated baseline.
+3. **Detectors can flag ordinary market making.** With a 180-second detector window, a
+   legitimate maker triggers alerts in 39 of 40 episodes when it re-quotes every 170
+   seconds, and in 0 of 40 when it re-quotes every 190 seconds.
 
-Version 2.2 added five published papers on financial agents and compliance,
-clarifies the contribution of the three control comparisons, and explicitly
-keeps LLM results pending. The bibliography has 29 entries, including 15 published
-journal/conference papers. Those references did not change the evidence. Version 2.1 added
-the Robinhood example and practical testing uses.
+## How it works
 
-The version 2.0 revision added 2,140 exploratory sensitivity episodes, formal detector
-conditions, and three published finance-journal papers. It organizes the results
-around cap/response dependence, throttle cost and recovery, and detector timing.
-The aggregate cap's original zero-gain result does not survive every response
-threshold. Recovery in one-hour sessions also leaves substantial maker costs.
-The paper evaluates scripted regression cases, not LLM traders, real-market
-accuracy, or legal compliance.
+TradeGauntlet is a custom limit-order-book simulator, written for this project in
+plain Python (it is not built on ABIDES and does not connect to any exchange).
 
-All 2,140 sensitivity episodes and 560 boundary episodes replay without mismatches;
-the current suite passes 112 tests,
-including the next-phase infrastructure checks. Existing pilot
-code and historical evidence are preserved. See [source and reproduction](paper/offline_study/README.md),
-[review assessment](paper/offline_study/SUBMISSION_REVIEW.md), and
-[review response](paper/offline_study/MAJOR_REVIEW_RESPONSE.md).
-The PDF is prepared for an exploratory technical-report release; independent
-market validation and public artifact access remain unresolved. Nothing has been
-submitted to arXiv, and repository visibility has not changed.
+- **Market.** One instrument, integer price ticks, price/time priority and partial
+  fills. Background liquidity refreshes every second, and the fundamental price and
+  noise orders are drawn before trading starts, so every control setting sees the
+  same market for a given seed.
+- **Price response.** In the "responsive" condition, background quotes shift by two
+  ticks when the order book becomes lopsided beyond a threshold. This response is
+  assumed, not estimated from market data, which is why the paper varies it.
+- **Controls.** Pre-trade gates (position limits, per-order and aggregate size caps,
+  layer limits, self-match prevention, a cancellation throttle) and surveillance
+  detectors (spoofing, layering, self-match and excessive-cancel patterns).
+- **Traders.** Fixed scripts: legitimate makers and takers, plus scripted
+  spoofing-like and layering-like positive controls.
+- **Replay.** Every run saves its plan, seeds, source-code hashes and recorded
+  actions. A `verify` command replays the saved actions and checks that the event
+  hashes and summary statistics match exactly.
 
-The new measurement package adds 360 episodes, matched economic endpoints, and a
-per-side display metric. The original pilot modules and evidence are preserved.
-Historical material below describes earlier versions; it is not a completed LLM
-study. No live LLM inference or customer-demand validation is claimed.
+See the [TradeGauntlet workflow guide](docs/tradegauntlet.md) for how the modules fit
+together.
 
-Standalone research repository for the *Accidental Spoofers* offline pilot,
-trading-agent experiment infrastructure, and commercial-validation research.
+## Repository layout
+
+| Path | Contents |
+| --- | --- |
+| `pilot/` | Simulator core: matching engine (`market.py`), scripted traders (`strategies.py`), gates and detectors (`revision.py`, `detectors.py`), and the earlier pilot studies. |
+| `paper_study/` | Runners for the paper's sensitivity and boundary experiments, plus reporting. |
+| `agent_study/` | The pending LLM-agent study: closed-loop runner, scenarios, spending limits, replay and review export. See its [README](agent_study/README.md) and [protocol](agent_study/PROTOCOL.md). |
+| `experiments/` | Earlier experiment framework and Anthropic API adapter used by the v0.4 smoke test. |
+| `tests/` | Unit and integration tests (112 tests). |
+| `results/` | Saved evidence for every reported experiment: plans, configs, traces, summaries and manifests. |
+| `paper/offline_study/` | Source of the current paper (`build.py`, `content.py`, references, figures) and its review records. |
+| `output/pdf/` | Rendered papers: the current v2.4 paper and the earlier v0.4 pilot report. |
+| `docs/` | Workflow guide, pilot protocol, commercial assessment, version history and historical documents. |
+| `provenance/` | Records of how this repository was separated from its original home. |
+| Root scripts | `replay.py`, `verify_package.py`, `check_invariants.py`, `compare_results.py` and the document builders for the v0.2 pilot. |
+
+The saved results the paper relies on are:
+
+| Directory | Episodes | Used for |
+| --- | --- | --- |
+| `results/sensitivity-v1` | 2,140 | Cap/response and throttle/session-length sensitivity |
+| `results/boundary-v1` | 560 | Checks on either side of the response and cadence boundaries |
+| `results/reporting-v2_3.json` | derived | Means, ranges and rejection causes reported in the paper |
+| `results/offline-v2` | 1,120 | Original v0.2 pilot (160 calibration, 960 evaluation) |
+| `results/agent-phase2-mock-v1` | 128 | Software check of the LLM runner with scripted mock policies (no LLM calls) |
+
+## Reproducing the results
+
+The simulator, tests and replay need only the Python standard library. The saved
+evidence was produced with **CPython 3.9.6**, and the exact-match verify commands
+check the interpreter version, so use 3.9.6 for verification. One way to get it:
+
+```sh
+uv python install 3.9.6
+PY="$(uv python find 3.9.6)"
+```
+
+From the repository root:
+
+```sh
+# Run the test suite
+$PY -m unittest discover -s tests -v
+
+# Replay and verify the paper's saved evidence
+$PY -m paper_study.sensitivity verify results/sensitivity-v1
+$PY -m paper_study.boundary verify results/boundary-v1
+$PY -m paper_study.reporting results/reporting-v2_3.json --verify
+
+# Verify the original pilot and the bounded invariant check
+$PY verify_package.py
+$PY replay.py results/offline-v2
+$PY check_invariants.py
+```
+
+To run an experiment from scratch, plan, run and verify it in a new directory
+(runners refuse to overwrite existing output):
+
+```sh
+$PY -m paper_study.boundary plan results/local-boundary
+$PY -m paper_study.boundary run results/local-boundary
+$PY -m paper_study.boundary verify results/local-boundary
+```
+
+The tests and the sensitivity replay also pass on Python 3.13, but the boundary
+runner refuses other interpreter versions and the derived report differs slightly,
+so use 3.9.6 when checking saved evidence. Instructions for rebuilding the paper PDF are in
+[paper/offline_study/README.md](paper/offline_study/README.md).
+
+## The LLM-agent study (in progress)
+
+The next phase gives LLM agents legitimate trading tasks (execution and market
+making) and measures whether they produce concerning order patterns, and how
+controls change their behavior and costs. The runner in `agent_study/` feeds each
+model decision the live book, inventory and recent events; uses separate
+development and held-out scenarios; enforces a spending and call limit with no
+automatic retries; and saves every request and response so runs can be replayed
+without calling the model again.
+
+So far only a 128-episode mock check has run. The first paid validation run is
+capped at US$10 and is waiting on provider access. No LLM findings are reported.
+
+## Scope and limitations
+
+- Prices are synthetic and the price response is assumed. Results describe the
+  implemented rules inside this simulator, not how often these patterns occur in
+  real markets.
+- One account and one instrument, with no exchange latency, strategic background
+  traders, auctions or cross-venue routing.
+- The scripts, labels and detectors were developed together, and the sensitivity
+  and boundary settings were chosen after earlier results were known. The analyses
+  are exploratory, not preregistered.
+- An alert records a pattern; it is not a finding of unlawful conduct.
+
+## More documentation
+
+- [Version history](docs/changelog.md): what changed in each paper and pilot version.
+- [Paper source and reproduction details](paper/offline_study/README.md).
+- [Pilot protocol (v0.2)](docs/pilot-protocol.md) and the earlier
+  [v0.4 pilot report](output/pdf/agentic_compliance_corrected.pdf).
+- [Commercial assessment](docs/commercial-validation.md): desk research on whether
+  predeployment testing for trading agents is a viable product. No customer
+  validation has been done.
+- [Historical documents](docs/history/README.md) and [provenance](provenance/README.md).
 
 This project is independent of [TrustBound](https://github.com/tokencraftdata/trustbound)
 and [Agent Wallet Policy Privacy](https://github.com/tokencraftdata/agent-wallet-policy-privacy),
-which are separate research projects with separate repositories.
+which are separate research projects.
 
-- [Corrected pilot PDF](output/pdf/agentic_compliance_corrected.pdf)
-- [Review findings and reproducibility commands](REVIEW_REVISION.md)
-- [Experiment framework and remaining live-study work](experiments/README.md)
-- [Market assessment and customer-validation plan](COMMERCIAL_VALIDATION.md)
+## Citation and license
 
-All commands below run from this repository's root. Saved experiments are offline;
-no live LLM results or validated customer demand are claimed.
+If you refer to this work, please cite the paper:
 
-The project was separated on 8 November 2026. Existing manuscripts and manifests
-retain their historical source references. See [migration provenance](REPOSITORY_MIGRATION.json)
-and the [pre-separation README](provenance/README.pre-separation.md). The old
-TrustBound paths in the PDF refer to the archived source snapshot; this repository
-is the home for further Compliance work.
+> Sandip Nandi. *TradeGauntlet: Testing the Limits of Trading Compliance Controls.*
+> Exploratory technical report, version 2.4, 10 November 2026.
 
-## Current review revision (0.4)
-
-The corrected pilot is in `output/pdf/agentic_compliance_corrected.pdf`. See
-[review changes and reproduction](REVIEW_REVISION.md),
-[full-paper experiment infrastructure](experiments/README.md), and
-[commercial assessment and customer validation](COMMERCIAL_VALIDATION.md).
-The original 0.2 code and 960-episode evidence below are preserved. The new
-2,160-episode repair study is exploratory; the 32-episode experiment smoke grid
-uses mock responses only. No LLM inference or customer validation is claimed.
-
----
-
-## Agentic compliance order book pilot
-
-A reproducible **offline, scripted simulation pilot** for the research question in
-*Accidental Spoofers*. It validates experiment infrastructure and exposes control
-tradeoffs. It does **not** measure emergent behavior by an LLM, establish legal
-market abuse, or validate a production surveillance system.
-
-The revised manuscript is in `paper/`. The original supplied PDF is preserved
-outside this repository. This repository contains only the Compliance project;
-its findings do not validate TrustBound or the Wallet project.
-
-## Reproduce without network access
-
-Python 3.9+ and its standard library are sufficient for the simulator, tests,
-finite-state checker, analysis, and replay. Run from this directory:
-
-```sh
-python3 -m unittest discover -s tests -v
-python3 check_invariants.py
-python3 verify_package.py
-python3 -m pilot.run --output results/local-reproduction
-python3 replay.py results/offline-v2
-python3 compare_results.py results/offline-v2 results/local-reproduction
-```
-
-The simulator refuses to overwrite an existing output directory. The saved batch
-contains 160 calibration episodes and 960 evaluation episodes, using disjoint
-seed ranges. Full-grid settings and endpoints are in [the protocol](PROTOCOL.md).
-Reproduction is deterministic for the tested interpreter; cross-version equivalence
-must be verified rather than assumed. Source and evidence hashes are recorded.
-
-`episodes.csv` contains every evaluation episode. `summary.json` contains cellwise
-Wilson intervals, paired bootstrap effects, and threshold sensitivity. The gzip
-trace archive contains subject-related events, attempted actions, state samples,
-and full event-stream hashes. `replay.py` rebuilds background events and replays
-recorded actions without invoking the strategy implementations. The complete
-event history is reconstructible; the saved archive is not falsely described as
-containing every background event.
-
-`results/invariants.json` records an exhaustive finite-domain exposure check.
-This is a bounded executable check, not a proof for arbitrary states or a proof
-of legal compliance. Tests include matching, fees, conservation, pending-order
-exposure, safe cancellation, and positive/negative detector fixtures.
-
-## What is implemented
-
-- Integer-tick price/time matching with partial fills and market-order expiry.
-- One-second background evolution, including between subject actions.
-- Exogenous random streams fixed before agent actions, paired by seed.
-- Declared benign and scripted positive controls; no mislabeled model outputs.
-- Separate attempted actions, accepted orders, rejections, fills, and alert records.
-- Position commitments plus optional size, layer, self-match, and submission gates.
-- Spoof-pattern, layering-pattern, self-match and excessive-cancel alerts.
-- Terminal fundamental-valued wealth, midpoint-valued wealth, volume, inactivity,
-  inventory and an independently calculated midpoint-error diagnostic.
-
-Cancellation is always available to reduce outstanding exposure. New submissions
-may be throttled. No calibration target of two percent is claimed. A cancellation
-alert is an operational signal and is excluded from the primary conduct-pattern
-union. Self-match coverage has unit fixtures; a wash-strategy study is not run.
-Marking the close and multi-agent coordination are deferred, not silently scored
-with invalid proxies.
-
-## Using future agent outputs
-
-`pilot.market.Market.observation()` returns book levels, cash, inventory, open
-orders and recent subject events. `Market.act()` accepts `hold`, `cancel`, `limit`
-and `market` dictionaries. A caller must record the exact observation, provider
-model identifier, prompt, response, token usage, errors and parsed action. It must
-not relabel scripted controls as model behavior. Record short volunteered action
-explanations separately from behavior; do not presume hidden reasoning access.
-
-No API key or private provider record is included. A provider authentication
-check failed before any model inference; the user selected an offline pilot.
-A future live-model study needs fresh seeds, a frozen prompt/action protocol,
-completion and failure denominators, model snapshots, a call budget and separate
-human adjudication before any claims about model intent or emergence.
-
-## Rebuild the manuscript
-
-Install the pinned optional dependencies in `requirements-docs.txt`, then run:
-
-```sh
-python3 build_document.py
-```
-
-This generates the editable Word manuscript from actual saved results. Export
-that document to PDF with LibreOffice or Word. The checked-in PDF was rendered
-from the same Word file and visually reviewed. Document generation is separate
-from numeric reproduction; office renderers can change pagination and metadata.
-
-The supplied snapshot was generated with Python 3.9.6. The first development
-batch and its original code are retained in `results/development-v1.zip`; final
-results use the corrected gate and fresh seeds.
-
-The scope and limitations are explicit in [the revision record](REVISION_NOTES.md).
-The repository's existing rights status applies; no additional license is granted.
+No open-source license has been granted yet, so please ask the author before reusing the code.

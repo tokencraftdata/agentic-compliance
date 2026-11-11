@@ -60,7 +60,7 @@ and 80 cadence-boundary episodes. The exact-time scheduler first reproduces all
 40 existing 180-second cadence event hashes. Saved attempts then replay with
 zero mismatches. `paper_study.reporting` derives descriptive ranges and exclusive
 rejection categories from the original saved records, without rewriting them.
-The [workflow guide](../../TRADEGAUNTLET.md) identifies the implementation modules.
+The [workflow guide](../../docs/tradegauntlet.md) identifies the implementation modules.
 
 ## Reproduce the sensitivity evidence
 

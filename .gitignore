@@ -4,3 +4,4 @@ __pycache__/
 .env
 results/local-*/
 paper/rendered/
+.DS_Store
