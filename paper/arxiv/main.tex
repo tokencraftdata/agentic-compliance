@@ -12,6 +12,8 @@
 \usepackage{tabularx}
 \usepackage{amsfonts}
 \usepackage{amsmath}
+\usepackage{amsthm}
+\newtheorem{proposition}{Proposition}
 \usepackage{microtype}
 \usepackage{courier}
 \usepackage[font=small,skip=6pt]{caption}
@@ -22,8 +24,8 @@
   pdfauthor={Sandip Nandi}}
 
 \title{TradeGauntlet: Testing the Limits of Trading Compliance Controls\\[4pt]
-  \large Scripted experiments on order splitting and cancellation timing}
-\date{10 November 2026}
+  \large Adaptive evasion, order splitting, and cancellation timing}
+\date{11 November 2026}
 \author{Sandip Nandi\\
   Independent Researcher}
 \renewcommand{\shorttitle}{TradeGauntlet}
@@ -34,7 +36,7 @@
 \maketitle
 
 \begin{abstract}
-An order-by-order size limit can admit a large display assembled from smaller orders. We built TradeGauntlet, a custom limit-order-book simulator and replay workflow, to examine this gap while separating alerts, gains from the simulated price response, and costs to legitimate execution. Six 10-lot orders pass the original gate without a conduct alert in all 40 tested seeds. An aggregate cap removes the gain at the original settings, but its effect depends on the assumed response. With throttling disabled, the same 20-lot cap gives a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at 0.2. Checks on either side of the response boundary preserve this contrast. The full policy reduces volume by 14.1\% for a large maker and 28.2\% for a patient maker; a separate ablation attributes most of the large maker's loss to throttling. In a one-hour test, submissions resume after lockout but volume remains 75.2\% below the ungated baseline. A legitimate maker triggers alerts in 39/40 episodes at a 170-second quoting interval and 0/40 at 190 seconds, with a 180-second detector window. These scripted cases expose control interactions that can be obscured by reporting alerts alone. The prices are synthetic; the results describe the implemented rules and their consequences, not real-market detection accuracy.
+Pre-trade gates and surveillance rules are usually evaluated by counting alerts. We argue that three quantities must be measured separately on matched market paths: whether a rule alerts, whether a gate removes the gain from moving the price, and how much legitimate execution the gate blocks. We build TradeGauntlet, a replayable limit-order-book simulator, and use it in three ways. First, we prove that when a gate and a detector threshold the same quantity, the detector is silent on gated traffic by construction, so zero alerts there measure the gate, not the detector. Second, a seeded search over split-order schedules, selected on training paths and scored on 100 held-out paths, finds alert-free strategies that profit from the simulated price response under every control we test when prices respond smoothly to book imbalance. With a response whose move probability is proportional to imbalance, the best alert-free gain found is 9.78 tick-lots per session with no gate, 6.14 (95\% CI 5.60 to 6.70) under an aggregate size cap, and 3.32 under a stricter cap: the cap reduces the gain but does not remove it. Third, we fit the response to one day of Nasdaq order-book data for AAPL: depth beyond the best quotes has no detectable one-second effect, and even the upper end of its confidence interval leaves gains below one tick-lot. The controls themselves carry costs: the full policy cuts a large market maker's volume by 15.1\% over 100 paths, and a legitimate maker alerts in 39/40 episodes when its quoting interval falls just inside the detector window. All trading is simulated; the results characterise the implemented rules, not real-market detection accuracy.
 \end{abstract}
 
 \keywords{trading compliance \and market surveillance \and spoofing \and limit order book simulation \and AI trading agents}
@@ -47,19 +49,24 @@ Robinhood announced built-in trading agents on September 29, 2026, describing th
 
 We built TradeGauntlet for this study: a small limit-order-book simulator coupled to a workflow for fixing scenarios, comparing controls on matched paths, and replaying the resulting orders. We distinguish whether a surveillance rule flags a sequence, whether a gate removes its gain from the simulated price response, and how much legitimate execution the gate prevents. An alert records a pattern; a rejection records an intervention. Neither alone tells us whether the intervention removed the gain or whether the trading was lawful.
 
-The experiments vary the aggregate cap and price-response threshold together, then examine cancellation windows and session lengths. A further test changes a legitimate maker's quoting interval relative to the detector window. These comparisons expose three problems: protection that depends on the assumed response, recovery that leaves substantial execution costs, and alerts on ordinary quoting. Each can be missed if an evaluation reports only alerts or rejected orders.
-
-The contribution is a set of executable counterexamples and a workflow for retesting them after a control change. The simulator makes the rule interactions inspectable; it does not estimate how often they occur in markets. All reported trading actions come from fixed scripts. Section 9 describes the pending extension to LLM agents.
+Our contributions are:
+\begin{enumerate}
+\item An evaluation method for stacks of trading controls that scores alerts, removed gains, and legitimate execution separately on matched market paths, with exact replay of every episode.
+\item Two propositions showing when an evaluation is uninformative by construction: a detector that shares a threshold with a gate cannot alert on gated traffic (Proposition~\ref{prop:coupling}), and a step response has a closed-form activation boundary in the cap multiple (Proposition~\ref{prop:boundary}).
+\item An adaptive adversary: a seeded search over split-order schedules, selected on training paths and scored on held-out paths with bootstrap confidence intervals, which replaces hand-written counterexamples (Section~\ref{sec:adversary}).
+\item A threshold-free price response and its fit to Nasdaq order-book data, which turns the question of whether a cap protects into a measured quantity rather than an assumed one.
+\end{enumerate}
+We also report costs to legitimate traders from the cancellation throttle and a detector-window counterexample on ordinary market making. The simulator makes these interactions inspectable; it does not estimate how often they occur in markets. No experiment uses an LLM; Section~\ref{sec:limitations} describes the pending extension to LLM agents.
 
 \section{Related work}
 
 Wang and Wellman~\cite{r1} study spoofing with trading agents, and Wang et al.~\cite{r7} extend the analysis to strategic responses and market-design changes. Cartea, Jaimungal, and Wang~\cite{r18} model the trade-off between spoofing gains and expected fines. These studies explain economic mechanisms that our fixed scripts and imposed price response take as given.
 
-Tao et al.~\cite{r19} derive spoofing conditions from a multilevel imbalance model, calibrate it to TMX Level-2 data, and propose monitoring based on distributional distance. Chen, Hsieh, and Yang~\cite{r20} use Taiwan derivatives order and trade data to study potential spoofing and a price-banding intervention. Both bring market evidence to questions of detection or trading restrictions. Here the response model is uncalibrated, so the comparisons measure effects within the simulator.
+Tao et al.~\cite{r19} derive spoofing conditions from a multilevel imbalance model, calibrate it to TMX Level-2 data, and propose monitoring based on distributional distance. Chen, Hsieh, and Yang~\cite{r20} use Taiwan derivatives order and trade data to study potential spoofing and a price-banding intervention. Both bring market evidence to questions of detection or trading restrictions. We fit our response model to one day of Nasdaq data (Section~\ref{sec:adversary}); the rest of the comparisons measure effects within the simulator.
 
 Two working papers address evidence that this design lacks. Do and Putni\c{n}\v{s}~\cite{r13} evaluate indicators using prosecuted cases and out-of-sample tests. Fabre and Challet~\cite{r10} use Level-3 data to estimate price responses and possible spoofing gains. External labels and an estimated response would strengthen our evaluation; varying an assumed threshold does not supply either.
 
-Learning traders can adapt to detection and enforcement. Byrd~\cite{r2} studies an RL trader that discovers spoofing and a learned recognizer that discourages it. Wang and Wellman~\cite{r3} model adaptation between manipulation and detection, while Cartea, Chang, and Garc\'{i}a-Arenas~\cite{r12} examine manipulation by learning algorithms. Gu et al.~\cite{r17} vary liquidity and spoofing strategies, and ABIDES~\cite{r4} supports richer agent interaction and communication latency. We hold the trading policies fixed to isolate the effects of control settings.
+Learning traders can adapt to detection and enforcement. Byrd~\cite{r2} studies an RL trader that discovers spoofing and a learned recognizer that discourages it. Wang and Wellman~\cite{r3} model adaptation between manipulation and detection, while Cartea, Chang, and Garc\'{i}a-Arenas~\cite{r12} examine manipulation by learning algorithms. Gu et al.~\cite{r17} vary liquidity and spoofing strategies, and ABIDES~\cite{r4} supports richer agent interaction and communication latency. Our adversary is simpler than these learners: it searches a fixed family of split-order schedules rather than learning a policy, which keeps each found strategy inspectable and replayable.
 
 Pandey and Rajwal~\cite{r25} evaluate LLM judgments about potential market abuse using variants of enforcement-case narratives. RISCTrade~\cite{r26} evaluates adherence to risk mandates during trading across multiple markets. We focus on what happens at the order level when a gate or surveillance rule changes, including the cost to legitimate execution.
 
@@ -93,6 +100,8 @@ Sessions & 720 seconds in the core study; 720 and 3,600 seconds in the throttle 
 The fundamental and noise streams are generated before trading starts. For a given seed and session length, every gate and response condition therefore receives the same exogenous draws. Unfilled market quantity expires. Background quotes are replaced between successive subject actions, so splitting an order also changes how long the display remains in the book.
 
 Immediately before each replenishment, let B and A be total remaining buy and sell quantity, including the subject. The imbalance is I = (B - A) / max(1, B + A). In the responsive condition, background quotes shift by two ticks when I exceeds a threshold t, by minus two ticks when I is below -t, and otherwise do not shift. The unresponsive condition omits this shift. The original threshold is 0.4; the sensitivity grid varies it. This step response is stipulated, not estimated from market data.
+
+Because every result under the step response hinges on an unestimated threshold, we add a second, threshold-free response. In the \emph{linear} condition, background quotes move $\kappa$ ticks in the direction of $I$ with probability $|I|$, and otherwise stay centred on the fundamental, so the expected displacement is $\kappa I$ ticks. This follows the empirical regularity that the probability of the next price move rising increases with order-book imbalance, roughly linearly for large-tick stocks~\cite{r31}, and that short-horizon price changes are approximately linear in order-flow imbalance~\cite{r30}. We use $\kappa \in \{1, 2\}$. The uniform draws that decide each move are generated before trading from a separate seeded stream, so all gate conditions on a seed share them. The linear response is anchored on published findings; it is not fitted to market data.
 
 \subsection{Pre-trade gates}
 
@@ -146,7 +155,7 @@ Cadence boundaries & 170- and 190-second maker cadences x 40 ungated seeds; scor
 \caption{Sensitivity and boundary checks: 2,700 episodes. The first three comparisons contain 2,140 episodes; the boundary checks add 560. The cap grid uses m in \{1, 2, 3, 4, 6\} and t in \{0.1, 0.2, 0.25, 0.3, 0.4, 0.5\}. Neighboring thresholds are 0.24/0.26 at m = 2, 0.39/0.41 at m = 4, and 0.49/0.51 at m = 6. Cap and parameter comparisons disable throttling. The horizon study uses t = 0.4, m = 2, and throttle windows of 120, 300, 900, and 1,800 seconds.}
 \end{table}
 
-The settings and parameter vectors were saved before each comparison was run, after inspecting the earlier results. This is exploratory analysis, not preregistration. Seeds 8000-8009 pair the cap and price-boundary conditions, 8100-8104 pair each parameter vector, and 8200-8209 pair the horizon conditions. Cadence checks reuse seeds 6000-6039. The runners are \texttt{paper\_study.sensitivity} and \texttt{paper\_study.boundary}. Tables give means with observed minimum and maximum values; these ranges are descriptive, not confidence intervals. Reused paths, rescoring, and parameter draws from one authored generator do not supply independent strategy samples.
+The settings and parameter vectors were saved before each comparison was run, after inspecting the earlier results. This is exploratory analysis, not preregistration. Seeds 8000-8009 pair the cap and price-boundary conditions, 8100-8104 pair each parameter vector, and 8200-8209 pair the horizon conditions. Cadence checks reuse seeds 6000-6039. The runners are \texttt{paper\_study.sensitivity} and \texttt{paper\_study.boundary}. Tables give means with observed minimum and maximum values; these ranges are descriptive, not confidence intervals. Reused paths, rescoring, and parameter draws from one authored generator do not supply independent strategy samples. The experiments in Section~\ref{sec:adversary} instead fix the search budget, seeds, and analysis in a saved plan before running, separate training from held-out paths, and report 95\% percentile bootstrap intervals over 100 held-out paths.
 
 \section{Aggregation and the price-response boundary}
 
@@ -165,9 +174,29 @@ aggregate & 0/40 & 0/40 & 24.00 [24.00, 24.00] & -25.95 [-33.20, -15.20] \\
 \caption{Six-by-ten split probe, \texttt{pilot.review\_study}, seeds 3000-3039, responsive market. Both gates include the original throttle. The 120-second scoring window is retained from this comparison; rescoring at the current 180-second default leaves these alert counts unchanged. Alerts count episodes; volume and wealth are mean [minimum, maximum]. Wealth is in tick-lots.}
 \end{table}
 
-Each split order passes the individual-size check, and all occupy one price level. The individual and layer detectors flag none of these 40 paths; the aggregate detector flags the admitted sequence. Under the aggregate gate, however, absence of an aggregate alert is guaranteed for fixed m < 3. At admission of the last qualifying order j, the group's quantity cannot exceed m d\textsubscript{j}. Its remaining quantity at the shared fill can only decrease, so its sum is at most m max\textsubscript{i} d\textsubscript{i}, below the detector's 3 max\textsubscript{i} d\textsubscript{i} threshold. This assumes every group order passed the same gate and cannot increase in size after admission. The zero count at m = 2 therefore says nothing about independent detector accuracy.
+Each split order passes the individual-size check, and all occupy one price level. The individual and layer detectors flag none of these 40 paths; the aggregate detector flags the admitted sequence. Under the aggregate gate, however, the absence of an aggregate alert is not evidence about the detector. It follows from the shared inequality.
 
-The original settings make this result structurally likely. With three intact background levels of D lots per side and subject display mD on only one side, I = m/(6 + m). Thus m = 2 gives I = 0.25, below 0.4. Under these static assumptions, activation requires m > 6t/(1 - t); at t = 0.4, the boundary is m = 4. Trades can deplete depth before replenishment, so 0.25 is not a global bound on the simulated book. A replay diagnostic of the 40 gated parameter draws nevertheless finds no response activations and a maximum absolute imbalance of 0.282. Their identical responsive and unresponsive event streams therefore verify a restricted mechanism, not general economic prevention.
+\begin{proposition}[Gate--detector coupling]\label{prop:coupling}
+Suppose every order in a candidate group was admitted by the aggregate gate with multiple $m$, and the aggregate pattern alerts when the group's remaining quantity at the shared fill is at least $k \max_i d_i$. If $m < k$, the aggregate pattern never alerts on that group.
+\end{proposition}
+
+\begin{proof}
+Let $j$ be the last group order admitted. At its admission the gate requires that the remaining same-side quantity, including $q_j$, be at most $m d_j \le m \max_i d_i$. Orders admitted before $j$ can only lose quantity afterwards, through fills or cancellation, and no order grows after admission, so the remaining quantity at the shared fill is also at most $m \max_i d_i < k \max_i d_i$.
+\end{proof}
+
+With $k = 3$ and the original $m = 2$, the zero alert count under the aggregate gate is guaranteed, and says nothing about independent detector accuracy. More generally, when a gate and a detector threshold the same quantity, evaluating the detector on gated traffic measures the gate.
+
+The original settings also make the zero gain structurally likely.
+
+\begin{proposition}[Static activation boundary]\label{prop:boundary}
+With three intact background levels of $D$ lots per side and a subject display of $mD$ lots on one side only, the imbalance is $I = m/(6+m)$. The step response with threshold $t$ activates if and only if $m > 6t/(1-t)$.
+\end{proposition}
+
+\begin{proof}
+One side holds $3D + mD$ lots and the other $3D$, so $I = mD/((6+m)D)$. The inequality $m/(6+m) > t$ rearranges to $m(1-t) > 6t$.
+\end{proof}
+
+Thus $m = 2$ gives $I = 0.25$, below 0.4, and at $t = 0.4$ the boundary is $m = 4$. Trades can deplete depth before replenishment, so 0.25 is not a global bound on the simulated book. A replay diagnostic of the 40 gated parameter draws nevertheless finds no response activations and a maximum absolute imbalance of 0.282. Their identical responsive and unresponsive event streams therefore verify a restricted mechanism, not general economic prevention. Section~\ref{sec:adversary} replaces the threshold with the linear response and the fixed scripts with a search.
 
 \begin{figure}[htbp]
 \centering
@@ -289,13 +318,65 @@ We selected and assessed the original window on the same cases. Extending W from
 
 For the 180-second maker, the aggregate policy reduces mean volume from 73.80 to 58.98 lots and produces no conduct alerts. The gate has changed the activity available to the detector. The disappearance of alerts, alongside reduced execution, does not establish better discrimination. Evaluating specificity beyond these examples requires separate strategy families and independently reviewed objectives.
 
+\section{Adaptive evasion and a fitted price response}\label{sec:adversary}
+
+The results so far rest on scripts we wrote and on a response threshold we chose. This section removes both. The runner is \texttt{paper\_study.adversary}; its plan, search logs, held-out episodes, and summary are saved, and a verify command reruns every held-out evaluation and reproduces the summary exactly.
+
+\paragraph{Adversary.} The adversary chooses a split-order schedule from the parameterized family of Section~4: the number of orders (2 to 8), total displayed quantity (10 to 80 lots), price spread behind the touch (0 to 5 ticks), submission gaps, lifetime overlap (full, staggered, or disjoint), and the delay before a 2-lot opposite-side execution. Each candidate is scored on 10 training paths by its mean response-dependent difference D minus 100 times its fraction of episodes with a conduct alert, so any alert-prone schedule loses. The search draws 40 random candidates and then makes 40 single-parameter local moves, keeping improvements. The selected schedule is then scored on 100 held-out paths that the search never saw. Searches run separately for each of four control settings (no gate; legacy; aggregate cap at m = 2; aggregate cap at m = 1) and five responses, with the cancellation throttle on.
+
+\paragraph{Responses.} Besides the step responses at t = 0.4 and t = 0.2, we use the linear response of Section~3.1 with $\kappa = 1$ and $\kappa = 2$ as stress settings, and a fitted setting in which the move probability is $s|I|$ with $s$ estimated from data.
+
+\paragraph{Fitting the response.} We use the free LOBSTER sample for AAPL on 21 June 2012, reconstructed from Nasdaq messages, with 400,391 book updates at 10 levels. On a one-second grid, excluding the first and last ten minutes, we regress the mid-price change over the next h seconds, measured in units of the prevailing half-spread, on the imbalance of the top three levels, which matches the simulator's three background levels. Intervals use a block bootstrap with five-minute blocks. The simulator's half-spread is one tick, so the one-second slope is directly comparable with $\kappa s$.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Horizon} & \textbf{Top three levels} & \textbf{Best level only} \\
+\midrule
+1 s & 0.018 [-0.003, 0.039] & 0.052 [0.031, 0.075] \\
+5 s & -0.083 [-0.155, -0.009] & 0.084 [0.019, 0.153] \\
+10 s & -0.150 [-0.279, -0.016] & 0.051 [-0.048, 0.156] \\
+\bottomrule
+\end{tabular}
+\caption{Slope of the future mid-price change, in half-spreads, on order-book imbalance: AAPL, 21 June 2012, 18,028 one-second observations, median half-spread 7.5 ticks. Brackets are 95\% block-bootstrap intervals. Produced by \texttt{paper\_study.calibration}.}
+\end{table}
+
+Depth beyond the best quotes has no detectable one-second effect for AAPL, and at five and ten seconds its sign reverses. Imbalance at the best quotes predicts small moves in the expected direction. Both are one to two orders of magnitude weaker than the stress settings, which assume a full half-spread per unit of imbalance. We set the fitted scale to $s = 0.039$, the upper end of the one-second interval for the top three levels, to favour the adversary. These are predictive regressions on a single large-cap, small-tick stock on one day; displayed orders that are not intended to trade may move prices less than organic depth, and imbalance is known to matter more for large-tick stocks~\cite{r31}.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lllll}
+\toprule
+\textbf{Response} & \textbf{No gate} & \textbf{Legacy} & \textbf{Aggregate, m = 2} & \textbf{Aggregate, m = 1} \\
+\midrule
+Step, t = 0.4 & 0.00 [0.00, 0.00] & 0.00 [0.00, 0.00] & 0.00 [0.00, 0.00] & 0.00 [0.00, 0.00] \\
+Step, t = 0.2 & 48.00 [48.00, 48.00] & 48.00 [48.00, 48.00] & 48.00 [48.00, 48.00] & 0.00 [0.00, 0.00] \\
+Linear, $\kappa = 1$ & 9.78 [9.26, 10.30] & 8.24 [7.62, 8.88] & 6.14 [5.60, 6.70] & 3.32 [2.86, 3.80] \\
+Linear, $\kappa = 2$ & 12.28 [11.16, 13.40] & 15.16 [14.08, 16.20] & 12.08 [10.96, 13.24] & 7.32 [6.40, 8.28] \\
+Fitted, AAPL upper & 0.34 [0.20, 0.50] & -0.03 [-0.15, 0.07] & 0.10 [-0.22, 0.36] & 0.12 [0.04, 0.22] \\
+\bottomrule
+\end{tabular}
+\caption{Held-out mean D, in tick-lots, of the schedule the search selected for each control and response, over 100 held-out paths (seeds 9100-9199). Brackets are 95\% bootstrap intervals. No held-out episode in any cell raised a conduct alert. Training paths are seeds 9000-9009; the throttle is on.}
+\end{table}
+
+Three results stand out. First, the detectors do not stop a searching adversary. With no gate and the $\kappa = 1$ response, the fixed six-by-ten probe earns 12.06 tick-lots per session (95\% CI 11.38 to 12.72) but alerts on all 100 held-out paths; the searched schedule keeps 9.78, about 81\% of that gain, with no alerts. It places two 40-lot orders, one and five ticks behind the touch, and cancels the first before submitting the second, so the only order live at the execution sits outside the detectors' three-tick distance condition. Second, the aggregate cap reduces but does not remove the gain under a smooth response: at m = 2 the searched schedule earns 6.14, with no alerts and a positive gain on 97 of 100 paths, and the fixed probe with the throttle off earns 6.08 (5.46 to 6.68), also without alerts. Even m = 1 leaves 3.32. Only the step responses produce the all-or-nothing protection of Section~5, and Proposition~\ref{prop:boundary} predicts which step cells are zero. Third, under the fitted response every searched gain is below one tick-lot per session, against 9.78 under the $\kappa = 1$ stress setting; the fixed probe earns 0.78 (0.54 to 1.04) with no gate. On data like this sample, the economic case for the aggregate cap is weak, and its legitimate-execution cost matters more.
+
+Selection on training paths overstates performance: the legacy-gate schedule under the fitted response scored 0.58 in training and $-0.03$ on held-out paths. The held-out separation is therefore necessary rather than cosmetic.
+
+The same plan reran the legitimate-cost comparison with 100 paths (seeds 9200-9299). The full aggregate policy, including the 1,800-second throttle, reduces the large maker's mean volume from 57.87 lots (55.52 to 60.19) to 49.14 (46.74 to 51.65), a 15.1\% loss, consistent with the 14.1\% in Table 5a.
+
 \section{Practical use and regulatory context}
 
 TradeGauntlet can be used to rerun a trading task and market path after a change to a cap, throttle, or scoring window. The saved configuration, attempted actions, rejection reasons, and event hashes allow a developer to trace a change in fills or alerts to the control setting. The examples show why this matters: zero alerts can be enforced by a size inequality, a recovered throttle can still suppress trading, and ordinary quoting can match a detector pattern. Reuse requires choosing cases that challenge the proposed control; passing the existing scripts is not a deployment criterion.
 
 An agent may react to a rejected order by changing its next decision. That reaction is absent from a replay of fixed actions. Studying it requires fresh model decisions in each control condition and separate records of attempted orders, accepted orders, alerts, and task outcomes. Such an experiment would complement the market-abuse judgment and risk-mandate studies~\cite{r25,r26} by examining adaptation to these order-level controls.
 
-For FINRA member firms, these tests relate to the technical controls used in market-conduct supervision. Rule 3110~\cite{r15} concerns the supervisory system and responsibilities. Notice 15-09~\cite{r14} discusses algorithm development, change control, testing, monitoring, and records, and recommends testing independently of development. Our experiment was developed and assessed within the same project. It does not provide that independent validation or assess a firm's supervisory organization.
+In the United States, the most direct legal counterpart of the gates is SEC Rule 15c3-5, the Market Access Rule~\cite{r32}. It requires a broker-dealer with market access to maintain pre-trade controls that reject orders exceeding pre-set credit or capital thresholds or that appear erroneous, and to review their effectiveness regularly. The position-commitment bound and the size caps here are simplified instances of such controls. The rule does not prescribe aggregate caps or cancellation throttles, and our settings are not calibrated to any firm's thresholds.
+
+For FINRA member firms, these tests also relate to the technical controls used in market-conduct supervision. Rule 3110~\cite{r15} concerns the supervisory system and responsibilities. Notice 15-09~\cite{r14} discusses algorithm development, change control, testing, monitoring, and records, and recommends testing independently of development. Our experiment was developed and assessed within the same project. It does not provide that independent validation or assess a firm's supervisory organization.
 
 FINRA Rule 5210.03~\cite{r16} includes a Type 1 disruptive-quoting pattern with multiple price levels, a supply-and-demand change, opposite-side trading, and withdrawal. The layering script resembles parts of that sequence; the same-price split probe does not reproduce the multiple-level condition. The single-account self-match check also falls short of the beneficial-ownership and related-algorithm considerations in Rule 5210.02. Notice 24-09~\cite{r6} applies existing obligations to generative-AI use; it provides context for the proposed agent study, not evidence that these scripts evaluate AI supervision.
 
@@ -305,11 +386,11 @@ EU RTS 6 provides a further testing connection~\cite{r22}. Articles 5 and 7 addr
 
 The size multiples, cancellation ratios, and time windows are experimental choices, not regulatory thresholds. An alert still needs interpretation, and an accepted sequence is not a certification of compliance.
 
-\section{Limitations and the agent study}
+\section{Limitations and the agent study}\label{sec:limitations}
 
-The model has one evaluated account, one instrument, three replenishing levels, and a two-tick step response. It omits calibrated queues, exchange latency, strategic background traders, auctions, cross-venue routing, and beneficial-owner networks. Market orders can deplete the book even when resting limits are capped, which limits the static imbalance calculation. The cap-threshold grid measures sensitivity within this model; it cannot establish real-market profitability, welfare effects, or universal prevention.
+The model has one evaluated account, one instrument, and three replenishing levels; its responses are either stipulated or fitted to a single stock-day. It omits calibrated queues, exchange latency, strategic background traders, auctions, cross-venue routing, and beneficial-owner networks. Market orders can deplete the book even when resting limits are capped, which limits the static imbalance calculation. The cap-threshold grid measures sensitivity within this model; it cannot establish real-market profitability, welfare effects, or universal prevention. The fitted response is a predictive regression on one large-cap, small-tick stock on one day in 2012. It should be repeated across large-tick stocks and dates, and it does not identify the causal effect of a trader's own displayed orders.
 
-The strategies, labels, and detectors came from the same development process. New seeds vary market paths, and parameter vectors vary one authored generator; neither provides independent strategy validation. The detector window was tuned on earlier cases. Sensitivity and boundary settings were then selected in response to observed results. The resulting means and ranges describe these exploratory comparisons, with no population-level accuracy or power claim.
+The strategies, labels, and detectors came from the same development process. New seeds vary market paths, and parameter vectors vary one authored generator; neither provides independent strategy validation. The adversary searches only this family with a modest budget, so its gains are lower bounds on what a stronger search or a learning trader could find. The detector window was tuned on earlier cases. Sensitivity and boundary settings were then selected in response to observed results. The resulting means and ranges describe these exploratory comparisons, with no population-level accuracy or power claim.
 
 Even the one-hour sessions are short and synthetic. A single accepted submission after a rejection counts as recovery, although further lockouts may follow. Executed volume also leaves out inventory risk, adverse selection, opportunity cost, and other aspects of execution quality. The gate conservatively checks the full quantity of a marketable limit order and can reject an executable order. Its measured costs belong to that implementation.
 
@@ -317,7 +398,7 @@ The planned LLM study will assign legitimate execution and market-making tasks, 
 
 \section{Conclusion and availability}
 
-An aggregate limit closes the illustrated order-splitting gap, but whether it removes the trading gain depends on the assumed price response. Execution costs depend on both the size cap and the cancellation throttle; alert counts can also be fixed by inequalities shared with the gate. Ordinary market making provides a further counterexample when its quoting interval falls inside the detector window. TradeGauntlet records these interactions as replayable tests, with alerts, response-dependent gains, and legitimate execution assessed separately. Calibrated markets, independently designed strategies, and adaptive LLM traders remain to be tested.
+Counting alerts is not enough to evaluate trading controls. A detector that shares a threshold with a gate is silent on gated traffic by construction, and a searching adversary finds alert-free split-order schedules under every control we tested whenever prices respond to displayed depth. Whether an aggregate cap protects depends on how strongly prices respond: under a step response it is all or nothing, under a smooth response it reduces but does not remove the gain, and under a response fitted to AAPL data there is little gain to remove while the throttle still costs a legitimate maker about 15\% of its volume. TradeGauntlet records these interactions as replayable tests, with alerts, response-dependent gains, and legitimate execution assessed separately. Fitting the response across more stocks, testing richer adversaries, and running adaptive LLM traders are the next steps.
 
 \subsection{Code and data availability}
 
@@ -325,7 +406,7 @@ Code, saved results, and reproduction instructions: \href{https://github.com/tok
 
 \subsection{Use of generative AI tools}
 
-Anthropic Claude Code assisted with the throttle-isolation, parameterized-evasion, negative-control, and detector-window-sweep modules, their tests, and results notes. OpenAI Codex assisted with the matched-counterfactual, cadence-grid, and sensitivity studies, the paper builder, literature checks, and manuscript drafting and revision. These tools were used to produce the research artifact; the reported trading experiments used fixed scripts and made no LLM calls. The human author is responsible for the methods, results, and references.
+Anthropic Claude Code assisted with the throttle-isolation, parameterized-evasion, negative-control, and detector-window-sweep modules, their tests, and results notes. OpenAI Codex assisted with the matched-counterfactual, cadence-grid, and sensitivity studies, the paper builder, literature checks, and manuscript drafting and revision. Anthropic Claude Code also assisted with the adversary and calibration modules and with this revision. These tools were used to produce the research artifact; the reported trading experiments used fixed scripts or a seeded search and made no LLM calls. The human author is responsible for the methods, results, and references.
 
 \small
 
@@ -417,6 +498,15 @@ Anthropic Claude Code assisted with the throttle-isolation, parameterized-evasio
 
 \bibitem{r29} Haochen Luo et al. QFinZero: A Unified Financial Toolchain for LLM-Based Trading Agents. Proceedings of ACL 2026, Volume 3: System Demonstrations, pp. 68-77.
 \url{https://doi.org/10.18653/v1/2026.acl-demo.7}
+
+\bibitem{r30} Rama Cont, Arseniy Kukanov, and Sasha Stoikov. The Price Impact of Order Book Events. Journal of Financial Econometrics 12(1), 2014, pp. 47-88.
+\url{https://doi.org/10.1093/jjfinec/nbt003}
+
+\bibitem{r31} Martin D. Gould and Julius Bonart. Queue Imbalance as a One-Tick-Ahead Price Predictor in a Limit Order Book. Market Microstructure and Liquidity 2(2), 2016, article 1650006.
+\url{https://doi.org/10.1142/S2382626616500064}
+
+\bibitem{r32} U.S. Securities and Exchange Commission. Risk Management Controls for Brokers or Dealers with Market Access (Rule 15c3-5, 17 CFR 240.15c3-5). Release No. 34-63241, November 3, 2010.
+\url{https://www.sec.gov/rules/final/2010/34-63241.pdf}
 
 \end{thebibliography}
 
