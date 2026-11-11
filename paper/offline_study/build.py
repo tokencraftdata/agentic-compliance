@@ -266,7 +266,7 @@ def build(commit):
         'authors':[{'name':'Sandip Nandi','affiliation':'Independent Researcher'}],
         'blocks':source},indent=2)+'\n')
     (HERE/'references.json').write_text(json.dumps([{'number':i,'text':t,'url':u} for i,(t,u) in enumerate(REFS,1)],indent=2)+'\n')
-    manifest={'document_version':'2.2','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
+    manifest={'document_version':'2.3','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
               'reportlab':reportlab.Version,'matplotlib':matplotlib.__version__,
               'source_sha256':digest(Path(__file__)),'content_source_sha256':digest(HERE/'content.py'),'evidence_manifest_sha256':digest(DATA/'manifest.json'),
               'summary_sha256':digest(DATA/'summary.json'),
