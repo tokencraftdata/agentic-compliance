@@ -92,7 +92,8 @@ external validity or novelty.
   120 to 180 seconds. Result ranges and rejection totals are derived from saved
   traces. The four remaining arXiv citations were checked again; no published
   replacement was confirmed. Detailed evidence is in `revision_v2_3_check.json`
-  and `reference_check_v2_3.json`.
+  and `reference_check_v2_3.json`. The final 13-page PDF has embedded fonts,
+  all 29 references cited, and all tables/figures checked by rendering every page.
 
 - Version 2.2 passes all 106 current tests. The central numbers were rechecked
   against 2,140 saved sensitivity episodes. Tables, captions, figure files,

@@ -26,5 +26,8 @@
     "Pending actual-LLM study"
   ],
   "ai_detection_claim": false,
-  "independent_human_validation_claim": false
+  "independent_human_validation_claim": false,
+  "result_paragraphs_checked_against_saved_evidence": true,
+  "pdf_pages_reviewed": 13,
+  "bibliography_unchanged": true
 }
