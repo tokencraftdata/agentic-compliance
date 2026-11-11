@@ -1,7 +1,7 @@
 # Trading-agent study: implementation and next run
 
 This package prepares the actual-LLM phase of the compliance study. No live LLM
-results have been collected. The current paper (v2.3) still reports scripted
+results have been collected. The current paper (v2.4) still reports scripted
 experiments only. Provider access is pending; the first validation run has a
 US$10 spending limit. The larger study has not been funded or registered.
 

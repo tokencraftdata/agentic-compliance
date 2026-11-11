@@ -1,6 +1,6 @@
-# ConductLab
+# TradeGauntlet
 
-ConductLab is the name for this project's custom limit-order-book simulator and
+TradeGauntlet is the name for this project's custom limit-order-book simulator and
 workflow for evaluating trading controls. It was built for the compliance study;
 it does not wrap ABIDES or connect to an exchange. The repository name remains
 `agentic-compliance`.

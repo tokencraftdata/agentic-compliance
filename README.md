@@ -11,14 +11,18 @@ validation is limited to US$10. No actual-LLM findings are added to the paper.
 
 ## Revised compliance methods paper (10 November 2026)
 
-[Read the paper](output/pdf/order_splitting_and_timing.pdf): **Evaluating Controls
-for Trading Compliance: An Offline Study of Order Splitting and Cancellation
-Timing** (version 2.3).
+[Read the paper](output/pdf/order_splitting_and_timing.pdf): **TradeGauntlet:
+Testing the Limits of Trading Compliance Controls** (version 2.4).
+
+Version 2.4 puts **TradeGauntlet** in the main title and simulator section heading.
+It renames the workflow introduced as ConductLab in v2.3; experiments, results,
+references and scientific claims are unchanged. See the
+[workflow guide](TRADEGAUNTLET.md).
 
 Version 2.3 names the custom simulator and replay workflow **ConductLab**,
 adds 560 checks on either side of rule boundaries, separates rejection causes,
 and reports observed ranges beside result means. It also revises the prose for
-more direct academic writing. See the [workflow guide](CONDUCTLAB.md) and
+more direct academic writing. See the [workflow guide](TRADEGAUNTLET.md) and
 [review response](paper/offline_study/REVIEW_RESPONSE_v2_3.md).
 
 Version 2.2 added five published papers on financial agents and compliance,
