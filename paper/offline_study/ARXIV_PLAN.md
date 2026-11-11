@@ -5,7 +5,7 @@ review, completed customer study, or promise of arXiv acceptance.
 
 ## Recommendation
 
-Current version: **2.1**, revised 10 November 2026. Use it as an exploratory
+Current version: **2.4**, revised 10 November 2026. Use it as an exploratory
 technical report on trading-control evaluation, with the bounded claims in
 `SUBMISSION_REVIEW.md`. It includes the cap/response and throttle/horizon checks;
 no LLM trader, calibrated market, or independent strategy-family validation is
@@ -22,8 +22,8 @@ final PDF. Repository access and licensing remain author decisions.
    1.2 replaces the anonymous label. Confirm the final content before submission;
    the current paper has not been submitted.
 2. Have the human author read the paper and inspect the result tables and cited
-   sources. The code audit passed 82 tests and replayed 2,140 new sensitivity episodes without
-   mismatches, but this is not independent scientific peer review.
+   sources. The current suite passes 112 tests; 2,140 sensitivity episodes and 560 boundary
+   episodes replay without mismatches, but this is not independent scientific peer review.
 3. Review section 10.2's AI assistance disclosure. Version 1.3 names both
    coding assistants used on the artifact (Anthropic Claude Code for the
    throttle-isolation, evasion-family, negative-control and window-sweep modules

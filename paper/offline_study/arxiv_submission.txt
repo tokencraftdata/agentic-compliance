@@ -1,7 +1,7 @@
-arXiv submission fields - version 2.1, prepared but not submitted
+arXiv submission fields - version 2.4, prepared but not submitted
 
 Title
-Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing
+TradeGauntlet: Testing the Limits of Trading Compliance Controls
 
 Author
 Sandip Nandi
@@ -16,17 +16,17 @@ Cross-lists
 None proposed for this scripted simulation study.
 
 Abstract
-An order-level size limit can admit a large displayed quantity when it is split across small orders. We study the evaluation of this failure and its repair in a scripted limit-order-book simulator. Six 10-lot orders pass the original gate and detectors in all 40 tested seeds. An aggregate cap removes their response-dependent gain at the original settings, but that result depends on the market-response threshold. In a separate cap-threshold grid with the cancellation throttle disabled, the same 20-lot cap yields a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at threshold 0.2. Throttle tests over 12-minute and one-hour sessions distinguish persistent lockout from recovery after old submissions leave the window. The full aggregate policy reduces maker volume by 14.1% and 28.2% in two short-session controls and by 75.2% in the one-hour test. Finally, a legitimate maker produces alerts in 34 of 40 episodes when its re-quote cadence meets the detector's 180-second window. These are configuration-dependent regression cases for compliance-control testing. The study uses synthetic prices and fixed trading scripts; it does not estimate real-market detection accuracy or evaluate LLM traders.
+An order-by-order size limit can admit a large display assembled from smaller orders. We built TradeGauntlet, a custom limit-order-book simulator and replay workflow, to examine this gap while separating alerts, gains from the simulated price response, and costs to legitimate execution. Six 10-lot orders pass the original gate without a conduct alert in all 40 tested seeds. An aggregate cap removes the gain at the original settings, but its effect depends on the assumed response. With throttling disabled, the same 20-lot cap gives a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at 0.2. Checks on either side of the response boundary preserve this contrast. The full policy reduces volume by 14.1% for a large maker and 28.2% for a patient maker; a separate ablation attributes most of the large maker's loss to throttling. In a one-hour test, submissions resume after lockout but volume remains 75.2% below the ungated baseline. A legitimate maker triggers alerts in 39/40 episodes at a 170-second quoting interval and 0/40 at 190 seconds, with a 180-second detector window. These scripted cases expose control interactions that can be obscured by reporting alerts alone. The prices are synthetic; the results describe the implemented rules and their consequences, not real-market detection accuracy.
 
 Comments
-11 pages, 3 figures; exploratory scripted simulation study
+13 pages, 3 figures; exploratory scripted simulation study
 
 Journal reference / publication DOI
 Leave empty: no journal publication is claimed for this manuscript.
 
 Upload file
 output/pdf/order_splitting_and_timing.pdf
-SHA-256: 9c9997171bde51105b2d2c69e2a8f26aa890fbbb6fc65d9e682901d9d5b5a84a
+SHA-256: 417e26e11d0c0849727fce3e6ff0463196f93de0893453bcc72ee31d48379e6a
 
 Submission route
 This document was created with ReportLab, not TeX. Use the single-PDF route,
@@ -34,11 +34,14 @@ including all figures and text. Do not upload the reproduction ZIP as a second
 manuscript file. Any ancillary material must follow arXiv's separate guidance.
 
 Assessment
-The paper is a bounded exploratory methods report on evaluation pitfalls. It
-reports 2,140 post-review sensitivity episodes, with matched replay, in addition
-to the earlier scripted evidence. No LLM trading study, independent test-family
-validation, market calibration, or legal-compliance certification is claimed.
-Formatting and numerical checks do not guarantee moderation or peer review.
+Version 2.4 puts TradeGauntlet in the title and simulator heading, and uses the
+name consistently in the manuscript. This is a naming revision: the experiments,
+results, references and scientific claims are unchanged from version 2.3.
+
+The paper reports 2,700 sensitivity and boundary episodes alongside the earlier
+scripted evidence. It remains an exploratory methods report on control-evaluation
+pitfalls. Independent strategy validation, market calibration and actual-LLM
+findings remain pending. Formatting checks do not guarantee arXiv acceptance.
 
 Author decisions remaining
 - Read the complete paper, results, cited sources, and AI-assistance disclosure.

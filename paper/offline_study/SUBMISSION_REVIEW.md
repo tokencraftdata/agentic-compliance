@@ -1,9 +1,46 @@
 # Submission assessment - 10 November 2026
 
-Version 2.1 retains the assessment of version 2.0 as an exploratory computational methods report.
+Version 2.4 retains the assessment of version 2.0 as an exploratory computational methods report.
 The paper is not a validated agentic-compliance system or an LLM trading study.
 
-## Scope of version 2.1
+## Scope of version 2.4
+
+Names the workflow TradeGauntlet in the main title, the simulator heading and
+all current manuscript mentions. The subtitle identifies order splitting and
+cancellation timing. Numerical results, detector definitions, references and
+limitations remain those reviewed for v2.3. No new experiments were run for
+this naming revision; the existing 112-test validation remains applicable.
+
+## Scope of version 2.3
+
+The revision adds 560 scripted boundary episodes, explicit rule inequalities,
+range summaries and a rejection breakdown. It names the existing custom simulator
+and replay workflow ConductLab. It also removes repeated framing and rewrites
+stiff explanations. No AI-detector score or claim of concealing assistance is used.
+The actual-agent study remains pending; the AI-use disclosure is retained.
+
+The boundary checks confirm 48/0 tick-lot differences at neighboring thresholds,
+and 39/40 versus 0/40 alerts for legitimate 170/190-second makers. These checks
+resolve dependence on equality, not dependence on stipulated rules. The contribution
+remains an inspectable set of control tests, not discovery of market behavior.
+The 28.2% patient-maker cost occurs without throttle rejects, while a separate
+matched large-maker ablation attributes most of its loss to throttling.
+
+## Scope of version 2.2
+
+Adds five published papers: Pandey and Rajwal (ICAIF 2025), RISCTrade (ICIC 2026,
+Springer proceedings citation year 2027, first online July 2026), InvestorBench
+(ACL 2025 long paper), FinAgent (KDD 2024), and QFinZero (ACL 2026 system demo).
+The two relevant finance-journal articles remain references 19 and 20.
+
+The abstract, introduction, related work, practical discussion, limitations and
+conclusion now identify the contribution as controlled comparisons of interacting
+compliance controls and their execution costs. The paper does not claim the first
+LLM-compliance benchmark. Actual-agent adaptation is a proposed extension with
+results explicitly pending. Mock software checks are not included as LLM findings.
+The tables, figures, numerical claims and underlying experiment sources are unchanged.
+
+## Scope of the preceding version 2.1
 
 Adds Robinhood as a dated industry example using two official company sources,
 and explains how the scripted cases could support control regression testing.
@@ -36,7 +73,7 @@ Version 2.0 addresses these issues with new comparisons and narrower claims:
 - Compact formal detector conditions replace ambiguous prose. Results are
   organized around three findings rather than an experiment-development log.
 - Three published journal articles and CFTC/EU sources broaden the literature
-  and regulatory discussion. The bibliography has 10 journal/conference papers,
+  and regulatory discussion. The version 2.2 bibliography has 15 journal/conference papers,
   4 arXiv preprints, 2 SSRN working papers, 6 official regulatory sources, and
   2 official company sources for the motivating example.
 
@@ -57,7 +94,21 @@ external validity or novelty.
 
 ## Validation and release status
 
-- 82 unit/integration tests passed, including the strict threshold boundary and
+- Version 2.3: 112 unit/integration tests pass; all 560 added records replay
+  exactly; all 40 original 180-second event hashes match before the new cadence
+  checks. All 120 Table 2 episodes retain their alert status when rescored from
+  120 to 180 seconds. Result ranges and rejection totals are derived from saved
+  traces. The four remaining arXiv citations were checked again; no published
+  replacement was confirmed. Detailed evidence is in `revision_v2_3_check.json`
+  and `reference_check_v2_3.json`. The final 13-page PDF has embedded fonts,
+  all 29 references cited, and all tables/figures checked by rendering every page.
+
+- Version 2.2 passes all 106 current tests. The central numbers were rechecked
+  against 2,140 saved sensitivity episodes. Tables, captions, figure files,
+  experiment code and numerical evidence are unchanged from v2.1. The 12-page
+  PDF contains 29 cited references; all pages were rendered and inspected.
+  See `revision_v2_2_check.json` for the scope of these checks.
+- The original 82 unit/integration tests passed, including the strict threshold boundary and
   separation of aggregate and individual size limits.
 - 40 original event hashes matched before the new study ran.
 - 2,140 new episodes replayed without a record mismatch; summaries recomputed.

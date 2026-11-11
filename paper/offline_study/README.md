@@ -1,18 +1,31 @@
 # Standalone offline research paper
 
-**Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
+**TradeGauntlet: Testing the Limits of Trading Compliance Controls**
 
-Version 2.1 is a revised exploratory methods paper by Sandip Nandi, Independent
+Version 2.4 is a revised exploratory methods paper by Sandip Nandi, Independent
 Researcher. It adds cap/response and throttle/horizon sensitivity analyses in
 response to the scientific review. The latest findings narrow the protection
 claim and foreground legitimate execution costs. It is not a completed LLM study
 or a real-market compliance validation.
 
-Version 2.1 adds a dated Robinhood example and explains the proposed use of the
-cases in regression testing. It does not change experiments, results, tables,
-or figures, and does not evaluate Robinhood or any LLM trader.
+Version 2.4 renames the workflow **TradeGauntlet** and includes it in the main
+title and Section 3 heading. This is a naming revision only; the numerical
+results, definitions, references and limitations are unchanged from v2.3.
 
-The bibliography now contains ten journal/conference papers, four arXiv preprints,
+Version 2.3 adds 560 off-boundary episodes, mean/minimum/maximum summaries,
+rejection causes, named seed cohorts, and the explicit gate-detector inequality.
+It introduces **ConductLab** as the name for the existing custom simulator and
+replay workflow. Prose is revised for clarity; references, limitations and the
+AI-use disclosure remain. The LLM study is pending. See
+`REVIEW_RESPONSE_v2_3.md` and `language_review_v2_3.json`.
+
+Version 2.2 added five published financial-agent/compliance papers and clarified
+the contribution: controlled comparisons of cap-response dependence, throttle
+cost/recovery, and detector timing. LLM-agent results remain pending. Version 2.1
+added the Robinhood example. Neither revision changes the numerical experiments,
+results, tables, or figures, or evaluates Robinhood or an LLM trader.
+
+The bibliography now contains fifteen journal/conference papers, four arXiv preprints,
 two SSRN working papers, six official regulatory sources, and two official
 Robinhood sources used as industry motivation. Published versions
 are cited where verified. `publication_review.json` records publication checks,
@@ -23,6 +36,31 @@ prose and evidence-derived tables. They produce `manuscript.json` and the PDF at
 `output/pdf/order_splitting_and_timing.pdf`. Source, evidence, and output hashes
 are recorded in `document_manifest.json`. No appendix or long reproduction
 section is included in the paper; the instructions are here.
+
+## Reproduce the boundary checks and result ranges
+
+Use **CPython 3.9.6** from the repository root:
+
+```sh
+python3 -m paper_study.boundary verify results/boundary-v1
+python3 -m paper_study.reporting results/reporting-v2_3.json --verify
+```
+
+To run a new copy, use a fresh directory:
+
+```sh
+python3 -m paper_study.boundary plan results/local-boundary
+python3 -m paper_study.boundary run results/local-boundary
+python3 -m paper_study.boundary verify results/local-boundary
+```
+
+The plan was saved before execution after the earlier findings were known;
+it was not preregistered or committed before execution. It adds 480 price-boundary
+and 80 cadence-boundary episodes. The exact-time scheduler first reproduces all
+40 existing 180-second cadence event hashes. Saved attempts then replay with
+zero mismatches. `paper_study.reporting` derives descriptive ranges and exclusive
+rejection categories from the original saved records, without rewriting them.
+The [workflow guide](../../TRADEGAUNTLET.md) identifies the implementation modules.
 
 ## Reproduce the sensitivity evidence
 

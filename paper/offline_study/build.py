@@ -27,8 +27,8 @@ ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
 DATA = ROOT / 'results/paper-review-v1'
 SENSITIVITY = ROOT / 'results/sensitivity-v1'
-TITLE = 'Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing'
-SUBTITLE = 'Scripted experiments on surveillance and pre-trade gates'
+TITLE = 'TradeGauntlet: Testing the Limits of Trading Compliance Controls'
+SUBTITLE = 'Scripted experiments on order splitting and cancellation timing'
 REFS = [
     ('Xintong Wang and Michael P. Wellman. Spoofing the Limit Order Book: An Agent-Based Model. AAMAS, 2017, pp. 651-659.', 'https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p651.pdf'),
     ('David Byrd. Learning Not to Spoof. Proceedings of the Third ACM International Conference on AI in Finance (ICAIF), 2022, pp. 139-147.', 'https://doi.org/10.1145/3533271.3561767'),
@@ -53,7 +53,12 @@ REFS = [
     ('Commodity Futures Trading Commission. Antidisruptive Practices Authority: Interpretive guidance and policy statement. Federal Register 78, 2013, pp. 31890-31897.', 'https://www.cftc.gov/LawRegulation/FederalRegister/FinalRules/2013-12365.html'),
     ('European Commission. Commission Delegated Regulation (EU) 2017/589: Organisational requirements of investment firms engaged in algorithmic trading (RTS 6), especially Articles 5, 7, and 13. Official Journal L 87, 2017, pp. 417-448.', 'https://eur-lex.europa.eu/eli/reg_del/2017/589/oj/eng'),
     ("Robinhood. Robinhood Puts the Power of Hedge Funds in Every Trader's Pocket. Company announcement, September 29, 2026. Accessed November 10, 2026.", 'https://robinhood.com/newsroom/hood-summit-2026/'),
-    ('Robinhood. Trading with your agent. Product documentation, accessed November 10, 2026.', 'https://robinhood.com/us/en/support/articles/trading-with-your-agent/')
+    ('Robinhood. Trading with your agent. Product documentation, accessed November 10, 2026.', 'https://robinhood.com/us/en/support/articles/trading-with-your-agent/'),
+    ('Avinash Kumar Pandey and Swati Rajwal. Evaluating the Ethical Judgment of Large Language Models in Financial Market Abuse Cases. Proceedings of the 6th ACM International Conference on AI in Finance (ICAIF), 2025, pp. 132-140.', 'https://doi.org/10.1145/3768292.3770439'),
+    ('Wenliang Huang, Junkai Li, Zengyi Yu, and Xiangjie Kong. RISCTrade: A Dynamic Multi-Market Benchmark for Risk-Mandate Compliance of Large Language Models in Closed-Loop Trading. Advanced Intelligent Computing Technology and Applications (ICIC 2026), LNCS 16648, Springer, 2027, pp. 360-370. First online July 14, 2026.', 'https://doi.org/10.1007/978-981-92-3400-4_30'),
+    ('Haohang Li et al. INVESTORBENCH: A Benchmark for Financial Decision-Making Tasks with LLM-based Agent. Proceedings of ACL 2025, Volume 1: Long Papers, pp. 2509-2525.', 'https://doi.org/10.18653/v1/2025.acl-long.126'),
+    ('Wentao Zhang et al. A Multimodal Foundation Agent for Financial Trading: Tool-Augmented, Diversified, and Generalist. Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD), 2024.', 'https://doi.org/10.1145/3637528.3671801'),
+    ('Haochen Luo et al. QFinZero: A Unified Financial Toolchain for LLM-Based Trading Agents. Proceedings of ACL 2026, Volume 3: System Demonstrations, pp. 68-77.', 'https://doi.org/10.18653/v1/2026.acl-demo.7')
 ]
 
 
@@ -134,8 +139,9 @@ def sensitivity_figures(data, folder):
             off = cell(cohort='throttle_horizon', gate='off', horizon=horizon)['filled_lots']
             rows = [cell(cohort='throttle_horizon', gate=gate, horizon=horizon, window=w, throttle=True) for w in windows]
             rows.append(cell(cohort='throttle_horizon', gate=gate, horizon=horizon, throttle=False))
-            ax.plot(range(5), [100*r['filled_lots']/off for r in rows], marker='o', color=color,
+            ax.plot(range(4), [100*r['filled_lots']/off for r in rows[:4]], marker='o', color=color,
                     label=f'{horizon//60}-minute session', linewidth=1.5, markersize=4)
+            ax.scatter([4], [100*rows[4]['filled_lots']/off], marker='D', color=color, s=20)
         ax.set_xticks(range(5), ['120','300','900','1800','off'], fontsize=8)
         ax.set_xlabel('Throttle window (seconds; off = disabled)')
         ax.set_title(gate.capitalize()+' gate', fontsize=9)
@@ -162,6 +168,8 @@ def build(commit):
     summary = json.loads((DATA/'summary.json').read_text())
     figs = figures(summary)
     sensitivity = json.loads((SENSITIVITY/'summary.json').read_text())
+    boundary = json.loads((ROOT/'results/boundary-v1/summary.json').read_text())
+    reporting = json.loads((ROOT/'results/reporting-v2_3.json').read_text())
     sensitivity_figures(sensitivity, figs)
     out = ROOT/'output/pdf/order_splitting_and_timing.pdf'; out.parent.mkdir(parents=True, exist_ok=True)
     # SimpleDocTemplate's text frame has six-point padding on each side.
@@ -238,7 +246,7 @@ def build(commit):
     p('Sandip Nandi<br/>Independent Researcher','subtitle')
     p('10 November 2026','subtitle')
     from content import compose
-    compose(p, table, figure, summary, sensitivity, commit)
+    compose(p, table, figure, summary, sensitivity, boundary, reporting, commit)
 
     p('References','h1')
     for i,(text,url) in enumerate(REFS,1):
@@ -261,12 +269,14 @@ def build(commit):
         'authors':[{'name':'Sandip Nandi','affiliation':'Independent Researcher'}],
         'blocks':source},indent=2)+'\n')
     (HERE/'references.json').write_text(json.dumps([{'number':i,'text':t,'url':u} for i,(t,u) in enumerate(REFS,1)],indent=2)+'\n')
-    manifest={'document_version':'2.1','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
+    manifest={'document_version':'2.4','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
               'reportlab':reportlab.Version,'matplotlib':matplotlib.__version__,
               'source_sha256':digest(Path(__file__)),'content_source_sha256':digest(HERE/'content.py'),'evidence_manifest_sha256':digest(DATA/'manifest.json'),
               'summary_sha256':digest(DATA/'summary.json'),
               'sensitivity_manifest_sha256':digest(SENSITIVITY/'manifest.json'),
               'sensitivity_summary_sha256':digest(SENSITIVITY/'summary.json'),'pdf_sha256':digest(out),
+              'boundary_manifest_sha256':digest(ROOT/'results/boundary-v1/manifest.json'),
+              'reporting_sha256':digest(ROOT/'results/reporting-v2_3.json'),
               'pdf_bytes':out.stat().st_size,'manuscript_sha256':digest(HERE/'manuscript.json')}
     (HERE/'document_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps({'pdf':str(out),'bytes':out.stat().st_size},indent=2))

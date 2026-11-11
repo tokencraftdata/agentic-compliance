@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-10",
+  "document_version": "2.3",
+  "review_scope": "Natural academic prose, reusable-workflow framing, and accepted scientific-review fixes",
+  "changed_body_paragraphs": 41,
+  "editorial_changes": [
+    "Concrete subjects and verbs in place of repeated framing",
+    "Consolidated scope statements",
+    "Removed reviewer-reply wording",
+    "Explained offline execution and custom engine",
+    "Short code-availability statement; no appendix"
+  ],
+  "scientific_changes": [
+    "560 added boundary episodes",
+    "Ranges beside means",
+    "Exclusive rejection categories and cohort names",
+    "Explicit gate-detector inequality",
+    "Current 180-second scoring default"
+  ],
+  "unchanged": [
+    "Historical simulator and experiment sources",
+    "Saved historical evidence",
+    "29-reference bibliography",
+    "AI-tool disclosure",
+    "Author and affiliation",
+    "Pending actual-LLM study"
+  ],
+  "ai_detection_claim": false,
+  "independent_human_validation_claim": false,
+  "result_paragraphs_checked_against_saved_evidence": true,
+  "pdf_pages_reviewed": 13,
+  "bibliography_unchanged": true
+}

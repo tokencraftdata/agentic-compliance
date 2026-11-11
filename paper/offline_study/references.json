@@ -118,5 +118,30 @@
     "number": 24,
     "text": "Robinhood. Trading with your agent. Product documentation, accessed November 10, 2026.",
     "url": "https://robinhood.com/us/en/support/articles/trading-with-your-agent/"
+  },
+  {
+    "number": 25,
+    "text": "Avinash Kumar Pandey and Swati Rajwal. Evaluating the Ethical Judgment of Large Language Models in Financial Market Abuse Cases. Proceedings of the 6th ACM International Conference on AI in Finance (ICAIF), 2025, pp. 132-140.",
+    "url": "https://doi.org/10.1145/3768292.3770439"
+  },
+  {
+    "number": 26,
+    "text": "Wenliang Huang, Junkai Li, Zengyi Yu, and Xiangjie Kong. RISCTrade: A Dynamic Multi-Market Benchmark for Risk-Mandate Compliance of Large Language Models in Closed-Loop Trading. Advanced Intelligent Computing Technology and Applications (ICIC 2026), LNCS 16648, Springer, 2027, pp. 360-370. First online July 14, 2026.",
+    "url": "https://doi.org/10.1007/978-981-92-3400-4_30"
+  },
+  {
+    "number": 27,
+    "text": "Haohang Li et al. INVESTORBENCH: A Benchmark for Financial Decision-Making Tasks with LLM-based Agent. Proceedings of ACL 2025, Volume 1: Long Papers, pp. 2509-2525.",
+    "url": "https://doi.org/10.18653/v1/2025.acl-long.126"
+  },
+  {
+    "number": 28,
+    "text": "Wentao Zhang et al. A Multimodal Foundation Agent for Financial Trading: Tool-Augmented, Diversified, and Generalist. Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD), 2024.",
+    "url": "https://doi.org/10.1145/3637528.3671801"
+  },
+  {
+    "number": 29,
+    "text": "Haochen Luo et al. QFinZero: A Unified Financial Toolchain for LLM-Based Trading Agents. Proceedings of ACL 2026, Volume 3: System Demonstrations, pp. 68-77.",
+    "url": "https://doi.org/10.18653/v1/2026.acl-demo.7"
   }
 ]
