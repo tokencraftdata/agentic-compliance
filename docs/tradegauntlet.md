@@ -45,4 +45,4 @@ The current checks use one subject account, one instrument, synthetic prices
 and fixed trading scripts. The actual-LLM runner is under `agent_study/`, but
 only mock software checks have run. Actual LLM findings and independently
 authored test scenarios remain pending. The paper's source and detailed
-reproduction instructions are in [paper/offline_study](paper/offline_study/README.md).
+reproduction instructions are in [paper/offline_study](../paper/offline_study/README.md).

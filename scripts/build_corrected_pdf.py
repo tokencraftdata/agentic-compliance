@@ -9,7 +9,7 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Preformatted
 from reportlab.graphics.shapes import Drawing, Rect, Line, String
 
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[1]
 NAVY=colors.HexColor('#173249');TEAL=colors.HexColor('#177B83');GRAY=colors.HexColor('#56616B')
 styles={
  'body':ParagraphStyle('body',fontName='Times-Roman',fontSize=11,leading=14.6,spaceAfter=8),
@@ -178,7 +178,7 @@ def build(commit):
     add(f'Code and evidence snapshot: <font name="Courier" size="8">{commit}</font>. The original protocol and results remain available alongside the extension. The corrected PDF is published in a later documentation commit so its embedded code identifier can be immutable.','small')
     add(f'<link href="{base}" color="#177B83">Open the exact code and evidence snapshot on GitHub</link>. The repository\'s access permissions apply.','small')
     add('From research/agentic_compliance, with Python 3.9 or later:','small')
-    story.append(Preformatted('python3 -m unittest discover -s tests -v\npython3 check_invariants.py\npython3 replay.py results/offline-v2\npython3 -m pilot.review_study verify results/review-v0.4\npython3 -m pilot.review_study run results/local-review\npython3 -m pilot.review_study compare \\\n  results/review-v0.4 results/local-review\npython3 review_sensitivity.py results/local-review \\\n  results/local-review-sensitivity.json',styles['code']))
+    story.append(Preformatted('python3 -m unittest discover -s tests -v\npython3 -m scripts.check_invariants\npython3 -m scripts.replay results/offline-v2\npython3 -m pilot.review_study verify results/review-v0.4\npython3 -m pilot.review_study run results/local-review\npython3 -m pilot.review_study compare \\\n  results/review-v0.4 results/local-review\npython3 -m scripts.review_sensitivity results/local-review \\\n  results/local-review-sensitivity.json',styles['code']))
     add('Existing evidence is never overwritten. Optional PDF generation uses reportlab 4.4.9 and build_corrected_pdf.py --code-commit followed by the identifier above. Numeric reproduction is separate from renderer metadata. The full background stream is reconstructed from seeds; recorded subject events and full-stream hashes identify each replay.','small')
     add('Provider-ready plumbing, separately labeled','h2')
     add('The accompanying experiment runner supports pinned model identifiers, P0/P2 prompts, both market responses and gate off/aggregate conditions, strict action parsing, optional short explanations, call budgets, provider errors, raw response records and action replay. An offline smoke grid contains 32 mock episodes and 384 mock calls, with zero LLM episodes. A network adapter is supplied but was not exercised against a provider. Failed or budget-exhausted episodes remain unresolved and contribute to explicit alert-rate bounds; they are not relabeled benign.')
