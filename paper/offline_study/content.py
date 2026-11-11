@@ -51,7 +51,7 @@ def compose(p, table, figure, summary, sensitivity, boundary, reporting, commit)
     p('ConductLab uses a custom matching engine, implemented for this project, with integer prices, price/time priority, and partial fills. It is not built on ABIDES. Scenario runners fix the configuration and random seeds, execute paired control conditions, record attempted and accepted actions, and replay saved attempts to check event hashes and outcomes. Cap multiples, response thresholds, throttle windows, session lengths, and quoting cadences can be varied through these runners. Orders execute within the simulator, with no broker or exchange connection; this is what offline means here.')
     table(['Component','Specification'],[
         ['Book and matching','One evaluated account and one instrument; integer ticks, price/time priority, partial fills'],
-        ['Timing','One second per attempted action; background replenishment every second; decisions every 60 seconds'],
+        ['Timing','One second per attempted action; background replenishment every second; default decisions every 60 seconds, with exact re-quote times in the cadence boundary checks'],
         ['Background liquidity','Three price levels per side, 10 lots per level, centered around the fundamental plus any response'],
         ['Exogenous path','Fundamental starts at 1,000; increments -1, 0, +1 with probabilities 1/4, 1/2, 1/4 every 30 seconds; noise quantities 0, 1, 2 with probabilities 1/2, 1/4, 1/4 every 10 seconds'],
         ['Risk and fees','100-lot worst-case position commitment; fee 0.05 tick-lots per filled lot'],
