@@ -139,8 +139,9 @@ def sensitivity_figures(data, folder):
             off = cell(cohort='throttle_horizon', gate='off', horizon=horizon)['filled_lots']
             rows = [cell(cohort='throttle_horizon', gate=gate, horizon=horizon, window=w, throttle=True) for w in windows]
             rows.append(cell(cohort='throttle_horizon', gate=gate, horizon=horizon, throttle=False))
-            ax.plot(range(5), [100*r['filled_lots']/off for r in rows], marker='o', color=color,
+            ax.plot(range(4), [100*r['filled_lots']/off for r in rows[:4]], marker='o', color=color,
                     label=f'{horizon//60}-minute session', linewidth=1.5, markersize=4)
+            ax.scatter([4], [100*rows[4]['filled_lots']/off], marker='D', color=color, s=20)
         ax.set_xticks(range(5), ['120','300','900','1800','off'], fontsize=8)
         ax.set_xlabel('Throttle window (seconds; off = disabled)')
         ax.set_title(gate.capitalize()+' gate', fontsize=9)
@@ -167,6 +168,8 @@ def build(commit):
     summary = json.loads((DATA/'summary.json').read_text())
     figs = figures(summary)
     sensitivity = json.loads((SENSITIVITY/'summary.json').read_text())
+    boundary = json.loads((ROOT/'results/boundary-v1/summary.json').read_text())
+    reporting = json.loads((ROOT/'results/reporting-v2_3.json').read_text())
     sensitivity_figures(sensitivity, figs)
     out = ROOT/'output/pdf/order_splitting_and_timing.pdf'; out.parent.mkdir(parents=True, exist_ok=True)
     # SimpleDocTemplate's text frame has six-point padding on each side.
@@ -243,7 +246,7 @@ def build(commit):
     p('Sandip Nandi<br/>Independent Researcher','subtitle')
     p('10 November 2026','subtitle')
     from content import compose
-    compose(p, table, figure, summary, sensitivity, commit)
+    compose(p, table, figure, summary, sensitivity, boundary, reporting, commit)
 
     p('References','h1')
     for i,(text,url) in enumerate(REFS,1):
@@ -272,6 +275,8 @@ def build(commit):
               'summary_sha256':digest(DATA/'summary.json'),
               'sensitivity_manifest_sha256':digest(SENSITIVITY/'manifest.json'),
               'sensitivity_summary_sha256':digest(SENSITIVITY/'summary.json'),'pdf_sha256':digest(out),
+              'boundary_manifest_sha256':digest(ROOT/'results/boundary-v1/manifest.json'),
+              'reporting_sha256':digest(ROOT/'results/reporting-v2_3.json'),
               'pdf_bytes':out.stat().st_size,'manuscript_sha256':digest(HERE/'manuscript.json')}
     (HERE/'document_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps({'pdf':str(out),'bytes':out.stat().st_size},indent=2))

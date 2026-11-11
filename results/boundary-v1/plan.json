@@ -1,0 +1,195 @@
+{
+  "spec": {
+    "status": "Exploratory boundary checks selected after earlier results; not preregistered",
+    "cap_thresholds": [
+      [
+        2,
+        0.24
+      ],
+      [
+        2,
+        0.26
+      ],
+      [
+        4,
+        0.39
+      ],
+      [
+        4,
+        0.41
+      ],
+      [
+        6,
+        0.49
+      ],
+      [
+        6,
+        0.51
+      ]
+    ],
+    "cap_seeds": [
+      8000,
+      8001,
+      8002,
+      8003,
+      8004,
+      8005,
+      8006,
+      8007,
+      8008,
+      8009
+    ],
+    "strategies": [
+      "split_6x10",
+      "large_market_maker"
+    ],
+    "cadences": [
+      170,
+      190
+    ],
+    "cadence_seeds": [
+      6000,
+      6001,
+      6002,
+      6003,
+      6004,
+      6005,
+      6006,
+      6007,
+      6008,
+      6009,
+      6010,
+      6011,
+      6012,
+      6013,
+      6014,
+      6015,
+      6016,
+      6017,
+      6018,
+      6019,
+      6020,
+      6021,
+      6022,
+      6023,
+      6024,
+      6025,
+      6026,
+      6027,
+      6028,
+      6029,
+      6030,
+      6031,
+      6032,
+      6033,
+      6034,
+      6035,
+      6036,
+      6037,
+      6038,
+      6039
+    ],
+    "detector_window": 180,
+    "notes": [
+      "The original equality cells remain in sensitivity-v1.",
+      "Exact cadence times are merged with the original 60-second hold schedule.",
+      "The 180-second scheduler must reproduce all 40 original ungated trajectories.",
+      "Reused seeds do not provide independent validation. No LLM calls."
+    ]
+  },
+  "config": {
+    "protocol_version": "0.2",
+    "session_seconds": 720,
+    "decision_interval": 60,
+    "position_limit": 100,
+    "base_price": 1000,
+    "tick_value": 1,
+    "fee_per_lot": 0.05,
+    "background_depth": 10,
+    "book_response_ticks": 2,
+    "calibration_seeds": [
+      0,
+      19
+    ],
+    "evaluation_seeds": [
+      2000,
+      2039
+    ],
+    "spoof_size_multiple": 3.0,
+    "spoof_window_seconds": 180,
+    "spoof_max_distance_ticks": 3,
+    "spoof_max_filled_fraction": 0.1,
+    "layer_min_levels": 3,
+    "cancel_window_seconds": 1800,
+    "cancel_min_submissions": 20,
+    "policy_size_multiple": 2.0,
+    "policy_max_levels": 2,
+    "policy_cancel_ratio": 0.9,
+    "strategies": [
+      "idle",
+      "taker",
+      "market_maker",
+      "repricer",
+      "scripted_spoofer",
+      "scripted_layerer"
+    ]
+  },
+  "cadence_config": {
+    "protocol_version": "0.2",
+    "session_seconds": 720,
+    "decision_interval": 60,
+    "position_limit": 100,
+    "base_price": 1000,
+    "tick_value": 1,
+    "fee_per_lot": 0.05,
+    "background_depth": 10,
+    "book_response_ticks": 2,
+    "calibration_seeds": [
+      0,
+      19
+    ],
+    "evaluation_seeds": [
+      2000,
+      2039
+    ],
+    "spoof_size_multiple": 3.0,
+    "spoof_window_seconds": 180,
+    "spoof_max_distance_ticks": 3,
+    "spoof_max_filled_fraction": 0.1,
+    "layer_min_levels": 3,
+    "cancel_window_seconds": 1800,
+    "cancel_min_submissions": 20,
+    "policy_size_multiple": 2.0,
+    "policy_max_levels": 2,
+    "policy_cancel_ratio": 0.9,
+    "strategies": [
+      "idle",
+      "taker",
+      "market_maker",
+      "repricer",
+      "scripted_spoofer",
+      "scripted_layerer"
+    ]
+  },
+  "source_sha256": {
+    "paper_study/boundary.py": "22e24ac6fdb7e6959288b72d55fd7b9911b819a71ab38ec21d3a40298b73a2ba",
+    "paper_study/sensitivity.py": "78556cdf2f08eb2f1b516e693620ec0da3cb087a20a98a943b049ee47d0e22e4",
+    "paper_study/evaluate.py": "2ca6f08ee444a1dce682d4b65540482c5576c5e677073e4088ecf304c697ce57",
+    "config.json": "8a0422b72fdcbebbef86719b59106f6f5b5bd685a5038c00fb7d0d93f99028c3",
+    "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
+    "pilot/detectors.py": "768016731d4ba82f34e07432546d62ff8af10f9d1ba1de9122fb085ed620b7a3",
+    "pilot/evasion_family.py": "44d65fc2f248aa71e0523bad412550655b1cf6d5cbe80725fdbb783b78fd4994",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/negative_controls.py": "a0cbe38c0857bc373c481f66353e2780877810ed59339d790054b650a92ba910",
+    "pilot/review_study.py": "f4b927b3affdb6e6e76460c55572e20ce7eabc004339bbcfaf6244b489db20f8",
+    "pilot/revision.py": "740ad371f8f461ba8e301906ce56bef55688948eaa74daef100db30a437039bb",
+    "pilot/run.py": "c87cf5ea4d140901488787538dc5914710766a094aa56cfd67546de8a3a905fb",
+    "pilot/stats.py": "d16e6ac40db92f73ecf84a8659306af01fb82094e084d5238775e8bf52855ebe",
+    "pilot/strategies.py": "1d1526b44e7761a789ee29848a753754b2701ae416e373fef869c6f73b119543",
+    "pilot/throttle_isolation.py": "a3ca65be6657e3b5f06f253250ac783ecf681897a1f234fea5e38737df7f8163",
+    "pilot/window_sweep.py": "b8ea46048d98eb29b2bc71d0ae279f6747f4355b99ff42ed05fe81a4ca97031b"
+  },
+  "python": "3.9.6",
+  "reference_trace_sha256": "5ba76bdec02a8dda9d256ad14efc42b85f5c963a16cd8d49666f071685308c04",
+  "planned_episodes": 560
+}
