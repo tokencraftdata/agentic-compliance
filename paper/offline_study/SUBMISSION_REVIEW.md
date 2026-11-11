@@ -1,7 +1,17 @@
 # Submission assessment - 10 November 2026
 
-Version 2.2 retains the assessment of version 2.0 as an exploratory computational methods report.
+Version 2.3 retains the assessment of version 2.0 as an exploratory computational methods report.
 The paper is not a validated agentic-compliance system or an LLM trading study.
+
+## Scope of version 2.3
+
+An editorial revision removes repeated framing and rewrites stiff explanations
+in more direct academic prose. The formal detector definitions, tables, figure
+captions, numerical findings, bibliography and AI-use disclosure are preserved.
+The limitations remain explicit, and the actual-agent study is still pending.
+This revision does not add experiments or strengthen the scientific claims.
+Language quality was reviewed by reading the text; no AI-detector score or claim
+about concealing tool assistance is used.
 
 ## Scope of version 2.2
 

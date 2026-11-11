@@ -2,13 +2,19 @@
 
 **Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
 
-Version 2.2 is a revised exploratory methods paper by Sandip Nandi, Independent
+Version 2.3 is a revised exploratory methods paper by Sandip Nandi, Independent
 Researcher. It adds cap/response and throttle/horizon sensitivity analyses in
 response to the scientific review. The latest findings narrow the protection
 claim and foreground legitimate execution costs. It is not a completed LLM study
 or a real-market compliance validation.
 
-Version 2.2 adds five published financial-agent/compliance papers and clarifies
+Version 2.3 revises the prose: shorter explanations, fewer repeated caveats, and
+more direct statements of the results. It retains the formal definitions,
+numerical findings, all 29 references, substantive limitations and AI disclosure.
+The LLM study remains pending. See `language_review_v2_3.json` for the editorial
+and consistency checks.
+
+Version 2.2 added five published financial-agent/compliance papers and clarified
 the contribution: controlled comparisons of cap-response dependence, throttle
 cost/recovery, and detector timing. LLM-agent results remain pending. Version 2.1
 added the Robinhood example. Neither revision changes the numerical experiments,

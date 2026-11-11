@@ -13,9 +13,12 @@ validation is limited to US$10. No actual-LLM findings are added to the paper.
 
 [Read the paper](output/pdf/order_splitting_and_timing.pdf): **Evaluating Controls
 for Trading Compliance: An Offline Study of Order Splitting and Cancellation
-Timing** (version 2.2).
+Timing** (version 2.3).
 
-Version 2.2 adds five published papers on financial agents and compliance,
+Version 2.3 edits the prose for clearer, more direct academic writing. It reduces
+repeated scope statements and simplifies the explanation of the findings while
+preserving the numerical evidence, formal definitions, references and limitations.
+Version 2.2 added five published papers on financial agents and compliance,
 clarifies the contribution of the three control comparisons, and explicitly
 keeps LLM results pending. The bibliography has 29 entries, including 15 published
 journal/conference papers. Numerical evidence is unchanged. Version 2.1 added
