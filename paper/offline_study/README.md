@@ -8,11 +8,12 @@ response to the scientific review. The latest findings narrow the protection
 claim and foreground legitimate execution costs. It is not a completed LLM study
 or a real-market compliance validation.
 
-Version 2.3 revises the prose: shorter explanations, fewer repeated caveats, and
-more direct statements of the results. It retains the formal definitions,
-numerical findings, all 29 references, substantive limitations and AI disclosure.
-The LLM study remains pending. See `language_review_v2_3.json` for the editorial
-and consistency checks.
+Version 2.3 adds 560 off-boundary episodes, mean/minimum/maximum summaries,
+rejection causes, named seed cohorts, and the explicit gate-detector inequality.
+It introduces **ConductLab** as the name for the existing custom simulator and
+replay workflow. Prose is revised for clarity; references, limitations and the
+AI-use disclosure remain. The LLM study is pending. See
+`REVIEW_RESPONSE_v2_3.md` and `language_review_v2_3.json`.
 
 Version 2.2 added five published financial-agent/compliance papers and clarified
 the contribution: controlled comparisons of cap-response dependence, throttle
@@ -31,6 +32,31 @@ prose and evidence-derived tables. They produce `manuscript.json` and the PDF at
 `output/pdf/order_splitting_and_timing.pdf`. Source, evidence, and output hashes
 are recorded in `document_manifest.json`. No appendix or long reproduction
 section is included in the paper; the instructions are here.
+
+## Reproduce the boundary checks and result ranges
+
+Use **CPython 3.9.6** from the repository root:
+
+```sh
+python3 -m paper_study.boundary verify results/boundary-v1
+python3 -m paper_study.reporting results/reporting-v2_3.json --verify
+```
+
+To run a new copy, use a fresh directory:
+
+```sh
+python3 -m paper_study.boundary plan results/local-boundary
+python3 -m paper_study.boundary run results/local-boundary
+python3 -m paper_study.boundary verify results/local-boundary
+```
+
+The plan was saved before execution after the earlier findings were known;
+it was not preregistered or committed before execution. It adds 480 price-boundary
+and 80 cadence-boundary episodes. The exact-time scheduler first reproduces all
+40 existing 180-second cadence event hashes. Saved attempts then replay with
+zero mismatches. `paper_study.reporting` derives descriptive ranges and exclusive
+rejection categories from the original saved records, without rewriting them.
+The [workflow guide](../../CONDUCTLAB.md) identifies the implementation modules.
 
 ## Reproduce the sensitivity evidence
 

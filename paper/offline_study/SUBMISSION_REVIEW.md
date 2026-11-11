@@ -5,13 +5,18 @@ The paper is not a validated agentic-compliance system or an LLM trading study.
 
 ## Scope of version 2.3
 
-An editorial revision removes repeated framing and rewrites stiff explanations
-in more direct academic prose. The formal detector definitions, tables, figure
-captions, numerical findings, bibliography and AI-use disclosure are preserved.
-The limitations remain explicit, and the actual-agent study is still pending.
-This revision does not add experiments or strengthen the scientific claims.
-Language quality was reviewed by reading the text; no AI-detector score or claim
-about concealing tool assistance is used.
+The revision adds 560 scripted boundary episodes, explicit rule inequalities,
+range summaries and a rejection breakdown. It names the existing custom simulator
+and replay workflow ConductLab. It also removes repeated framing and rewrites
+stiff explanations. No AI-detector score or claim of concealing assistance is used.
+The actual-agent study remains pending; the AI-use disclosure is retained.
+
+The boundary checks confirm 48/0 tick-lot differences at neighboring thresholds,
+and 39/40 versus 0/40 alerts for legitimate 170/190-second makers. These checks
+resolve dependence on equality, not dependence on stipulated rules. The contribution
+remains an inspectable set of control tests, not discovery of market behavior.
+The 28.2% patient-maker cost occurs without throttle rejects, while a separate
+matched large-maker ablation attributes most of its loss to throttling.
 
 ## Scope of version 2.2
 
@@ -80,6 +85,14 @@ agentic-AI result. More peer-reviewed references strengthen its context, not its
 external validity or novelty.
 
 ## Validation and release status
+
+- Version 2.3: 112 unit/integration tests pass; all 560 added records replay
+  exactly; all 40 original 180-second event hashes match before the new cadence
+  checks. All 120 Table 2 episodes retain their alert status when rescored from
+  120 to 180 seconds. Result ranges and rejection totals are derived from saved
+  traces. The four remaining arXiv citations were checked again; no published
+  replacement was confirmed. Detailed evidence is in `revision_v2_3_check.json`
+  and `reference_check_v2_3.json`.
 
 - Version 2.2 passes all 106 current tests. The central numbers were rechecked
   against 2,140 saved sensitivity episodes. Tables, captions, figure files,

@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-10",
+  "document_version": "2.3",
+  "checks": [
+    {
+      "number": 5,
+      "source": "https://arxiv.org/abs/2512.11933",
+      "checked": "Title, authors, version and governance-framework scope match. No journal or proceedings replacement confirmed."
+    },
+    {
+      "number": 8,
+      "source": "https://arxiv.org/abs/2608.19974v2",
+      "full_text": "https://arxiv.org/html/2608.19974v2",
+      "checked": "Version 2, 12 October 2026; full text states exogenous prices and complete execution at current price. No published replacement confirmed."
+    },
+    {
+      "number": 9,
+      "source": "https://arxiv.org/abs/2510.04952v2",
+      "full_text": "https://arxiv.org/html/2510.04952v2",
+      "checked": "Version 2, 7 October 2025. Section 7 leaves the full zkSNARK pipeline to future work despite stronger language in the abstract. No published replacement confirmed."
+    },
+    {
+      "number": 10,
+      "source": "https://arxiv.org/abs/2504.15908",
+      "checked": "Title, authors and Level-3 price-response scope match. Conference presentation found, but no peer-reviewed proceedings or journal replacement confirmed. Retain preprint citation.",
+      "presentation_program": "https://wp.lancs.ac.uk/ffmm2025/files/2025/09/FFMM2025-Programme.Final1_.pdf"
+    },
+    {
+      "number": 23,
+      "source": "https://robinhood.com/newsroom/hood-summit-2026/",
+      "checked": "September 29 announcement says built-in agents are coming soon to eligible U.S. customers. Paper describes announcement, not confirmed availability."
+    }
+  ],
+  "scope": "Primary-source metadata/full-text verification and publication-status search; no independent replication of cited findings"
+}

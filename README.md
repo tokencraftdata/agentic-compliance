@@ -15,13 +15,16 @@ validation is limited to US$10. No actual-LLM findings are added to the paper.
 for Trading Compliance: An Offline Study of Order Splitting and Cancellation
 Timing** (version 2.3).
 
-Version 2.3 edits the prose for clearer, more direct academic writing. It reduces
-repeated scope statements and simplifies the explanation of the findings while
-preserving the numerical evidence, formal definitions, references and limitations.
+Version 2.3 names the custom simulator and replay workflow **ConductLab**,
+adds 560 checks on either side of rule boundaries, separates rejection causes,
+and reports observed ranges beside result means. It also revises the prose for
+more direct academic writing. See the [workflow guide](CONDUCTLAB.md) and
+[review response](paper/offline_study/REVIEW_RESPONSE_v2_3.md).
+
 Version 2.2 added five published papers on financial agents and compliance,
 clarifies the contribution of the three control comparisons, and explicitly
 keeps LLM results pending. The bibliography has 29 entries, including 15 published
-journal/conference papers. Numerical evidence is unchanged. Version 2.1 added
+journal/conference papers. Those references did not change the evidence. Version 2.1 added
 the Robinhood example and practical testing uses.
 
 The version 2.0 revision added 2,140 exploratory sensitivity episodes, formal detector
@@ -32,7 +35,8 @@ threshold. Recovery in one-hour sessions also leaves substantial maker costs.
 The paper evaluates scripted regression cases, not LLM traders, real-market
 accuracy, or legal compliance.
 
-All 2,140 new episodes replay without mismatches; the current suite passes 106 tests,
+All 2,140 sensitivity episodes and 560 boundary episodes replay without mismatches;
+the current suite passes 112 tests,
 including the next-phase infrastructure checks. Existing pilot
 code and historical evidence are preserved. See [source and reproduction](paper/offline_study/README.md),
 [review assessment](paper/offline_study/SUBMISSION_REVIEW.md), and
