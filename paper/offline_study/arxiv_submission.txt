@@ -1,4 +1,4 @@
-arXiv submission fields - version 2.1, prepared but not submitted
+arXiv submission fields - version 2.3, prepared but not submitted
 
 Title
 Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing
@@ -16,17 +16,17 @@ Cross-lists
 None proposed for this scripted simulation study.
 
 Abstract
-Testing a trading-compliance control requires separating surveillance alerts, economic effects, and costs to legitimate execution. We examine these outcomes in a scripted limit-order-book simulator. Six 10-lot orders pass the original order-level size gate and detectors in all 40 tested seeds. An aggregate cap removes their response-dependent gain at the original settings, but that result depends on the market-response threshold. In a separate cap-threshold grid with the cancellation throttle disabled, the same 20-lot cap yields a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at threshold 0.2. Throttle tests over 12-minute and one-hour sessions distinguish persistent lockout from recovery after old submissions leave the window. The full aggregate policy reduces maker volume by 14.1% and 28.2% in two short-session controls and by 75.2% in the one-hour test. Finally, a legitimate maker produces alerts in 34 of 40 episodes when its re-quote cadence meets the detector's 180-second window. These comparisons provide regression cases for testing interacting compliance controls. The study uses synthetic prices and fixed trading scripts; it does not estimate real-market detection accuracy. The proposed LLM-agent evaluation remains pending.
+An order-by-order size limit can admit a large display assembled from smaller orders. We built ConductLab, a custom limit-order-book simulator and replay workflow, to examine this gap while separating alerts, gains from the simulated price response, and costs to legitimate execution. Six 10-lot orders pass the original gate without a conduct alert in all 40 tested seeds. An aggregate cap removes the gain at the original settings, but its effect depends on the assumed response. With throttling disabled, the same 20-lot cap gives a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at 0.2. Checks on either side of the response boundary preserve this contrast. The full policy reduces volume by 14.1% for a large maker and 28.2% for a patient maker; a separate ablation attributes most of the large maker's loss to throttling. In a one-hour test, submissions resume after lockout but volume remains 75.2% below the ungated baseline. A legitimate maker triggers alerts in 39/40 episodes at a 170-second quoting interval and 0/40 at 190 seconds, with a 180-second detector window. These scripted cases expose control interactions that can be obscured by reporting alerts alone. The prices are synthetic; the results describe the implemented rules and their consequences, not real-market detection accuracy.
 
 Comments
-12 pages, 3 figures; exploratory scripted simulation study
+13 pages, 3 figures; exploratory scripted simulation study
 
 Journal reference / publication DOI
 Leave empty: no journal publication is claimed for this manuscript.
 
 Upload file
 output/pdf/order_splitting_and_timing.pdf
-SHA-256: 71e1fa5cbc3d41970e5df1b720f3d80d7d1331291ea5ade00bf738421962cae3
+SHA-256: 9b95b0f5c25aba47a557619323f7db068d02167f2b6b8af04101c313cd4e2fe9
 
 Submission route
 This document was created with ReportLab, not TeX. Use the single-PDF route,
@@ -34,14 +34,14 @@ including all figures and text. Do not upload the reproduction ZIP as a second
 manuscript file. Any ancillary material must follow arXiv's separate guidance.
 
 Assessment
-Version 2.2 adds five published agent/compliance references and clarifies the
-control-evaluation contribution. Actual-LLM results remain pending.
+Version 2.3 adds 560 boundary checks, observed ranges, rejection causes and
+clear cohort labels. ConductLab names the custom simulator and replay workflow.
+The prose is revised, and the LLM study remains pending. The paper reports 2,700
+sensitivity and boundary episodes alongside the earlier scripted evidence.
 
-The paper is a bounded exploratory methods report on evaluation pitfalls. It
-reports 2,140 post-review sensitivity episodes, with matched replay, in addition
-to the earlier scripted evidence. No LLM trading study, independent test-family
-validation, market calibration, or legal-compliance certification is claimed.
-Formatting and numerical checks do not guarantee moderation or peer review.
+This is an exploratory methods report on control-evaluation pitfalls. It does
+not report independent strategy validation, market calibration or actual-LLM
+findings. Formatting and numerical checks do not guarantee arXiv acceptance.
 
 Author decisions remaining
 - Read the complete paper, results, cited sources, and AI-assistance disclosure.
