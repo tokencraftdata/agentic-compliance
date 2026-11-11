@@ -1,6 +1,6 @@
 {
   "date": "2026-11-10",
-  "document_version": "2.3",
+  "document_version": "2.4",
   "pages": 13,
   "author": "Sandip Nandi",
   "author_confirmed": true,
@@ -19,7 +19,7 @@
     8
   ],
   "text_within_page_margins": true,
-  "code_commit": "6073730b16e02237d04c9104c37487f1d2a167ec",
+  "code_commit": "f92f3260686e9da2a8da6bbe3be064d07487a8e2",
   "source_commit_link_verified_in_pdf": true,
   "ai_disclosure": true,
   "all_fonts_embedded": true,
@@ -37,7 +37,7 @@
       "embedded": true
     }
   },
-  "pdf_sha256": "9b95b0f5c25aba47a557619323f7db068d02167f2b6b8af04101c313cd4e2fe9",
+  "pdf_sha256": "417e26e11d0c0849727fce3e6ff0463196f93de0893453bcc72ee31d48379e6a",
   "not_encrypted": true,
   "embedded_figures": 3,
   "no_open_action": true,

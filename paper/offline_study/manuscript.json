@@ -1,6 +1,6 @@
 {
-  "title": "Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing",
-  "subtitle": "Scripted experiments on surveillance and pre-trade gates",
+  "title": "TradeGauntlet: Testing the Limits of Trading Compliance Controls",
+  "subtitle": "Scripted experiments on order splitting and cancellation timing",
   "authors": [
     {
       "name": "Sandip Nandi",
@@ -10,11 +10,11 @@
   "blocks": [
     {
       "type": "title",
-      "text": "Evaluating Controls for Trading Compliance:<br/>An Offline Study of Order Splitting and Cancellation Timing"
+      "text": "TradeGauntlet:<br/>Testing the Limits of Trading Compliance Controls"
     },
     {
       "type": "subtitle",
-      "text": "Scripted experiments on surveillance and pre-trade gates"
+      "text": "Scripted experiments on order splitting and cancellation timing"
     },
     {
       "type": "subtitle",
@@ -30,7 +30,7 @@
     },
     {
       "type": "body",
-      "text": "An order-by-order size limit can admit a large display assembled from smaller orders. We built ConductLab, a custom limit-order-book simulator and replay workflow, to examine this gap while separating alerts, gains from the simulated price response, and costs to legitimate execution. Six 10-lot orders pass the original gate without a conduct alert in all 40 tested seeds. An aggregate cap removes the gain at the original settings, but its effect depends on the assumed response. With throttling disabled, the same 20-lot cap gives a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at 0.2. Checks on either side of the response boundary preserve this contrast. The full policy reduces volume by 14.1% for a large maker and 28.2% for a patient maker; a separate ablation attributes most of the large maker's loss to throttling. In a one-hour test, submissions resume after lockout but volume remains 75.2% below the ungated baseline. A legitimate maker triggers alerts in 39/40 episodes at a 170-second quoting interval and 0/40 at 190 seconds, with a 180-second detector window. These scripted cases expose control interactions that can be obscured by reporting alerts alone. The prices are synthetic; the results describe the implemented rules and their consequences, not real-market detection accuracy."
+      "text": "An order-by-order size limit can admit a large display assembled from smaller orders. We built TradeGauntlet, a custom limit-order-book simulator and replay workflow, to examine this gap while separating alerts, gains from the simulated price response, and costs to legitimate execution. Six 10-lot orders pass the original gate without a conduct alert in all 40 tested seeds. An aggregate cap removes the gain at the original settings, but its effect depends on the assumed response. With throttling disabled, the same 20-lot cap gives a mean responsive-minus-unresponsive wealth difference of 0.00 tick-lots at threshold 0.4 and 48.00 at 0.2. Checks on either side of the response boundary preserve this contrast. The full policy reduces volume by 14.1% for a large maker and 28.2% for a patient maker; a separate ablation attributes most of the large maker's loss to throttling. In a one-hour test, submissions resume after lockout but volume remains 75.2% below the ungated baseline. A legitimate maker triggers alerts in 39/40 episodes at a 170-second quoting interval and 0/40 at 190 seconds, with a 180-second detector window. These scripted cases expose control interactions that can be obscured by reporting alerts alone. The prices are synthetic; the results describe the implemented rules and their consequences, not real-market detection accuracy."
     },
     {
       "type": "h1",
@@ -46,7 +46,7 @@
     },
     {
       "type": "body",
-      "text": "We built ConductLab for this study: a small limit-order-book simulator coupled to a workflow for fixing scenarios, comparing controls on matched paths, and replaying the resulting orders. We distinguish whether a surveillance rule flags a sequence, whether a gate removes its gain from the simulated price response, and how much legitimate execution the gate prevents. An alert records a pattern; a rejection records an intervention. Neither alone tells us whether the intervention removed the gain or whether the trading was lawful."
+      "text": "We built TradeGauntlet for this study: a small limit-order-book simulator coupled to a workflow for fixing scenarios, comparing controls on matched paths, and replaying the resulting orders. We distinguish whether a surveillance rule flags a sequence, whether a gate removes its gain from the simulated price response, and how much legitimate execution the gate prevents. An alert records a pattern; a rejection records an intervention. Neither alone tells us whether the intervention removed the gain or whether the trading was lawful."
     },
     {
       "type": "body",
@@ -90,7 +90,7 @@
     },
     {
       "type": "h1",
-      "text": "3. Market, gates, and detectors"
+      "text": "3. TradeGauntlet: simulator, gates, and detectors"
     },
     {
       "type": "h2",
@@ -98,7 +98,7 @@
     },
     {
       "type": "body",
-      "text": "ConductLab uses a custom matching engine, implemented for this project, with integer prices, price/time priority, and partial fills. It is not built on ABIDES. Scenario runners fix the configuration and random seeds, execute paired control conditions, record attempted and accepted actions, and replay saved attempts to check event hashes and outcomes. Cap multiples, response thresholds, throttle windows, session lengths, and quoting cadences can be varied through these runners. Orders execute within the simulator, with no broker or exchange connection; this is what offline means here."
+      "text": "TradeGauntlet uses a custom matching engine, implemented for this project, with integer prices, price/time priority, and partial fills. It is not built on ABIDES. Scenario runners fix the configuration and random seeds, execute paired control conditions, record attempted and accepted actions, and replay saved attempts to check event hashes and outcomes. Cap multiples, response thresholds, throttle windows, session lengths, and quoting cadences can be varied through these runners. Orders execute within the simulator, with no broker or exchange connection; this is what offline means here."
     },
     {
       "type": "table",
@@ -573,7 +573,7 @@
     },
     {
       "type": "body",
-      "text": "ConductLab can be used to rerun a trading task and market path after a change to a cap, throttle, or scoring window. The saved configuration, attempted actions, rejection reasons, and event hashes allow a developer to trace a change in fills or alerts to the control setting. The examples show why this matters: zero alerts can be enforced by a size inequality, a recovered throttle can still suppress trading, and ordinary quoting can match a detector pattern. Reuse requires choosing cases that challenge the proposed control; passing the existing scripts is not a deployment criterion."
+      "text": "TradeGauntlet can be used to rerun a trading task and market path after a change to a cap, throttle, or scoring window. The saved configuration, attempted actions, rejection reasons, and event hashes allow a developer to trace a change in fills or alerts to the control setting. The examples show why this matters: zero alerts can be enforced by a size inequality, a recovered throttle can still suppress trading, and ordinary quoting can match a detector pattern. Reuse requires choosing cases that challenge the proposed control; passing the existing scripts is not a deployment criterion."
     },
     {
       "type": "body",
@@ -625,7 +625,7 @@
     },
     {
       "type": "body",
-      "text": "An aggregate limit closes the illustrated order-splitting gap, but whether it removes the trading gain depends on the assumed price response. Execution costs depend on both the size cap and the cancellation throttle; alert counts can also be fixed by inequalities shared with the gate. Ordinary market making provides a further counterexample when its quoting interval falls inside the detector window. ConductLab records these interactions as replayable tests, with alerts, response-dependent gains, and legitimate execution assessed separately. Calibrated markets, independently designed strategies, and adaptive LLM traders remain to be tested."
+      "text": "An aggregate limit closes the illustrated order-splitting gap, but whether it removes the trading gain depends on the assumed price response. Execution costs depend on both the size cap and the cancellation throttle; alert counts can also be fixed by inequalities shared with the gate. Ordinary market making provides a further counterexample when its quoting interval falls inside the detector window. TradeGauntlet records these interactions as replayable tests, with alerts, response-dependent gains, and legitimate execution assessed separately. Calibrated markets, independently designed strategies, and adaptive LLM traders remain to be tested."
     },
     {
       "type": "h2",
@@ -633,7 +633,7 @@
     },
     {
       "type": "body",
-      "text": "Code, saved results, and reproduction instructions: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/6073730b16e02237d04c9104c37487f1d2a167ec\" color=\"#254f70\">github.com/tokencraftdata/agentic-compliance</link>. The repository is currently private."
+      "text": "Code, saved results, and reproduction instructions: <link href=\"https://github.com/tokencraftdata/agentic-compliance/tree/f92f3260686e9da2a8da6bbe3be064d07487a8e2\" color=\"#254f70\">github.com/tokencraftdata/agentic-compliance</link>. The repository is currently private."
     },
     {
       "type": "h2",
