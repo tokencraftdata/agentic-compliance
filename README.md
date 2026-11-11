@@ -69,8 +69,9 @@ together.
 | `experiments/` | Earlier experiment framework and Anthropic API adapter used by the v0.4 smoke test. |
 | `tests/` | Unit and integration tests (112 tests). |
 | `results/` | Saved evidence for every reported experiment: plans, configs, traces, summaries and manifests. |
-| `paper/offline_study/` | Source of the current paper (`build.py`, `content.py`, references, figures) and its review records. |
-| `output/pdf/` | Rendered papers: the current v2.4 paper and the earlier v0.4 pilot report. |
+| `paper/arxiv/` | The paper in the arXiv LaTeX template (`main.tex`); edit this from now on. See its [README](paper/arxiv/README.md). |
+| `paper/offline_study/` | Original v2.4 build of the paper (`build.py`, `content.py`, references, figures) and its review records. |
+| `output/pdf/` | Rendered papers: v2.4 in the arXiv template (`tradegauntlet_arxiv.pdf`), the original v2.4 layout, and the earlier v0.4 pilot report. |
 | `docs/` | Workflow guide, pilot protocol, commercial assessment, version history and historical documents. |
 | `provenance/` | Records of how this repository was separated from its original home. |
 | `scripts/` | Command-line tools for the original pilot: replay, package verification, the invariant check, result comparison and the v0.2/v0.4 document builders. Run them from the root as `python -m scripts.<name>`. |
