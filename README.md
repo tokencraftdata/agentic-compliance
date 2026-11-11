@@ -174,4 +174,4 @@ If you refer to this work, please cite the paper:
 > Sandip Nandi. *TradeGauntlet: Testing the Limits of Trading Compliance Controls.*
 > Exploratory technical report, version 2.4, 10 November 2026.
 
-No open-source license has been granted yet, so please ask the author before reusing the code.
+The code and data in this repository are released under the [MIT License](LICENSE).
