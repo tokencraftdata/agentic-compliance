@@ -73,7 +73,7 @@ together.
 | `output/pdf/` | Rendered papers: the current v2.4 paper and the earlier v0.4 pilot report. |
 | `docs/` | Workflow guide, pilot protocol, commercial assessment, version history and historical documents. |
 | `provenance/` | Records of how this repository was separated from its original home. |
-| Root scripts | `replay.py`, `verify_package.py`, `check_invariants.py`, `compare_results.py` and the document builders for the v0.2 pilot. |
+| `scripts/` | Command-line tools for the original pilot: replay, package verification, the invariant check, result comparison and the v0.2/v0.4 document builders. Run them from the root as `python -m scripts.<name>`. |
 
 The saved results the paper relies on are:
 
@@ -108,9 +108,9 @@ $PY -m paper_study.boundary verify results/boundary-v1
 $PY -m paper_study.reporting results/reporting-v2_3.json --verify
 
 # Verify the original pilot and the bounded invariant check
-$PY verify_package.py
-$PY replay.py results/offline-v2
-$PY check_invariants.py
+$PY -m scripts.verify_package
+$PY -m scripts.replay results/offline-v2
+$PY -m scripts.check_invariants
 ```
 
 To run an experiment from scratch, plan, run and verify it in a new directory

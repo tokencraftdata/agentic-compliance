@@ -14,3 +14,8 @@ They are not the current description of the work; start from the
 Commands in these files assume the repository root as the working directory. File
 names that were at the root at the time (for example `PROTOCOL.md` or
 `RELEASE_MANIFEST.json`) now live in `docs/` and `provenance/`.
+
+The root-level scripts these documents mention (`replay.py`, `verify_package.py`,
+`check_invariants.py`, `compare_results.py`, `review_sensitivity.py` and the
+document builders) now live in `scripts/`. Run them as, for example,
+`python3 -m scripts.replay results/offline-v2`.

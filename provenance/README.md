@@ -9,6 +9,6 @@ Records of where this repository's code and evidence came from.
 - `README.pre-separation.md`: the README as it stood before the split.
 
 These manifests record files at the paths they had when written. Several documents
-have since moved into `docs/`; the code and `results/` paths are unchanged, and
+have since moved into `docs/` and the root scripts into `scripts/`; the code and `results/` paths are unchanged, and
 each experiment's own `manifest.json` under `results/` is what the verify
 commands check.

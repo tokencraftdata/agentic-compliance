@@ -5,7 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 from pilot.run import summarize, digest
-root=Path(__file__).resolve().parent
+root=Path(__file__).resolve().parents[1]
 result=root/'results/offline-v2'
 manifest=json.loads((result/'manifest.json').read_text())
 for name,expected in manifest['source_sha256'].items():
