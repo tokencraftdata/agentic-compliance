@@ -1,12 +1,16 @@
 # Standalone offline research paper
 
-**Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing**
+**TradeGauntlet: Testing the Limits of Trading Compliance Controls**
 
-Version 2.3 is a revised exploratory methods paper by Sandip Nandi, Independent
+Version 2.4 is a revised exploratory methods paper by Sandip Nandi, Independent
 Researcher. It adds cap/response and throttle/horizon sensitivity analyses in
 response to the scientific review. The latest findings narrow the protection
 claim and foreground legitimate execution costs. It is not a completed LLM study
 or a real-market compliance validation.
+
+Version 2.4 renames the workflow **TradeGauntlet** and includes it in the main
+title and Section 3 heading. This is a naming revision only; the numerical
+results, definitions, references and limitations are unchanged from v2.3.
 
 Version 2.3 adds 560 off-boundary episodes, mean/minimum/maximum summaries,
 rejection causes, named seed cohorts, and the explicit gate-detector inequality.
@@ -56,7 +60,7 @@ and 80 cadence-boundary episodes. The exact-time scheduler first reproduces all
 40 existing 180-second cadence event hashes. Saved attempts then replay with
 zero mismatches. `paper_study.reporting` derives descriptive ranges and exclusive
 rejection categories from the original saved records, without rewriting them.
-The [workflow guide](../../CONDUCTLAB.md) identifies the implementation modules.
+The [workflow guide](../../TRADEGAUNTLET.md) identifies the implementation modules.
 
 ## Reproduce the sensitivity evidence
 

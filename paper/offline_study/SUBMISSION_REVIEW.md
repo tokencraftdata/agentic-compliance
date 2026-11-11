@@ -1,7 +1,15 @@
 # Submission assessment - 10 November 2026
 
-Version 2.3 retains the assessment of version 2.0 as an exploratory computational methods report.
+Version 2.4 retains the assessment of version 2.0 as an exploratory computational methods report.
 The paper is not a validated agentic-compliance system or an LLM trading study.
+
+## Scope of version 2.4
+
+Names the workflow TradeGauntlet in the main title, the simulator heading and
+all current manuscript mentions. The subtitle identifies order splitting and
+cancellation timing. Numerical results, detector definitions, references and
+limitations remain those reviewed for v2.3. No new experiments were run for
+this naming revision; the existing 112-test validation remains applicable.
 
 ## Scope of version 2.3
 

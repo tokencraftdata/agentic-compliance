@@ -27,8 +27,8 @@ ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
 DATA = ROOT / 'results/paper-review-v1'
 SENSITIVITY = ROOT / 'results/sensitivity-v1'
-TITLE = 'Evaluating Controls for Trading Compliance: An Offline Study of Order Splitting and Cancellation Timing'
-SUBTITLE = 'Scripted experiments on surveillance and pre-trade gates'
+TITLE = 'TradeGauntlet: Testing the Limits of Trading Compliance Controls'
+SUBTITLE = 'Scripted experiments on order splitting and cancellation timing'
 REFS = [
     ('Xintong Wang and Michael P. Wellman. Spoofing the Limit Order Book: An Agent-Based Model. AAMAS, 2017, pp. 651-659.', 'https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p651.pdf'),
     ('David Byrd. Learning Not to Spoof. Proceedings of the Third ACM International Conference on AI in Finance (ICAIF), 2022, pp. 139-147.', 'https://doi.org/10.1145/3533271.3561767'),
@@ -269,7 +269,7 @@ def build(commit):
         'authors':[{'name':'Sandip Nandi','affiliation':'Independent Researcher'}],
         'blocks':source},indent=2)+'\n')
     (HERE/'references.json').write_text(json.dumps([{'number':i,'text':t,'url':u} for i,(t,u) in enumerate(REFS,1)],indent=2)+'\n')
-    manifest={'document_version':'2.3','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
+    manifest={'document_version':'2.4','date':'2026-11-10','code_commit':commit,'python':platform.python_version(),
               'reportlab':reportlab.Version,'matplotlib':matplotlib.__version__,
               'source_sha256':digest(Path(__file__)),'content_source_sha256':digest(HERE/'content.py'),'evidence_manifest_sha256':digest(DATA/'manifest.json'),
               'summary_sha256':digest(DATA/'summary.json'),
