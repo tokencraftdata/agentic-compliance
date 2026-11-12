@@ -23,6 +23,7 @@ price, and how much legitimate trading the gate blocks. The paper uses this to s
   rules, scored on held-out paths with bootstrap intervals;
 - two baseline detectors (an order-to-trade ratio and a learned classifier);
 - the execution-quality cost of each control to legitimate traders;
+- stylized facts against the data, and the adversary replayed on real price paths;
 - a check in the independent ABIDES market simulator;
 - Claude Haiku 5.5 and Sonnet 5.5 trading legitimate tasks under the same controls.
 
@@ -44,6 +45,7 @@ Main result folders:
 | --- | --- |
 | `adversary-v1`, `adversary-budget-v1` | Adaptive adversary; repeat with 3x budget and 200 held-out seeds |
 | `robustness-v1` | Response window, tick-unit mapping, search restarts, display gain |
+| `empirical-paths-v1` | Stylized facts vs LOBSTER; adversary replayed on real price paths (LOBSTER data not included) |
 | `lobster-calibration-v1` | Fitted imbalance-to-price slopes (LOBSTER data not included) |
 | `baselines-v1` | Order-to-trade ratio and learned detector |
 | `execution-quality-v1` | Fill rate, shortfall, edge, markout and inventory of legitimate scripts |
