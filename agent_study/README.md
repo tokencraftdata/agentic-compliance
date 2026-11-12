@@ -56,7 +56,9 @@ call would return the same output. Review export supplies zero human labels.
 It cannot be frozen or run until an exact available model ID, supported input
 limit, current token prices and price-check date are supplied. The Models API
 preflight checks availability and limits before inference. The credential is read
-from `ANTHROPIC_API_KEY` and is not written to experiment records.
+from `TG_ANTHROPIC_API_KEY` (falling back to `ANTHROPIC_API_KEY`) and is not
+written to experiment records. The v1 study plan and run book are in
+[docs/llm-agent-study.md](../docs/llm-agent-study.md).
 
 The proposed development run has eight episodes and at most 48 calls: one model,
 one market path, two tasks, gate off/aggregate, and response off/on. It checks
