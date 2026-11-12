@@ -19,7 +19,7 @@ OUT = Path(__file__).resolve().parent / 'figures'
 TEXT_WIDTH = 6.5  # inches, the arxiv.sty text block
 
 INK, INK2, MUTED, GRID = '#1f1f1e', '#52514e', '#8a8984', '#e4e3df'
-BLUE, ORANGE, AQUA = '#2a78d6', '#eb6834', '#1baf7a'
+BLUE, ORANGE, AQUA, YELLOW, MAGENTA = '#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4'
 BLUE_RAMP = ['#f3f7fd', '#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b']
 ORDINAL = ['#86b6ef', '#3987e5', '#1c5cab', '#0d366b']   # weakest to strictest control
 SEQ = LinearSegmentedColormap.from_list('seq', BLUE_RAMP)
@@ -161,8 +161,10 @@ def cadence():
 
 
 def calibration():
-    fig, axes = plt.subplots(1, 2, figsize=(TEXT_WIDTH, 2.45), gridspec_kw={'wspace': 0.28})
-    stocks = [('AAPL', BLUE), ('INTC', ORANGE), ('MSFT', AQUA)]
+    fig, axes = plt.subplots(1, 2, figsize=(TEXT_WIDTH, 2.6), gridspec_kw={'wspace': 0.28})
+    # Categorical slots 1-5 in fixed order; the table in the paper is the text alternative.
+    stocks = [('AAPL', BLUE), ('INTC', ORANGE), ('MSFT', AQUA), ('AMZN', YELLOW), ('GOOG', MAGENTA)]
+    wide = ['AAPL', 'AMZN', 'GOOG']
     ax = axes[0]
     xs = np.linspace(-1, 1, 50)
     ax.plot(xs, xs, color=MUTED, linewidth=1.0, linestyle=(0, (4, 2)))
@@ -170,41 +172,43 @@ def calibration():
     slopes = {}
     for ticker, color in stocks:
         e = load(f'results/lobster-calibration-v1/{ticker}/calibration.json')['estimates']
-        h = e['h1s']
-        bins = h['i3_binned_mean_move']
+        bins = e['h1s']['i3_binned_mean_move']
         centers = [(b['bin'][0] + b['bin'][1]) / 2 for b in bins]
-        ax.plot(centers, [b['mean_move_half_spreads'] for b in bins], color=color, marker='o', markersize=4.5,
-                linewidth=1.6, markeredgecolor='white', markeredgewidth=0.8, zorder=3)
+        ax.plot(centers, [b['mean_move_half_spreads'] for b in bins], color=color, marker='o', markersize=4,
+                linewidth=1.4, markeredgecolor='white', markeredgewidth=0.7, zorder=3)
         slopes[ticker] = [e[k]['i3'] for k in ('h1s', 'h5s', 'h10s')]
-        ax.annotate(ticker, (centers[-1], bins[-1]['mean_move_half_spreads']),
-                    xytext=(6, {'AAPL': -9, 'INTC': 2, 'MSFT': -2}[ticker]),
-                    textcoords='offset points', color=color, fontsize=8, va='center')
+    ax.annotate('MSFT', (0.8, 1.0), xytext=(6, -2), textcoords='offset points', color=INK, fontsize=7.5, va='center')
+    ax.annotate('INTC', (0.8, 0.0), xytext=(6, 7), textcoords='offset points', color=INK, fontsize=7.5, va='center')
+    ax.annotate('AAPL, AMZN,\nGOOG', (0.8, 0.0), xytext=(6, -10), textcoords='offset points', color=INK, fontsize=7.5,
+                va='center', linespacing=0.95)
     ax.axhline(0, color=GRID, linewidth=0.8, zorder=0)
-    ax.set_xlim(-1.05, 1.3)
+    ax.set_xlim(-1.05, 1.42)
     ax.set_ylim(-0.75, 1.25)
     ax.set_xlabel('Imbalance of top three levels, $I$')
     ax.set_ylabel('Next-second mid move (half-spreads)')
     ax.set_title('Mean one-second move by imbalance')
     ax2 = axes[1]
-    horizons = [1, 5, 10]
-    for k, (ticker, color) in enumerate(stocks):
-        offs = (k - 1) * 0.16
+    order = ['AAPL', 'AMZN', 'GOOG', 'INTC', 'MSFT']
+    colors = dict(stocks)
+    for k, ticker in enumerate(order):
+        offs = (k - 2) * 0.13
         est = slopes[ticker]
         y = [s['slope_half_spreads'] for s in est]
         lo = [s['slope_half_spreads'] - s['slope_ci95_block_bootstrap'][0] for s in est]
         hi = [s['slope_ci95_block_bootstrap'][1] - s['slope_half_spreads'] for s in est]
-        ax2.errorbar(np.array(range(3)) + offs, y, yerr=[lo, hi], fmt='o', color=color, markersize=4.5,
-                     markeredgecolor='white', markeredgewidth=0.8, elinewidth=1.2, capsize=0, label=ticker)
+        ax2.errorbar(np.arange(3) + offs, y, yerr=[lo, hi], fmt='o', color=colors[ticker], markersize=4,
+                     markeredgecolor='white', markeredgewidth=0.7, elinewidth=1.2, capsize=0)
     ax2.axhline(0, color=INK2, linewidth=0.6, zorder=0)
     for xv in (0.5, 1.5):
         ax2.axvline(xv, color=GRID, linewidth=0.8, zorder=0)
-    ax2.set_xticks(range(3), [f'{h} s' for h in horizons])
+    ax2.set_xticks(range(3), ['1 s', '5 s', '10 s'])
     ax2.set_xlim(-0.5, 2.5)
     ax2.set_xlabel('Horizon')
     ax2.set_ylabel('Slope (half-spreads per unit $I$)')
     ax2.set_title('Fitted slope with 95% block-bootstrap interval')
-    ax2.legend(handles=[plt.Line2D([], [], color=c, marker='o', linestyle='', markersize=4.5) for _, c in stocks],
-               labels=[t for t, _ in stocks], frameon=False, loc='upper left', handletextpad=0.1)
+    ax2.legend(handles=[plt.Line2D([], [], color=colors[t], marker='o', linestyle='', markersize=4.5) for t in order],
+               labels=[f'{t} (wide spread)' if t in wide else f'{t} (one tick)' for t in order],
+               frameon=False, loc='upper left', handletextpad=0.1, fontsize=7.2, labelspacing=0.25)
     ax2.grid(axis='y', color=GRID, linewidth=0.6)
     ax2.set_axisbelow(True)
     fig.savefig(OUT / 'calibration.pdf')

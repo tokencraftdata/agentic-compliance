@@ -341,38 +341,38 @@ The results so far rest on scripts we wrote and on a response threshold we chose
 
 \paragraph{Responses.} Besides the step responses at $t = 0.4$ and $t = 0.2$, we use the linear response of Section~\ref{sec:market} with $\kappa = 1$ as a stress setting, and three fitted settings in which the move probability is $s|I|$ with $s$ estimated from data for one stock.
 
-\paragraph{Fitting the response.} We use the free LOBSTER samples for AAPL, INTC, and MSFT on 21 June 2012, reconstructed from Nasdaq messages at 10 levels (400,391, 624,040, and 668,765 book updates). AAPL traded near \$580 with a wide spread; INTC and MSFT traded near \$27 and \$30 and usually had a one-tick spread, so they are large-tick stocks in the sense of~\cite{r31}. On a one-second grid, excluding the first and last ten minutes, we regress the mid-price change over the next $h$ seconds, measured in units of the prevailing half-spread, on the imbalance of the top three levels, which matches the simulator's three background levels. Intervals use a block bootstrap with five-minute blocks. The simulator's half-spread is one tick, so the one-second slope is directly comparable with $\kappa s$, and we set each fitted scale $s$ to that stock's one-second point estimate.
+\paragraph{Fitting the response.} We use the five free LOBSTER samples, AAPL, AMZN, GOOG, INTC, and MSFT on 21 June 2012, reconstructed from Nasdaq messages at 10 levels (148,000 to 669,000 book updates per stock). AAPL, AMZN, and GOOG traded between about \$220 and \$580 with spreads of several ticks; INTC and MSFT traded near \$27 and \$30 and usually had a one-tick spread, so they are large-tick stocks in the sense of~\cite{r31}. On a one-second grid, excluding the first and last ten minutes, we regress the mid-price change over the next $h$ seconds, measured in units of the prevailing half-spread, on the imbalance of the top three levels, which matches the simulator's three background levels. Intervals use a block bootstrap with five-minute blocks. The simulator's half-spread is one tick, so the one-second slope is directly comparable with $\kappa s$, and we set the fitted scale $s$ to a stock's one-second point estimate. AMZN and GOOG give slopes close to AAPL's, so the adversary uses AAPL, INTC, and MSFT as fitted settings.
 
 \begin{table}[htbp]
 \centering
-\small
-\begin{tabular}{llll}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrllll}
 \toprule
-\textbf{Horizon} & \textbf{AAPL} & \textbf{INTC} & \textbf{MSFT} \\
+ & \textbf{Spread} & & \multicolumn{3}{c}{\textbf{Top three levels}} & \textbf{Best level} \\
+\cmidrule(lr){4-6}\cmidrule(lr){7-7}
+\textbf{Stock} & \textbf{(ticks)} & \textbf{Obs.} & \textbf{1 s} & \textbf{5 s} & \textbf{10 s} & \textbf{1 s} \\
 \midrule
-\multicolumn{4}{l}{\emph{Top three levels}} \\
-1 s & 0.018 [-0.003, 0.039] & 0.348 [0.287, 0.417] & 0.479 [0.406, 0.574] \\
-5 s & -0.083 [-0.155, -0.009] & 1.169 [0.932, 1.406] & 1.515 [1.270, 1.803] \\
-10 s & -0.150 [-0.279, -0.016] & 1.721 [1.321, 2.130] & 2.041 [1.683, 2.476] \\
+AAPL & 15 & 18,028 & 0.018 [$-$0.003, 0.039] & $-$0.083 [$-$0.155, $-$0.009] & $-$0.150 [$-$0.279, $-$0.016] & 0.052 [0.031, 0.075] \\
+AMZN & 12 & 15,340 & 0.032 [0.015, 0.049] & 0.069 [0.007, 0.129] & 0.063 [$-$0.044, 0.166] & 0.036 [0.022, 0.050] \\
+GOOG & 26 & 11,152 & 0.016 [$-$0.005, 0.037] & 0.028 [$-$0.039, 0.097] & 0.052 [$-$0.062, 0.166] & 0.025 [0.007, 0.044] \\
 \midrule
-\multicolumn{4}{l}{\emph{Best level only}} \\
-1 s & 0.052 [0.031, 0.075] & 0.201 [0.172, 0.229] & 0.252 [0.222, 0.284] \\
-5 s & 0.084 [0.019, 0.153] & 0.646 [0.560, 0.736] & 0.775 [0.683, 0.865] \\
-10 s & 0.051 [-0.048, 0.156] & 0.907 [0.776, 1.040] & 1.006 [0.862, 1.139] \\
+INTC & 1 & 18,889 & 0.348 [0.287, 0.417] & 1.169 [0.932, 1.406] & 1.721 [1.321, 2.130] & 0.201 [0.172, 0.229] \\
+MSFT & 1 & 19,220 & 0.479 [0.406, 0.574] & 1.515 [1.270, 1.803] & 2.041 [1.683, 2.476] & 0.252 [0.222, 0.284] \\
 \bottomrule
 \end{tabular}
-\caption{Slope of the future mid-price change, in half-spreads, on order-book imbalance, 21 June 2012. One-second observations: AAPL 18,028, INTC 18,889, MSFT 19,220. Median spread: AAPL 15 ticks, INTC and MSFT one tick. Brackets are 95\% block-bootstrap intervals. Produced by \texttt{paper\_study.calibration}.}
+\caption{Slope of the future mid-price change, in half-spreads, on order-book imbalance, 21 June 2012. Spread is the median quoted spread; observations are one-second grid points. Brackets are 95\% block-bootstrap intervals. Slopes at other horizons for the best level are saved with the results. Produced by \texttt{paper\_study.calibration}.}
 \label{tab:calibration}
 \end{table}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/calibration.pdf}
-\caption{Fitted price response. Left: mean next-second mid move by top-three-level imbalance, in five bins, against the $\kappa = 1$ stress setting (dashed). Right: slope at each horizon with its 95\% block-bootstrap interval.}
+\caption{Fitted price response. Left: mean next-second mid move by top-three-level imbalance, in five bins; the three wide-spread stocks overlap near zero. The dashed line is the $\kappa = 1$ stress setting. Right: slope at each horizon with its 95\% block-bootstrap interval.}
 \label{fig:calibration}
 \end{figure}
 
-The two kinds of stock differ sharply. For AAPL, depth beyond the best quotes has no detectable one-second effect, and at five and ten seconds its sign reverses. For INTC and MSFT, imbalance predicts the next move strongly: the one-second slope is 0.35 and 0.48 half-spreads per unit of imbalance, about a third to a half of the $\kappa = 1$ stress setting, and it grows with the horizon to about two half-spreads at ten seconds. The one-second fit is therefore conservative for the simulator, whose 180-second detector window and multi-second schedules give the response more time to act. These are predictive regressions on three stocks on one day; displayed orders that are not intended to trade may move prices less than organic depth, and the regressions do not identify the causal effect of one trader's orders.
+The stocks split by tick size. For the three wide-spread stocks, the top-three-level slope is at most 0.032 half-spreads per unit of imbalance at one second and at most 0.069 at any horizon; for AAPL the sign reverses at five and ten seconds. For INTC and MSFT, imbalance predicts the next move strongly: the one-second slope is 0.35 and 0.48 half-spreads per unit of imbalance, about a third to a half of the $\kappa = 1$ stress setting, and it grows with the horizon to about two half-spreads at ten seconds. The one-second fit is therefore conservative for the simulator, whose 180-second detector window and multi-second schedules give the response more time to act. These are predictive regressions on five stocks on one day; displayed orders that are not intended to trade may move prices less than organic depth, and the regressions do not identify the causal effect of one trader's orders.
 
 \begin{table}[htbp]
 \centering
