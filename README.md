@@ -89,6 +89,8 @@ The saved results the paper relies on are:
 | `results/lobster-calibration-v1` | derived | Imbalance-to-price slopes fitted to the five LOBSTER samples (AAPL, AMZN, GOOG, INTC, MSFT) (data not included) |
 | `results/execution-quality-v1` | 6,000 | Fill rate, shortfall, edge, markout and inventory of the legitimate scripts under each control |
 | `results/abides-check-v1` | 200 ABIDES sessions | Split-display gain in the ABIDES RMSC04 market (needs ABIDES installed) |
+| `results/baselines-v1` | ~11,000 | Order-to-trade ratio and learned detector; adaptive search against all detectors |
+| `results/adversary-budget-v1` | ~90,000 | Nine key searches repeated with 3x budget and 200 held-out seeds |
 | `results/agent-phase2-mock-v1` | 128 | Software check of the LLM runner with scripted mock policies (no LLM calls) |
 
 ## Reproducing the results
