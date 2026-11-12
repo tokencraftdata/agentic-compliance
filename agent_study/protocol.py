@@ -86,7 +86,7 @@ def validate(plan):
                 raise ValueError('unknown mock policy')
         elif model.get('provider') == 'anthropic':
             fields={'provider','id','max_input_tokens','input_usd_per_million','output_usd_per_million','pricing_checked_on','pricing_source'}
-            if set(model)!=fields or not isinstance(model['id'],str) or not model['id'] or 'latest' in model['id']:
+            if set(model) not in (fields, fields|{'thinking'}) or model.get('thinking', 'disabled') not in ('disabled','between_tools') or not isinstance(model['id'],str) or not model['id'] or 'latest' in model['id']:
                 raise ValueError('configure an exact provider-returned model ID and prices')
             if type(model['max_input_tokens']) is not int or model['max_input_tokens'] <= 0:
                 raise ValueError('verified context limit required')

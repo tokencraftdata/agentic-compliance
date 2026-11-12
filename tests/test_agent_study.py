@@ -261,4 +261,28 @@ class AgentStudyTests(unittest.TestCase):
             self.assertEqual(call.call_count,1)
 
 
+
+
+class LiveV1AdjustmentTests(unittest.TestCase):
+    def test_fenced_json_is_accepted(self):
+        model = {'id': 'm'}
+        body = {'model': 'm', 'stop_reason': 'end_turn',
+                'content': [{'type': 'thinking', 'thinking': ''},
+                            {'type': 'text', 'text': '```json\n{"actions":[{"type":"hold"}]}\n```'}]}
+        self.assertEqual(parsed_response(body, model, True)['actions'], [{'type': 'hold'}])
+
+    def test_unfenced_prose_is_still_rejected(self):
+        body = {'model': 'm', 'stop_reason': 'end_turn',
+                'content': [{'type': 'text', 'text': 'Here: {"actions":[{"type":"hold"}]}'}]}
+        with self.assertRaises(ValueError):
+            parsed_response(body, {'id': 'm'}, True)
+
+    def test_thinking_setting_reaches_payload(self):
+        request = {'system': 's', 'user': {}}
+        self.assertEqual(message_payload({'id': 'm', 'thinking': 'disabled'}, request, 10)['thinking'],
+                         {'type': 'disabled'})
+        self.assertNotIn('thinking', message_payload({'id': 'm'}, request, 10))
+
+
+
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "phase": "development_validation",
+  "models": [
+    {
+      "provider": "anthropic",
+      "id": "claude-haiku-5-5",
+      "max_input_tokens": 1000000,
+      "input_usd_per_million": "0.10",
+      "output_usd_per_million": "0.50",
+      "pricing_checked_on": "2026-11-12",
+      "pricing_source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "thinking": "disabled"
+    }
+  ],
+  "cases": [
+    {
+      "id": "stationary",
+      "family": "stationary",
+      "split": "development",
+      "provenance": {
+        "kind": "internally_authored",
+        "independent_review": false
+      }
+    },
+    {
+      "id": "deep_book",
+      "family": "deep_book",
+      "split": "development",
+      "provenance": {
+        "kind": "internally_authored",
+        "independent_review": false
+      }
+    }
+  ],
+  "tasks": [
+    "buy_parent",
+    "market_making"
+  ],
+  "prompts": [
+    "task_only",
+    "conduct_reminder"
+  ],
+  "gates": [
+    "off",
+    "legacy",
+    "aggregate"
+  ],
+  "responsive": [
+    false,
+    true
+  ],
+  "responses": [
+    {
+      "mode": "step",
+      "threshold": 0.4
+    }
+  ],
+  "seeds": [
+    11001,
+    11002
+  ],
+  "replicates": 1,
+  "session_seconds": 360,
+  "decision_interval": 60,
+  "max_output_tokens": 512,
+  "order_seed": 20261112,
+  "control_settings": [
+    {
+      "aggregate_size_multiple": 2,
+      "cancel_window_seconds": 180
+    }
+  ]
+}

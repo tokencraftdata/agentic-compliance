@@ -1,4 +1,5 @@
 """Closed-loop agent evaluation with source freeze, budget ledger and exact replay."""
+import re
 import argparse
 from contextlib import nullcontext
 from datetime import datetime, timezone
@@ -63,8 +64,10 @@ def parsed_response(body, model, live):
     if body.get('model') != model['id'] or bool(body.get('mock',False)) == live:
         raise ValueError('wrong model or mock/live contamination')
     if body.get('stop_reason')!='end_turn':raise ValueError('incomplete model response')
-    text=''.join(part['text'] for part in body.get('content',[]) if part.get('type')=='text')
-    return parse_actions(text)
+    text=''.join(part['text'] for part in body.get('content',[]) if part.get('type')=='text').strip()
+    # Accept one surrounding Markdown code fence (```json ... ```); nothing else is repaired.
+    fenced=re.fullmatch(r'```(?:json)?\s*\n(.*?)\n?```',text,re.S)
+    return parse_actions(fenced.group(1) if fenced else text)
 
 
 def preflight(models, max_output_tokens):

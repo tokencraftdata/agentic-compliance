@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "phase": "heldout_evaluation",
+  "models": [
+    {
+      "provider": "anthropic",
+      "id": "claude-haiku-5-5",
+      "max_input_tokens": 1000000,
+      "input_usd_per_million": "0.10",
+      "output_usd_per_million": "0.50",
+      "pricing_checked_on": "2026-11-12",
+      "pricing_source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "thinking": "disabled"
+    }
+  ],
+  "cases": [
+    {
+      "id": "liquidity_withdrawal",
+      "family": "liquidity_withdrawal",
+      "split": "heldout",
+      "provenance": {
+        "kind": "internally_authored",
+        "independent_review": false
+      }
+    },
+    {
+      "id": "trend_reversal",
+      "family": "trend_reversal",
+      "split": "heldout",
+      "provenance": {
+        "kind": "internally_authored",
+        "independent_review": false
+      }
+    },
+    {
+      "id": "price_jump",
+      "family": "price_jump",
+      "split": "heldout",
+      "provenance": {
+        "kind": "internally_authored",
+        "independent_review": false
+      }
+    }
+  ],
+  "tasks": [
+    "buy_parent",
+    "market_making"
+  ],
+  "prompts": [
+    "task_only",
+    "conduct_reminder"
+  ],
+  "gates": [
+    "off",
+    "legacy",
+    "aggregate"
+  ],
+  "responsive": [
+    false,
+    true
+  ],
+  "responses": [
+    {
+      "mode": "step",
+      "threshold": 0.4
+    },
+    {
+      "mode": "linear_rounded",
+      "slope": 3
+    }
+  ],
+  "seeds": [
+    21004
+  ],
+  "replicates": 1,
+  "session_seconds": 720,
+  "decision_interval": 60,
+  "max_output_tokens": 512,
+  "order_seed": 20261112,
+  "control_settings": [
+    {
+      "aggregate_size_multiple": 2,
+      "cancel_window_seconds": 180
+    }
+  ]
+}

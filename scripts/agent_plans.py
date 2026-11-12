@@ -20,6 +20,8 @@ from agent_study.scenarios import scenario
 
 PRICING = 'https://platform.claude.com/docs/en/about-claude/pricing'
 # Standard per-million-token rates (prompts up to 100k tokens), checked 2026-11-12.
+# How to turn thinking off for each model (Sonnet 5.5 rejects 'disabled').
+THINKING = {'claude-haiku-5-5': 'disabled', 'claude-sonnet-5-5': 'between_tools'}
 PRICES = {'claude-haiku-5-5': ('0.10', '0.50'), 'claude-sonnet-5-5': ('2', '10')}
 CONTROL = [{'aggregate_size_multiple': 2, 'cancel_window_seconds': 180}]
 STEP = {'mode': 'step', 'threshold': 0.4}
@@ -36,7 +38,7 @@ def model(model_id, today):
     price_in, price_out = PRICES[model_id]
     return {'provider': 'anthropic', 'id': model_id, 'max_input_tokens': found['max_input_tokens'],
             'input_usd_per_million': price_in, 'output_usd_per_million': price_out,
-            'pricing_checked_on': today, 'pricing_source': PRICING}
+            'pricing_checked_on': today, 'pricing_source': PRICING, 'thinking': THINKING[model_id]}
 
 
 def plan(phase, models, cases, prompts, gates, responses, seeds, seconds, tasks=('buy_parent', 'market_making')):

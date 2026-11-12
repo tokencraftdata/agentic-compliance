@@ -30,6 +30,12 @@ settles. Per-shard caps therefore cover at least one reservation.
 - Python 3.9.6 (`uv python install 3.9.6`), the interpreter of the existing evidence.
 - The key is read from `TG_ANTHROPIC_API_KEY`, falling back to `ANTHROPIC_API_KEY`.
   The base URL is fixed at `https://api.anthropic.com`; `ANTHROPIC_BASE_URL` is ignored.
+- Thinking is turned off for every decision call: Haiku 5.5 with `thinking: disabled`,
+  Sonnet 5.5 with `thinking: between_tools` (Sonnet 5.5 rejects `disabled`; no tools are
+  sent, so it does not think). Each plan's model entry records this, so it is frozen.
+  The first stage 1 run, with default thinking, had 36 of 48 replies unusable (thinking
+  used up the 512-token limit, or JSON came wrapped in a Markdown fence). It is kept as
+  `1-dev-check-attempt1`. The runner now also accepts one surrounding code fence.
 - HTTP 429 and 529 are retried up to six times with backoff; they are not billed.
   Every other provider failure stops the shard and keeps its reservation.
 

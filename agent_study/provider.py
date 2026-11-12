@@ -63,9 +63,16 @@ def api(path, payload=None, sleep=time.sleep):
 
 
 def message_payload(model, request, max_output_tokens):
-    return {'model': model['id'], 'max_tokens': max_output_tokens,
-            'system': request['system'],
-            'messages': [{'role': 'user', 'content': json.dumps(request['user'], sort_keys=True)}]}
+    payload = {'model': model['id'], 'max_tokens': max_output_tokens,
+               'system': request['system'],
+               'messages': [{'role': 'user', 'content': json.dumps(request['user'], sort_keys=True)}]}
+    # Haiku 5.5 and Sonnet 5.5 think by default, which can exhaust the output
+    # budget before any answer. The frozen model entry says how to turn it off:
+    # 'disabled' (Haiku 5.5) or 'between_tools' (Sonnet 5.5; no tools are sent,
+    # so the model does not think).
+    if model.get('thinking'):
+        payload['thinking'] = {'type': model['thinking']}
+    return payload
 
 
 def infer(model, request, max_output_tokens):
