@@ -43,7 +43,7 @@ class AdversaryTests(unittest.TestCase):
         self.assertEqual(m.response_inputs[-1][2], 0)
 
     def test_unresponsive_market_never_shifts(self):
-        cfg = A.config_for(BASE, A.lookup(A.CONTROLS, 'none'), A.lookup(A.RESPONSES, 'linear_k2'), False)
+        cfg = A.config_for(BASE, A.lookup(A.CONTROLS, 'none'), A.lookup(A.RESPONSES, 'linear_k1'), False)
         m = A.run_script(A.ResponseMarket(cfg, 9000, False, 'off'), 'split_6x10', cfg)
         self.assertTrue(all(shift == 0 for _, _, shift in m.response_inputs))
 

@@ -62,11 +62,12 @@ RESPONSES = [
     {'name': 'step_t0.4', 'mode': 'step', 'threshold': 0.4},
     {'name': 'step_t0.2', 'mode': 'step', 'threshold': 0.2},
     {'name': 'linear_k1', 'mode': 'linear', 'kappa': 1, 'scale': 1.0},
-    {'name': 'linear_k2', 'mode': 'linear', 'kappa': 2, 'scale': 1.0},
-    # Upper end of the 95% block-bootstrap interval for the one-second slope of the mid-price
-    # change (in half-spreads) on three-level imbalance, AAPL 2012-06-21
-    # (results/lobster-calibration-v1/calibration.json). The point estimate, 0.018, is weaker.
-    {'name': 'fitted_aapl_upper', 'mode': 'linear', 'kappa': 1, 'scale': 0.0386},
+    # One-second slope of the mid-price change (in half-spreads) on three-level imbalance,
+    # fitted by paper_study.calibration to the LOBSTER samples for 21 June 2012
+    # (results/lobster-calibration-v1/<TICKER>/calibration.json), point estimates.
+    {'name': 'fitted_aapl', 'mode': 'linear', 'kappa': 1, 'scale': 0.017851},
+    {'name': 'fitted_intc', 'mode': 'linear', 'kappa': 1, 'scale': 0.347866},
+    {'name': 'fitted_msft', 'mode': 'linear', 'kappa': 1, 'scale': 0.478911},
 ]
 SPEC = {
     'status': 'Exploratory; search budget, seeds and analysis fixed in this plan before running',
