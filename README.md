@@ -92,6 +92,6 @@ More: [version history](docs/changelog.md), [workflow guide](docs/tradegauntlet.
 
 ## Citation and license
 
-> Sandip Nandi. *TradeGauntlet: Testing the Limits of Trading Compliance Controls.* Preprint, 2026.
+> Sandip Nandi, Aishwarya Bose, Apurba Bose, and Soovadeep Bakshi. *TradeGauntlet: Testing the Limits of Trading Compliance Controls.* Preprint, 2026.
 
 Code and data are released under the [MIT License](LICENSE).
