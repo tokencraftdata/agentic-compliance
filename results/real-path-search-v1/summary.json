@@ -1,0 +1,916 @@
+{
+  "cells": [
+    {
+      "ticker": "MSFT",
+      "response": "fitted_msft",
+      "control": "none",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 2.64,
+        "D_ci95": [
+          0.701667,
+          6.053333
+        ],
+        "positive_D": 13,
+        "alerts": 3,
+        "positive_D_no_alert": 12,
+        "mean_filled_lots": 34.4
+      },
+      "synthetic_policy": {
+        "mean_D": 2.666667,
+        "D_ci95": [
+          2.0,
+          3.4
+        ],
+        "positive_D": 24,
+        "alerts": 17,
+        "positive_D_no_alert": 12,
+        "mean_filled_lots": 26.533333
+      },
+      "difference_mean_D": -0.026667,
+      "difference_D_ci95": [
+        -2.13,
+        3.415
+      ],
+      "difference_alerts": -14,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 5,
+            "lots_total": 30,
+            "price_spread_ticks": 5,
+            "submission_gap_s": 1,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 1
+          },
+          "train_score": 1.0,
+          "evaluations": 51
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 6,
+            "lots_total": 80,
+            "price_spread_ticks": 4,
+            "submission_gap_s": 30,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 60
+          },
+          "train_score": 0.2,
+          "evaluations": 59
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 2,
+            "lots_total": 30,
+            "price_spread_ticks": 4,
+            "submission_gap_s": 1,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 0
+          },
+          "train_score": 2.8,
+          "evaluations": 51
+        }
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "response": "fitted_msft",
+      "control": "legacy",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 9.633333,
+        "D_ci95": [
+          1.6,
+          22.233333
+        ],
+        "positive_D": 19,
+        "alerts": 3,
+        "positive_D_no_alert": 18,
+        "mean_filled_lots": 57.8
+      },
+      "synthetic_policy": {
+        "mean_D": 8.093333,
+        "D_ci95": [
+          1.273333,
+          17.863333
+        ],
+        "positive_D": 22,
+        "alerts": 0,
+        "positive_D_no_alert": 22,
+        "mean_filled_lots": 59.033333
+      },
+      "difference_mean_D": 1.54,
+      "difference_D_ci95": [
+        -12.135,
+        16.61
+      ],
+      "difference_alerts": 3,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 4,
+            "lots_total": 80,
+            "price_spread_ticks": 2,
+            "submission_gap_s": 0,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 1
+          },
+          "train_score": 16.15,
+          "evaluations": 58
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 8,
+            "lots_total": 30,
+            "price_spread_ticks": 2,
+            "submission_gap_s": 1,
+            "lifetime_overlap": "staggered",
+            "execution_delay_s": 5
+          },
+          "train_score": 3.305,
+          "evaluations": 58
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 5,
+            "lots_total": 80,
+            "price_spread_ticks": 3,
+            "submission_gap_s": 30,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 90
+          },
+          "train_score": 27.84,
+          "evaluations": 49
+        }
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "response": "fitted_msft",
+      "control": "aggregate_2x",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 4.41,
+        "D_ci95": [
+          0.333333,
+          11.178333
+        ],
+        "positive_D": 7,
+        "alerts": 0,
+        "positive_D_no_alert": 7,
+        "mean_filled_lots": 43.733333
+      },
+      "synthetic_policy": {
+        "mean_D": 2.6,
+        "D_ci95": [
+          1.933333,
+          3.333333
+        ],
+        "positive_D": 24,
+        "alerts": 0,
+        "positive_D_no_alert": 24,
+        "mean_filled_lots": 23.833333
+      },
+      "difference_mean_D": 1.81,
+      "difference_D_ci95": [
+        -2.361667,
+        8.76
+      ],
+      "difference_alerts": 0,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 4,
+            "lots_total": 60,
+            "price_spread_ticks": 1,
+            "submission_gap_s": 5,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 40
+          },
+          "train_score": 16.2575,
+          "evaluations": 58
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 7,
+            "lots_total": 60,
+            "price_spread_ticks": 4,
+            "submission_gap_s": 5,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 20
+          },
+          "train_score": 10.0675,
+          "evaluations": 64
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 6,
+            "lots_total": 40,
+            "price_spread_ticks": 0,
+            "submission_gap_s": 10,
+            "lifetime_overlap": "staggered",
+            "execution_delay_s": 40
+          },
+          "train_score": 17.955,
+          "evaluations": 50
+        }
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "response": "fitted_msft",
+      "control": "aggregate_1x",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": -0.168333,
+        "D_ci95": [
+          -2.543333,
+          1.238333
+        ],
+        "positive_D": 11,
+        "alerts": 0,
+        "positive_D_no_alert": 11,
+        "mean_filled_lots": 28.733333
+      },
+      "synthetic_policy": {
+        "mean_D": 3.053333,
+        "D_ci95": [
+          0.993333,
+          5.706667
+        ],
+        "positive_D": 14,
+        "alerts": 0,
+        "positive_D_no_alert": 14,
+        "mean_filled_lots": 46.333333
+      },
+      "difference_mean_D": -3.221667,
+      "difference_D_ci95": [
+        -6.821667,
+        -0.291667
+      ],
+      "difference_alerts": 0,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 2,
+            "lots_total": 20,
+            "price_spread_ticks": 1,
+            "submission_gap_s": 1,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 20
+          },
+          "train_score": 23.4975,
+          "evaluations": 56
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 8,
+            "lots_total": 80,
+            "price_spread_ticks": 4,
+            "submission_gap_s": 0,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 5
+          },
+          "train_score": 1.8475,
+          "evaluations": 55
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 6,
+            "lots_total": 30,
+            "price_spread_ticks": 0,
+            "submission_gap_s": 5,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 90
+          },
+          "train_score": 3.96,
+          "evaluations": 53
+        }
+      ]
+    },
+    {
+      "ticker": "INTC",
+      "response": "fitted_intc",
+      "control": "none",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": -5.983333,
+        "D_ci95": [
+          -21.95,
+          2.4
+        ],
+        "positive_D": 13,
+        "alerts": 3,
+        "positive_D_no_alert": 12,
+        "mean_filled_lots": 23.366667
+      },
+      "synthetic_policy": {
+        "mean_D": 2.461667,
+        "D_ci95": [
+          -0.665,
+          5.99
+        ],
+        "positive_D": 19,
+        "alerts": 23,
+        "positive_D_no_alert": 5,
+        "mean_filled_lots": 36.1
+      },
+      "difference_mean_D": -8.445,
+      "difference_D_ci95": [
+        -23.263333,
+        0.095
+      ],
+      "difference_alerts": -20,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 3,
+            "lots_total": 50,
+            "price_spread_ticks": 5,
+            "submission_gap_s": 2,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 1
+          },
+          "train_score": 2.105,
+          "evaluations": 61
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 4,
+            "lots_total": 80,
+            "price_spread_ticks": 2,
+            "submission_gap_s": 0,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 1
+          },
+          "train_score": 1.425,
+          "evaluations": 65
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 7,
+            "lots_total": 20,
+            "price_spread_ticks": 3,
+            "submission_gap_s": 30,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 60
+          },
+          "train_score": 0.0,
+          "evaluations": 52
+        }
+      ]
+    },
+    {
+      "ticker": "INTC",
+      "response": "fitted_intc",
+      "control": "legacy",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 3.8,
+        "D_ci95": [
+          1.003333,
+          7.375
+        ],
+        "positive_D": 15,
+        "alerts": 0,
+        "positive_D_no_alert": 15,
+        "mean_filled_lots": 39.566667
+      },
+      "synthetic_policy": {
+        "mean_D": 2.333333,
+        "D_ci95": [
+          1.453333,
+          3.401667
+        ],
+        "positive_D": 20,
+        "alerts": 0,
+        "positive_D_no_alert": 20,
+        "mean_filled_lots": 41.866667
+      },
+      "difference_mean_D": 1.466667,
+      "difference_D_ci95": [
+        -1.661667,
+        5.421667
+      ],
+      "difference_alerts": 0,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 8,
+            "lots_total": 70,
+            "price_spread_ticks": 4,
+            "submission_gap_s": 0,
+            "lifetime_overlap": "staggered",
+            "execution_delay_s": 10
+          },
+          "train_score": 6.3275,
+          "evaluations": 56
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 4,
+            "lots_total": 80,
+            "price_spread_ticks": 2,
+            "submission_gap_s": 5,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 40
+          },
+          "train_score": 8.325,
+          "evaluations": 59
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 5,
+            "lots_total": 80,
+            "price_spread_ticks": 1,
+            "submission_gap_s": 2,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 20
+          },
+          "train_score": 88.7525,
+          "evaluations": 56
+        }
+      ]
+    },
+    {
+      "ticker": "INTC",
+      "response": "fitted_intc",
+      "control": "aggregate_2x",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 1.933333,
+        "D_ci95": [
+          1.266667,
+          2.6
+        ],
+        "positive_D": 19,
+        "alerts": 0,
+        "positive_D_no_alert": 19,
+        "mean_filled_lots": 55.866667
+      },
+      "synthetic_policy": {
+        "mean_D": 1.401667,
+        "D_ci95": [
+          0.866667,
+          2.003333
+        ],
+        "positive_D": 17,
+        "alerts": 0,
+        "positive_D_no_alert": 17,
+        "mean_filled_lots": 26.133333
+      },
+      "difference_mean_D": 0.531667,
+      "difference_D_ci95": [
+        -0.468333,
+        1.531667
+      ],
+      "difference_alerts": 0,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 8,
+            "lots_total": 50,
+            "price_spread_ticks": 4,
+            "submission_gap_s": 1,
+            "lifetime_overlap": "staggered",
+            "execution_delay_s": 0
+          },
+          "train_score": 3.2075,
+          "evaluations": 52
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 2,
+            "lots_total": 40,
+            "price_spread_ticks": 3,
+            "submission_gap_s": 10,
+            "lifetime_overlap": "staggered",
+            "execution_delay_s": 10
+          },
+          "train_score": 4.3925,
+          "evaluations": 58
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 3,
+            "lots_total": 60,
+            "price_spread_ticks": 0,
+            "submission_gap_s": 20,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 5
+          },
+          "train_score": 4.6075,
+          "evaluations": 60
+        }
+      ]
+    },
+    {
+      "ticker": "INTC",
+      "response": "fitted_intc",
+      "control": "aggregate_1x",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 0.665,
+        "D_ci95": [
+          -0.275,
+          1.463333
+        ],
+        "positive_D": 12,
+        "alerts": 0,
+        "positive_D_no_alert": 12,
+        "mean_filled_lots": 30.3
+      },
+      "synthetic_policy": {
+        "mean_D": -0.34,
+        "D_ci95": [
+          -2.413333,
+          0.866667
+        ],
+        "positive_D": 9,
+        "alerts": 0,
+        "positive_D_no_alert": 9,
+        "mean_filled_lots": 26.133333
+      },
+      "difference_mean_D": 1.005,
+      "difference_D_ci95": [
+        -0.67,
+        3.28
+      ],
+      "difference_alerts": 0,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 7,
+            "lots_total": 70,
+            "price_spread_ticks": 3,
+            "submission_gap_s": 0,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 2
+          },
+          "train_score": 4.19,
+          "evaluations": 50
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 8,
+            "lots_total": 80,
+            "price_spread_ticks": 2,
+            "submission_gap_s": 0,
+            "lifetime_overlap": "staggered",
+            "execution_delay_s": 20
+          },
+          "train_score": 5.63,
+          "evaluations": 50
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 8,
+            "lots_total": 80,
+            "price_spread_ticks": 0,
+            "submission_gap_s": 0,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 5
+          },
+          "train_score": 2.995,
+          "evaluations": 48
+        }
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "response": "linear_k1",
+      "control": "none",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 2.701667,
+        "D_ci95": [
+          1.835,
+          3.635
+        ],
+        "positive_D": 21,
+        "alerts": 4,
+        "positive_D_no_alert": 19,
+        "mean_filled_lots": 18.7
+      },
+      "synthetic_policy": {
+        "mean_D": 9.733333,
+        "D_ci95": [
+          8.733333,
+          10.733333
+        ],
+        "positive_D": 30,
+        "alerts": 16,
+        "positive_D_no_alert": 14,
+        "mean_filled_lots": 24
+      },
+      "difference_mean_D": -7.031667,
+      "difference_D_ci95": [
+        -8.466667,
+        -5.631667
+      ],
+      "difference_alerts": -12,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 5,
+            "lots_total": 50,
+            "price_spread_ticks": 4,
+            "submission_gap_s": 0,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 1
+          },
+          "train_score": 5.8575,
+          "evaluations": 60
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 7,
+            "lots_total": 10,
+            "price_spread_ticks": 5,
+            "submission_gap_s": 30,
+            "lifetime_overlap": "staggered",
+            "execution_delay_s": 10
+          },
+          "train_score": 0.4,
+          "evaluations": 53
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 6,
+            "lots_total": 60,
+            "price_spread_ticks": 5,
+            "submission_gap_s": 1,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 1
+          },
+          "train_score": 4.925,
+          "evaluations": 55
+        }
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "response": "linear_k1",
+      "control": "legacy",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 6.7,
+        "D_ci95": [
+          -1.288333,
+          18.94
+        ],
+        "positive_D": 21,
+        "alerts": 0,
+        "positive_D_no_alert": 21,
+        "mean_filled_lots": 46.533333
+      },
+      "synthetic_policy": {
+        "mean_D": 7.225,
+        "D_ci95": [
+          5.126667,
+          9.39
+        ],
+        "positive_D": 28,
+        "alerts": 4,
+        "positive_D_no_alert": 24,
+        "mean_filled_lots": 29.633333
+      },
+      "difference_mean_D": -0.525,
+      "difference_D_ci95": [
+        -9.55,
+        11.955
+      ],
+      "difference_alerts": -4,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 3,
+            "lots_total": 60,
+            "price_spread_ticks": 1,
+            "submission_gap_s": 10,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 0
+          },
+          "train_score": 32.695,
+          "evaluations": 59
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 7,
+            "lots_total": 80,
+            "price_spread_ticks": 3,
+            "submission_gap_s": 5,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 5
+          },
+          "train_score": 29.5025,
+          "evaluations": 50
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 8,
+            "lots_total": 50,
+            "price_spread_ticks": 5,
+            "submission_gap_s": 2,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 0
+          },
+          "train_score": 23.3025,
+          "evaluations": 59
+        }
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "response": "linear_k1",
+      "control": "aggregate_2x",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 1.6,
+        "D_ci95": [
+          -0.266667,
+          3.066667
+        ],
+        "positive_D": 18,
+        "alerts": 0,
+        "positive_D_no_alert": 18,
+        "mean_filled_lots": 42.1
+      },
+      "synthetic_policy": {
+        "mean_D": 5.036667,
+        "D_ci95": [
+          -2.043333,
+          11.893333
+        ],
+        "positive_D": 24,
+        "alerts": 0,
+        "positive_D_no_alert": 24,
+        "mean_filled_lots": 32.466667
+      },
+      "difference_mean_D": -3.436667,
+      "difference_D_ci95": [
+        -9.856667,
+        3.6
+      ],
+      "difference_alerts": 0,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 3,
+            "lots_total": 60,
+            "price_spread_ticks": 0,
+            "submission_gap_s": 20,
+            "lifetime_overlap": "staggered",
+            "execution_delay_s": 60
+          },
+          "train_score": 40.6175,
+          "evaluations": 60
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 8,
+            "lots_total": 80,
+            "price_spread_ticks": 1,
+            "submission_gap_s": 1,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 1
+          },
+          "train_score": 13.585,
+          "evaluations": 54
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 6,
+            "lots_total": 80,
+            "price_spread_ticks": 0,
+            "submission_gap_s": 1,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 20
+          },
+          "train_score": 25.6675,
+          "evaluations": 55
+        }
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "response": "linear_k1",
+      "control": "aggregate_1x",
+      "windows": 30,
+      "real_path_policy": {
+        "mean_D": 2.838333,
+        "D_ci95": [
+          1.971667,
+          3.733333
+        ],
+        "positive_D": 22,
+        "alerts": 0,
+        "positive_D_no_alert": 22,
+        "mean_filled_lots": 39.4
+      },
+      "synthetic_policy": {
+        "mean_D": 3.066667,
+        "D_ci95": [
+          2.333333,
+          3.8
+        ],
+        "positive_D": 26,
+        "alerts": 0,
+        "positive_D_no_alert": 26,
+        "mean_filled_lots": 25.7
+      },
+      "difference_mean_D": -0.228333,
+      "difference_D_ci95": [
+        -1.47,
+        1.02
+      ],
+      "difference_alerts": 0,
+      "fold_policies": [
+        {
+          "fold": 0,
+          "best_params": {
+            "n_orders": 5,
+            "lots_total": 40,
+            "price_spread_ticks": 1,
+            "submission_gap_s": 5,
+            "lifetime_overlap": "disjoint",
+            "execution_delay_s": 20
+          },
+          "train_score": 35.1125,
+          "evaluations": 52
+        },
+        {
+          "fold": 1,
+          "best_params": {
+            "n_orders": 3,
+            "lots_total": 30,
+            "price_spread_ticks": 5,
+            "submission_gap_s": 0,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 0
+          },
+          "train_score": 3.5,
+          "evaluations": 49
+        },
+        {
+          "fold": 2,
+          "best_params": {
+            "n_orders": 7,
+            "lots_total": 30,
+            "price_spread_ticks": 3,
+            "submission_gap_s": 1,
+            "lifetime_overlap": "full",
+            "execution_delay_s": 10
+          },
+          "train_score": 14.725,
+          "evaluations": 59
+        }
+      ]
+    }
+  ],
+  "lobster_sha256": {
+    "INTC": {
+      "message": "199c55b35f6c62f07b058922038c0b8d168bc3be9d2de94da19c901cd3f29927",
+      "orderbook": "6bc4c4dc1e92d78e46d04f9e7914df2d8c2a9231928493e7395a9085e1fc91ab"
+    },
+    "MSFT": {
+      "message": "669e5c35b1eab0f7336fa9ed919002e65b08d2aabd96bb4ae88d647184e7a18d",
+      "orderbook": "ec2f53467cf7bfb00b5702381bea7b4a061bb4c1730454df3679b272b3561c0e"
+    }
+  },
+  "llm_episodes": 0,
+  "inference_scope": "Cross-fitted: each of 30 real-path windows is scored by a policy searched on the other two folds. Bootstrap 95% intervals over windows; one trading day per stock."
+}
