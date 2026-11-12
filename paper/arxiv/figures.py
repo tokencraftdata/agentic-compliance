@@ -128,7 +128,7 @@ def throttle_horizon():
         ax.set_xlim(-0.35, 5.0)
         ax.set_ylim(0, 112)
         ax.set_xlabel('Throttle window (s)')
-        ax.set_title(f'{gate.capitalize()} gate')
+        ax.set_title({'legacy': 'Per-order gate', 'aggregate': 'Aggregate gate'}[gate])
         ax.grid(axis='y', color=GRID, linewidth=0.6)
         ax.set_axisbelow(True)
     axes[0].set_ylabel('Volume, % of ungated')
@@ -223,7 +223,7 @@ def adversary():
     rows = json.loads(path.read_text())['adversary']
     responses = [('linear_k1', r'Stress, $\kappa=1$'), ('fitted_msft', 'Fitted, MSFT'),
                  ('fitted_intc', 'Fitted, INTC'), ('fitted_aapl', 'Fitted, AAPL')]
-    controls = [('none', 'No gate'), ('legacy', 'Legacy gate'), ('aggregate_2x', 'Aggregate cap, $m=2$'),
+    controls = [('none', 'No gate'), ('legacy', 'Per-order gate'), ('aggregate_2x', 'Aggregate cap, $m=2$'),
                 ('aggregate_1x', 'Aggregate cap, $m=1$')]
     fig, ax = plt.subplots(figsize=(TEXT_WIDTH, 2.5))
     for k, ((ctrl, label), color) in enumerate(zip(controls, ORDINAL)):
