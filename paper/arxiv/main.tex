@@ -36,7 +36,7 @@
 \maketitle
 
 \begin{abstract}
-Pre-trade gates and surveillance rules are usually evaluated by counting alerts. We argue that three quantities must be measured separately on matched market paths: whether a rule alerts, whether a gate removes the gain from moving the price, and how much legitimate execution the gate blocks. We build TradeGauntlet, a replayable limit-order-book simulator, and use it in three ways. First, we prove that when a gate and a detector threshold the same quantity, the detector is silent on gated traffic by construction, so zero alerts there measure the gate, not the detector. Second, a seeded search over split-order schedules, selected on training paths and scored on 100 held-out paths, finds alert-free strategies that profit from the simulated price response under every control we test when prices respond smoothly to book imbalance. With a response whose move probability is proportional to imbalance, the best alert-free gain found is 9.78 tick-lots per session with no gate, 6.14 (95\% CI 5.60 to 6.70) under an aggregate size cap, and 3.32 under a stricter cap: the cap reduces the gain but does not remove it. Third, we fit the response to one day of Nasdaq order-book data for AAPL: depth beyond the best quotes has no detectable one-second effect, and even the upper end of its confidence interval leaves gains below one tick-lot. The controls themselves carry costs: the full policy cuts a large market maker's volume by 15.1\% over 100 paths, and a legitimate maker alerts in 39/40 episodes when its quoting interval falls just inside the detector window. All trading is simulated; the results characterise the implemented rules, not real-market detection accuracy.
+Pre-trade gates and surveillance rules are usually evaluated by counting alerts. We argue that three quantities must be measured separately on matched market paths: whether a rule alerts, whether a gate removes the gain from moving the price, and how much legitimate execution the gate blocks. We build TradeGauntlet, a replayable limit-order-book simulator, and use it in three ways. First, we prove that when a gate and a detector threshold the same quantity, the detector is silent on gated traffic by construction, so zero alerts there measure the gate, not the detector. Second, we fit the simulator's price response to Nasdaq order-book data for five stocks. Book imbalance has almost no one-second effect for the three wide-spread stocks (slopes of 0.02 to 0.03 half-spreads) but a strong one for the two one-tick stocks (0.35 and 0.48). Third, a seeded search over split-order schedules, selected on training paths and scored on 100 held-out paths, finds alert-free strategies that profit from the price response under every control we test. Under the one-tick fits, an aggregate size cap at twice reference depth leaves the gain essentially unchanged (2.68 tick-lots per session for MSFT, 95\% CI 2.30 to 3.06, against 2.84 with no gate), and only a cap at reference depth halves it. Meanwhile the full policy cuts a large market maker's volume by 15.1\% over 100 paths, and a legitimate maker alerts in 39/40 episodes when its quoting interval falls just inside the detector window. All trading is simulated; the results characterise the implemented rules, not real-market detection accuracy.
 \end{abstract}
 
 \keywords{trading compliance \and market surveillance \and spoofing \and limit order book simulation \and AI trading agents}
@@ -54,7 +54,7 @@ Our contributions are:
 \item An evaluation method for stacks of trading controls that scores alerts, removed gains, and legitimate execution separately on matched market paths, with exact replay of every episode.
 \item Two propositions showing when an evaluation is uninformative by construction: a detector that shares a threshold with a gate cannot alert on gated traffic (Proposition~\ref{prop:coupling}), and a step response has a closed-form activation boundary in the cap multiple (Proposition~\ref{prop:boundary}).
 \item An adaptive adversary: a seeded search over split-order schedules, selected on training paths and scored on held-out paths with bootstrap confidence intervals, which replaces hand-written counterexamples (Section~\ref{sec:adversary}).
-\item A threshold-free price response and its fit to Nasdaq order-book data, which turns the question of whether a cap protects into a measured quantity rather than an assumed one.
+\item A threshold-free price response fitted to Nasdaq order-book data for five stocks, which turns the question of whether a cap protects into a measured quantity rather than an assumed one. The answer depends on tick size.
 \end{enumerate}
 We also report costs to legitimate traders from the cancellation throttle and a detector-window counterexample on ordinary market making. The simulator makes these interactions inspectable; it does not estimate how often they occur in markets. No experiment uses an LLM; Section~\ref{sec:limitations} describes the pending extension to LLM agents.
 
@@ -337,7 +337,7 @@ For the 180-second maker, the aggregate policy reduces mean volume from 73.80 to
 
 The results so far rest on scripts we wrote and on a response threshold we chose. This section removes both. The runner is \texttt{paper\_study.adversary}; its plan, search logs, held-out episodes, and summary are saved, and a verify command reruns every held-out evaluation and reproduces the summary exactly.
 
-\paragraph{Adversary.} The adversary chooses a split-order schedule from the parameterized family of Section~\ref{sec:design}: the number of orders (2 to 8), total displayed quantity (10 to 80 lots), price spread behind the touch (0 to 5 ticks), submission gaps, lifetime overlap (full, staggered, or disjoint), and the delay before a 2-lot opposite-side execution. Each candidate is scored on 10 training paths by its mean response-dependent difference $D$ minus 100 times its fraction of episodes with a conduct alert, so any alert-prone schedule loses. The search draws 40 random candidates and then makes 40 single-parameter local moves, keeping improvements. The selected schedule is then scored on 100 held-out paths that the search never saw. Searches run separately for each of four control settings (no gate; legacy; aggregate cap at $m = 2$; aggregate cap at $m = 1$) and five responses, with the cancellation throttle on.
+\paragraph{Adversary.} The adversary chooses a split-order schedule from the parameterized family of Section~\ref{sec:design}: the number of orders (2 to 8), total displayed quantity (10 to 80 lots), price spread behind the touch (0 to 5 ticks), submission gaps, lifetime overlap (full, staggered, or disjoint), and the delay before a 2-lot opposite-side execution. Each candidate is scored on 10 training paths by its mean response-dependent difference $D$ minus 100 times its fraction of episodes with a conduct alert, so any alert-prone schedule loses. The search draws 40 random candidates and then makes 40 single-parameter local moves, keeping improvements. The selected schedule is then scored on 100 held-out paths that the search never saw. Searches run separately for each of four control settings (no gate; legacy; aggregate cap at $m = 2$; aggregate cap at $m = 1$) and six responses, with the cancellation throttle on: 24 searches in all.
 
 \paragraph{Responses.} Besides the step responses at $t = 0.4$ and $t = 0.2$, we use the linear response of Section~\ref{sec:market} with $\kappa = 1$ as a stress setting, and three fitted settings in which the move probability is $s|I|$ with $s$ estimated from data for one stock.
 
@@ -346,7 +346,7 @@ The results so far rest on scripts we wrote and on a response threshold we chose
 \begin{table}[htbp]
 \centering
 \footnotesize
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{2.5pt}
 \begin{tabular}{lrrllll}
 \toprule
  & \textbf{Spread} & & \multicolumn{3}{c}{\textbf{Top three levels}} & \textbf{Best level} \\
@@ -376,25 +376,38 @@ The stocks split by tick size. For the three wide-spread stocks, the top-three-l
 
 \begin{table}[htbp]
 \centering
-\small
+\footnotesize
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lllll}
 \toprule
-\textbf{Response} & \textbf{No gate} & \textbf{Legacy} & \textbf{Aggregate, m = 2} & \textbf{Aggregate, m = 1} \\
+\textbf{Response} & \textbf{No gate} & \textbf{Legacy} & \textbf{Aggregate, $m = 2$} & \textbf{Aggregate, $m = 1$} \\
 \midrule
-Step, t = 0.4 & 0.00 [0.00, 0.00] & 0.00 [0.00, 0.00] & 0.00 [0.00, 0.00] & 0.00 [0.00, 0.00] \\
-Step, t = 0.2 & 48.00 [48.00, 48.00] & 48.00 [48.00, 48.00] & 48.00 [48.00, 48.00] & 0.00 [0.00, 0.00] \\
+Step, $t = 0.4$ & 0.00 [0.00, 0.00] & 0.00 [0.00, 0.00] & 0.00 [0.00, 0.00] & 0.00 [0.00, 0.00] \\
+Step, $t = 0.2$ & 48.00 [48.00, 48.00] & 48.00 [48.00, 48.00] & 48.00 [48.00, 48.00] & 0.00 [0.00, 0.00] \\
 Linear, $\kappa = 1$ & 9.78 [9.26, 10.30] & 8.24 [7.62, 8.88] & 6.14 [5.60, 6.70] & 3.32 [2.86, 3.80] \\
-Linear, $\kappa = 2$ & 12.28 [11.16, 13.40] & 15.16 [14.08, 16.20] & 12.08 [10.96, 13.24] & 7.32 [6.40, 8.28] \\
-Fitted, AAPL upper & 0.34 [0.20, 0.50] & -0.03 [-0.15, 0.07] & 0.10 [-0.22, 0.36] & 0.12 [0.04, 0.22] \\
+Fitted, MSFT & 2.84 [2.42, 3.28] & 3.14 [2.68, 3.60] & 2.68 [2.30, 3.06] & 1.37 [0.97, 1.76] \\
+Fitted, INTC & 2.00 [1.64, 2.38] & 2.68 [2.26, 3.12] & 2.00 [1.62, 2.38] & 1.10 [0.82, 1.38] \\
+Fitted, AAPL & 0.00 [0.00, 0.00] & 0.12 [0.04, 0.22] & 0.04 [0.00, 0.10] & 0.04 [0.00, 0.10] \\
 \bottomrule
 \end{tabular}
-\caption{Held-out mean D, in tick-lots, of the schedule the search selected for each control and response, over 100 held-out paths (seeds 9100-9199). Brackets are 95\% bootstrap intervals. No held-out episode in any cell raised a conduct alert. Training paths are seeds 9000-9009; the throttle is on.}
+\caption{Held-out mean $D$, in tick-lots per session, of the schedule the search selected for each control and response, over 100 held-out paths (seeds 9100-9199). Brackets are 95\% bootstrap intervals. No held-out episode in any cell raised a conduct alert. Training paths are seeds 9000-9009; the throttle is on.}
 \label{tab:adversary}
 \end{table}
 
-Three results stand out. First, the detectors do not stop a searching adversary. With no gate and the $\kappa = 1$ response, the fixed six-by-ten probe earns 12.06 tick-lots per session (95\% CI 11.38 to 12.72) but alerts on all 100 held-out paths; the searched schedule keeps 9.78, about 81\% of that gain, with no alerts. It places two 40-lot orders, one and five ticks behind the touch, and cancels the first before submitting the second, so the only order live at the execution sits outside the detectors' three-tick distance condition. Second, the aggregate cap reduces but does not remove the gain under a smooth response: at m = 2 the searched schedule earns 6.14, with no alerts and a positive gain on 97 of 100 paths, and the fixed probe with the throttle off earns 6.08 (5.46 to 6.68), also without alerts. Even m = 1 leaves 3.32. Only the step responses produce the all-or-nothing protection of Section~\ref{sec:aggregation}, and Proposition~\ref{prop:boundary} predicts which step cells are zero. Third, under the fitted response every searched gain is below one tick-lot per session, against 9.78 under the $\kappa = 1$ stress setting; the fixed probe earns 0.78 (0.54 to 1.04) with no gate. On data like this sample, the economic case for the aggregate cap is weak, and its legitimate-execution cost matters more.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/adversary.pdf}
+\caption{The data of Table~\ref{tab:adversary} for the smooth responses: held-out gain of the best alert-free schedule found, with 95\% bootstrap intervals, by control. The step responses are omitted; their cells are exactly 0 or 48.}
+\label{fig:adversary}
+\end{figure}
 
-Selection on training paths overstates performance: the legacy-gate schedule under the fitted response scored 0.58 in training and $-0.03$ on held-out paths. The held-out separation is therefore necessary rather than cosmetic.
+Three results stand out. First, the detectors do not stop a searching adversary. With no gate and the $\kappa = 1$ response, the fixed six-by-ten probe earns 12.06 tick-lots per session (95\% CI 11.38 to 12.72) but alerts on all 100 held-out paths; the searched schedule keeps 9.78, about 81\% of that gain, with no alerts. It places two 40-lot orders, one and five ticks behind the touch, and cancels the first before submitting the second, so the only order live at the execution sits outside the detectors' three-tick distance condition. The same holds under the responses fitted to the one-tick stocks: the fixed probe earns 4.32 (INTC) and 5.86 (MSFT) with an alert on every path, and the search finds alert-free schedules earning 2.00 and 2.84.
+
+Second, how much the aggregate cap protects depends on the response, and under the fitted responses it protects little. Under $\kappa = 1$, the cap at $m = 2$ cuts the searched gain from 9.78 to 6.14, and $m = 1$ to 3.32. Under the INTC and MSFT fits, $m = 2$ leaves the searched gain essentially unchanged (2.00 and 2.68, against 2.00 and 2.84 with no gate); only $m = 1$ roughly halves it (1.10 and 1.37). The cap does remove the fixed probe's alerts, but the probe still earns 2.30 (INTC) and 3.04 (MSFT) under the cap with the throttle off, about the gain the search finds. Only the step responses produce the all-or-nothing protection of Section~\ref{sec:aggregation}, and Proposition~\ref{prop:boundary} predicts which step cells are zero.
+
+Third, the size of the gain follows the stock's tick size. Under the AAPL fit, which stands for the three wide-spread stocks, no searched schedule earns more than 0.12 tick-lots per session and the fixed probe earns 0.50 (0.32 to 0.70) with no gate. Under the one-tick fits, the searched gains are 20 to 30\% of the $\kappa = 1$ stress setting, positive on 66 to 80 of 100 held-out paths with no gate or a legacy or $m = 2$ cap, and still positive under $m = 1$.
+
+Selection on training paths overstates performance, and a modest search does not always find the best schedule. Under the INTC fit, the legacy-gate cell exceeds the no-gate cell (2.68 against 2.00): the gate's rejections turn the selected schedule into one the no-gate search did not find. The searched gains are therefore lower bounds, and the held-out separation is necessary rather than cosmetic.
 
 The same plan reran the legitimate-cost comparison with 100 paths (seeds 9200-9299). The full aggregate policy, including the 1,800-second throttle, reduces the large maker's mean volume from 57.87 lots (55.52 to 60.19) to 49.14 (46.74 to 51.65), a 15.1\% loss, consistent with the 14.1\% in Table~\ref{tab:legit}.
 
@@ -418,7 +431,7 @@ The size multiples, cancellation ratios, and time windows are experimental choic
 
 \section{Limitations and the agent study}\label{sec:limitations}
 
-The model has one evaluated account, one instrument, and three replenishing levels; its responses are either stipulated or fitted to a single stock-day. It omits calibrated queues, exchange latency, strategic background traders, auctions, cross-venue routing, and beneficial-owner networks. Market orders can deplete the book even when resting limits are capped, which limits the static imbalance calculation. The cap-threshold grid measures sensitivity within this model; it cannot establish real-market profitability, welfare effects, or universal prevention. The fitted response is a predictive regression on one large-cap, small-tick stock on one day in 2012. It should be repeated across large-tick stocks and dates, and it does not identify the causal effect of a trader's own displayed orders.
+The model has one evaluated account, one instrument, and three replenishing levels; its responses are either stipulated or fitted to five stocks on one day. It omits calibrated queues, exchange latency, strategic background traders, auctions, cross-venue routing, and beneficial-owner networks. Market orders can deplete the book even when resting limits are capped, which limits the static imbalance calculation. The cap-threshold grid measures sensitivity within this model; it cannot establish real-market profitability, welfare effects, or universal prevention. The fitted response is a predictive regression on five Nasdaq stocks on one day in 2012. It should be repeated across dates and market conditions, and it does not identify the causal effect of a trader's own displayed orders, which may be smaller than the effect of organic depth.
 
 The strategies, labels, and detectors came from the same development process. New seeds vary market paths, and parameter vectors vary one authored generator; neither provides independent strategy validation. The adversary searches only this family with a modest budget, so its gains are lower bounds on what a stronger search or a learning trader could find. The detector window was tuned on earlier cases. Sensitivity and boundary settings were then selected in response to observed results. The resulting means and ranges describe these exploratory comparisons, with no population-level accuracy or power claim.
 
@@ -428,7 +441,7 @@ The planned LLM study will assign legitimate execution and market-making tasks, 
 
 \section{Conclusion and availability}
 
-Counting alerts is not enough to evaluate trading controls. A detector that shares a threshold with a gate is silent on gated traffic by construction, and a searching adversary finds alert-free split-order schedules under every control we tested whenever prices respond to displayed depth. Whether an aggregate cap protects depends on how strongly prices respond: under a step response it is all or nothing, under a smooth response it reduces but does not remove the gain, and under a response fitted to AAPL data there is little gain to remove while the throttle still costs a legitimate maker about 15\% of its volume. TradeGauntlet records these interactions as replayable tests, with alerts, response-dependent gains, and legitimate execution assessed separately. Fitting the response across more stocks, testing richer adversaries, and running adaptive LLM traders are the next steps.
+Counting alerts is not enough to evaluate trading controls. A detector that shares a threshold with a gate is silent on gated traffic by construction, and a searching adversary finds alert-free split-order schedules under every control we tested whenever prices respond to displayed depth. Whether they do depends on the stock: in the order-book data, imbalance barely moves wide-spread stocks but clearly moves one-tick stocks. Under the one-tick fits, an aggregate cap at twice reference depth leaves the searched gain essentially intact, while the throttle that accompanies it costs a legitimate maker about 15\% of its volume. TradeGauntlet records these interactions as replayable tests, with alerts, response-dependent gains, and legitimate execution assessed separately. Fitting the response on more days, testing richer adversaries, and running adaptive LLM traders are the next steps.
 
 \subsection{Code and data availability}
 
