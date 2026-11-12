@@ -1,0 +1,2002 @@
+[
+ {
+  "seed": 1,
+  "k": 0,
+  "cash": -5791687,
+  "shares": 158,
+  "fundamental_close": 99937,
+  "cycles": 28,
+  "median_reference_depth": 152.0,
+  "executed_lots": 1064
+ },
+ {
+  "seed": 2,
+  "k": 0,
+  "cash": 16497187,
+  "shares": -65,
+  "fundamental_close": 100017,
+  "cycles": 28,
+  "median_reference_depth": 212.25,
+  "executed_lots": 1337
+ },
+ {
+  "seed": 3,
+  "k": 0,
+  "cash": 12404510,
+  "shares": -24,
+  "fundamental_close": 99959,
+  "cycles": 28,
+  "median_reference_depth": 167.25,
+  "executed_lots": 994
+ },
+ {
+  "seed": 4,
+  "k": 0,
+  "cash": 3193898,
+  "shares": 68,
+  "fundamental_close": 100064,
+  "cycles": 28,
+  "median_reference_depth": 128.75,
+  "executed_lots": 978
+ },
+ {
+  "seed": 5,
+  "k": 0,
+  "cash": 8902702,
+  "shares": 11,
+  "fundamental_close": 99935,
+  "cycles": 28,
+  "median_reference_depth": 133.5,
+  "executed_lots": 903
+ },
+ {
+  "seed": 6,
+  "k": 0,
+  "cash": -2701537,
+  "shares": 127,
+  "fundamental_close": 99997,
+  "cycles": 28,
+  "median_reference_depth": 207.25,
+  "executed_lots": 1271
+ },
+ {
+  "seed": 7,
+  "k": 0,
+  "cash": 20400171,
+  "shares": -104,
+  "fundamental_close": 100031,
+  "cycles": 28,
+  "median_reference_depth": 169.5,
+  "executed_lots": 1186
+ },
+ {
+  "seed": 8,
+  "k": 0,
+  "cash": 41188159,
+  "shares": -312,
+  "fundamental_close": 99964,
+  "cycles": 28,
+  "median_reference_depth": 131.75,
+  "executed_lots": 988
+ },
+ {
+  "seed": 9,
+  "k": 0,
+  "cash": -11591415,
+  "shares": 216,
+  "fundamental_close": 99955,
+  "cycles": 28,
+  "median_reference_depth": 160.5,
+  "executed_lots": 1134
+ },
+ {
+  "seed": 10,
+  "k": 0,
+  "cash": 21795118,
+  "shares": -118,
+  "fundamental_close": 100016,
+  "cycles": 28,
+  "median_reference_depth": 176.25,
+  "executed_lots": 1078
+ },
+ {
+  "seed": 11,
+  "k": 0,
+  "cash": 24400528,
+  "shares": -144,
+  "fundamental_close": 100009,
+  "cycles": 28,
+  "median_reference_depth": 199.75,
+  "executed_lots": 1130
+ },
+ {
+  "seed": 12,
+  "k": 0,
+  "cash": -8905810,
+  "shares": 189,
+  "fundamental_close": 99993,
+  "cycles": 28,
+  "median_reference_depth": 139.25,
+  "executed_lots": 1339
+ },
+ {
+  "seed": 13,
+  "k": 0,
+  "cash": 23100272,
+  "shares": -131,
+  "fundamental_close": 100025,
+  "cycles": 28,
+  "median_reference_depth": 102.5,
+  "executed_lots": 803
+ },
+ {
+  "seed": 14,
+  "k": 0,
+  "cash": 18510536,
+  "shares": -85,
+  "fundamental_close": 100106,
+  "cycles": 28,
+  "median_reference_depth": 123.0,
+  "executed_lots": 1085
+ },
+ {
+  "seed": 15,
+  "k": 0,
+  "cash": 14994674,
+  "shares": -50,
+  "fundamental_close": 99924,
+  "cycles": 28,
+  "median_reference_depth": 140.75,
+  "executed_lots": 896
+ },
+ {
+  "seed": 16,
+  "k": 0,
+  "cash": -9000618,
+  "shares": 190,
+  "fundamental_close": 99923,
+  "cycles": 28,
+  "median_reference_depth": 173.25,
+  "executed_lots": 958
+ },
+ {
+  "seed": 17,
+  "k": 0,
+  "cash": 10202356,
+  "shares": -2,
+  "fundamental_close": 100101,
+  "cycles": 28,
+  "median_reference_depth": 178.5,
+  "executed_lots": 1118
+ },
+ {
+  "seed": 18,
+  "k": 0,
+  "cash": 35003059,
+  "shares": -250,
+  "fundamental_close": 100014,
+  "cycles": 28,
+  "median_reference_depth": 188.75,
+  "executed_lots": 1190
+ },
+ {
+  "seed": 19,
+  "k": 0,
+  "cash": 15896025,
+  "shares": -59,
+  "fundamental_close": 99887,
+  "cycles": 28,
+  "median_reference_depth": 132.0,
+  "executed_lots": 871
+ },
+ {
+  "seed": 20,
+  "k": 0,
+  "cash": 19597809,
+  "shares": -96,
+  "fundamental_close": 99916,
+  "cycles": 28,
+  "median_reference_depth": 158.5,
+  "executed_lots": 1220
+ },
+ {
+  "seed": 21,
+  "k": 0,
+  "cash": 18301792,
+  "shares": -83,
+  "fundamental_close": 100044,
+  "cycles": 28,
+  "median_reference_depth": 165.5,
+  "executed_lots": 1247
+ },
+ {
+  "seed": 22,
+  "k": 0,
+  "cash": 14598552,
+  "shares": -46,
+  "fundamental_close": 100013,
+  "cycles": 28,
+  "median_reference_depth": 153.75,
+  "executed_lots": 1046
+ },
+ {
+  "seed": 23,
+  "k": 0,
+  "cash": -18099095,
+  "shares": 281,
+  "fundamental_close": 99983,
+  "cycles": 28,
+  "median_reference_depth": 179.5,
+  "executed_lots": 1287
+ },
+ {
+  "seed": 24,
+  "k": 0,
+  "cash": 12600954,
+  "shares": -26,
+  "fundamental_close": 100045,
+  "cycles": 28,
+  "median_reference_depth": 204.25,
+  "executed_lots": 1296
+ },
+ {
+  "seed": 25,
+  "k": 0,
+  "cash": 1485062,
+  "shares": 85,
+  "fundamental_close": 100125,
+  "cycles": 28,
+  "median_reference_depth": 174.5,
+  "executed_lots": 1151
+ },
+ {
+  "seed": 26,
+  "k": 0,
+  "cash": -7690528,
+  "shares": 177,
+  "fundamental_close": 99990,
+  "cycles": 28,
+  "median_reference_depth": 186.5,
+  "executed_lots": 1221
+ },
+ {
+  "seed": 27,
+  "k": 0,
+  "cash": 25998372,
+  "shares": -160,
+  "fundamental_close": 99998,
+  "cycles": 28,
+  "median_reference_depth": 146.0,
+  "executed_lots": 1042
+ },
+ {
+  "seed": 28,
+  "k": 0,
+  "cash": 1902996,
+  "shares": 81,
+  "fundamental_close": 100058,
+  "cycles": 28,
+  "median_reference_depth": 117.25,
+  "executed_lots": 1073
+ },
+ {
+  "seed": 29,
+  "k": 0,
+  "cash": 2993546,
+  "shares": 70,
+  "fundamental_close": 100060,
+  "cycles": 28,
+  "median_reference_depth": 150.75,
+  "executed_lots": 1096
+ },
+ {
+  "seed": 30,
+  "k": 0,
+  "cash": 25494678,
+  "shares": -155,
+  "fundamental_close": 100006,
+  "cycles": 28,
+  "median_reference_depth": 113.5,
+  "executed_lots": 917
+ },
+ {
+  "seed": 31,
+  "k": 0,
+  "cash": -702164,
+  "shares": 107,
+  "fundamental_close": 100010,
+  "cycles": 28,
+  "median_reference_depth": 188.75,
+  "executed_lots": 1265
+ },
+ {
+  "seed": 32,
+  "k": 0,
+  "cash": 3898275,
+  "shares": 61,
+  "fundamental_close": 100049,
+  "cycles": 28,
+  "median_reference_depth": 120.25,
+  "executed_lots": 1061
+ },
+ {
+  "seed": 33,
+  "k": 0,
+  "cash": 2697108,
+  "shares": 73,
+  "fundamental_close": 100053,
+  "cycles": 28,
+  "median_reference_depth": 166.0,
+  "executed_lots": 1395
+ },
+ {
+  "seed": 34,
+  "k": 0,
+  "cash": -29904310,
+  "shares": 399,
+  "fundamental_close": 100032,
+  "cycles": 28,
+  "median_reference_depth": 214.25,
+  "executed_lots": 1555
+ },
+ {
+  "seed": 35,
+  "k": 0,
+  "cash": 18504364,
+  "shares": -85,
+  "fundamental_close": 99967,
+  "cycles": 28,
+  "median_reference_depth": 192.0,
+  "executed_lots": 1209
+ },
+ {
+  "seed": 36,
+  "k": 0,
+  "cash": 31205785,
+  "shares": -212,
+  "fundamental_close": 100026,
+  "cycles": 28,
+  "median_reference_depth": 192.0,
+  "executed_lots": 1368
+ },
+ {
+  "seed": 37,
+  "k": 0,
+  "cash": 22101878,
+  "shares": -121,
+  "fundamental_close": 99909,
+  "cycles": 28,
+  "median_reference_depth": 194.5,
+  "executed_lots": 1259
+ },
+ {
+  "seed": 38,
+  "k": 0,
+  "cash": 14302620,
+  "shares": -43,
+  "fundamental_close": 99887,
+  "cycles": 28,
+  "median_reference_depth": 148.25,
+  "executed_lots": 1271
+ },
+ {
+  "seed": 39,
+  "k": 0,
+  "cash": -3792133,
+  "shares": 138,
+  "fundamental_close": 99970,
+  "cycles": 28,
+  "median_reference_depth": 190.0,
+  "executed_lots": 1248
+ },
+ {
+  "seed": 40,
+  "k": 0,
+  "cash": 1897825,
+  "shares": 81,
+  "fundamental_close": 99955,
+  "cycles": 28,
+  "median_reference_depth": 110.75,
+  "executed_lots": 863
+ },
+ {
+  "seed": 41,
+  "k": 0,
+  "cash": -2298974,
+  "shares": 123,
+  "fundamental_close": 99930,
+  "cycles": 28,
+  "median_reference_depth": 212.75,
+  "executed_lots": 1341
+ },
+ {
+  "seed": 42,
+  "k": 0,
+  "cash": -7897791,
+  "shares": 179,
+  "fundamental_close": 99936,
+  "cycles": 28,
+  "median_reference_depth": 144.5,
+  "executed_lots": 1169
+ },
+ {
+  "seed": 43,
+  "k": 0,
+  "cash": 12293923,
+  "shares": -23,
+  "fundamental_close": 99876,
+  "cycles": 28,
+  "median_reference_depth": 200.75,
+  "executed_lots": 1217
+ },
+ {
+  "seed": 44,
+  "k": 0,
+  "cash": -14398753,
+  "shares": 244,
+  "fundamental_close": 100057,
+  "cycles": 28,
+  "median_reference_depth": 175.0,
+  "executed_lots": 1136
+ },
+ {
+  "seed": 45,
+  "k": 0,
+  "cash": -1806759,
+  "shares": 118,
+  "fundamental_close": 100050,
+  "cycles": 28,
+  "median_reference_depth": 100.0,
+  "executed_lots": 718
+ },
+ {
+  "seed": 46,
+  "k": 0,
+  "cash": 24594330,
+  "shares": -146,
+  "fundamental_close": 100055,
+  "cycles": 28,
+  "median_reference_depth": 189.5,
+  "executed_lots": 1248
+ },
+ {
+  "seed": 47,
+  "k": 0,
+  "cash": -2906978,
+  "shares": 129,
+  "fundamental_close": 100002,
+  "cycles": 28,
+  "median_reference_depth": 219.75,
+  "executed_lots": 1411
+ },
+ {
+  "seed": 48,
+  "k": 0,
+  "cash": 10201915,
+  "shares": -2,
+  "fundamental_close": 99986,
+  "cycles": 28,
+  "median_reference_depth": 126.0,
+  "executed_lots": 1172
+ },
+ {
+  "seed": 49,
+  "k": 0,
+  "cash": 6303710,
+  "shares": 37,
+  "fundamental_close": 99968,
+  "cycles": 28,
+  "median_reference_depth": 182.5,
+  "executed_lots": 1095
+ },
+ {
+  "seed": 50,
+  "k": 0,
+  "cash": 26589839,
+  "shares": -166,
+  "fundamental_close": 99961,
+  "cycles": 28,
+  "median_reference_depth": 204.0,
+  "executed_lots": 1188
+ },
+ {
+  "seed": 1,
+  "k": 1,
+  "cash": 6391655,
+  "shares": 36,
+  "fundamental_close": 100012,
+  "cycles": 28,
+  "median_reference_depth": 210.0,
+  "executed_lots": 1644
+ },
+ {
+  "seed": 2,
+  "k": 1,
+  "cash": 22498716,
+  "shares": -125,
+  "fundamental_close": 100012,
+  "cycles": 28,
+  "median_reference_depth": 166.25,
+  "executed_lots": 1209
+ },
+ {
+  "seed": 3,
+  "k": 1,
+  "cash": 2406121,
+  "shares": 76,
+  "fundamental_close": 99959,
+  "cycles": 28,
+  "median_reference_depth": 159.5,
+  "executed_lots": 1372
+ },
+ {
+  "seed": 4,
+  "k": 1,
+  "cash": 22196942,
+  "shares": -122,
+  "fundamental_close": 100049,
+  "cycles": 28,
+  "median_reference_depth": 156.0,
+  "executed_lots": 1210
+ },
+ {
+  "seed": 5,
+  "k": 1,
+  "cash": 1404616,
+  "shares": 86,
+  "fundamental_close": 99932,
+  "cycles": 28,
+  "median_reference_depth": 165.25,
+  "executed_lots": 1042
+ },
+ {
+  "seed": 6,
+  "k": 1,
+  "cash": -15103516,
+  "shares": 251,
+  "fundamental_close": 100004,
+  "cycles": 28,
+  "median_reference_depth": 220.5,
+  "executed_lots": 1433
+ },
+ {
+  "seed": 7,
+  "k": 1,
+  "cash": 20400171,
+  "shares": -104,
+  "fundamental_close": 100031,
+  "cycles": 28,
+  "median_reference_depth": 169.5,
+  "executed_lots": 1186
+ },
+ {
+  "seed": 8,
+  "k": 1,
+  "cash": 32999376,
+  "shares": -230,
+  "fundamental_close": 100012,
+  "cycles": 28,
+  "median_reference_depth": 152.5,
+  "executed_lots": 1200
+ },
+ {
+  "seed": 9,
+  "k": 1,
+  "cash": 2597488,
+  "shares": 74,
+  "fundamental_close": 100032,
+  "cycles": 28,
+  "median_reference_depth": 216.0,
+  "executed_lots": 1532
+ },
+ {
+  "seed": 10,
+  "k": 1,
+  "cash": 8800628,
+  "shares": 12,
+  "fundamental_close": 100036,
+  "cycles": 28,
+  "median_reference_depth": 151.25,
+  "executed_lots": 1192
+ },
+ {
+  "seed": 11,
+  "k": 1,
+  "cash": 24400528,
+  "shares": -144,
+  "fundamental_close": 100009,
+  "cycles": 28,
+  "median_reference_depth": 199.75,
+  "executed_lots": 1130
+ },
+ {
+  "seed": 12,
+  "k": 1,
+  "cash": -8905810,
+  "shares": 189,
+  "fundamental_close": 99993,
+  "cycles": 28,
+  "median_reference_depth": 139.25,
+  "executed_lots": 1339
+ },
+ {
+  "seed": 13,
+  "k": 1,
+  "cash": 37505891,
+  "shares": -275,
+  "fundamental_close": 100038,
+  "cycles": 28,
+  "median_reference_depth": 108.75,
+  "executed_lots": 959
+ },
+ {
+  "seed": 14,
+  "k": 1,
+  "cash": 7303836,
+  "shares": 27,
+  "fundamental_close": 100104,
+  "cycles": 28,
+  "median_reference_depth": 146.5,
+  "executed_lots": 1091
+ },
+ {
+  "seed": 15,
+  "k": 1,
+  "cash": -7096490,
+  "shares": 171,
+  "fundamental_close": 99987,
+  "cycles": 28,
+  "median_reference_depth": 128.75,
+  "executed_lots": 1173
+ },
+ {
+  "seed": 16,
+  "k": 1,
+  "cash": -4086788,
+  "shares": 141,
+  "fundamental_close": 99872,
+  "cycles": 28,
+  "median_reference_depth": 121.75,
+  "executed_lots": 959
+ },
+ {
+  "seed": 17,
+  "k": 1,
+  "cash": 5802307,
+  "shares": 42,
+  "fundamental_close": 100101,
+  "cycles": 28,
+  "median_reference_depth": 178.5,
+  "executed_lots": 1162
+ },
+ {
+  "seed": 18,
+  "k": 1,
+  "cash": 25501027,
+  "shares": -155,
+  "fundamental_close": 100029,
+  "cycles": 28,
+  "median_reference_depth": 150.5,
+  "executed_lots": 1181
+ },
+ {
+  "seed": 19,
+  "k": 1,
+  "cash": -11399198,
+  "shares": 214,
+  "fundamental_close": 99958,
+  "cycles": 28,
+  "median_reference_depth": 131.75,
+  "executed_lots": 1064
+ },
+ {
+  "seed": 20,
+  "k": 1,
+  "cash": 34784336,
+  "shares": -248,
+  "fundamental_close": 99918,
+  "cycles": 28,
+  "median_reference_depth": 157.75,
+  "executed_lots": 1134
+ },
+ {
+  "seed": 21,
+  "k": 1,
+  "cash": 20907639,
+  "shares": -109,
+  "fundamental_close": 100037,
+  "cycles": 28,
+  "median_reference_depth": 137.75,
+  "executed_lots": 1107
+ },
+ {
+  "seed": 22,
+  "k": 1,
+  "cash": 12797718,
+  "shares": -28,
+  "fundamental_close": 100002,
+  "cycles": 28,
+  "median_reference_depth": 151.25,
+  "executed_lots": 1070
+ },
+ {
+  "seed": 23,
+  "k": 1,
+  "cash": -26899887,
+  "shares": 369,
+  "fundamental_close": 99983,
+  "cycles": 28,
+  "median_reference_depth": 179.5,
+  "executed_lots": 1375
+ },
+ {
+  "seed": 24,
+  "k": 1,
+  "cash": 31519393,
+  "shares": -215,
+  "fundamental_close": 100067,
+  "cycles": 28,
+  "median_reference_depth": 203.75,
+  "executed_lots": 1663
+ },
+ {
+  "seed": 25,
+  "k": 1,
+  "cash": 1284912,
+  "shares": 87,
+  "fundamental_close": 100125,
+  "cycles": 28,
+  "median_reference_depth": 174.5,
+  "executed_lots": 1153
+ },
+ {
+  "seed": 26,
+  "k": 1,
+  "cash": -14088925,
+  "shares": 241,
+  "fundamental_close": 99978,
+  "cycles": 28,
+  "median_reference_depth": 122.25,
+  "executed_lots": 1281
+ },
+ {
+  "seed": 27,
+  "k": 1,
+  "cash": 30099749,
+  "shares": -201,
+  "fundamental_close": 99975,
+  "cycles": 28,
+  "median_reference_depth": 146.25,
+  "executed_lots": 1303
+ },
+ {
+  "seed": 28,
+  "k": 1,
+  "cash": 1202891,
+  "shares": 88,
+  "fundamental_close": 100058,
+  "cycles": 28,
+  "median_reference_depth": 117.25,
+  "executed_lots": 1080
+ },
+ {
+  "seed": 29,
+  "k": 1,
+  "cash": 11499930,
+  "shares": -15,
+  "fundamental_close": 100048,
+  "cycles": 28,
+  "median_reference_depth": 150.25,
+  "executed_lots": 1387
+ },
+ {
+  "seed": 30,
+  "k": 1,
+  "cash": 37691533,
+  "shares": -277,
+  "fundamental_close": 99991,
+  "cycles": 28,
+  "median_reference_depth": 106.25,
+  "executed_lots": 1039
+ },
+ {
+  "seed": 31,
+  "k": 1,
+  "cash": -32900145,
+  "shares": 429,
+  "fundamental_close": 99962,
+  "cycles": 28,
+  "median_reference_depth": 204.75,
+  "executed_lots": 1601
+ },
+ {
+  "seed": 32,
+  "k": 1,
+  "cash": 11100347,
+  "shares": -11,
+  "fundamental_close": 100049,
+  "cycles": 28,
+  "median_reference_depth": 120.25,
+  "executed_lots": 1133
+ },
+ {
+  "seed": 33,
+  "k": 1,
+  "cash": -1602865,
+  "shares": 116,
+  "fundamental_close": 100045,
+  "cycles": 28,
+  "median_reference_depth": 180.75,
+  "executed_lots": 1354
+ },
+ {
+  "seed": 34,
+  "k": 1,
+  "cash": -3402434,
+  "shares": 134,
+  "fundamental_close": 100069,
+  "cycles": 28,
+  "median_reference_depth": 205.25,
+  "executed_lots": 1374
+ },
+ {
+  "seed": 35,
+  "k": 1,
+  "cash": 19502629,
+  "shares": -95,
+  "fundamental_close": 100008,
+  "cycles": 28,
+  "median_reference_depth": 204.0,
+  "executed_lots": 1313
+ },
+ {
+  "seed": 36,
+  "k": 1,
+  "cash": 24206760,
+  "shares": -142,
+  "fundamental_close": 100031,
+  "cycles": 28,
+  "median_reference_depth": 151.25,
+  "executed_lots": 1304
+ },
+ {
+  "seed": 37,
+  "k": 1,
+  "cash": 3610676,
+  "shares": 64,
+  "fundamental_close": 99905,
+  "cycles": 28,
+  "median_reference_depth": 233.75,
+  "executed_lots": 1568
+ },
+ {
+  "seed": 38,
+  "k": 1,
+  "cash": 31591606,
+  "shares": -216,
+  "fundamental_close": 99900,
+  "cycles": 28,
+  "median_reference_depth": 135.5,
+  "executed_lots": 1438
+ },
+ {
+  "seed": 39,
+  "k": 1,
+  "cash": -12087742,
+  "shares": 221,
+  "fundamental_close": 99950,
+  "cycles": 28,
+  "median_reference_depth": 210.5,
+  "executed_lots": 1655
+ },
+ {
+  "seed": 40,
+  "k": 1,
+  "cash": -23104047,
+  "shares": 331,
+  "fundamental_close": 99922,
+  "cycles": 28,
+  "median_reference_depth": 130.75,
+  "executed_lots": 1091
+ },
+ {
+  "seed": 41,
+  "k": 1,
+  "cash": -19993570,
+  "shares": 300,
+  "fundamental_close": 99982,
+  "cycles": 28,
+  "median_reference_depth": 241.0,
+  "executed_lots": 1758
+ },
+ {
+  "seed": 42,
+  "k": 1,
+  "cash": -8897792,
+  "shares": 189,
+  "fundamental_close": 99936,
+  "cycles": 28,
+  "median_reference_depth": 144.5,
+  "executed_lots": 1179
+ },
+ {
+  "seed": 43,
+  "k": 1,
+  "cash": 12293923,
+  "shares": -23,
+  "fundamental_close": 99876,
+  "cycles": 28,
+  "median_reference_depth": 200.75,
+  "executed_lots": 1217
+ },
+ {
+  "seed": 44,
+  "k": 1,
+  "cash": -39810724,
+  "shares": 498,
+  "fundamental_close": 100047,
+  "cycles": 28,
+  "median_reference_depth": 193.75,
+  "executed_lots": 1624
+ },
+ {
+  "seed": 45,
+  "k": 1,
+  "cash": -1806759,
+  "shares": 118,
+  "fundamental_close": 100050,
+  "cycles": 28,
+  "median_reference_depth": 100.0,
+  "executed_lots": 718
+ },
+ {
+  "seed": 46,
+  "k": 1,
+  "cash": 3102341,
+  "shares": 69,
+  "fundamental_close": 100001,
+  "cycles": 28,
+  "median_reference_depth": 199.75,
+  "executed_lots": 1343
+ },
+ {
+  "seed": 47,
+  "k": 1,
+  "cash": -2207147,
+  "shares": 122,
+  "fundamental_close": 100002,
+  "cycles": 28,
+  "median_reference_depth": 219.75,
+  "executed_lots": 1418
+ },
+ {
+  "seed": 48,
+  "k": 1,
+  "cash": 14702093,
+  "shares": -47,
+  "fundamental_close": 99986,
+  "cycles": 28,
+  "median_reference_depth": 126.0,
+  "executed_lots": 1217
+ },
+ {
+  "seed": 49,
+  "k": 1,
+  "cash": 21794718,
+  "shares": -118,
+  "fundamental_close": 99964,
+  "cycles": 28,
+  "median_reference_depth": 140.25,
+  "executed_lots": 1088
+ },
+ {
+  "seed": 50,
+  "k": 1,
+  "cash": -29998471,
+  "shares": 400,
+  "fundamental_close": 99979,
+  "cycles": 28,
+  "median_reference_depth": 174.25,
+  "executed_lots": 1424
+ },
+ {
+  "seed": 1,
+  "k": 2,
+  "cash": 6391655,
+  "shares": 36,
+  "fundamental_close": 100012,
+  "cycles": 28,
+  "median_reference_depth": 210.0,
+  "executed_lots": 1644
+ },
+ {
+  "seed": 2,
+  "k": 2,
+  "cash": 22498716,
+  "shares": -125,
+  "fundamental_close": 100012,
+  "cycles": 28,
+  "median_reference_depth": 166.25,
+  "executed_lots": 1209
+ },
+ {
+  "seed": 3,
+  "k": 2,
+  "cash": -12185158,
+  "shares": 222,
+  "fundamental_close": 99889,
+  "cycles": 28,
+  "median_reference_depth": 118.5,
+  "executed_lots": 1186
+ },
+ {
+  "seed": 4,
+  "k": 2,
+  "cash": 22196942,
+  "shares": -122,
+  "fundamental_close": 100049,
+  "cycles": 28,
+  "median_reference_depth": 156.0,
+  "executed_lots": 1210
+ },
+ {
+  "seed": 5,
+  "k": 2,
+  "cash": 1404616,
+  "shares": 86,
+  "fundamental_close": 99932,
+  "cycles": 28,
+  "median_reference_depth": 165.25,
+  "executed_lots": 1042
+ },
+ {
+  "seed": 6,
+  "k": 2,
+  "cash": -15103516,
+  "shares": 251,
+  "fundamental_close": 100004,
+  "cycles": 28,
+  "median_reference_depth": 220.5,
+  "executed_lots": 1433
+ },
+ {
+  "seed": 7,
+  "k": 2,
+  "cash": 20400171,
+  "shares": -104,
+  "fundamental_close": 100031,
+  "cycles": 28,
+  "median_reference_depth": 169.5,
+  "executed_lots": 1186
+ },
+ {
+  "seed": 8,
+  "k": 2,
+  "cash": 32999376,
+  "shares": -230,
+  "fundamental_close": 100012,
+  "cycles": 28,
+  "median_reference_depth": 152.5,
+  "executed_lots": 1200
+ },
+ {
+  "seed": 9,
+  "k": 2,
+  "cash": 1096847,
+  "shares": 89,
+  "fundamental_close": 100025,
+  "cycles": 28,
+  "median_reference_depth": 200.75,
+  "executed_lots": 1497
+ },
+ {
+  "seed": 10,
+  "k": 2,
+  "cash": 10301048,
+  "shares": -3,
+  "fundamental_close": 100036,
+  "cycles": 28,
+  "median_reference_depth": 151.25,
+  "executed_lots": 1207
+ },
+ {
+  "seed": 11,
+  "k": 2,
+  "cash": 24400528,
+  "shares": -144,
+  "fundamental_close": 100009,
+  "cycles": 28,
+  "median_reference_depth": 199.75,
+  "executed_lots": 1130
+ },
+ {
+  "seed": 12,
+  "k": 2,
+  "cash": -8905810,
+  "shares": 189,
+  "fundamental_close": 99993,
+  "cycles": 28,
+  "median_reference_depth": 139.25,
+  "executed_lots": 1339
+ },
+ {
+  "seed": 13,
+  "k": 2,
+  "cash": 37505891,
+  "shares": -275,
+  "fundamental_close": 100038,
+  "cycles": 28,
+  "median_reference_depth": 108.75,
+  "executed_lots": 959
+ },
+ {
+  "seed": 14,
+  "k": 2,
+  "cash": 7303836,
+  "shares": 27,
+  "fundamental_close": 100104,
+  "cycles": 28,
+  "median_reference_depth": 146.5,
+  "executed_lots": 1091
+ },
+ {
+  "seed": 15,
+  "k": 2,
+  "cash": -22892040,
+  "shares": 329,
+  "fundamental_close": 99936,
+  "cycles": 28,
+  "median_reference_depth": 154.75,
+  "executed_lots": 1531
+ },
+ {
+  "seed": 16,
+  "k": 2,
+  "cash": -4086788,
+  "shares": 141,
+  "fundamental_close": 99872,
+  "cycles": 28,
+  "median_reference_depth": 121.75,
+  "executed_lots": 959
+ },
+ {
+  "seed": 17,
+  "k": 2,
+  "cash": 5802307,
+  "shares": 42,
+  "fundamental_close": 100101,
+  "cycles": 28,
+  "median_reference_depth": 178.5,
+  "executed_lots": 1162
+ },
+ {
+  "seed": 18,
+  "k": 2,
+  "cash": 25501027,
+  "shares": -155,
+  "fundamental_close": 100029,
+  "cycles": 28,
+  "median_reference_depth": 150.5,
+  "executed_lots": 1181
+ },
+ {
+  "seed": 19,
+  "k": 2,
+  "cash": -11399198,
+  "shares": 214,
+  "fundamental_close": 99958,
+  "cycles": 28,
+  "median_reference_depth": 131.75,
+  "executed_lots": 1064
+ },
+ {
+  "seed": 20,
+  "k": 2,
+  "cash": 34784336,
+  "shares": -248,
+  "fundamental_close": 99918,
+  "cycles": 28,
+  "median_reference_depth": 157.75,
+  "executed_lots": 1134
+ },
+ {
+  "seed": 21,
+  "k": 2,
+  "cash": 8505026,
+  "shares": 15,
+  "fundamental_close": 100069,
+  "cycles": 28,
+  "median_reference_depth": 161.75,
+  "executed_lots": 1271
+ },
+ {
+  "seed": 22,
+  "k": 2,
+  "cash": 17096041,
+  "shares": -71,
+  "fundamental_close": 100002,
+  "cycles": 28,
+  "median_reference_depth": 151.25,
+  "executed_lots": 1113
+ },
+ {
+  "seed": 23,
+  "k": 2,
+  "cash": -34600580,
+  "shares": 446,
+  "fundamental_close": 99983,
+  "cycles": 28,
+  "median_reference_depth": 179.5,
+  "executed_lots": 1452
+ },
+ {
+  "seed": 24,
+  "k": 2,
+  "cash": 31519393,
+  "shares": -215,
+  "fundamental_close": 100067,
+  "cycles": 28,
+  "median_reference_depth": 203.75,
+  "executed_lots": 1663
+ },
+ {
+  "seed": 25,
+  "k": 2,
+  "cash": 1284912,
+  "shares": 87,
+  "fundamental_close": 100125,
+  "cycles": 28,
+  "median_reference_depth": 174.5,
+  "executed_lots": 1153
+ },
+ {
+  "seed": 26,
+  "k": 2,
+  "cash": -14088925,
+  "shares": 241,
+  "fundamental_close": 99978,
+  "cycles": 28,
+  "median_reference_depth": 122.25,
+  "executed_lots": 1281
+ },
+ {
+  "seed": 27,
+  "k": 2,
+  "cash": 43900470,
+  "shares": -339,
+  "fundamental_close": 99993,
+  "cycles": 28,
+  "median_reference_depth": 151.75,
+  "executed_lots": 1535
+ },
+ {
+  "seed": 28,
+  "k": 2,
+  "cash": 1202891,
+  "shares": 88,
+  "fundamental_close": 100058,
+  "cycles": 28,
+  "median_reference_depth": 117.25,
+  "executed_lots": 1080
+ },
+ {
+  "seed": 29,
+  "k": 2,
+  "cash": 11499930,
+  "shares": -15,
+  "fundamental_close": 100048,
+  "cycles": 28,
+  "median_reference_depth": 150.25,
+  "executed_lots": 1387
+ },
+ {
+  "seed": 30,
+  "k": 2,
+  "cash": 37691533,
+  "shares": -277,
+  "fundamental_close": 99991,
+  "cycles": 28,
+  "median_reference_depth": 106.25,
+  "executed_lots": 1039
+ },
+ {
+  "seed": 31,
+  "k": 2,
+  "cash": -32900145,
+  "shares": 429,
+  "fundamental_close": 99962,
+  "cycles": 28,
+  "median_reference_depth": 204.75,
+  "executed_lots": 1601
+ },
+ {
+  "seed": 32,
+  "k": 2,
+  "cash": 11100347,
+  "shares": -11,
+  "fundamental_close": 100049,
+  "cycles": 28,
+  "median_reference_depth": 120.25,
+  "executed_lots": 1133
+ },
+ {
+  "seed": 33,
+  "k": 2,
+  "cash": 1099045,
+  "shares": 89,
+  "fundamental_close": 100052,
+  "cycles": 28,
+  "median_reference_depth": 267.0,
+  "executed_lots": 1673
+ },
+ {
+  "seed": 34,
+  "k": 2,
+  "cash": 1498889,
+  "shares": 85,
+  "fundamental_close": 100069,
+  "cycles": 28,
+  "median_reference_depth": 205.25,
+  "executed_lots": 1423
+ },
+ {
+  "seed": 35,
+  "k": 2,
+  "cash": 23204510,
+  "shares": -132,
+  "fundamental_close": 99977,
+  "cycles": 28,
+  "median_reference_depth": 186.0,
+  "executed_lots": 1342
+ },
+ {
+  "seed": 36,
+  "k": 2,
+  "cash": 24206760,
+  "shares": -142,
+  "fundamental_close": 100031,
+  "cycles": 28,
+  "median_reference_depth": 151.25,
+  "executed_lots": 1304
+ },
+ {
+  "seed": 37,
+  "k": 2,
+  "cash": 14599277,
+  "shares": -46,
+  "fundamental_close": 99903,
+  "cycles": 28,
+  "median_reference_depth": 166.75,
+  "executed_lots": 1418
+ },
+ {
+  "seed": 38,
+  "k": 2,
+  "cash": 32896488,
+  "shares": -229,
+  "fundamental_close": 99865,
+  "cycles": 28,
+  "median_reference_depth": 163.25,
+  "executed_lots": 1377
+ },
+ {
+  "seed": 39,
+  "k": 2,
+  "cash": 11796979,
+  "shares": -18,
+  "fundamental_close": 99956,
+  "cycles": 28,
+  "median_reference_depth": 156.25,
+  "executed_lots": 1536
+ },
+ {
+  "seed": 40,
+  "k": 2,
+  "cash": -30805491,
+  "shares": 408,
+  "fundamental_close": 99916,
+  "cycles": 28,
+  "median_reference_depth": 105.5,
+  "executed_lots": 1160
+ },
+ {
+  "seed": 41,
+  "k": 2,
+  "cash": -19993570,
+  "shares": 300,
+  "fundamental_close": 99982,
+  "cycles": 28,
+  "median_reference_depth": 241.0,
+  "executed_lots": 1758
+ },
+ {
+  "seed": 42,
+  "k": 2,
+  "cash": -8897792,
+  "shares": 189,
+  "fundamental_close": 99936,
+  "cycles": 28,
+  "median_reference_depth": 144.5,
+  "executed_lots": 1179
+ },
+ {
+  "seed": 43,
+  "k": 2,
+  "cash": 12293923,
+  "shares": -23,
+  "fundamental_close": 99876,
+  "cycles": 28,
+  "median_reference_depth": 200.75,
+  "executed_lots": 1217
+ },
+ {
+  "seed": 44,
+  "k": 2,
+  "cash": -29305535,
+  "shares": 393,
+  "fundamental_close": 100084,
+  "cycles": 28,
+  "median_reference_depth": 196.25,
+  "executed_lots": 1617
+ },
+ {
+  "seed": 45,
+  "k": 2,
+  "cash": -1806759,
+  "shares": 118,
+  "fundamental_close": 100050,
+  "cycles": 28,
+  "median_reference_depth": 100.0,
+  "executed_lots": 718
+ },
+ {
+  "seed": 46,
+  "k": 2,
+  "cash": 3102341,
+  "shares": 69,
+  "fundamental_close": 100001,
+  "cycles": 28,
+  "median_reference_depth": 199.75,
+  "executed_lots": 1343
+ },
+ {
+  "seed": 47,
+  "k": 2,
+  "cash": -2207147,
+  "shares": 122,
+  "fundamental_close": 100002,
+  "cycles": 28,
+  "median_reference_depth": 219.75,
+  "executed_lots": 1418
+ },
+ {
+  "seed": 48,
+  "k": 2,
+  "cash": 14702093,
+  "shares": -47,
+  "fundamental_close": 99986,
+  "cycles": 28,
+  "median_reference_depth": 126.0,
+  "executed_lots": 1217
+ },
+ {
+  "seed": 49,
+  "k": 2,
+  "cash": 21794718,
+  "shares": -118,
+  "fundamental_close": 99964,
+  "cycles": 28,
+  "median_reference_depth": 140.25,
+  "executed_lots": 1088
+ },
+ {
+  "seed": 50,
+  "k": 2,
+  "cash": -23505342,
+  "shares": 335,
+  "fundamental_close": 99948,
+  "cycles": 28,
+  "median_reference_depth": 175.75,
+  "executed_lots": 1575
+ },
+ {
+  "seed": 1,
+  "k": 6,
+  "cash": 3590517,
+  "shares": 64,
+  "fundamental_close": 100012,
+  "cycles": 28,
+  "median_reference_depth": 202.75,
+  "executed_lots": 1584
+ },
+ {
+  "seed": 2,
+  "k": 6,
+  "cash": 22498716,
+  "shares": -125,
+  "fundamental_close": 100012,
+  "cycles": 28,
+  "median_reference_depth": 166.25,
+  "executed_lots": 1209
+ },
+ {
+  "seed": 3,
+  "k": 6,
+  "cash": 2394404,
+  "shares": 76,
+  "fundamental_close": 99936,
+  "cycles": 28,
+  "median_reference_depth": 141.25,
+  "executed_lots": 1676
+ },
+ {
+  "seed": 4,
+  "k": 6,
+  "cash": 22196942,
+  "shares": -122,
+  "fundamental_close": 100049,
+  "cycles": 28,
+  "median_reference_depth": 156.0,
+  "executed_lots": 1210
+ },
+ {
+  "seed": 5,
+  "k": 6,
+  "cash": 1404616,
+  "shares": 86,
+  "fundamental_close": 99932,
+  "cycles": 28,
+  "median_reference_depth": 165.25,
+  "executed_lots": 1042
+ },
+ {
+  "seed": 6,
+  "k": 6,
+  "cash": -15103516,
+  "shares": 251,
+  "fundamental_close": 100004,
+  "cycles": 28,
+  "median_reference_depth": 220.5,
+  "executed_lots": 1433
+ },
+ {
+  "seed": 7,
+  "k": 6,
+  "cash": 24302471,
+  "shares": -143,
+  "fundamental_close": 100045,
+  "cycles": 28,
+  "median_reference_depth": 169.5,
+  "executed_lots": 1385
+ },
+ {
+  "seed": 8,
+  "k": 6,
+  "cash": 32999376,
+  "shares": -230,
+  "fundamental_close": 100012,
+  "cycles": 28,
+  "median_reference_depth": 152.5,
+  "executed_lots": 1200
+ },
+ {
+  "seed": 9,
+  "k": 6,
+  "cash": 10204946,
+  "shares": -2,
+  "fundamental_close": 99984,
+  "cycles": 28,
+  "median_reference_depth": 136.75,
+  "executed_lots": 1180
+ },
+ {
+  "seed": 10,
+  "k": 6,
+  "cash": 10701163,
+  "shares": -7,
+  "fundamental_close": 100036,
+  "cycles": 28,
+  "median_reference_depth": 151.25,
+  "executed_lots": 1211
+ },
+ {
+  "seed": 11,
+  "k": 6,
+  "cash": 24400528,
+  "shares": -144,
+  "fundamental_close": 100009,
+  "cycles": 28,
+  "median_reference_depth": 199.75,
+  "executed_lots": 1130
+ },
+ {
+  "seed": 12,
+  "k": 6,
+  "cash": -8905810,
+  "shares": 189,
+  "fundamental_close": 99993,
+  "cycles": 28,
+  "median_reference_depth": 139.25,
+  "executed_lots": 1339
+ },
+ {
+  "seed": 13,
+  "k": 6,
+  "cash": 37505891,
+  "shares": -275,
+  "fundamental_close": 100038,
+  "cycles": 28,
+  "median_reference_depth": 108.75,
+  "executed_lots": 959
+ },
+ {
+  "seed": 14,
+  "k": 6,
+  "cash": 7303836,
+  "shares": 27,
+  "fundamental_close": 100104,
+  "cycles": 28,
+  "median_reference_depth": 146.5,
+  "executed_lots": 1091
+ },
+ {
+  "seed": 15,
+  "k": 6,
+  "cash": -23891840,
+  "shares": 339,
+  "fundamental_close": 99936,
+  "cycles": 28,
+  "median_reference_depth": 154.75,
+  "executed_lots": 1541
+ },
+ {
+  "seed": 16,
+  "k": 6,
+  "cash": -4086788,
+  "shares": 141,
+  "fundamental_close": 99872,
+  "cycles": 28,
+  "median_reference_depth": 121.75,
+  "executed_lots": 959
+ },
+ {
+  "seed": 17,
+  "k": 6,
+  "cash": 5802307,
+  "shares": 42,
+  "fundamental_close": 100101,
+  "cycles": 28,
+  "median_reference_depth": 178.5,
+  "executed_lots": 1162
+ },
+ {
+  "seed": 18,
+  "k": 6,
+  "cash": 25501027,
+  "shares": -155,
+  "fundamental_close": 100029,
+  "cycles": 28,
+  "median_reference_depth": 150.5,
+  "executed_lots": 1181
+ },
+ {
+  "seed": 19,
+  "k": 6,
+  "cash": -11399198,
+  "shares": 214,
+  "fundamental_close": 99958,
+  "cycles": 28,
+  "median_reference_depth": 131.75,
+  "executed_lots": 1064
+ },
+ {
+  "seed": 20,
+  "k": 6,
+  "cash": 34784336,
+  "shares": -248,
+  "fundamental_close": 99918,
+  "cycles": 28,
+  "median_reference_depth": 157.75,
+  "executed_lots": 1134
+ },
+ {
+  "seed": 21,
+  "k": 6,
+  "cash": -14209926,
+  "shares": 242,
+  "fundamental_close": 100058,
+  "cycles": 28,
+  "median_reference_depth": 155.75,
+  "executed_lots": 1306
+ },
+ {
+  "seed": 22,
+  "k": 6,
+  "cash": 34289333,
+  "shares": -243,
+  "fundamental_close": 100002,
+  "cycles": 28,
+  "median_reference_depth": 151.25,
+  "executed_lots": 1285
+ },
+ {
+  "seed": 23,
+  "k": 6,
+  "cash": -34600580,
+  "shares": 446,
+  "fundamental_close": 99983,
+  "cycles": 28,
+  "median_reference_depth": 179.5,
+  "executed_lots": 1452
+ },
+ {
+  "seed": 24,
+  "k": 6,
+  "cash": 31519393,
+  "shares": -215,
+  "fundamental_close": 100067,
+  "cycles": 28,
+  "median_reference_depth": 203.75,
+  "executed_lots": 1663
+ },
+ {
+  "seed": 25,
+  "k": 6,
+  "cash": 1284912,
+  "shares": 87,
+  "fundamental_close": 100125,
+  "cycles": 28,
+  "median_reference_depth": 174.5,
+  "executed_lots": 1153
+ },
+ {
+  "seed": 26,
+  "k": 6,
+  "cash": -6786222,
+  "shares": 168,
+  "fundamental_close": 99992,
+  "cycles": 28,
+  "median_reference_depth": 207.5,
+  "executed_lots": 1386
+ },
+ {
+  "seed": 27,
+  "k": 6,
+  "cash": 50700978,
+  "shares": -407,
+  "fundamental_close": 99994,
+  "cycles": 28,
+  "median_reference_depth": 128.0,
+  "executed_lots": 1507
+ },
+ {
+  "seed": 28,
+  "k": 6,
+  "cash": 1202891,
+  "shares": 88,
+  "fundamental_close": 100058,
+  "cycles": 28,
+  "median_reference_depth": 117.25,
+  "executed_lots": 1080
+ },
+ {
+  "seed": 29,
+  "k": 6,
+  "cash": 11499930,
+  "shares": -15,
+  "fundamental_close": 100048,
+  "cycles": 28,
+  "median_reference_depth": 150.25,
+  "executed_lots": 1387
+ },
+ {
+  "seed": 30,
+  "k": 6,
+  "cash": 37691533,
+  "shares": -277,
+  "fundamental_close": 99991,
+  "cycles": 28,
+  "median_reference_depth": 106.25,
+  "executed_lots": 1039
+ },
+ {
+  "seed": 31,
+  "k": 6,
+  "cash": -32900145,
+  "shares": 429,
+  "fundamental_close": 99962,
+  "cycles": 28,
+  "median_reference_depth": 204.75,
+  "executed_lots": 1601
+ },
+ {
+  "seed": 32,
+  "k": 6,
+  "cash": 11100347,
+  "shares": -11,
+  "fundamental_close": 100049,
+  "cycles": 28,
+  "median_reference_depth": 120.25,
+  "executed_lots": 1133
+ },
+ {
+  "seed": 33,
+  "k": 6,
+  "cash": 1099045,
+  "shares": 89,
+  "fundamental_close": 100052,
+  "cycles": 28,
+  "median_reference_depth": 267.0,
+  "executed_lots": 1673
+ },
+ {
+  "seed": 34,
+  "k": 6,
+  "cash": 11100699,
+  "shares": -11,
+  "fundamental_close": 100069,
+  "cycles": 28,
+  "median_reference_depth": 212.0,
+  "executed_lots": 1553
+ },
+ {
+  "seed": 35,
+  "k": 6,
+  "cash": 23204510,
+  "shares": -132,
+  "fundamental_close": 99977,
+  "cycles": 28,
+  "median_reference_depth": 186.0,
+  "executed_lots": 1342
+ },
+ {
+  "seed": 36,
+  "k": 6,
+  "cash": 24206760,
+  "shares": -142,
+  "fundamental_close": 100031,
+  "cycles": 28,
+  "median_reference_depth": 151.25,
+  "executed_lots": 1304
+ },
+ {
+  "seed": 37,
+  "k": 6,
+  "cash": 14599277,
+  "shares": -46,
+  "fundamental_close": 99903,
+  "cycles": 28,
+  "median_reference_depth": 166.75,
+  "executed_lots": 1418
+ },
+ {
+  "seed": 38,
+  "k": 6,
+  "cash": 32896488,
+  "shares": -229,
+  "fundamental_close": 99865,
+  "cycles": 28,
+  "median_reference_depth": 163.25,
+  "executed_lots": 1377
+ },
+ {
+  "seed": 39,
+  "k": 6,
+  "cash": 11796979,
+  "shares": -18,
+  "fundamental_close": 99956,
+  "cycles": 28,
+  "median_reference_depth": 156.25,
+  "executed_lots": 1536
+ },
+ {
+  "seed": 40,
+  "k": 6,
+  "cash": -36603869,
+  "shares": 466,
+  "fundamental_close": 99935,
+  "cycles": 28,
+  "median_reference_depth": 104.75,
+  "executed_lots": 1170
+ },
+ {
+  "seed": 41,
+  "k": 6,
+  "cash": -15495082,
+  "shares": 255,
+  "fundamental_close": 99971,
+  "cycles": 28,
+  "median_reference_depth": 235.75,
+  "executed_lots": 1597
+ },
+ {
+  "seed": 42,
+  "k": 6,
+  "cash": -8897792,
+  "shares": 189,
+  "fundamental_close": 99936,
+  "cycles": 28,
+  "median_reference_depth": 144.5,
+  "executed_lots": 1179
+ },
+ {
+  "seed": 43,
+  "k": 6,
+  "cash": 12293923,
+  "shares": -23,
+  "fundamental_close": 99876,
+  "cycles": 28,
+  "median_reference_depth": 200.75,
+  "executed_lots": 1217
+ },
+ {
+  "seed": 44,
+  "k": 6,
+  "cash": -29305535,
+  "shares": 393,
+  "fundamental_close": 100084,
+  "cycles": 28,
+  "median_reference_depth": 196.25,
+  "executed_lots": 1617
+ },
+ {
+  "seed": 45,
+  "k": 6,
+  "cash": -1806759,
+  "shares": 118,
+  "fundamental_close": 100050,
+  "cycles": 28,
+  "median_reference_depth": 100.0,
+  "executed_lots": 718
+ },
+ {
+  "seed": 46,
+  "k": 6,
+  "cash": 3102341,
+  "shares": 69,
+  "fundamental_close": 100001,
+  "cycles": 28,
+  "median_reference_depth": 199.75,
+  "executed_lots": 1343
+ },
+ {
+  "seed": 47,
+  "k": 6,
+  "cash": -2207147,
+  "shares": 122,
+  "fundamental_close": 100002,
+  "cycles": 28,
+  "median_reference_depth": 219.75,
+  "executed_lots": 1418
+ },
+ {
+  "seed": 48,
+  "k": 6,
+  "cash": 14702093,
+  "shares": -47,
+  "fundamental_close": 99986,
+  "cycles": 28,
+  "median_reference_depth": 126.0,
+  "executed_lots": 1217
+ },
+ {
+  "seed": 49,
+  "k": 6,
+  "cash": 21794718,
+  "shares": -118,
+  "fundamental_close": 99964,
+  "cycles": 28,
+  "median_reference_depth": 140.25,
+  "executed_lots": 1088
+ },
+ {
+  "seed": 50,
+  "k": 6,
+  "cash": -23505342,
+  "shares": 335,
+  "fundamental_close": 99948,
+  "cycles": 28,
+  "median_reference_depth": 175.75,
+  "executed_lots": 1575
+ }
+]

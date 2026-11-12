@@ -1,0 +1,129 @@
+{
+  "spec": {
+    "status": "Exploratory robustness check; seeds, arms and schedule fixed before running",
+    "config": "rmsc04",
+    "end_time": "10:00:00",
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50
+    ],
+    "display_multiples": [
+      0,
+      1,
+      2,
+      6
+    ],
+    "orders_per_cycle": 6,
+    "ticks_behind": 1,
+    "execution_fraction_of_depth": 0.2,
+    "execution_delay_s": 2,
+    "cancel_delay_s": 1,
+    "cycle_s": 60,
+    "first_cycle_after_open_s": 120,
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20261117
+  },
+  "abides_commit": "f9cbe51342b7dedd9587e4e069040d68a5c6477f",
+  "arms": [
+    {
+      "display_multiple": 1,
+      "n": 50,
+      "mean_D_cents": -348.52,
+      "D_ci95_cents": [
+        -2360.18,
+        1618.68
+      ],
+      "mean_D_cents_per_executed_share": -0.271137,
+      "D_per_share_ci95": [
+        -1.964508,
+        1.386823
+      ],
+      "positive_D": 22
+    },
+    {
+      "display_multiple": 2,
+      "n": 50,
+      "mean_D_cents": -672.7,
+      "D_ci95_cents": [
+        -2901.42,
+        1552.6
+      ],
+      "mean_D_cents_per_executed_share": -0.449567,
+      "D_per_share_ci95": [
+        -2.322299,
+        1.348192
+      ],
+      "positive_D": 23
+    },
+    {
+      "display_multiple": 6,
+      "n": 50,
+      "mean_D_cents": -973.12,
+      "D_ci95_cents": [
+        -3333.16,
+        1321.74
+      ],
+      "mean_D_cents_per_executed_share": -0.632705,
+      "D_per_share_ci95": [
+        -2.561008,
+        1.268636
+      ],
+      "positive_D": 24
+    }
+  ],
+  "median_reference_depth_shares": 159.0,
+  "runs_with_baseline_closing_fundamental": "89/200",
+  "mean_executed_shares": 1250.27,
+  "source_sha256": {
+    "paper_study/abides_check.py": "0e36b44db9dcba014759cfdeb6bd8d84cbf441a39d6814dd1bdd434baa769c74"
+  },
+  "python": "3.9.6"
+}

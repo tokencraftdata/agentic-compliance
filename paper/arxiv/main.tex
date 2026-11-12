@@ -314,7 +314,39 @@ Patient maker, 300 s & 6.00 [6, 6] & 0.00 [0, 0] & 0.00 [0, 0] & 0.03 [0, 1] \\
 
 \renewcommand{\thetable}{\arabic{table}}
 
-The large maker loses 14.1\% of volume in Table~\ref{tab:legit}. Its 27.95 mean rejections comprise 20.30 size-cap rejections, 7.40 throttle rejections, and 0.25 failed cancellations. The separate throttle ablation shows why rejection counts alone cannot attribute the volume loss. The patient maker loses 28.2\% without any throttle rejections; its cost arises under the remaining gate checks. The passive scheduled and slice executors receive no gate rejections, yet complete only 34.2\% and 37.7\% of their 80-lot parent orders. These are task-completion measurements, not operational false-rejection rates or full best-execution assessments.
+The large maker loses 14.1\% of volume in Table~\ref{tab:legit}. Its 27.95 mean rejections comprise 20.30 size-cap rejections, 7.40 throttle rejections, and 0.25 failed cancellations. The separate throttle ablation shows why rejection counts alone cannot attribute the volume loss. The patient maker loses 28.2\% without any throttle rejections; its cost arises under the remaining gate checks. The passive scheduled and slice executors receive no gate rejections, yet complete only 34.2\% and 37.7\% of their 80-lot parent orders. Volume alone can both understate and overstate the cost. Table~\ref{tab:execution} scores the same scripts with standard execution-quality measures on 100 new seeds under the MSFT-fitted response. The cap at $m = 2$ leaves both executors and the small maker unaffected: fill rates move by less than 0.1 percentage points and implementation shortfall by less than 0.003 ticks per lot. For the large maker, the throttle removes the volume: with it the maker loses 5.7 lots (9\%) and 2.5 tick-lots of P\&L, while the cap alone leaves volume and P\&L unchanged within their intervals. In both arms its edge per lot falls by about 0.11 ticks while its 60-second markout does not worsen, so the cap pushes quotes away from the best price without changing adverse selection. The patient maker loses 31\% of its volume, yet its P\&L does not fall, because the cap halves its inventory exposure; a volume-based cost would rank this as the largest harm. The stricter cap, $m = 1$, is costly by every measure: the scheduled executor fills 20 percentage points less of its parent, and both large makers are shut out entirely. Results under the step and AAPL-fitted responses are similar.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{llrlll}
+\toprule
+& & & \multicolumn{3}{c}{\textbf{Change from ungated, paired by seed}} \\
+\cmidrule(lr){4-6}
+\textbf{Strategy} & \textbf{Measure} & \textbf{Ungated} & \textbf{$m = 2$ + throttle} & \textbf{$m = 2$} & \textbf{$m = 1$} \\
+\midrule
+Scheduled exec. & Fill rate (\%) & 32.8 & 0.0 [$-$0.1, 0.0] & 0.0 [$-$0.1, 0.0] & $-$19.6 [$-$21.3, $-$18.0] \\
+ & Shortfall (ticks/lot) & 0.046 & 0.000 [$-$0.001, 0.000] & 0.000 [$-$0.001, 0.000] & 0.029 [$-$0.044, 0.102] \\
+\addlinespace
+Slice exec. & Fill rate (\%) & 37.6 & 0.0 [$-$0.1, 0.0] & 0.0 [$-$0.1, 0.0] & $-$7.8 [$-$9.7, $-$6.2] \\
+ & Shortfall (ticks/lot) & 0.180 & 0.001 [0.000, 0.003] & 0.001 [0.000, 0.003] & $-$0.007 [$-$0.075, 0.055] \\
+\addlinespace
+Small maker & Volume (lots) & 31.3 & 0.0 [0.0, 0.0] & 0.0 [0.0, 0.0] & 0.0 [0.0, 0.0] \\
+\addlinespace
+Large maker & Volume (lots) & 60.2 & $-$5.7 [$-$7.3, $-$4.0] & 1.7 [0.5, 3.0] & $-$60.2 [$-$62.8, $-$57.8] \\
+ & P\&L (tick-lots) & 27.0 & $-$2.5 [$-$5.3, 0.3] & 0.6 [$-$2.0, 3.1] & $-$27.0 [$-$34.7, $-$19.6] \\
+ & Edge (ticks/lot) & 0.646 & $-$0.111 [$-$0.137, $-$0.084] & $-$0.124 [$-$0.146, $-$0.102] & $-$0.646 [$-$0.677, $-$0.615] \\
+ & Markout (ticks/lot) & 0.457 & 0.030 [0.000, 0.060] & 0.021 [0.002, 0.042] & $-$0.457 [$-$0.519, $-$0.394] \\
+\addlinespace
+Patient maker & Volume (lots) & 74.5 & $-$23.3 [$-$25.8, $-$20.9] & $-$23.3 [$-$25.8, $-$20.9] & $-$74.5 [$-$77.4, $-$71.4] \\
+ & P\&L (tick-lots) & $-$0.2 & 1.4 [$-$7.3, 10.4] & 1.4 [$-$7.4, 10.3] & 0.2 [$-$15.6, 17.1] \\
+ & $|$Inventory$|$ (lots) & 19.5 & $-$8.9 [$-$10.0, $-$7.8] & $-$8.9 [$-$10.0, $-$7.8] & $-$19.5 [$-$21.3, $-$17.7] \\
+\bottomrule
+\end{tabular}
+\caption{Execution quality of the legitimate scripts under the MSFT-fitted response, seeds 9300-9399. Brackets are 95\% bootstrap intervals for the paired difference. Shortfall is per lot of the 80-lot parent and includes the cost of completing the unfilled remainder at the closing fundamental; edge and markout are signed against the mid at the fill and 60 seconds later. The $m = 2$ and $m = 1$ columns have the throttle off. No arm raised a conduct alert. Produced by \texttt{paper\_study.execution\_quality}, which also reports the step and AAPL-fitted responses.}
+\label{tab:execution}
+\end{table}
 
 \section{Detector timing and legitimate counterexamples}\label{sec:cadence}
 
@@ -410,6 +442,8 @@ Third, the size of the gain follows the stock's tick size. Under the AAPL fit, w
 Selection on training paths overstates performance, and a modest search does not always find the best schedule. Under the INTC fit, the legacy-gate cell exceeds the no-gate cell (2.68 against 2.00): the gate's rejections turn the selected schedule into one the no-gate search did not find. The searched gains are therefore lower bounds, and the held-out separation is necessary rather than cosmetic.
 
 The same plan reran the legitimate-cost comparison with 100 paths (seeds 9200-9299). The full aggregate policy, including the 1,800-second throttle, reduces the large maker's mean volume from 57.87 lots (55.52 to 60.19) to 49.14 (46.74 to 51.65), a 15.1\% loss, consistent with the 14.1\% in Table~\ref{tab:legit}.
+
+\paragraph{An independent simulator.} To check that these gains do not depend on our engine, we added a split-display agent to the ABIDES RMSC04 reference market~\cite{r4}, in which 1,117 noise, value, momentum, and adaptive market-making agents set prices and nothing is imposed (\texttt{paper\_study.abides\_check}). Each 60-second cycle the agent rests six orders one tick behind the best quote, totalling $k$ times the reference depth, sells or buys 20\% of reference depth at market two seconds later, and cancels the display one second after that. Over 50 paired 30-minute sessions, the gain from displaying, relative to the same schedule with no display and marked at the same closing fundamental, is $-0.27$, $-0.45$, and $-0.63$ cents per executed share for $k = 1$, 2, and 6 (one tick is one cent), with 95\% intervals from about $-2.5$ to $+1.4$ that include zero; 22 to 24 of 50 sessions are positive. In this market, displayed depth earns nothing detectable even at six times reference depth, the setting the step response rewards most. ABIDES's reference market thus behaves like the wide-spread stocks rather than the one-tick stocks, and its result bounds the gain rather than contradicting the fitted one-tick responses, which come from data.
 
 \section{Practical use and regulatory context}
 
