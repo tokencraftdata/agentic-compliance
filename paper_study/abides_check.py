@@ -23,6 +23,14 @@ abides-markets, Python 3.9:
 
     python -m paper_study.abides_check run results/abides-check-v1 [--workers 4]
     python -m paper_study.abides_check verify results/abides-check-v1
+    python -m paper_study.abides_check run results/abides-check-v2 --spec v2
+
+In v1 the paired runs did not share a fundamental path: ABIDES generates the
+fundamental lazily, so its draws depend on when agents query it, and adding the
+display changes those times (only 39 of 150 display runs shared the baseline's
+closing value). v2 freezes the fundamental before trading on a one-second grid,
+from a fixed random state, so every arm of a seed sees the same fundamental
+path, and it reports the minimum effect detectable at 80% power.
 """
 import argparse
 import hashlib
@@ -43,6 +51,28 @@ SPEC = {
     'first_cycle_after_open_s': 120,
     'bootstrap_resamples': 10000, 'bootstrap_seed': 20261117,
 }
+SPEC_V2 = {**SPEC,
+           'status': 'Robustness check, v2: fundamental frozen before trading; seeds and arms fixed before running',
+           'seeds': list(range(1, 101)), 'fundamental_grid_s': 1, 'fundamental_seed_salt': 7919,
+           'bootstrap_seed': 20261122}
+SPECS = {'v1': SPEC, 'v2': SPEC_V2}
+
+
+def freeze_fundamental(oracle, symbol, grid_ns, seed):
+    """Precompute the oracle's fundamental on a fixed grid so trading cannot change its draws."""
+    import numpy as np
+    state = np.random.get_state()   # megashock arrival times use the global stream
+    np.random.seed(seed)
+    values, t = [], oracle.mkt_open
+    while t <= oracle.mkt_close:
+        values.append(oracle.advance_fundamental_value_series(t, symbol))
+        t += grid_ns
+    np.random.set_state(state)
+    start = oracle.mkt_open
+
+    def advance(current_time, sym):
+        return values[min(max(0, (current_time - start) // grid_ns), len(values) - 1)]
+    oracle.advance_fundamental_value_series = advance
 
 
 def make_agent_class():
@@ -133,6 +163,10 @@ def episode(seed, k, spec):
     from abides_markets.configs import rmsc04
     from abides_markets.utils import generate_latency_model
     cfg = rmsc04.build_config(seed=seed, end_time=spec['end_time'])
+    if 'fundamental_grid_s' in spec:
+        from abides_core.utils import str_to_ns
+        freeze_fundamental(cfg['custom_properties']['oracle'], 'ABM', str_to_ns(f"{spec['fundamental_grid_s']}s"),
+                           seed * spec['fundamental_seed_salt'] % (2**32))
     Agent = make_agent_class()
     agent = Agent(len(cfg['agents']), 'ABM', k, spec, np.random.RandomState(seed=seed))
     cfg['agents'].append(agent)
@@ -158,28 +192,30 @@ def bootstrap(values, resamples, seed):
     return [round(means[int(0.025 * resamples)], 6), round(means[int(0.975 * resamples) - 1], 6)]
 
 
-def compute(workers):
-    jobs = [(s, k, SPEC) for k in SPEC['display_multiples'] for s in SPEC['seeds']]
+def compute(workers, spec=SPEC):
+    jobs = [(s, k, spec) for k in spec['display_multiples'] for s in spec['seeds']]
     with ProcessPoolExecutor(max_workers=workers) as pool:
         rows = list(pool.map(_job, jobs))
     return rows
 
 
-def summarize(rows):
+def summarize(rows, spec=SPEC):
     base = {r['seed']: r for r in rows if r['k'] == 0}
     out = []
-    for k in SPEC['display_multiples'][1:]:
+    for k in spec['display_multiples'][1:]:
         arm = [r for r in rows if r['k'] == k]
         # Both arms are marked at the baseline run's closing fundamental, so D reflects trading only.
         d = [(r['cash'] - base[r['seed']]['cash']) + (r['shares'] - base[r['seed']]['shares']) *
              base[r['seed']]['fundamental_close'] for r in arm]
         per_lot = [x / max(1, r['executed_lots']) for x, r in zip(d, arm)]
         out.append({'display_multiple': k, 'n': len(d), 'mean_D_cents': round(statistics.mean(d), 6),
-                    'D_ci95_cents': bootstrap(d, SPEC['bootstrap_resamples'], f"{SPEC['bootstrap_seed']}|{k}"),
+                    'D_ci95_cents': bootstrap(d, spec['bootstrap_resamples'], f"{spec['bootstrap_seed']}|{k}"),
                     'mean_D_cents_per_executed_share': round(statistics.mean(per_lot), 6),
-                    'D_per_share_ci95': bootstrap(per_lot, SPEC['bootstrap_resamples'],
-                                                  f"{SPEC['bootstrap_seed']}|{k}|share"),
+                    'D_per_share_ci95': bootstrap(per_lot, spec['bootstrap_resamples'],
+                                                  f"{spec['bootstrap_seed']}|{k}|share"),
                     'positive_D': sum(x > 0 for x in d)})
+        if spec is not SPEC:   # two-sided 5% test at 80% power: 2.8 standard errors of the paired mean
+            out[-1]['mde80_cents_per_share'] = round(2.8 * statistics.stdev(per_lot) / len(per_lot) ** 0.5, 6)
     depths = [r['median_reference_depth'] for r in rows if r['median_reference_depth']]
     same_close = sum(r['fundamental_close'] == base[r['seed']]['fundamental_close'] for r in rows)
     return {'arms': out, 'median_reference_depth_shares': statistics.median(depths),
@@ -191,19 +227,20 @@ def source_hashes():
     return {str(Path(__file__).relative_to(ROOT)): hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
 
 
-def run(out, workers):
+def run(out, workers, version='v1'):
+    spec = SPECS[version]
     out.mkdir(parents=True, exist_ok=False)
-    rows = compute(workers)
+    rows = compute(workers, spec)
     (out / 'episodes.json').write_text(json.dumps(rows, indent=1) + '\n')
-    summary = {'spec': SPEC, 'abides_commit': ABIDES_COMMIT, **summarize(rows),
+    summary = {'spec': spec, 'abides_commit': ABIDES_COMMIT, **summarize(rows, spec),
                'source_sha256': source_hashes(), 'python': platform.python_version()}
     (out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
     print(json.dumps(summary['arms'], indent=1))
 
 
-def verify(out, workers):
+def verify(out, workers, version='v1'):
     saved = json.loads((out / 'episodes.json').read_text())
-    assert json.loads(json.dumps(compute(workers))) == saved
+    assert json.loads(json.dumps(compute(workers, SPECS[version]))) == saved
     print(json.dumps({'episodes_reproduced': len(saved)}))
 
 
@@ -212,5 +249,6 @@ if __name__ == '__main__':
     parser.add_argument('command', choices=['run', 'verify'])
     parser.add_argument('output', type=Path)
     parser.add_argument('--workers', type=int, default=4)
+    parser.add_argument('--spec', choices=sorted(SPECS), default='v1')
     args = parser.parse_args()
-    run(args.output, args.workers) if args.command == 'run' else verify(args.output, args.workers)
+    (run if args.command == 'run' else verify)(args.output, args.workers, args.spec)

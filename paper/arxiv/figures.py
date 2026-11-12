@@ -168,22 +168,23 @@ def calibration():
     ax = axes[0]
     xs = np.linspace(-1, 1, 50)
     ax.plot(xs, xs, color=MUTED, linewidth=1.0, linestyle=(0, (4, 2)))
-    ax.text(0.33, 0.55, r'stress, $\kappa=1$', color=INK2, fontsize=7.5, ha='right')
-    slopes = {}
+    ax.text(0.30, 0.38, r'stress, $\kappa=1$', color=INK2, fontsize=7.5, ha='right')
+    slopes, ends = {}, {}
     for ticker, color in stocks:
         e = load(f'results/lobster-calibration-v1/{ticker}/calibration.json')['estimates']
-        bins = e['h1s']['i3_binned_mean_move']
+        bins = [b for b in e['h1s']['i3_binned_mean_move'] if b['n'] >= 30]   # drop sparse extreme bins
+        ends[ticker] = ((bins[-1]['bin'][0] + bins[-1]['bin'][1]) / 2, bins[-1]['mean_move_half_spreads'])
         centers = [(b['bin'][0] + b['bin'][1]) / 2 for b in bins]
         ax.plot(centers, [b['mean_move_half_spreads'] for b in bins], color=color, marker='o', markersize=4,
                 linewidth=1.4, markeredgecolor='white', markeredgewidth=0.7, zorder=3)
         slopes[ticker] = [e[k]['i3'] for k in ('h1s', 'h5s', 'h10s')]
-    ax.annotate('MSFT', (0.8, 1.0), xytext=(6, -2), textcoords='offset points', color=INK, fontsize=7.5, va='center')
-    ax.annotate('INTC', (0.8, 0.0), xytext=(6, 7), textcoords='offset points', color=INK, fontsize=7.5, va='center')
-    ax.annotate('AAPL, AMZN,\nGOOG', (0.8, 0.0), xytext=(6, -10), textcoords='offset points', color=INK, fontsize=7.5,
+    ax.annotate('MSFT', ends['MSFT'], xytext=(6, 5), textcoords='offset points', color=INK, fontsize=7.5, va='center')
+    ax.annotate('INTC', ends['INTC'], xytext=(6, -2), textcoords='offset points', color=INK, fontsize=7.5, va='center')
+    ax.annotate('AAPL, AMZN,\nGOOG', ends['AAPL'], xytext=(6, -10), textcoords='offset points', color=INK, fontsize=7.5,
                 va='center', linespacing=0.95)
     ax.axhline(0, color=GRID, linewidth=0.8, zorder=0)
     ax.set_xlim(-1.05, 1.42)
-    ax.set_ylim(-0.75, 1.25)
+    ax.set_ylim(-0.45, 0.45)
     ax.set_xlabel('Imbalance of top three levels, $I$')
     ax.set_ylabel('Next-second mid move (half-spreads)')
     ax.set_title('Mean one-second move by imbalance')
