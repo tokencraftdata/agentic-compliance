@@ -1,18 +1,27 @@
 """Direct Anthropic client and conservative, persistent USD reservations.
 
-No retries, tools, prompt caching, or fallback models. A failed call retains its
-full reservation because a timeout does not establish that inference was free.
+No tools, prompt caching, or fallback models. The only retries are for HTTP 429
+(rate limited) and 529 (overloaded): the API rejects those requests before any
+inference, so they are not billed. Any other failure retains its full
+reservation because a timeout does not establish that inference was free.
 """
 from decimal import Decimal
 import fcntl
 import json
 import os
+import time
 from pathlib import Path
 import urllib.error
 import urllib.request
 
 API_VERSION = '2026-10-21'
 API_ROOT = 'https://api.anthropic.com/v1'
+# The base URL is fixed: ANTHROPIC_BASE_URL is deliberately ignored because
+# hosted sessions may point it at a different endpoint. The study key is read
+# from TG_ANTHROPIC_API_KEY first, then ANTHROPIC_API_KEY.
+KEY_VARIABLES = ('TG_ANTHROPIC_API_KEY', 'ANTHROPIC_API_KEY')
+UNBILLED_RETRY_CODES = (429, 529)
+MAX_UNBILLED_RETRIES = 6
 
 
 class ProviderFailure(RuntimeError):
@@ -21,20 +30,36 @@ class ProviderFailure(RuntimeError):
         super().__init__(self.code)
 
 
-def api(path, payload=None):
-    key = os.environ.get('ANTHROPIC_API_KEY')
-    if not key:
-        raise ProviderFailure('credential_absent')
+def credential():
+    for name in KEY_VARIABLES:
+        if os.environ.get(name):
+            return os.environ[name]
+    raise ProviderFailure('credential_absent')
+
+
+def retry_delay(error, attempt):
+    try:
+        return min(60.0, max(1.0, float(error.headers.get('retry-after'))))
+    except (TypeError, ValueError, AttributeError):
+        return min(60.0, 2.0 ** (attempt + 1))
+
+
+def api(path, payload=None, sleep=time.sleep):
+    key = credential()
     request = urllib.request.Request(API_ROOT + path,
         data=json.dumps(payload).encode() if payload is not None else None,
         headers={'x-api-key': key, 'anthropic-version': API_VERSION, 'Content-Type': 'application/json'})
-    try:
-        with urllib.request.urlopen(request, timeout=50) as response:
-            return json.load(response)
-    except urllib.error.HTTPError as error:
-        raise ProviderFailure('http_' + str(error.code)) from None
-    except Exception as error:
-        raise ProviderFailure(type(error).__name__) from None
+    for attempt in range(MAX_UNBILLED_RETRIES + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=90) as response:
+                return json.load(response)
+        except urllib.error.HTTPError as error:
+            if error.code in UNBILLED_RETRY_CODES and attempt < MAX_UNBILLED_RETRIES:
+                sleep(retry_delay(error, attempt))
+                continue
+            raise ProviderFailure('http_' + str(error.code)) from None
+        except Exception as error:
+            raise ProviderFailure(type(error).__name__) from None
 
 
 def message_payload(model, request, max_output_tokens):

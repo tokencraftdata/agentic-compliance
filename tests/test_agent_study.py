@@ -10,7 +10,9 @@ from unittest.mock import patch
 from agent_study.protocol import freeze, load_frozen, validate, conditions, ROOT
 from agent_study.scenarios import scenario, make_tape, validate_case
 from agent_study.market import ScenarioMarket
-from agent_study.provider import Budget, ProviderFailure, message_payload
+from agent_study.provider import Budget, ProviderFailure, message_payload, api, credential
+import io
+import urllib.error
 from agent_study.runner import run, verify, parsed_response, mock_response, config_for
 from agent_study.review import export
 
@@ -234,6 +236,29 @@ class AgentStudyTests(unittest.TestCase):
     def test_payload_has_only_synthetic_inputs_and_no_tools_or_credentials(self):
         result=message_payload(live_model(),{'system':'s','user':{'observation':{'inventory':0}}},256)
         self.assertEqual(set(result),{'model','max_tokens','system','messages'})
+
+    def test_study_key_variable_takes_precedence(self):
+        with patch.dict('os.environ',{'TG_ANTHROPIC_API_KEY':'study','ANTHROPIC_API_KEY':'other'}):
+            self.assertEqual(credential(),'study')
+        with patch.dict('os.environ',{'ANTHROPIC_API_KEY':'other'},clear=True):
+            self.assertEqual(credential(),'other')
+        with patch.dict('os.environ',{},clear=True):
+            with self.assertRaises(ProviderFailure):credential()
+
+    def test_only_unbilled_rate_limit_errors_are_retried(self):
+        def http(code):
+            return urllib.error.HTTPError('https://api.anthropic.com/v1/x',code,'e',{},io.BytesIO(b'{}'))
+        class Ok(io.BytesIO):
+            def __enter__(self):return self
+            def __exit__(self,*a):return False
+        delays=[]
+        with patch.dict('os.environ',{'TG_ANTHROPIC_API_KEY':'k'}),patch('urllib.request.urlopen',side_effect=[http(429),http(529),Ok(b'{"ok":1}')]) as call:
+            self.assertEqual(api('/x',sleep=delays.append),{'ok':1})
+            self.assertEqual(call.call_count,3);self.assertEqual(len(delays),2)
+            self.assertEqual(call.call_args[0][0].full_url,'https://api.anthropic.com/v1/x')
+        with patch.dict('os.environ',{'TG_ANTHROPIC_API_KEY':'k'}),patch('urllib.request.urlopen',side_effect=[http(500),Ok(b'{}')]) as call:
+            with self.assertRaises(ProviderFailure):api('/x',sleep=delays.append)
+            self.assertEqual(call.call_count,1)
 
 
 if __name__=='__main__':unittest.main()
