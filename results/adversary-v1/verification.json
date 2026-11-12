@@ -1,6 +1,6 @@
 {
-  "held_out_policies_rerun": 20,
-  "confirm_arms_rerun": 12,
+  "held_out_policies_rerun": 24,
+  "confirm_arms_rerun": 14,
   "summary_reproduced": true,
   "source_and_evidence_hashes_verified": true
 }

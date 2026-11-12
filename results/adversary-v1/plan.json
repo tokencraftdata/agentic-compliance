@@ -95,16 +95,22 @@
         "scale": 1.0
       },
       {
-        "name": "linear_k2",
-        "mode": "linear",
-        "kappa": 2,
-        "scale": 1.0
-      },
-      {
-        "name": "fitted_aapl_upper",
+        "name": "fitted_aapl",
         "mode": "linear",
         "kappa": 1,
-        "scale": 0.0386
+        "scale": 0.017851
+      },
+      {
+        "name": "fitted_intc",
+        "mode": "linear",
+        "kappa": 1,
+        "scale": 0.347866
+      },
+      {
+        "name": "fitted_msft",
+        "mode": "linear",
+        "kappa": 1,
+        "scale": 0.478911
       }
     ],
     "throttle": true,
@@ -352,13 +358,19 @@
       {
         "strategy": "split_6x10",
         "control": "aggregate_2x",
-        "response": "linear_k2",
+        "response": "fitted_aapl",
         "throttle": false
       },
       {
         "strategy": "split_6x10",
         "control": "aggregate_2x",
-        "response": "fitted_aapl_upper",
+        "response": "fitted_intc",
+        "throttle": false
+      },
+      {
+        "strategy": "split_6x10",
+        "control": "aggregate_2x",
+        "response": "fitted_msft",
         "throttle": false
       },
       {
@@ -382,13 +394,19 @@
       {
         "strategy": "split_6x10",
         "control": "none",
-        "response": "linear_k2",
+        "response": "fitted_aapl",
         "throttle": false
       },
       {
         "strategy": "split_6x10",
         "control": "none",
-        "response": "fitted_aapl_upper",
+        "response": "fitted_intc",
+        "throttle": false
+      },
+      {
+        "strategy": "split_6x10",
+        "control": "none",
+        "response": "fitted_msft",
         "throttle": false
       },
       {
@@ -449,7 +467,7 @@
     ]
   },
   "source_sha256": {
-    "paper_study/adversary.py": "5db92d2162f0c00c2514231a4f810d857536f45807e39a5f664a0b9170e2cd19",
+    "paper_study/adversary.py": "358204a2d0404a34c37bf255d82f2420cb5e48c5a87e48100e3178cd08cc6de2",
     "paper_study/sensitivity.py": "78556cdf2f08eb2f1b516e693620ec0da3cb087a20a98a943b049ee47d0e22e4",
     "config.json": "8a0422b72fdcbebbef86719b59106f6f5b5bd685a5038c00fb7d0d93f99028c3",
     "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
