@@ -85,8 +85,8 @@ The saved results the paper relies on are:
 | `results/boundary-v1` | 560 | Checks on either side of the response and cadence boundaries |
 | `results/reporting-v2_3.json` | derived | Means, ranges and rejection causes reported in the paper |
 | `results/offline-v2` | 1,120 | Original v0.2 pilot (160 calibration, 960 evaluation) |
-| `results/adversary-v1` | 20 searches, 6,400 held-out and confirmation episodes | Adaptive adversary and 100-seed confirmations with bootstrap intervals |
-| `results/lobster-calibration-v1` | derived | Imbalance-to-price slopes fitted to the LOBSTER AAPL sample (data not included) |
+| `results/adversary-v1` | 24 searches, 7,600 held-out and confirmation episodes | Adaptive adversary and 100-seed confirmations with bootstrap intervals |
+| `results/lobster-calibration-v1` | derived | Imbalance-to-price slopes fitted to the LOBSTER AAPL, INTC and MSFT samples (data not included) |
 | `results/agent-phase2-mock-v1` | 128 | Software check of the LLM runner with scripted mock policies (no LLM calls) |
 
 ## Reproducing the results

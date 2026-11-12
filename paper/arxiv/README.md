@@ -10,8 +10,9 @@ The text, tables, numbers and references are unchanged from the v2.4 PDF built b
 | --- | --- |
 | `main.tex` | The paper. References are an inline `thebibliography`, keys `r1`-`r29` in the v2.4 numbering. |
 | `arxiv.sty` | The template style file, unmodified. |
-| `figures/` | Figures 1-3 as vector PDFs, redrawn from the saved results with the v2.4 plotting code. |
-| `make_tex.py` | The one-off converter that produced `main.tex` and `figures/` from `paper/offline_study/manuscript.json`. Rerunning it overwrites `main.tex`. |
+| `figures/` | Figures as vector PDFs. |
+| `figures.py` | Draws every figure from the saved results under `results/` (needs matplotlib and numpy): `python paper/arxiv/figures.py`. |
+| `make_tex.py` | The one-off converter that produced the first `main.tex` from `paper/offline_study/manuscript.json`. Rerunning it overwrites `main.tex`; edit `main.tex` directly instead. |
 
 ## Build
 
