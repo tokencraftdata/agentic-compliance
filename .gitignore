@@ -5,3 +5,6 @@ __pycache__/
 results/local-*/
 paper/rendered/
 .DS_Store
+
+# ABIDES run logs
+log/

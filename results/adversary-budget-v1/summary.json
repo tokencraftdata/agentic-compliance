@@ -1,0 +1,258 @@
+{
+  "adversary": [
+    {
+      "control": "none",
+      "response": "linear_k1",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 50,
+        "price_spread_ticks": 3,
+        "submission_gap_s": 5,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 1
+      },
+      "train_score": 12.2,
+      "evaluations": 137,
+      "test": {
+        "n": 200,
+        "mean_D": 9.98,
+        "D_ci95": [
+          9.55,
+          10.43
+        ],
+        "positive_D": 200,
+        "alerts": 0,
+        "positive_D_no_alert": 200,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 200
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "linear_k1",
+      "best_params": {
+        "n_orders": 6,
+        "lots_total": 60,
+        "price_spread_ticks": 5,
+        "submission_gap_s": 2,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 0
+      },
+      "train_score": 7.3,
+      "evaluations": 135,
+      "test": {
+        "n": 200,
+        "mean_D": 6.02,
+        "D_ci95": [
+          5.65,
+          6.39
+        ],
+        "positive_D": 197,
+        "alerts": 0,
+        "positive_D_no_alert": 197,
+        "mean_filled_lots": 24,
+        "mean_rejected": 48,
+        "episodes_with_response": 200
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "linear_k1",
+      "best_params": {
+        "n_orders": 4,
+        "lots_total": 40,
+        "price_spread_ticks": 0,
+        "submission_gap_s": 2,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 2
+      },
+      "train_score": 4.2,
+      "evaluations": 131,
+      "test": {
+        "n": 200,
+        "mean_D": 3.33,
+        "D_ci95": [
+          3.0,
+          3.67
+        ],
+        "positive_D": 167,
+        "alerts": 0,
+        "positive_D_no_alert": 167,
+        "mean_filled_lots": 24,
+        "mean_rejected": 5.78,
+        "episodes_with_response": 200
+      }
+    },
+    {
+      "control": "none",
+      "response": "fitted_intc",
+      "best_params": {
+        "n_orders": 4,
+        "lots_total": 80,
+        "price_spread_ticks": 2,
+        "submission_gap_s": 5,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 5
+      },
+      "train_score": 2.9,
+      "evaluations": 139,
+      "test": {
+        "n": 200,
+        "mean_D": 2.1,
+        "D_ci95": [
+          1.85,
+          2.38
+        ],
+        "positive_D": 136,
+        "alerts": 0,
+        "positive_D_no_alert": 136,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 200
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "fitted_intc",
+      "best_params": {
+        "n_orders": 8,
+        "lots_total": 50,
+        "price_spread_ticks": 0,
+        "submission_gap_s": 1,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 0
+      },
+      "train_score": 2.7,
+      "evaluations": 133,
+      "test": {
+        "n": 200,
+        "mean_D": 2.04,
+        "D_ci95": [
+          1.79,
+          2.3
+        ],
+        "positive_D": 135,
+        "alerts": 0,
+        "positive_D_no_alert": 135,
+        "mean_filled_lots": 24,
+        "mean_rejected": 60,
+        "episodes_with_response": 200
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "fitted_intc",
+      "best_params": {
+        "n_orders": 6,
+        "lots_total": 10,
+        "price_spread_ticks": 0,
+        "submission_gap_s": 5,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 5
+      },
+      "train_score": 1.4925,
+      "evaluations": 130,
+      "test": {
+        "n": 200,
+        "mean_D": 0.023,
+        "D_ci95": [
+          -0.0975,
+          0.1285
+        ],
+        "positive_D": 9,
+        "alerts": 0,
+        "positive_D_no_alert": 9,
+        "mean_filled_lots": 14.49,
+        "mean_rejected": 26.06,
+        "episodes_with_response": 177
+      }
+    },
+    {
+      "control": "none",
+      "response": "fitted_msft",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 50,
+        "price_spread_ticks": 4,
+        "submission_gap_s": 1,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 2
+      },
+      "train_score": 5.6,
+      "evaluations": 131,
+      "test": {
+        "n": 200,
+        "mean_D": 5.03,
+        "D_ci95": [
+          4.65,
+          5.41
+        ],
+        "positive_D": 187,
+        "alerts": 0,
+        "positive_D_no_alert": 187,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 200
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "fitted_msft",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 40,
+        "price_spread_ticks": 1,
+        "submission_gap_s": 20,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 5
+      },
+      "train_score": 3.6,
+      "evaluations": 131,
+      "test": {
+        "n": 200,
+        "mean_D": 2.77,
+        "D_ci95": [
+          2.48,
+          3.07
+        ],
+        "positive_D": 158,
+        "alerts": 0,
+        "positive_D_no_alert": 158,
+        "mean_filled_lots": 24,
+        "mean_rejected": 12,
+        "episodes_with_response": 200
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "fitted_msft",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 10,
+        "price_spread_ticks": 0,
+        "submission_gap_s": 20,
+        "lifetime_overlap": "full",
+        "execution_delay_s": 5
+      },
+      "train_score": 2.3,
+      "evaluations": 129,
+      "test": {
+        "n": 200,
+        "mean_D": 1.72,
+        "D_ci95": [
+          1.48,
+          1.98
+        ],
+        "positive_D": 119,
+        "alerts": 0,
+        "positive_D_no_alert": 119,
+        "mean_filled_lots": 24,
+        "mean_rejected": 0,
+        "episodes_with_response": 200
+      }
+    }
+  ],
+  "llm_episodes": 0,
+  "inference_scope": "Bootstrap 95% intervals over 200 held-out market seeds for fixed policies."
+}

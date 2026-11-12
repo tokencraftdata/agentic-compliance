@@ -1,0 +1,184 @@
+{
+  "source_files": {
+    "INTC_2012-06-21_34200000_57600000_message_10.csv": "199c55b35f6c62f07b058922038c0b8d168bc3be9d2de94da19c901cd3f29927",
+    "INTC_2012-06-21_34200000_57600000_orderbook_10.csv": "6bc4c4dc1e92d78e46d04f9e7914df2d8c2a9231928493e7395a9085e1fc91ab"
+  },
+  "method": {
+    "levels": 3,
+    "grid_seconds": 1,
+    "trim_seconds": 600,
+    "units": "mid-price change divided by the half-spread at the start of the interval",
+    "bootstrap": "2000 resamples of 300-second blocks"
+  },
+  "estimates": {
+    "h1s": {
+      "n_seconds": 18889,
+      "i3": {
+        "slope_half_spreads": 0.347866,
+        "intercept": -0.025566,
+        "slope_through_origin": 0.297496,
+        "slope_ci95_block_bootstrap": [
+          0.287321,
+          0.41722
+        ]
+      },
+      "i1": {
+        "slope_half_spreads": 0.200575,
+        "intercept": -0.015629,
+        "slope_through_origin": 0.195763,
+        "slope_ci95_block_bootstrap": [
+          0.171824,
+          0.229048
+        ]
+      },
+      "i3_binned_mean_move": [
+        {
+          "bin": [
+            -0.6,
+            -0.2
+          ],
+          "n": 996,
+          "mean_move_half_spreads": -0.149598
+        },
+        {
+          "bin": [
+            -0.2,
+            0.2
+          ],
+          "n": 14473,
+          "mean_move_half_spreads": -0.016237
+        },
+        {
+          "bin": [
+            0.2,
+            0.6
+          ],
+          "n": 3412,
+          "mean_move_half_spreads": 0.072978
+        },
+        {
+          "bin": [
+            0.6,
+            1.0
+          ],
+          "n": 8,
+          "mean_move_half_spreads": 0.0
+        }
+      ]
+    },
+    "h5s": {
+      "n_seconds": 18799,
+      "i3": {
+        "slope_half_spreads": 1.169217,
+        "intercept": -0.101153,
+        "slope_through_origin": 0.968755,
+        "slope_ci95_block_bootstrap": [
+          0.931563,
+          1.406172
+        ]
+      },
+      "i1": {
+        "slope_half_spreads": 0.646361,
+        "intercept": -0.066971,
+        "slope_through_origin": 0.625124,
+        "slope_ci95_block_bootstrap": [
+          0.560337,
+          0.736453
+        ]
+      },
+      "i3_binned_mean_move": [
+        {
+          "bin": [
+            -0.6,
+            -0.2
+          ],
+          "n": 990,
+          "mean_move_half_spreads": -0.435354
+        },
+        {
+          "bin": [
+            -0.2,
+            0.2
+          ],
+          "n": 14408,
+          "mean_move_half_spreads": -0.074368
+        },
+        {
+          "bin": [
+            0.2,
+            0.6
+          ],
+          "n": 3393,
+          "mean_move_half_spreads": 0.226348
+        },
+        {
+          "bin": [
+            0.6,
+            1.0
+          ],
+          "n": 8,
+          "mean_move_half_spreads": 0.5
+        }
+      ]
+    },
+    "h10s": {
+      "n_seconds": 18788,
+      "i3": {
+        "slope_half_spreads": 1.721027,
+        "intercept": -0.174968,
+        "slope_through_origin": 1.372379,
+        "slope_ci95_block_bootstrap": [
+          1.321082,
+          2.129628
+        ]
+      },
+      "i1": {
+        "slope_half_spreads": 0.907447,
+        "intercept": -0.122554,
+        "slope_through_origin": 0.868639,
+        "slope_ci95_block_bootstrap": [
+          0.776414,
+          1.040264
+        ]
+      },
+      "i3_binned_mean_move": [
+        {
+          "bin": [
+            -0.6,
+            -0.2
+          ],
+          "n": 977,
+          "mean_move_half_spreads": -0.619243
+        },
+        {
+          "bin": [
+            -0.2,
+            0.2
+          ],
+          "n": 14422,
+          "mean_move_half_spreads": -0.137672
+        },
+        {
+          "bin": [
+            0.2,
+            0.6
+          ],
+          "n": 3382,
+          "mean_move_half_spreads": 0.302779
+        },
+        {
+          "bin": [
+            0.6,
+            1.0
+          ],
+          "n": 7,
+          "mean_move_half_spreads": 0.571429
+        }
+      ]
+    },
+    "median_half_spread_ticks": 0.5,
+    "mean_abs_i3": 0.130438
+  },
+  "source_sha256": "566c2a11d49a85c9a2e1be407db105e4a523bc3f26750e7b97020b2098b2552c",
+  "python": "3.9.6"
+}

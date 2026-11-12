@@ -10,7 +10,8 @@ run with it, and the paper that reports them.
 **Read the paper:** [TradeGauntlet: Testing the Limits of Trading Compliance Controls](output/pdf/order_splitting_and_timing.pdf)
 (v2.4, 10 November 2026, exploratory technical report).
 
-> **Status.** Every trade in the reported experiments comes from a fixed script.
+> **Status.** Every trade in the reported experiments comes from a fixed script or a
+> seeded search over split-order schedules (`paper_study.adversary`).
 > The LLM-agent study is built and passes its software checks, but no real model has
 > been run yet. Nothing here measures real-market detection accuracy or establishes
 > legal compliance.
@@ -69,8 +70,9 @@ together.
 | `experiments/` | Earlier experiment framework and Anthropic API adapter used by the v0.4 smoke test. |
 | `tests/` | Unit and integration tests (112 tests). |
 | `results/` | Saved evidence for every reported experiment: plans, configs, traces, summaries and manifests. |
-| `paper/offline_study/` | Source of the current paper (`build.py`, `content.py`, references, figures) and its review records. |
-| `output/pdf/` | Rendered papers: the current v2.4 paper and the earlier v0.4 pilot report. |
+| `paper/arxiv/` | The paper in the arXiv LaTeX template (`main.tex`); edit this from now on. See its [README](paper/arxiv/README.md). |
+| `paper/offline_study/` | Original v2.4 build of the paper (`build.py`, `content.py`, references, figures) and its review records. |
+| `output/pdf/` | Rendered papers: v2.4 in the arXiv template (`tradegauntlet_arxiv.pdf`), the original v2.4 layout, and the earlier v0.4 pilot report. |
 | `docs/` | Workflow guide, pilot protocol, commercial assessment, version history and historical documents. |
 | `provenance/` | Records of how this repository was separated from its original home. |
 | `scripts/` | Command-line tools for the original pilot: replay, package verification, the invariant check, result comparison and the v0.2/v0.4 document builders. Run them from the root as `python -m scripts.<name>`. |
@@ -83,6 +85,12 @@ The saved results the paper relies on are:
 | `results/boundary-v1` | 560 | Checks on either side of the response and cadence boundaries |
 | `results/reporting-v2_3.json` | derived | Means, ranges and rejection causes reported in the paper |
 | `results/offline-v2` | 1,120 | Original v0.2 pilot (160 calibration, 960 evaluation) |
+| `results/adversary-v1` | 24 searches, 7,600 held-out and confirmation episodes | Adaptive adversary and 100-seed confirmations with bootstrap intervals |
+| `results/lobster-calibration-v1` | derived | Imbalance-to-price slopes fitted to the five LOBSTER samples (AAPL, AMZN, GOOG, INTC, MSFT) (data not included) |
+| `results/execution-quality-v1` | 6,000 | Fill rate, shortfall, edge, markout and inventory of the legitimate scripts under each control |
+| `results/abides-check-v1` | 200 ABIDES sessions | Split-display gain in the ABIDES RMSC04 market (needs ABIDES installed) |
+| `results/baselines-v1` | ~11,000 | Order-to-trade ratio and learned detector; adaptive search against all detectors |
+| `results/adversary-budget-v1` | ~90,000 | Nine key searches repeated with 3x budget and 200 held-out seeds |
 | `results/agent-phase2-mock-v1` | 128 | Software check of the LLM runner with scripted mock policies (no LLM calls) |
 
 ## Reproducing the results
@@ -106,6 +114,7 @@ $PY -m unittest discover -s tests -v
 $PY -m paper_study.sensitivity verify results/sensitivity-v1
 $PY -m paper_study.boundary verify results/boundary-v1
 $PY -m paper_study.reporting results/reporting-v2_3.json --verify
+$PY -m paper_study.adversary verify results/adversary-v1   # about 5 minutes on 4 cores
 
 # Verify the original pilot and the bounded invariant check
 $PY -m scripts.verify_package

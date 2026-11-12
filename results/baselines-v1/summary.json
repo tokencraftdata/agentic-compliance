@@ -1,0 +1,446 @@
+{
+  "detectors": {
+    "model": {
+      "features": [
+        "cancel_ratio",
+        "log_otr",
+        "max_display_ratio",
+        "cancel_after_fill",
+        "short_lived",
+        "passive_fill_ratio",
+        "aggressor_share"
+      ],
+      "mean": [
+        0.9445096820917637,
+        2.070993540089264,
+        3.5386672502461978,
+        0.6264830318296476,
+        0.627404802892649,
+        0.04602409750916912,
+        0.8285891684842287
+      ],
+      "sd": [
+        0.1509308846131637,
+        0.7402926093863594,
+        2.4736049461861027,
+        0.37968236680777884,
+        0.4685926968047764,
+        0.12324285367205304,
+        0.3020626114973434
+      ],
+      "weights": [
+        0.731007438,
+        0.723199226,
+        -0.144570519,
+        0.219191928,
+        -1.201161236,
+        -0.009087723,
+        1.542995114
+      ],
+      "bias": 4.040441656
+    },
+    "otr_threshold": 3.2857142857142856,
+    "learned_threshold": -2.6666109309909496
+  },
+  "training": {
+    "positive": {
+      "n": 600,
+      "conduct": 386,
+      "otr": 577,
+      "learned": 600,
+      "any": 600
+    },
+    "negative": {
+      "n": 50,
+      "conduct": 0,
+      "otr": 2,
+      "learned": 2,
+      "any": 2
+    }
+  },
+  "legit_false_alerts": {
+    "vwap_executor": {
+      "n": 100,
+      "conduct": 0,
+      "otr": 1,
+      "learned": 0,
+      "any": 1
+    },
+    "iceberg": {
+      "n": 100,
+      "conduct": 0,
+      "otr": 0,
+      "learned": 0,
+      "any": 0
+    },
+    "market_maker": {
+      "n": 100,
+      "conduct": 0,
+      "otr": 0,
+      "learned": 0,
+      "any": 0
+    },
+    "large_market_maker": {
+      "n": 100,
+      "conduct": 0,
+      "otr": 22,
+      "learned": 15,
+      "any": 23
+    },
+    "patient_large_maker": {
+      "n": 100,
+      "conduct": 0,
+      "otr": 0,
+      "learned": 0,
+      "any": 0
+    }
+  },
+  "random_schedules": {
+    "n": 100,
+    "conduct": 64,
+    "otr": 99,
+    "learned": 100,
+    "any": 100
+  },
+  "searched_schedules": [
+    {
+      "control": "none",
+      "response": "step_t0.4",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "none",
+      "response": "step_t0.2",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "none",
+      "response": "linear_k1",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "none",
+      "response": "fitted_aapl",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "none",
+      "response": "fitted_intc",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "none",
+      "response": "fitted_msft",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "legacy",
+      "response": "step_t0.4",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "legacy",
+      "response": "step_t0.2",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "legacy",
+      "response": "linear_k1",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "legacy",
+      "response": "fitted_aapl",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "legacy",
+      "response": "fitted_intc",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "legacy",
+      "response": "fitted_msft",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "step_t0.4",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "step_t0.2",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "linear_k1",
+      "n": 100,
+      "conduct": 0,
+      "otr": 0,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "fitted_aapl",
+      "n": 100,
+      "conduct": 0,
+      "otr": 0,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "fitted_intc",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "fitted_msft",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "step_t0.4",
+      "n": 100,
+      "conduct": 0,
+      "otr": 0,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "step_t0.2",
+      "n": 100,
+      "conduct": 0,
+      "otr": 0,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "linear_k1",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "fitted_aapl",
+      "n": 100,
+      "conduct": 0,
+      "otr": 100,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "fitted_intc",
+      "n": 100,
+      "conduct": 0,
+      "otr": 0,
+      "learned": 100,
+      "any": 100
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "fitted_msft",
+      "n": 100,
+      "conduct": 0,
+      "otr": 16,
+      "learned": 100,
+      "any": 100
+    }
+  ],
+  "searched_totals": {
+    "n": 2400,
+    "conduct": 0,
+    "otr": 1816,
+    "learned": 2400,
+    "any": 2400
+  },
+  "adaptive": [
+    {
+      "control": "none",
+      "response": "linear_k1",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 80,
+        "price_spread_ticks": 1,
+        "submission_gap_s": 5,
+        "lifetime_overlap": "staggered",
+        "execution_delay_s": 1,
+        "execution_lots": 10
+      },
+      "train_score": -17.0,
+      "evaluations": 62,
+      "test": {
+        "n": 100,
+        "mean_D": 69.3,
+        "D_ci95": [
+          66.4,
+          72.3
+        ],
+        "positive_D": 100,
+        "any_alert": 100,
+        "conduct_alerts": 100,
+        "otr_alerts": 100,
+        "learned_alerts": 100
+      }
+    },
+    {
+      "control": "none",
+      "response": "fitted_msft",
+      "best_params": {
+        "n_orders": 8,
+        "lots_total": 80,
+        "price_spread_ticks": 3,
+        "submission_gap_s": 2,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 10,
+        "execution_lots": 20
+      },
+      "train_score": -76.0,
+      "evaluations": 51,
+      "test": {
+        "n": 100,
+        "mean_D": 16.4,
+        "D_ci95": [
+          13.4,
+          19.6
+        ],
+        "positive_D": 59,
+        "any_alert": 100,
+        "conduct_alerts": 0,
+        "otr_alerts": 100,
+        "learned_alerts": 100
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "linear_k1",
+      "best_params": {
+        "n_orders": 2,
+        "lots_total": 40,
+        "price_spread_ticks": 4,
+        "submission_gap_s": 1,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 40,
+        "execution_lots": 20
+      },
+      "train_score": -26.0,
+      "evaluations": 58,
+      "test": {
+        "n": 100,
+        "mean_D": 63.6,
+        "D_ci95": [
+          57.8,
+          69.4
+        ],
+        "positive_D": 99,
+        "any_alert": 100,
+        "conduct_alerts": 0,
+        "otr_alerts": 0,
+        "learned_alerts": 100
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "fitted_msft",
+      "best_params": {
+        "n_orders": 5,
+        "lots_total": 60,
+        "price_spread_ticks": 3,
+        "submission_gap_s": 20,
+        "lifetime_overlap": "disjoint",
+        "execution_delay_s": 10,
+        "execution_lots": 20
+      },
+      "train_score": -86.0,
+      "evaluations": 58,
+      "test": {
+        "n": 100,
+        "mean_D": 11.0,
+        "D_ci95": [
+          8.6,
+          13.6
+        ],
+        "positive_D": 46,
+        "any_alert": 100,
+        "conduct_alerts": 0,
+        "otr_alerts": 100,
+        "learned_alerts": 100
+      }
+    }
+  ],
+  "llm_episodes": 0,
+  "inference_scope": "Detection counts over fixed seeds; schedules come from one authored family."
+}
