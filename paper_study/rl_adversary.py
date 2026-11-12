@@ -19,7 +19,7 @@ shows where a longer search ends up.
     python -m paper_study.rl_adversary verify results/rl-adversary-v1
 """
 import argparse
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import gzip
 import hashlib
 import json
@@ -195,14 +195,31 @@ def run_cmd(out, workers):
     if (out / 'summary.json').exists():
         raise ValueError('Existing evidence cannot be overwritten')
     base, spec = p['config'], p['spec']
+    # Each finished search is checkpointed, so a restarted run skips it. The
+    # searches are deterministic, so a resumed run gives the same result.
+    partial = out / 'partial'
+    partial.mkdir(exist_ok=True)
+    name = lambda run, cell: f"{run['name']}__{cell['control']}__{cell['response']}.json"
+    index = {}
+    for f in partial.glob('*.json'):
+        s = json.loads(f.read_text())
+        index[(s['run'], s['control'], s['response'])] = s
     # Long runs first so the pool is not left with one straggler.
-    order = sorted(jobs(spec), key=lambda j: -j[1]['iterations'])
+    order = sorted((j for j in jobs(spec) if (j[1]['name'], j[0]['control'], j[0]['response']) not in index),
+                   key=lambda j: -j[1]['iterations'])
     with ProcessPoolExecutor(max_workers=workers) as pool:
-        found = list(pool.map(_search_job, [(base, cell, run, spec) for cell, run in order]))
-    index = {(s['run'], s['control'], s['response']): s for s in found}
+        futures = [pool.submit(_search_job, (base, cell, run, spec)) for cell, run in order]
+        for future in as_completed(futures):
+            s = future.result()
+            (partial / name({'name': s['run']}, s)).write_text(canonical(s) + '\n')
+            index[(s['run'], s['control'], s['response'])] = s
+            print('searched', s['run'], s['control'], s['response'], s['train_score'], flush=True)
     searches = [index[(run['name'], cell['control'], cell['response'])] for cell, run in jobs(spec)]
     held = compute_held_out(base, searches, workers)
     write_gz(out / 'search_log.jsonl.gz', searches)
+    for f in partial.glob('*.json'):
+        f.unlink()
+    partial.rmdir()
     write_gz(out / 'episodes.jsonl.gz', held)
     summary = {'cells': summarize(searches, held, spec),
                'inference_scope': 'Bootstrap 95% intervals over 100 held-out market seeds for each selected policy; '
