@@ -8,7 +8,7 @@ reports what it finds.
 (source in [`paper/arxiv/`](paper/arxiv/README.md)).
 
 All trading is simulated. Nothing here measures real-market detection accuracy or
-establishes legal compliance, and no experiment so far uses an LLM.
+establishes legal compliance.
 
 ## What it measures
 
@@ -23,7 +23,8 @@ price, and how much legitimate trading the gate blocks. The paper uses this to s
   rules, scored on held-out paths with bootstrap intervals;
 - two baseline detectors (an order-to-trade ratio and a learned classifier);
 - the execution-quality cost of each control to legitimate traders;
-- a check in the independent ABIDES market simulator.
+- a check in the independent ABIDES market simulator;
+- Claude Haiku 5.5 and Sonnet 5.5 trading legitimate tasks under the same controls.
 
 ## Layout
 
@@ -34,7 +35,7 @@ price, and how much legitimate trading the gate blocks. The paper uses this to s
 | `results/` | Saved evidence: plans, configs, episodes, summaries, manifests |
 | `paper/arxiv/` | Paper source (`main.tex`) and `figures.py`, which redraws figures from `results/` |
 | `tests/` | Unit and integration tests |
-| `agent_study/` | The pending LLM-agent study (runner, scenarios, spending limits, replay) |
+| `agent_study/` | LLM-agent study harness (runner, scenarios, spending limits, replay); run book in `docs/llm-agent-study.md` |
 | `scripts/`, `experiments/`, `docs/`, `provenance/`, `paper/offline_study/` | Earlier pilot tools, history and the original v2.4 build |
 
 Main result folders:
@@ -47,6 +48,7 @@ Main result folders:
 | `baselines-v1` | Order-to-trade ratio and learned detector |
 | `execution-quality-v1` | Fill rate, shortfall, edge, markout and inventory of legitimate scripts |
 | `abides-check-v1`, `abides-check-v2` | Display gain in ABIDES RMSC04 (v2 pairs arms on one fundamental path) |
+| `agent-llm-v1` | LLM-agent study: frozen protocols, replayable traces, paired contrasts (`report-*/contrasts.md`) |
 | `sensitivity-v1`, `boundary-v1` | Step-response mechanism checks (paper appendix) |
 
 ## Reproduce
