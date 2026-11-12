@@ -10,7 +10,9 @@ from unittest.mock import patch
 from agent_study.protocol import freeze, load_frozen, validate, conditions, ROOT
 from agent_study.scenarios import scenario, make_tape, validate_case
 from agent_study.market import ScenarioMarket
-from agent_study.provider import Budget, ProviderFailure, message_payload
+from agent_study.provider import Budget, ProviderFailure, message_payload, api, credential
+import io
+import urllib.error
 from agent_study.runner import run, verify, parsed_response, mock_response, config_for
 from agent_study.review import export
 
@@ -235,5 +237,83 @@ class AgentStudyTests(unittest.TestCase):
         result=message_payload(live_model(),{'system':'s','user':{'observation':{'inventory':0}}},256)
         self.assertEqual(set(result),{'model','max_tokens','system','messages'})
 
+    def test_study_key_variable_takes_precedence(self):
+        with patch.dict('os.environ',{'TG_ANTHROPIC_API_KEY':'study','ANTHROPIC_API_KEY':'other'}):
+            self.assertEqual(credential(),'study')
+        with patch.dict('os.environ',{'ANTHROPIC_API_KEY':'other'},clear=True):
+            self.assertEqual(credential(),'other')
+        with patch.dict('os.environ',{},clear=True):
+            with self.assertRaises(ProviderFailure):credential()
+
+    def test_only_unbilled_rate_limit_errors_are_retried(self):
+        def http(code):
+            return urllib.error.HTTPError('https://api.anthropic.com/v1/x',code,'e',{},io.BytesIO(b'{}'))
+        class Ok(io.BytesIO):
+            def __enter__(self):return self
+            def __exit__(self,*a):return False
+        delays=[]
+        with patch.dict('os.environ',{'TG_ANTHROPIC_API_KEY':'k'}),patch('urllib.request.urlopen',side_effect=[http(429),http(529),Ok(b'{"ok":1}')]) as call:
+            self.assertEqual(api('/x',sleep=delays.append),{'ok':1})
+            self.assertEqual(call.call_count,3);self.assertEqual(len(delays),2)
+            self.assertEqual(call.call_args[0][0].full_url,'https://api.anthropic.com/v1/x')
+        with patch.dict('os.environ',{'TG_ANTHROPIC_API_KEY':'k'}),patch('urllib.request.urlopen',side_effect=[http(500),Ok(b'{}')]) as call:
+            with self.assertRaises(ProviderFailure):api('/x',sleep=delays.append)
+            self.assertEqual(call.call_count,1)
+
+
+
+
+class LiveV1AdjustmentTests(unittest.TestCase):
+    def test_fenced_json_is_accepted(self):
+        model = {'id': 'm'}
+        body = {'model': 'm', 'stop_reason': 'end_turn',
+                'content': [{'type': 'thinking', 'thinking': ''},
+                            {'type': 'text', 'text': '```json\n{"actions":[{"type":"hold"}]}\n```'}]}
+        self.assertEqual(parsed_response(body, model, True)['actions'], [{'type': 'hold'}])
+
+    def test_unfenced_prose_is_still_rejected(self):
+        body = {'model': 'm', 'stop_reason': 'end_turn',
+                'content': [{'type': 'text', 'text': 'Here: {"actions":[{"type":"hold"}]}'}]}
+        with self.assertRaises(ValueError):
+            parsed_response(body, {'id': 'm'}, True)
+
+    def test_thinking_setting_reaches_payload(self):
+        request = {'system': 's', 'user': {}}
+        self.assertEqual(message_payload({'id': 'm', 'thinking': 'disabled'}, request, 10)['thinking'],
+                         {'type': 'disabled'})
+        self.assertNotIn('thinking', message_payload({'id': 'm'}, request, 10))
+
+
+
+class LedgerLogTests(unittest.TestCase):
+    def test_ledger_grows_linearly_and_replays(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'b.jsonl'
+            with Budget(path, '100') as budget:
+                for n in range(200):
+                    i = budget.reserve(live_model(), 256, str(n))
+                    budget.settle(i, {'usage': {'input_tokens': 100, 'output_tokens': 20}})
+                total = budget.committed()
+            self.assertLess(path.stat().st_size, 200 * 2 * 600)
+            with Budget(path, '100') as budget:
+                self.assertEqual(budget.committed(), total)
+                self.assertEqual(len(budget.state['entries']), 200)
+
+    def test_legacy_snapshot_ledger_still_loads(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'b.jsonl'
+            entry = {'call_id': 'x', 'committed_usd': '0.5', 'status': 'settled'}
+            path.write_text(json.dumps({'cap_usd': '1', 'entries': []}) + '\n' +
+                            json.dumps({'cap_usd': '1', 'entries': [entry]}) + '\n')
+            with Budget(path, '1') as budget:
+                self.assertEqual(budget.committed(), Decimal('0.5'))
+
+    def test_truncated_entry_line_fails_closed(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'b.jsonl'
+            path.write_text(json.dumps({'cap_usd': '1', 'entries': []}) + '\n{"entry_index": 0, "ent')
+            with self.assertRaises(ValueError):
+                with Budget(path, '1'):
+                    pass
 
 if __name__=='__main__':unittest.main()

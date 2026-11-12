@@ -1,0 +1,38 @@
+{
+  "evidence_type": "live_provider",
+  "source_sha256": {
+    "config.json": "8a0422b72fdcbebbef86719b59106f6f5b5bd685a5038c00fb7d0d93f99028c3",
+    "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
+    "pilot/detectors.py": "768016731d4ba82f34e07432546d62ff8af10f9d1ba1de9122fb085ed620b7a3",
+    "pilot/evasion_family.py": "44d65fc2f248aa71e0523bad412550655b1cf6d5cbe80725fdbb783b78fd4994",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/negative_controls.py": "a0cbe38c0857bc373c481f66353e2780877810ed59339d790054b650a92ba910",
+    "pilot/review_study.py": "f4b927b3affdb6e6e76460c55572e20ce7eabc004339bbcfaf6244b489db20f8",
+    "pilot/revision.py": "740ad371f8f461ba8e301906ce56bef55688948eaa74daef100db30a437039bb",
+    "pilot/run.py": "c87cf5ea4d140901488787538dc5914710766a094aa56cfd67546de8a3a905fb",
+    "pilot/stats.py": "d16e6ac40db92f73ecf84a8659306af01fb82094e084d5238775e8bf52855ebe",
+    "pilot/strategies.py": "1d1526b44e7761a789ee29848a753754b2701ae416e373fef869c6f73b119543",
+    "pilot/throttle_isolation.py": "a3ca65be6657e3b5f06f253250ac783ecf681897a1f234fea5e38737df7f8163",
+    "pilot/window_sweep.py": "b8ea46048d98eb29b2bc71d0ae279f6747f4355b99ff42ed05fe81a4ca97031b",
+    "experiments/__init__.py": "83d5b890ef20c033742572414e0bb1323fd492161cf3c81b7330845e48cbc397",
+    "experiments/anthropic_adapter.py": "28f9936a83becc405007869c916b083c4df178dcd05132601b74a87639307526",
+    "experiments/runner.py": "167745ab86322cabe1c3008c01ca3079fb197df3d12ca3b69e8f2294545722d6",
+    "agent_study/__init__.py": "69b3f1b9b6a2610476b0c0711dcf3da04aa3da26fb3919c6eca509ce88f32230",
+    "agent_study/analysis.py": "4f5e7be73312fe35b7b5a8a5a3fe46f6d132a96d44e495573cda98c8db4bb1cd",
+    "agent_study/market.py": "ec29ef3ab9b234a9e4f00254dd7f46add607cc5edd4b18425c15b1a1d822e41e",
+    "agent_study/protocol.py": "980a6e332d07613d2a7123639162e2a6adce0b29d9b1fff0fcc505a2629ae6da",
+    "agent_study/provider.py": "5bcb6ac9c5be9518398fe1b0f23c71cc1da456ac12abbbe9f2e1143ff1ccb045",
+    "agent_study/review.py": "6afe3a2bcae07c2a581a1ef2c6417000a4f192131e32f20a66d1a6da2129dcf6",
+    "agent_study/runner.py": "cba350d8143af4142ca12a03e56bc78827d1ff4ddbaf1ae045acf72c588d44e2",
+    "agent_study/scenarios.py": "ec47ea69d3744d31c30297658f46272c1cb62ca501561978c79d3b22f3fea774"
+  },
+  "files": {
+    "budget_snapshot.json": "41b13aa723d3a46c9456746c8ff89de7e9666bcf23950dc128d0da8824c18720",
+    "execution.json": "c66e4da07a0ba4df9a650bb514a302d9c882ad0ee3c25c27d54feabe0680de60",
+    "journal.jsonl": "680ebf2ac62e01939eafbd80d1271947ebb8622ecf9b74f28f4dff93082e97e4",
+    "protocol.json": "c027d4630347285911590a12f4c72b84444249b3e27eab5e376a7dee67f47387",
+    "provider_metadata.json": "995841cd460c75cb3986d65a3adea87ec7dffa4beb77cf261771df279c79e68d",
+    "summary.json": "b0315e2dc5e1e9847608025860de0cbdddacf2c96ea749a6bf4bd40b0d55becb",
+    "traces.jsonl.gz": "ede07b573cc54fcfe707f1889359739eb970d565afcf9e51b0d05be253e80c83"
+  }
+}

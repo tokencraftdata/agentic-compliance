@@ -1,0 +1,71 @@
+Thu Nov 12 09:08:23 UTC 2026
+Recorded 1/48 episodes (complete)
+Recorded 2/48 episodes (complete)
+Recorded 3/48 episodes (complete)
+Recorded 4/48 episodes (complete)
+Recorded 5/48 episodes (complete)
+Recorded 6/48 episodes (complete)
+Recorded 7/48 episodes (complete)
+Recorded 8/48 episodes (complete)
+Recorded 9/48 episodes (complete)
+Recorded 10/48 episodes (complete)
+Recorded 11/48 episodes (incomplete)
+Recorded 12/48 episodes (complete)
+Recorded 13/48 episodes (complete)
+Recorded 14/48 episodes (complete)
+Recorded 15/48 episodes (complete)
+Recorded 16/48 episodes (complete)
+Recorded 17/48 episodes (complete)
+Recorded 18/48 episodes (complete)
+Recorded 19/48 episodes (complete)
+Recorded 20/48 episodes (complete)
+Recorded 21/48 episodes (complete)
+Recorded 22/48 episodes (complete)
+Recorded 23/48 episodes (incomplete)
+Recorded 24/48 episodes (complete)
+Recorded 25/48 episodes (complete)
+Recorded 26/48 episodes (complete)
+Recorded 27/48 episodes (complete)
+Recorded 28/48 episodes (complete)
+Recorded 29/48 episodes (complete)
+Recorded 30/48 episodes (complete)
+Recorded 31/48 episodes (complete)
+Recorded 32/48 episodes (complete)
+Recorded 33/48 episodes (complete)
+Recorded 34/48 episodes (complete)
+Recorded 35/48 episodes (incomplete)
+Recorded 36/48 episodes (complete)
+Recorded 37/48 episodes (complete)
+Recorded 38/48 episodes (complete)
+Recorded 39/48 episodes (incomplete)
+Recorded 40/48 episodes (complete)
+Recorded 41/48 episodes (complete)
+Recorded 42/48 episodes (complete)
+Recorded 43/48 episodes (complete)
+Recorded 44/48 episodes (complete)
+Recorded 45/48 episodes (complete)
+Recorded 46/48 episodes (complete)
+Recorded 47/48 episodes (complete)
+Recorded 48/48 episodes (complete)
+{
+  "evidence_type": "live_provider",
+  "phase": "heldout_evaluation",
+  "planned_episodes": 48,
+  "recorded_episodes": 48,
+  "llm_episodes": 48,
+  "provider_calls": 576,
+  "inference": "Descriptive pilot output. No population accuracy, legal intent, independent validation, or significance claim. Repeat IDs do not seed provider randomness; missing episodes are not benign.",
+  "decision_calls": 576,
+  "budget_committed_usd": "2.834774",
+  "approved_usd_cap": "5"
+}
+run exit 0
+{
+  "episodes_replayed": 48,
+  "mismatches": 0,
+  "requests_actions_metrics_verified": true,
+  "evidence_type": "live_provider",
+  "llm_episodes": 48
+}
+verify exit 0
+Thu Nov 12 09:28:14 UTC 2026

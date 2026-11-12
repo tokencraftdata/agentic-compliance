@@ -1,0 +1,1205 @@
+{
+  "cap_usd": "0.25",
+  "entries": [
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:00c49c7b95ef8ba13563ccef:0",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001067",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 467,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 120,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:00c49c7b95ef8ba13563ccef:1",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001804",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1214,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 118,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:00c49c7b95ef8ba13563ccef:2",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002228",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1758,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 94,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:00c49c7b95ef8ba13563ccef:3",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002545",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1765,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 156,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:00c49c7b95ef8ba13563ccef:4",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002603",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1958,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 129,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:00c49c7b95ef8ba13563ccef:5",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002388",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1848,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 108,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:a035b260dbd76fe31f8c222a:0",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001056",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 461,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 119,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:a035b260dbd76fe31f8c222a:1",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002054",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1254,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 160,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:a035b260dbd76fe31f8c222a:2",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002276",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1796,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 96,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:a035b260dbd76fe31f8c222a:3",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.000242",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1845,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 115,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:a035b260dbd76fe31f8c222a:4",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002403",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1718,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 137,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:a035b260dbd76fe31f8c222a:5",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002397",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1637,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 152,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:e414a26f46f4ece9ed443b09:0",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0000926",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 461,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 93,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:e414a26f46f4ece9ed443b09:1",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001504",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 964,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 108,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:e414a26f46f4ece9ed443b09:2",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.000174",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1240,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:e414a26f46f4ece9ed443b09:3",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002212",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1517,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 139,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:e414a26f46f4ece9ed443b09:4",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002214",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1699,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 103,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:e414a26f46f4ece9ed443b09:5",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002236",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1586,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 130,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:3c5bae79665a910c0b7de9c8:0",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001072",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 467,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 121,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:3c5bae79665a910c0b7de9c8:1",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.000189",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1215,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 135,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:3c5bae79665a910c0b7de9c8:2",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002308",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1858,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 90,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:3c5bae79665a910c0b7de9c8:3",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002626",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1826,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 160,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:3c5bae79665a910c0b7de9c8:4",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002455",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1905,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 110,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:3c5bae79665a910c0b7de9c8:5",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002318",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1823,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 99,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:ada12cdabc0f52894eda0dd3:0",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001096",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 461,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 127,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:ada12cdabc0f52894eda0dd3:1",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001867",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1262,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 121,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:ada12cdabc0f52894eda0dd3:2",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002241",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1761,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 96,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:ada12cdabc0f52894eda0dd3:3",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.000231",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1810,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:ada12cdabc0f52894eda0dd3:4",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002359",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1799,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 112,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:ada12cdabc0f52894eda0dd3:5",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002798",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1818,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 196,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:51823fbf7e5fb4ef57475136:0",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001072",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 467,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 121,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:51823fbf7e5fb4ef57475136:1",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001905",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1215,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 138,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:51823fbf7e5fb4ef57475136:2",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002211",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1861,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 70,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:51823fbf7e5fb4ef57475136:3",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002269",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1809,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 92,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:51823fbf7e5fb4ef57475136:4",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002595",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1725,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 174,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:51823fbf7e5fb4ef57475136:5",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002469",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1859,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 122,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4d086946382ad26fb02ec323:0",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001017",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 467,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 110,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4d086946382ad26fb02ec323:1",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001909",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1204,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 141,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4d086946382ad26fb02ec323:2",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002461",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1771,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 138,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4d086946382ad26fb02ec323:3",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002614",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1884,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 146,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4d086946382ad26fb02ec323:4",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002721",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1956,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 153,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4d086946382ad26fb02ec323:5",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002706",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1896,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 162,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4a6f942cf053cbab1a969375:0",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001071",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 461,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 122,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4a6f942cf053cbab1a969375:1",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001727",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1257,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 94,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4a6f942cf053cbab1a969375:2",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0001953",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1518,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 87,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4a6f942cf053cbab1a969375:3",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002217",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1717,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 100,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4a6f942cf053cbab1a969375:4",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002205",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1605,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 120,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "call_id": "ac9b97d8aadca27d8ce6ab7f7af410be69c7e78e366f4d7eacf7947df8d5a180:4a6f942cf053cbab1a969375:5",
+      "model": "claude-haiku-5-5",
+      "committed_usd": "0.0002273",
+      "reservation_usd": "0.100256",
+      "input_price": "0.10",
+      "output_price": "0.50",
+      "status": "settled",
+      "usage": {
+        "input_tokens": 1518,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 151,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    }
+  ]
+}
