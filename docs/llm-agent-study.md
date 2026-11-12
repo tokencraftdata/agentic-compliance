@@ -36,6 +36,11 @@ settles. Per-shard caps therefore cover at least one reservation.
   The first stage 1 run, with default thinking, had 36 of 48 replies unusable (thinking
   used up the 512-token limit, or JSON came wrapped in a Markdown fence). It is kept as
   `1-dev-check-attempt1`. The runner now also accepts one surrounding code fence.
+- Budget ledgers append one changed entry per line (earlier ledgers rewrote the full
+  state each time, about 1 GB per held-out shard). Old ledgers still load. The stage 1
+  and 2 development results verify against the source at the commit that added them
+  ("Turn off model thinking for live calls; run development stages"); the stage 2
+  ledger from that format is kept xz-compressed.
 - HTTP 429 and 529 are retried up to six times with backoff; they are not billed.
   Every other provider failure stops the shard and keeps its reservation.
 

@@ -285,4 +285,35 @@ class LiveV1AdjustmentTests(unittest.TestCase):
 
 
 
+class LedgerLogTests(unittest.TestCase):
+    def test_ledger_grows_linearly_and_replays(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'b.jsonl'
+            with Budget(path, '100') as budget:
+                for n in range(200):
+                    i = budget.reserve(live_model(), 256, str(n))
+                    budget.settle(i, {'usage': {'input_tokens': 100, 'output_tokens': 20}})
+                total = budget.committed()
+            self.assertLess(path.stat().st_size, 200 * 2 * 600)
+            with Budget(path, '100') as budget:
+                self.assertEqual(budget.committed(), total)
+                self.assertEqual(len(budget.state['entries']), 200)
+
+    def test_legacy_snapshot_ledger_still_loads(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'b.jsonl'
+            entry = {'call_id': 'x', 'committed_usd': '0.5', 'status': 'settled'}
+            path.write_text(json.dumps({'cap_usd': '1', 'entries': []}) + '\n' +
+                            json.dumps({'cap_usd': '1', 'entries': [entry]}) + '\n')
+            with Budget(path, '1') as budget:
+                self.assertEqual(budget.committed(), Decimal('0.5'))
+
+    def test_truncated_entry_line_fails_closed(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'b.jsonl'
+            path.write_text(json.dumps({'cap_usd': '1', 'entries': []}) + '\n{"entry_index": 0, "ent')
+            with self.assertRaises(ValueError):
+                with Budget(path, '1'):
+                    pass
+
 if __name__=='__main__':unittest.main()

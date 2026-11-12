@@ -82,6 +82,25 @@ def infer(model, request, max_output_tokens):
     return body
 
 
+def replay_ledger(raw):
+    state = None
+    for line in raw.splitlines():
+        record = json.loads(line)
+        if 'entries' in record:
+            state = {'cap_usd': record['cap_usd'], 'entries': list(record['entries'])}
+        else:
+            index = record['entry_index']
+            if type(index) is not int or not 0 <= index <= len(state['entries']):
+                raise ValueError('ledger entry out of order')
+            if index == len(state['entries']):
+                state['entries'].append(record['entry'])
+            else:
+                state['entries'][index] = record['entry']
+    if state is None:
+        raise ValueError('ledger has no snapshot')
+    return state
+
+
 class Budget:
     """One local ledger shared across validation attempts; lock spans the run.
 
@@ -106,23 +125,29 @@ class Budget:
             raise
         self.handle.seek(0)
         raw = self.handle.read()
-        # Append-only snapshots: interrupted writes fail closed on the next open.
-        # Never replace a paid history with a fresh zero balance after a crash.
+        # Append-only log: a line is either a full snapshot or one changed entry.
+        # Rewriting the full state on every change grew quadratically (about
+        # 1 GB for a 1,728-call shard), so changes are logged one entry at a
+        # time and replayed here. Interrupted writes fail closed on the next
+        # open. Never replace a paid history with a fresh zero balance.
         try:
-            self.state = json.loads(raw.splitlines()[-1]) if raw else {'cap_usd': str(self.cap), 'entries': []}
-        except (ValueError,IndexError):
+            self.state = replay_ledger(raw) if raw else {'cap_usd': str(self.cap), 'entries': []}
+        except (ValueError, IndexError, KeyError, TypeError):
             self.__exit__(None,None,None)
             raise ValueError('budget ledger is incomplete; manual reconciliation required') from None
         if Decimal(self.state['cap_usd']) != self.cap:
             self.__exit__(None, None, None)
             raise ValueError('existing budget cannot be changed implicitly')
-        self.save()
+        self.write(self.state)
         return self
 
-    def save(self):
-        self.handle.write(json.dumps(self.state, sort_keys=True) + '\n')
+    def write(self, record):
+        self.handle.write(json.dumps(record, sort_keys=True) + '\n')
         self.handle.flush()
         os.fsync(self.handle.fileno())
+
+    def save_entry(self, index):
+        self.write({'entry_index': index, 'entry': self.state['entries'][index]})
 
     def committed(self):
         return sum((Decimal(e['committed_usd']) for e in self.state['entries']), Decimal(0))
@@ -144,7 +169,7 @@ class Budget:
             'committed_usd': str(amount), 'reservation_usd': str(amount),
             'input_price': str(price_in), 'output_price': str(price_out),
             'status': 'reserved_or_charge_unknown'})
-        self.save()
+        self.save_entry(len(self.state['entries']) - 1)
         return len(self.state['entries']) - 1
 
     def settle(self, index, body):
@@ -158,10 +183,10 @@ class Budget:
                   usage['output_tokens'] * Decimal(entry['output_price'])) / Decimal(1000000)
         if amount > Decimal(entry['reservation_usd']):
             entry.update(status='reservation_exceeded', committed_usd=str(amount))
-            self.save()
+            self.save_entry(index)
             raise ProviderFailure('provider_usage_exceeds_reserved_bound')
         entry.update(status='settled', committed_usd=str(amount), usage=usage)
-        self.save()
+        self.save_entry(index)
 
     def __exit__(self, *args):
         if self.handle:
