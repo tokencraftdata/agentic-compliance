@@ -46,6 +46,7 @@ Main result folders:
 | `adversary-v1`, `adversary-budget-v1` | Adaptive adversary; repeat with 3x budget and 200 held-out seeds |
 | `robustness-v1` | Response window, tick-unit mapping, search restarts, display gain |
 | `empirical-paths-v1` | Stylized facts vs LOBSTER; adversary replayed on real price paths (LOBSTER data not included) |
+| `real-path-search-v1` | Adversary search rerun on real price paths, three folds, each window scored out of sample (LOBSTER data not included) |
 | `lobster-calibration-v1` | Fitted imbalance-to-price slopes (LOBSTER data not included) |
 | `baselines-v1` | Order-to-trade ratio and learned detector |
 | `execution-quality-v1` | Fill rate, shortfall, edge, markout and inventory of legitimate scripts |

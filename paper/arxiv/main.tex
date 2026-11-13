@@ -42,7 +42,7 @@
 \maketitle
 
 \begin{abstract}
-Pre-trade gates reject orders before they reach the market; surveillance rules flag suspicious order patterns afterwards. Both are usually judged by counting alerts. We argue that three things must be measured separately, on matched market paths: whether a rule alerts, whether a gate removes the gain from moving the price, and how much legitimate trading the gate blocks. TradeGauntlet, a replayable limit-order-book simulator, makes this possible. First, a detector that shares a threshold with a gate is silent on gated traffic by construction, so zero alerts there measure the gate. Second, with a price response fitted to Nasdaq order-book data for five stocks, a seeded search finds split-order schedules that evade the implemented conduct rules under every control we test, scored on held-out paths and also when only depth near the best price moves it. Replayed on real Nasdaq price paths, which are more volatile and heavy-tailed than the simulator's, the schedules keep their gains, but the ungated ones trigger alerts in about half the windows. Third, an aggregate cap at twice reference depth removes between none and about half of the gain, and an order-to-trade ratio and a learned detector together catch every searched schedule but flag 23\% of a legitimate large maker's sessions. Fourth, legitimate makers also gain from the price response, and the cancellation throttle, not the cap, carries most of their cost. A paired check in ABIDES finds no detectable gain from displayed depth. Finally, with two LLMs trading legitimate tasks, every alert was a self-match by a market maker, which the gates remove by construction; the measurable effects are the gates' cost in fills and a prompt reminder that reduces Sonnet's self-matching. All trading is simulated.
+Pre-trade gates reject orders before they reach the market; surveillance rules flag suspicious order patterns afterwards. Both are usually judged by counting alerts. We argue that three things must be measured separately, on matched market paths: whether a rule alerts, whether a gate removes the gain from moving the price, and how much legitimate trading the gate blocks. TradeGauntlet, a replayable limit-order-book simulator, makes this possible. First, a detector that shares a threshold with a gate is silent on gated traffic by construction, so zero alerts there measure the gate. Second, with a price response fitted to Nasdaq order-book data for five stocks, a seeded search finds split-order schedules that evade the implemented conduct rules under every control we test, scored on held-out paths and also when only depth near the best price moves it. Replayed on real Nasdaq price paths, which are more volatile and heavy-tailed than the simulator's, the schedules keep their gains, but the ungated ones trigger alerts in about half the windows. Searching again on the real paths brings the ungated alerts down to 3 or 4 of 30 windows, at the cost of a smaller or undetectable gain; under the per-order gate and the twice-depth cap the gains stay positive for both fitted stocks. Third, an aggregate cap at twice reference depth removes between none and about half of the gain, and an order-to-trade ratio and a learned detector together catch every searched schedule but flag 23\% of a legitimate large maker's sessions. Fourth, legitimate makers also gain from the price response, and the cancellation throttle, not the cap, carries most of their cost. A paired check in ABIDES finds no detectable gain from displayed depth. Finally, with two LLMs trading legitimate tasks, every alert was a self-match by a market maker, which the gates remove by construction; the measurable effects are the gates' cost in fills and a prompt reminder that reduces Sonnet's self-matching. All trading is simulated.
 \end{abstract}
 
 \keywords{trading compliance \and market surveillance \and spoofing \and limit order book simulation \and adversarial evaluation}
@@ -316,7 +316,13 @@ Legitimate scripts gain from the response too. Under the MSFT fit, the patient m
 
 \emph{Real price paths and stylized facts.} The simulator's fundamental moves by at most one tick every 30 seconds, so its prices lack the heavy tails and volatility clustering of real markets. Table~\ref{tab:facts} applies the same estimators to 720-second sessions of the simulator and to 30 consecutive 740-second windows of each LOBSTER sample, all in half-spread units (\texttt{paper\_study.empirical\_paths}). Real 60-second returns are two to four times as volatile as the simulator's, heavy-tailed, and show volatility clustering; in both, returns are serially uncorrelated.
 
-We therefore replaced the fundamental with the real mid-price path of each window, rounded to whole half-spreads, kept the noise and response streams of seed $9100 + k$ for window $k$, and replayed the schedules selected on synthetic training paths, unchanged, with the response fitted to the same stock (Table~\ref{tab:replay}). The gains survive. Under the MSFT fit, $D$ is 2.67 with no gate and 2.60 under the twice-depth cap, against 2.84 and 2.68 on synthetic paths, and under $\kappa = 1$ it is 9.73 against 9.78. The evasion of the ungated schedules does not survive. On real paths they trigger alerts in 16 to 23 of 30 windows: self-matches under the fitted responses, and the spoofing pattern under $\kappa = 1$. Larger price moves bring the displayed orders into the path of the schedule's own executions, or within the spoofing distance. Under the caps, whose per-order checks include self-match prevention, no window alerts. With 30 windows the intervals are wide; under the cap at reference depth they include zero for INTC and run from 1.0 to 5.6 for MSFT. We did not search again on real paths, so whether a search on volatile paths finds ungated schedules that evade the rules remains open.
+We therefore replaced the fundamental with the real mid-price path of each window, rounded to whole half-spreads, kept the noise and response streams of seed $9100 + k$ for window $k$, and replayed the schedules selected on synthetic training paths, unchanged, with the response fitted to the same stock (Table~\ref{tab:replay}). The gains survive. Under the MSFT fit, $D$ is 2.67 with no gate and 2.60 under the twice-depth cap, against 2.84 and 2.68 on synthetic paths, and under $\kappa = 1$ it is 9.73 against 9.78. The evasion of the ungated schedules does not survive. On real paths they trigger alerts in 16 to 23 of 30 windows: self-matches under the fitted responses, and the spoofing pattern under $\kappa = 1$. Larger price moves bring the displayed orders into the path of the schedule's own executions, or within the spoofing distance. Under the caps, whose per-order checks include self-match prevention, no window alerts. With 30 windows the intervals are wide; under the cap at reference depth they include zero for INTC and run from 1.0 to 5.6 for MSFT.
+
+These schedules were tuned on calm paths, so we also reran the search on the real paths (\texttt{paper\_study.real\_path\_search}, Table~\ref{tab:realsearch}). The 30 windows of each stock form three folds by window number modulo 3. For each fold, the search, with the same space, budget, and alert penalty as before, is trained on the other 20 windows, and its schedule is scored on the 10 windows in the fold. Every window therefore gets one out-of-sample score. The schedule selected on synthetic paths is scored on the same windows for a paired comparison, and reproduces Table~\ref{tab:replay}.
+
+With no gate, searching on real paths brings the alerts down from 17, 23, and 16 of 30 windows to 3, 3, and 4. The gain does not all survive. Under the MSFT fit it stays at 2.64 (0.70 to 6.05). Under $\kappa = 1$ it falls from 9.73 to 2.70, a paired difference of $-7.03$ ($-8.47$ to $-5.63$), so avoiding alerts on volatile paths costs about 70\% of the gain. Under the INTC fit the mean is $-5.98$ ($-21.95$ to 2.40), so no gain is detectable.
+
+Under the gates, only three windows alert, all under the per-order gate with the MSFT fit. The per-order gate leaves 9.63 (1.60 to 22.23) under the MSFT fit and 3.80 (1.00 to 7.38) under the INTC fit. The twice-depth cap leaves 4.41 (0.33 to 11.18) and 1.93 (1.27 to 2.60), but under $\kappa = 1$ its interval includes zero. At reference depth the intervals include zero for both fitted responses. The schedules selected in different folds differ, and their training scores differ by more than tenfold in some cells, so these numbers, like those in Table~\ref{tab:adversary}, are lower bounds from an unstable search rather than estimates of what an optimal adversary would earn.
 
 \begin{table}[t]
 \centering
@@ -351,6 +357,30 @@ INTC fit, INTC & none & 2.46 [$-0.67$, 6.05] & 23/30 & 2.00 [1.64, 2.38] \\
 $\kappa = 1$, MSFT & none & 9.73 [8.73, 10.73] & 16/30 & 9.78 [9.26, 10.30] \\
  & $m = 2$ & 5.04 [$-1.97$, 11.95] & 0/30 & 6.14 [5.60, 6.70] \\
  & $m = 1$ & 3.07 [2.33, 3.80] & 0/30 & 3.32 [2.86, 3.80] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Search rerun on real mid-price windows (\texttt{results/real-path-search-v1}). Each of 30 windows is scored by a schedule searched on the other two folds (real-path policy), and by the schedule selected on synthetic paths (synthetic policy, as in Table~\ref{tab:replay}). Mean $D$ in tick-lots per session with 95\% bootstrap interval over windows, and windows with a conduct alert.}\label{tab:realsearch}
+\begin{tabular}{llrrrr}
+\toprule
+ & & \multicolumn{2}{c}{Real-path policy} & \multicolumn{2}{c}{Synthetic policy} \\
+Response, path & Control & $D$ & Alerts & $D$ & Alerts \\
+\midrule
+MSFT fit, MSFT & none & 2.64 [0.70, 6.05] & 3/30 & 2.67 & 17/30 \\
+ & per-order & 9.63 [1.60, 22.23] & 3/30 & 8.09 & 0/30 \\
+ & $m = 2$ & 4.41 [0.33, 11.18] & 0/30 & 2.60 & 0/30 \\
+ & $m = 1$ & $-0.17$ [$-2.54$, 1.24] & 0/30 & 3.05 & 0/30 \\
+INTC fit, INTC & none & $-5.98$ [$-21.95$, 2.40] & 3/30 & 2.46 & 23/30 \\
+ & per-order & 3.80 [1.00, 7.38] & 0/30 & 2.33 & 0/30 \\
+ & $m = 2$ & 1.93 [1.27, 2.60] & 0/30 & 1.40 & 0/30 \\
+ & $m = 1$ & 0.67 [$-0.28$, 1.46] & 0/30 & $-0.34$ & 0/30 \\
+$\kappa = 1$, MSFT & none & 2.70 [1.84, 3.64] & 4/30 & 9.73 & 16/30 \\
+ & per-order & 6.70 [$-1.29$, 18.94] & 0/30 & 7.22 & 4/30 \\
+ & $m = 2$ & 1.60 [$-0.27$, 3.07] & 0/30 & 5.04 & 0/30 \\
+ & $m = 1$ & 2.84 [1.97, 3.73] & 0/30 & 3.07 & 0/30 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -488,7 +518,7 @@ The size multiples, cancellation ratios, and time windows are experimental choic
 
 \emph{Market model.} The simulator has one evaluated account, one instrument, and three replenishing levels; its responses are either stipulated or fitted to five stocks on one day. It omits calibrated queues, exchange latency, strategic background traders, auctions, cross-venue routing, and beneficial-owner networks. Market orders can deplete the book even when resting limits are capped, which limits the static imbalance calculation. The cap-threshold grid measures sensitivity within this model; it cannot establish real-market profitability, welfare effects, or universal prevention.
 
-\emph{Prices and data.} The simulator's own price path lacks the heavy tails and volatility clustering of the data~\cite{r38,r39}. Replaying real price paths keeps the gains but makes the ungated schedules alert, and we did not search again on those paths. The book itself stays stylized, with constant depth and a constant two-tick spread. The fitted response is a predictive regression on five Nasdaq stocks on one day in 2012, and its strength depends on how simulator ticks are mapped to market prices. It should be repeated across dates and market conditions, and it does not identify the causal effect of a trader's own displayed orders, which may be smaller than the effect of organic depth.
+\emph{Prices and data.} The simulator's own price path lacks the heavy tails and volatility clustering of the data~\cite{r38,r39}. Replaying real price paths keeps the gains but makes the ungated schedules alert. Searching again on those paths avoids most alerts but leaves a smaller gain, none under the INTC fit, and the search on 20 windows is unstable. All real paths come from one day. The book itself stays stylized, with constant depth and a constant two-tick spread. The fitted response is a predictive regression on five Nasdaq stocks on one day in 2012, and its strength depends on how simulator ticks are mapped to market prices. It should be repeated across dates and market conditions, and it does not identify the causal effect of a trader's own displayed orders, which may be smaller than the effect of organic depth.
 
 \emph{Strategies and detectors.} The strategies, labels, and detectors came from the same development process. New seeds vary market paths, and parameter vectors vary one authored generator; neither provides independent strategy validation. The adversary searches only this family with a modest budget, so its gains are lower bounds on what a stronger search or a learning trader could find. Every schedule in the family executes with a market order, which the learned baseline exploits; strategies that execute passively or mix genuine quoting with displays are untested. The detector window was tuned on earlier cases, and the sensitivity and boundary settings were then chosen in response to observed results. The resulting means and ranges describe these exploratory comparisons and support no claim about population-level accuracy or power.
 
@@ -502,7 +532,7 @@ Counting alerts is not enough to evaluate trading controls. Our results support 
 
 \emph{Zero alerts can be guaranteed rather than earned.} A detector that shares a threshold with a gate is silent on gated traffic by construction, and the same holds for the self-match detector and the LLM traders: the gates silence the only detector the models trigger.
 
-\emph{A searching adversary evades the conduct rules.} The search finds split-order schedules that evade the implemented rules under every control we tested, with a price response fitted to market data, and also when only depth near the touch moves the price. On real price paths the gains persist, but the ungated schedules, tuned on calm synthetic paths, trigger alerts in about half the windows; the gated ones still do not.
+\emph{A searching adversary evades the conduct rules.} The search finds split-order schedules that evade the implemented rules under every control we tested, with a price response fitted to market data, and also when only depth near the touch moves the price. On real price paths the gains persist, but the ungated schedules, tuned on calm synthetic paths, trigger alerts in about half the windows. A search on the real paths avoids most of those alerts but keeps only part of the ungated gain, while under the per-order gate and the twice-depth cap the gain stays positive for both fitted stocks.
 
 \emph{An aggregate cap helps, but only partly.} A cap at twice reference depth removes between none and about half of the searched gain, depending on the response, and the variation across search restarts is as large as some of these differences. Two standard baselines, an order-to-trade ratio and a learned classifier trained on the same family, stop the searched schedules at the price of false alerts on an active legitimate maker.
 
@@ -514,7 +544,7 @@ TradeGauntlet records all of these interactions as replayable tests. The next st
 
 \subsection{Code and data availability}
 
-Code, saved results, and reproduction instructions: \href{https://github.com/tokencraftdata/agentic-compliance/tree/4270c7c4b837a075fa284ee83d903af505448ab9}{github.com/tokencraftdata/agentic-compliance}.
+Code, saved results, and reproduction instructions: \href{https://github.com/tokencraftdata/agentic-compliance/tree/6b3ec0281df1cad9b51ecc02b2a56089fff9c1a4}{github.com/tokencraftdata/agentic-compliance}.
 
 \subsection{Use of generative AI tools}
 
