@@ -92,8 +92,6 @@ template is not a preregistration or spending authorization: it currently expand
 to 2,880 episodes and 34,560 calls **per model**, before any added control settings.
 It needs a precision, runtime and cost assessment rather than an automatic run.
 
-The saved [128-episode software check](../results/agent-phase2-mock-v1/README.md)
-replays without mismatches; all 106 tests pass. It contains zero provider calls.
 
 The same paper can include the completed study: retain a short scripted-control
 validation section and add actual-agent methods and results. Do not promote mock

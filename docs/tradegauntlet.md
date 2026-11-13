@@ -42,7 +42,6 @@ the implementation against its recorded execution; it does not independently
 validate the market assumptions or the script's assigned intent.
 
 The current checks use one subject account, one instrument, synthetic prices
-and fixed trading scripts. The actual-LLM runner is under `agent_study/`, but
-only mock software checks have run. Actual LLM findings and independently
-authored test scenarios remain pending. The paper's source and detailed
-reproduction instructions are in [paper/offline_study](../paper/offline_study/README.md).
+and fixed trading scripts. The LLM-agent runner is under `agent_study/`; its
+saved run is in `results/agent-llm-v1`. Independently authored test scenarios
+remain pending. The paper's source is in [paper/arxiv](../paper/arxiv/main.tex).
