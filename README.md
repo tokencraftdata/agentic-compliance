@@ -47,6 +47,8 @@ Main result folders:
 | `robustness-v1` | Response window, tick-unit mapping, search restarts, display gain |
 | `empirical-paths-v1` | Stylized facts vs LOBSTER; adversary replayed on real price paths (LOBSTER data not included) |
 | `real-path-search-v1` | Adversary search rerun on real price paths, three folds, each window scored out of sample (LOBSTER data not included) |
+| `rl-adversary-v1` | Policy-gradient adversary over the schedule space: three runs at the random search's budget, one at 10x |
+| `llm-adversary-v1` | Sonnet 5.5 asked to act as the adversary; it declined in all 240 rounds (1.69 USD) |
 | `lobster-calibration-v1` | Fitted imbalance-to-price slopes (LOBSTER data not included) |
 | `baselines-v1` | Order-to-trade ratio and learned detector |
 | `execution-quality-v1` | Fill rate, shortfall, edge, markout and inventory of legitimate scripts |
