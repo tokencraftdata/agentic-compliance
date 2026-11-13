@@ -1,9 +1,0 @@
-{
-  "source_title": "Accidental Spoofers: Emergent Market Abuse by LLM Trading Agents in Limit Order Books",
-  "source_sha256": "51e0b09172340eb56cd87f946b72e68b4fe52c9e2c0357e8ed8529ee84ce5f07",
-  "source_pages": 10,
-  "revision_scope": "Replace unsupported empirical claims with the offline v0.2 pilot and retain the LLM study as future work.",
-  "source_preserved": true,
-  "llm_episodes": 0,
-  "provider_authentication": "HTTP 401; no inference completed; user chose offline pilot"
-}

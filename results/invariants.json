@@ -1,7 +1,0 @@
-{
-  "scope": "position cap 3; integer inventory -3..3; pending buy/sell lots 0..6; new lots 1..6",
-  "states": 84,
-  "transitions_checked": 1008,
-  "failures": 0,
-  "claim": "Acceptance equals the worst-case exposure predicate over this finite domain only."
-}

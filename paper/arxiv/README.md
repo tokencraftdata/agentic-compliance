@@ -1,18 +1,15 @@
-# TradeGauntlet paper: arXiv LaTeX version
+# TradeGauntlet paper: arXiv LaTeX source
 
-`main.tex` is the v2.4 paper (10 November 2026) in the standard arXiv preprint
-template ([arxiv.sty](https://github.com/kourgeorge/arxiv-style) by George Kour).
-The text, tables, numbers and references are unchanged from the v2.4 PDF built by
-`paper/offline_study/build.py`; only the layout differs. From now on, edit
+`main.tex` is the paper, in the standard arXiv preprint template
+([arxiv.sty](https://github.com/kourgeorge/arxiv-style) by George Kour). Edit
 `main.tex` directly.
 
 | File | Contents |
 | --- | --- |
-| `main.tex` | The paper. References are an inline `thebibliography`, keys `r1`-`r29` in the v2.4 numbering. |
+| `main.tex` | The paper. References are an inline `thebibliography`. |
 | `arxiv.sty` | The template style file, unmodified. |
 | `figures/` | Figures as vector PDFs. |
 | `figures.py` | Draws every figure from the saved results under `results/` (needs matplotlib and numpy): `python paper/arxiv/figures.py`. |
-| `make_tex.py` | The one-off converter that produced the first `main.tex` from `paper/offline_study/manuscript.json`. Rerunning it overwrites `main.tex`; edit `main.tex` directly instead. |
 
 ## Build
 
@@ -30,5 +27,13 @@ embedded and none are Type 3, as arXiv prefers.
 ## Uploading to arXiv
 
 Upload `main.tex`, `arxiv.sty` and `figures/` (not the PDF): arXiv compiles the
-source itself. See `paper/offline_study/ARXIV_PLAN.md` for the category,
-endorsement and disclosure checklist.
+source itself. Before uploading:
+
+1. Proposed primary category: **q-fin.TR** (Trading and Market Microstructure).
+   A first submission can require [endorsement](https://info.arxiv.org/help/endorsement.html).
+2. Make the repository public, or the code link in the paper will not resolve.
+3. Choose the paper's [license](https://info.arxiv.org/help/license/index.html);
+   it cannot be changed for a posted version.
+4. Check that the title, abstract and authors in the form match `main.tex`, and
+   that the AI-assistance disclosure is current
+   ([arXiv policy](https://info.arxiv.org/help/moderation/index.html#policy-for-authors-use-of-generative-ai-language-tools)).

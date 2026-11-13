@@ -37,7 +37,9 @@ price, and how much legitimate trading the gate blocks. The paper uses this to s
 | `paper/arxiv/` | Paper source (`main.tex`) and `figures.py`, which redraws figures from `results/` |
 | `tests/` | Unit and integration tests |
 | `agent_study/` | LLM-agent study harness (runner, scenarios, spending limits, replay); run book in `docs/llm-agent-study.md` |
-| `scripts/`, `experiments/`, `docs/`, `provenance/`, `paper/offline_study/` | Earlier pilot tools, history and the original v2.4 build |
+| `experiments/` | Action format and Anthropic adapter used by `agent_study/` |
+| `scripts/` | `agent_plans` and `agent_report`, which build and summarize the LLM-agent runs |
+| `docs/` | Workflow guide and the LLM-agent run book |
 
 Main result folders:
 
@@ -90,8 +92,7 @@ traders or cross-venue routing. The price response is fitted on one day of data 
 five stocks. Scripts, labels and detectors were developed together, and the analyses
 are exploratory, not preregistered. An alert records a pattern, not unlawful conduct.
 
-More: [version history](docs/changelog.md), [workflow guide](docs/tradegauntlet.md),
-[historical documents](docs/history/README.md).
+More: [workflow guide](docs/tradegauntlet.md), [LLM-agent run book](docs/llm-agent-study.md).
 
 ## Citation and license
 
