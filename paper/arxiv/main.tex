@@ -40,7 +40,6 @@
 \begin{document}
 \maketitle
 
-
 \begin{abstract}
 Trading controls are usually judged by counting alerts. We argue that three quantities must be measured separately, on matched market paths and against a trader who adapts: whether a surveillance rule \emph{detects} a pattern, whether a pre-trade gate \emph{prevents} the gain from moving the price, and what the gate \emph{costs} legitimate traders. TradeGauntlet, a replayable limit-order-book simulator with a price response fitted to Nasdaq order-book data, measures all three, and four findings follow. First, zero alerts can be built in: a detector that shares a threshold with a gate cannot fire on gated traffic, and the only alerts two LLM market makers produced were self-matches that the gates block outright. Second, detection fails against a searching adversary: a random search and a policy gradient find split-order schedules that evade the implemented conduct rules under every control we test, on held-out paths, when only depth near the best price moves it, and, after a search on real Nasdaq price paths, in all but 3 or 4 of 30 windows, though with a smaller gain. Third, prevention is partial and depends on the adversary's strength: an aggregate cap at twice reference depth removes 38 to 44\% of the gain of the strongest schedules found, but little of a weaker search's. Fourth, prevention has a cost: legitimate makers gain from the same price response, the cancellation throttle carries most of their execution cost, and baseline detectors that catch every searched schedule flag 23\% of a large maker's sessions. In the ABIDES agent-based market, where no response is imposed, a small display near the best price moves the midpoint by about the fitted amount, but larger or deeper displays do not, so the fitted response likely overstates what large displays earn. Asked to act as the adversary, Claude Sonnet 5.5 declined in all 240 rounds. All trading is simulated.
 \end{abstract}
@@ -66,21 +65,11 @@ Our contributions are the evaluation method and its scorecard; three adaptive ad
 
 \section{Related work}
 
-Wang and Wellman~\cite{r1} study spoofing with trading agents, and Wang et al.~\cite{r7} extend the analysis to strategic responses and market-design changes. Cartea, Jaimungal, and Wang~\cite{r18} model the trade-off between spoofing gains and expected fines. Lee, Eom, and Park~\cite{r34} measure the strategies and profits of spoofing traders in Korean market data, and Williams and Skrzypacz~\cite{r35} show when spoofing arises in equilibrium. Wang, Vorobeychik, and Wellman~\cite{r36} propose cloaking part of the order book, an intervention that, like our caps, limits how much displayed depth can move prices. These studies explain economic mechanisms that our fixed scripts and imposed price response take as given.
+\emph{Spoofing and its economics.} Agent-based studies show how spoofing works and how markets respond to it~\cite{r1,r7}. Others model its trade-off with fines~\cite{r18}, measure it in Korean market data~\cite{r34}, show when it arises in equilibrium~\cite{r35}, or cloak part of the book~\cite{r36}, an intervention that, like our caps, limits how much displayed depth moves prices. Tao et al.~\cite{r19} and Chen, Hsieh, and Yang~\cite{r20} bring TMX Level-2 and Taiwan derivatives data to detection and price banding, and Do and Putni\c{n}\v{s}~\cite{r13} and Fabre and Challet~\cite{r10} use prosecuted cases and Level-3 data. That is evidence our design lacks: we fit a response to Nasdaq data but have no external labels of manipulation.
 
-Tao et al.~\cite{r19} derive spoofing conditions from a multilevel imbalance model, calibrate it to TMX Level-2 data, and propose monitoring based on distributional distance. Chen, Hsieh, and Yang~\cite{r20} use Taiwan derivatives order and trade data to study potential spoofing and a price-banding intervention. Both bring market evidence to questions of detection or trading restrictions. We fit our response model to Nasdaq data for five stocks (Section~\ref{sec:calibration}); the rest of the comparisons measure effects within the simulator.
+\emph{Adaptive traders and detectors.} Byrd~\cite{r2} trains an RL trader that discovers spoofing and a recognizer that discourages it, Wang and Wellman~\cite{r3} model adaptation between manipulation and detection, and Cartea, Chang, and Garc\'{i}a-Arenas~\cite{r12} and Gu et al.~\cite{r17} study manipulation by learning algorithms and across liquidity conditions. Tuccella, Nadler, and \c{S}erban~\cite{r37} train a recurrent spoofing detector. ABIDES~\cite{r4} supports richer agent interaction, and we use it to check our price response. Our adversaries are simpler: a random search and a policy gradient over a fixed family of split-order schedules, which keeps each strategy they find inspectable and replayable. Realism metrics~\cite{r38} and generative simulators~\cite{r39} test whether a simulator reproduces market stylized facts; our minimal book does not, so we also replay real price paths.
 
-Two working papers use evidence that our design lacks. Do and Putni\c{n}\v{s}~\cite{r13} evaluate indicators using prosecuted cases and out-of-sample tests. Fabre and Challet~\cite{r10} use Level-3 data to estimate price responses and possible spoofing gains. We also fit a response to data, but we have no external labels of manipulation.
-
-Learning traders can adapt to detection and enforcement. Byrd~\cite{r2} studies an RL trader that discovers spoofing and a learned recognizer that discourages it. Wang and Wellman~\cite{r3} model adaptation between manipulation and detection, while Cartea, Chang, and Garc\'{i}a-Arenas~\cite{r12} examine manipulation by learning algorithms. Gu et al.~\cite{r17} vary liquidity and spoofing strategies, and ABIDES~\cite{r4} supports richer agent interaction and communication latency. Tuccella, Nadler, and \c{S}erban~\cite{r37} train a recurrent detector for spoofing on order-book data. Our adversaries are simpler than these learners: a random search and a policy gradient over a fixed family of split-order schedules, which keeps each strategy they find inspectable and replayable.
-
-Realism metrics for limit-order-book simulators~\cite{r38} and generative market simulators~\cite{r39} measure whether a simulator reproduces market stylized facts. Our minimal book does not reproduce them on its own price paths, so we also replay real price paths (Section~\ref{sec:realpaths}).
-
-Pandey and Rajwal~\cite{r25} evaluate LLM judgments about potential market abuse using variants of enforcement-case narratives. RISCTrade~\cite{r26} evaluates adherence to risk mandates during trading across multiple markets. We focus on what happens at the order level when a gate or surveillance rule changes, including the cost to legitimate execution.
-
-InvestorBench~\cite{r27} compares LLM agents across financial tasks and assets. FinAgent~\cite{r28} develops a multimodal trading agent with tools and memory. QFinZero~\cite{r29} provides standardized financial tools, stateful brokerage simulation, order-lifecycle management, and replay. Here, we compare interacting controls on matched market paths, with scripted, searched, and LLM traders.
-
-ReguSim~\cite{r8} separates a trader's reasoning, attempted orders, enforcement, and monitoring evidence; its reported environment uses exogenous prices and fully executes accepted orders. Borjigin and He~\cite{r9} propose constrained execution with a runtime shield, leaving the full cryptographic proof pipeline for future work. Kurshan, Balch, and Byrd~\cite{r5} discuss agent-based governance, and Byrd~\cite{r11} studies trading with LLM-generated social posts. Our LLM traders choose orders from the book alone, without a social-information channel.
+\emph{LLM agents and controls.} LLM studies evaluate judgments about market abuse~\cite{r25}, adherence to risk mandates~\cite{r26}, and trading across tasks and tools~\cite{r27,r28,r29}. ReguSim~\cite{r8} separates a trader's reasoning, orders, enforcement, and monitoring, but uses exogenous prices and fully executes accepted orders; Borjigin and He~\cite{r9} propose a runtime shield; and Kurshan, Balch, and Byrd~\cite{r5} and Byrd~\cite{r11} discuss agent-based governance and LLM-generated social posts. We instead compare interacting controls at the order level, on matched market paths, with scripted, searched, and LLM traders.
 
 \section{TradeGauntlet: simulator, controls, and measurements}
 
@@ -144,7 +133,6 @@ Self-match & The subject is both buyer and seller in a fill. \\
 
 Remaining quantity $r_i(f)$ is measured immediately before the shared fill, after any earlier partial executions. The \emph{conduct alert} is the union of these four signals; a separate cancellation-ratio diagnostic is not part of it. The scoring window is $W = 180$ seconds by default, shared by the individual, layer, and aggregate patterns. Table~\ref{tab:split} keeps the 120-second window of the first split-order comparison, and Appendix~\ref{sec:cadence} varies $W$. These patterns are not a complete legal test and do not estimate intent.
 
-
 \subsection{The three measurements}\label{sec:design}
 
 We score every control on three measurements, always comparing conditions on the same market paths. \emph{Detection} is the share of episodes with a conduct alert (Table~\ref{tab:patterns}) or, in Section~\ref{sec:baselines}, a baseline alert. \emph{Prevention} is measured by the gain a strategy draws from the price response, which a gate may or may not remove. \emph{Cost} is measured on legitimate scripts: fills, implementation shortfall, P\&L, edge, markout, and false alerts.
@@ -189,24 +177,15 @@ MSFT & 1 & 19,220 & 0.479 [0.406, 0.574] & 1.515 [1.270, 1.803] & 2.041 [1.683, 
 \label{tab:calibration}
 \end{table}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{figures/calibration.pdf}
-\caption{Fitted price response. Left: mean next-second mid move by top-three-level imbalance, in five bins, omitting bins with fewer than 30 observations; the three wide-spread stocks overlap near zero. The dashed line is the $\kappa = 1$ stress setting. Right: slope at each horizon with its 95\% block-bootstrap interval.}
-\label{fig:calibration}
-\end{figure}
-
 Under the half-spread mapping, the stocks split by tick size. For the three wide-spread stocks, the top-three-level slope is at most 0.032 half-spreads per unit of imbalance at one second and at most 0.069 at any horizon; for AAPL the sign even reverses at five and ten seconds. For INTC and MSFT, imbalance predicts the next move strongly: the one-second slope is 0.35 and 0.48 half-spreads per unit of imbalance, about a third to a half of the $\kappa = 1$ stress setting, and it grows to about two half-spreads at ten seconds. The simulator applies its response every second, so we use the one-second slopes; the longer horizons are not comparable with a per-second response.
 
 Measured in market ticks instead, the one-second slopes are close for all five stocks, from 0.13 (AAPL) to 0.24 (MSFT) ticks per unit of imbalance, so the contrast between the two groups depends on the unit. Gould and Bonart~\cite{r31} study the best-level queue; for the one-tick stocks our top-three slope is about twice the best-level slope (Table~\ref{tab:calibration}). All of these are predictive regressions on five stocks on one day. Displayed orders that are not meant to trade may move prices less than organic depth does, and the regressions do not identify the causal effect of one trader's orders.
 
 \subsection{Checking the shape in ABIDES}\label{sec:abides}
 
-TradeGauntlet imposes its price response. To check whether displayed depth pays when no response is imposed, we added a split-display agent to the ABIDES RMSC04 reference market~\cite{r4}, in which 1,116 noise, value, momentum, and adaptive market-making agents trade through an exchange agent and prices move only through their reactions (\texttt{paper\_study.abides\_check}). Every 60 seconds the agent rests six orders one tick behind the best quote, totalling $c$ times the reference depth (the median of the best bid and ask sizes, 158 shares on average). Two seconds later it buys or sells 20\% of reference depth at market, and one second after that it cancels the display. The quantity measured differs from $D$. It is the gain from displaying: the agent's wealth with the display minus its wealth with the same execution schedule and no display ($c = 0$).
+TradeGauntlet imposes its price response. ABIDES~\cite{r4} does not: in its RMSC04 reference market, 1,116 noise, value, momentum, and adaptive market-making agents trade through an exchange agent, and prices move only through their reactions. We precompute the ABIDES fundamental on a one-second grid before trading, so every arm of a seed shares the same fundamental path. A first check (\texttt{paper\_study.abides\_check}) added an agent that rests a display of $c$ times reference depth one tick behind the touch every 60 seconds, executes 20\% of reference depth two seconds later, and cancels. Over 100 seeds, its wealth gain from displaying is $-0.54$ to $-0.20$ cents per executed share for $c = 1$, 2, and 6, with intervals that include zero, but the minimum detectable effect, about 2 cents per share, is ten to twenty times the gains the fitted responses give in TradeGauntlet. Wealth is too noisy for this question.
 
-ABIDES generates its fundamental lazily, so the draws depend on when agents query it. We therefore precompute the fundamental on a one-second grid before trading, which gives every arm of a seed the same fundamental path and closing mark (400 of 400 runs). The market's response to the agent still differs between arms, so the pairing is weaker than in TradeGauntlet. Over 100 seeds of 30-minute sessions, the gain from displaying is $-0.20$, $-0.54$, and $-0.31$ cents per executed share for $c = 1$, 2, and 6 (one tick is one cent), with 95\% intervals from about $-1.9$ to $+1.1$ that include zero; 45 to 47 of 100 sessions are positive. The minimum effect detectable at 80\% power is 1.8 to 2.0 cents per share. Displayed depth thus earns nothing detectable in this market, and gains above about one tick per executed share are unlikely. The check cannot, however, detect gains of the size the fitted responses give in TradeGauntlet, about 0.1 to 0.2 ticks per executed lot. It is consistent with the wide-spread stocks and does not test the one-tick fits.
-
-\paragraph{Does the display move the price?} Wealth is a noisy outcome, so a second check measures the mechanism directly (\texttt{paper\_study.abides\_response}). Every 60 seconds a probe agent reads the top three levels, rests a display of $c$ times reference depth as six orders, and reads the midpoint 1, 2, and 5 seconds later before cancelling; it never executes, and it alternates between bid and ask displays. An arm with $c = 0$ reads the book at the same times. The effect at each horizon is the move of the midpoint in the display's direction minus the same move in the $c = 0$ arm, for the same seed and cycle, in units of the median half-spread. Four display arms rest $c = 1$, 2, or 6 one tick behind the touch, or $c = 2$ five ticks behind, where trading rarely reaches it. The far arm separates agents reacting to displayed depth from displayed depth absorbing trades. Each arm runs on the same 100 seeds in RMSC04 and in a thinner book with 20 instead of 102 value agents, 2,600 to 2,800 paired cycles per arm, with intervals from a bootstrap over seeds. TradeGauntlet's fitted responses predict an effect equal to the fitted slope times the change in three-level imbalance the display creates. Table~\ref{tab:abidesresponse} compares the two.
+\paragraph{Does the display move the price?} A second check measures the mechanism directly (\texttt{paper\_study.abides\_response}). Every 60 seconds a probe agent reads the top three levels, rests a display of $c$ times reference depth as six orders, and reads the midpoint 1, 2, and 5 seconds later before cancelling; it never executes, and it alternates between bid and ask displays. An arm with $c = 0$ reads the book at the same times. The effect at each horizon is the move of the midpoint in the display's direction minus the same move in the $c = 0$ arm, for the same seed and cycle, in units of the median half-spread. Four display arms rest $c = 1$, 2, or 6 one tick behind the touch, or $c = 2$ five ticks behind, where trading rarely reaches it. The far arm separates agents reacting to displayed depth from displayed depth absorbing trades. Each arm runs on the same 100 seeds in RMSC04 and in a thinner book with 20 instead of 102 value agents, 2,600 to 2,800 paired cycles per arm, with intervals from a bootstrap over seeds. TradeGauntlet's fitted responses predict an effect equal to the fitted slope times the change in three-level imbalance the display creates. Table~\ref{tab:abidesresponse} compares the two.
 
 \begin{table}[t]
 \centering
@@ -293,49 +272,9 @@ Fitted, AAPL & 0.00 [0.00, 0.00] & 0.12 [0.04, 0.22] & 0.04 [0.00, 0.10] & 0.04 
 \label{tab:adversary}
 \end{table}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{figures/adversary.pdf}
-\caption{The data of Table~\ref{tab:adversary} for the smooth responses: held-out gain of the best alert-free schedule found, with 95\% bootstrap intervals, by control. The step responses are omitted; their cells are exactly 0 or 48.}
-\label{fig:adversary}
-\end{figure}
-
 \emph{The detectors do not stop a searching adversary.} With no gate and the $\kappa = 1$ response, the fixed six-by-ten probe earns 12.06 tick-lots per session (95\% CI 11.38 to 12.72) but alerts on all 100 held-out paths. The searched schedule keeps 9.78, about 81\% of that gain, with no alerts. It places two 40-lot orders, one and five ticks behind the touch, and cancels the first before submitting the second, so the only order live at the execution sits outside the detectors' three-tick distance condition. The same holds under the responses fitted to the one-tick stocks: the fixed probe earns 4.32 (INTC) and 5.86 (MSFT) with an alert on every path, and the search finds alert-free schedules earning 2.00 and 2.84.
 
-\paragraph{Robustness.} We fixed four further checks in one plan before running them (\texttt{paper\_study.robustness}): restarting the search, limiting the response to depth near the touch, changing the unit mapping, and separating the display gain from $D$. Each cell repeats its search with three independent search seeds at the original budget and keeps the restart with the best training score. Table~\ref{tab:robustness} reports that schedule's held-out gain on seeds 9100-9199 and the range across the three restarts. The restarts bear on prevention and are discussed in Section~\ref{sec:prevention}, and the display gain in Section~\ref{sec:cost}.
-
-\begin{table}[htbp]
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{llll}
-\toprule
-\textbf{Response} & \textbf{Control} & \textbf{All resting depth} & \textbf{Depth within three ticks} \\
-\midrule
-Linear, $\kappa = 1$ & No gate & 9.68 [9.04, 10.34] (6.28--9.78) & 7.30 [6.72, 7.90] (4.62--7.30) \\
- & $m = 2$ & 6.24 [5.70, 6.80] (6.14--6.24) & 6.12 [5.56, 6.68] (5.85--6.12) \\
- & $m = 1$ & 3.32 [2.84, 3.80] (2.88--3.34) & 2.96 [0.05, 5.85] (2.96--3.52) \\
-\addlinespace
-Fitted, MSFT & No gate & 4.48 [4.02, 4.96] (2.84--4.48) & 2.84 [2.42, 3.26] (2.80--2.96) \\
- & $m = 2$ & 2.54 [2.14, 2.96] (2.54--2.70) & 3.06 [2.56, 3.58] (2.54--3.06) \\
- & $m = 1$ & 1.37 [0.98, 1.76] (1.37--1.58) & 1.58 [1.26, 1.90] (1.28--1.58) \\
-\addlinespace
-Fitted, INTC & No gate & --- & 2.42 [2.02, 2.84] (1.34--2.42) \\
- & $m = 2$ & --- & 1.84 [1.50, 2.20] (1.48--2.00) \\
- & $m = 1$ & --- & 1.06 [0.80, 1.34] (1.06--1.32) \\
-\addlinespace
-Tick units, MSFT & No gate & --- & 1.52 [1.20, 1.86] (1.52--1.76) \\
- & $m = 2$ & --- & 1.12 [0.82, 1.44] (1.12--1.66) \\
- & $m = 1$ & --- & 1.04 [0.20, 2.01] (0.17--1.04) \\
-\addlinespace
-Tick units, AAPL & No gate & --- & 0.88 [0.64, 1.14] (0.76--0.88) \\
- & $m = 2$ & --- & 0.96 [0.70, 1.24] (0.74--0.96) \\
- & $m = 1$ & --- & 0.87 [0.12, 1.81] (0.30--0.87) \\
-\bottomrule
-\end{tabular}
-\caption{Held-out mean $D$, in tick-lots per session, of the selected schedule, with its 95\% bootstrap interval and, in parentheses, the range across three search restarts. ``All resting depth'' is the response of Table~\ref{tab:adversary}; ``within three ticks'' counts only orders within three ticks of each side's best price, matching the fitted top three levels. Tick units map one simulator tick to one market tick. No held-out episode in any cell raised a conduct alert. Throttle on; produced by \texttt{paper\_study.robustness}.}
-\label{tab:robustness}
-\end{table}
+\paragraph{Robustness.} We fixed four further checks in one plan before running them (\texttt{paper\_study.robustness}): restarting the search, limiting the response to depth near the touch, changing the unit mapping, and separating the display gain from $D$. Each cell repeats its search with three independent search seeds at the original budget and keeps the restart with the best training score. Table~\ref{tab:robustness} in Appendix~\ref{sec:supp} reports that schedule's held-out gain on seeds 9100-9199 and the range across the three restarts. The restarts bear on prevention and are discussed in Section~\ref{sec:prevention}, and the display gain in Section~\ref{sec:cost}.
 
 \emph{Response window.} In the default response, depth at any distance from the touch moves the price as much as depth at the touch, and the schedules above rest orders up to five ticks back, outside the fitted top three levels. When only orders within three ticks of each side's best price count, the search still finds alert-free schedules under every control: 7.30 tick-lots under $\kappa = 1$, 2.84 under the MSFT fit, and 2.42 under the INTC fit with no gate, with no conduct alert on any held-out path. In eight of these nine cells, the selected schedule rests all its orders one to three ticks behind the touch. The evasion therefore does not depend on depth outside the fitted window; the cap's effect does (Section~\ref{sec:prevention}).
 
@@ -347,11 +286,11 @@ Selection on training paths overstates performance, and a modest search does not
 
 \subsection{Real price paths}\label{sec:realpaths}
 
-The simulator's fundamental moves by at most one tick every 30 seconds, so its prices lack the heavy tails and volatility clustering of real markets. Table~\ref{tab:facts} applies the same estimators to 720-second sessions of the simulator and to 30 consecutive 740-second windows of each LOBSTER sample, all in half-spread units (\texttt{paper\_study.empirical\_paths}). Real 60-second returns are two to four times as volatile as the simulator's, heavy-tailed, and show volatility clustering; in both, returns are serially uncorrelated.
+The simulator's fundamental moves by at most one tick every 30 seconds, so its prices lack the heavy tails and volatility clustering of real markets. Table~\ref{tab:facts} in Appendix~\ref{sec:supp} applies the same estimators to 720-second sessions of the simulator and to 30 consecutive 740-second windows of each LOBSTER sample, all in half-spread units (\texttt{paper\_study.empirical\_paths}). Real 60-second returns are two to four times as volatile as the simulator's, heavy-tailed, and show volatility clustering; in both, returns are serially uncorrelated.
 
-We therefore replaced the fundamental with the real mid-price path of each window, rounded to whole half-spreads, kept the noise and response streams of seed $9100 + k$ for window $k$, and replayed the schedules selected on synthetic training paths, unchanged, with the response fitted to the same stock (Table~\ref{tab:replay}). The gains survive. Under the MSFT fit, $D$ is 2.67 with no gate and 2.60 under the twice-depth cap, against 2.84 and 2.68 on synthetic paths, and under $\kappa = 1$ it is 9.73 against 9.78. The evasion of the ungated schedules does not survive. On real paths they trigger alerts in 16 to 23 of 30 windows: self-matches under the fitted responses, and the spoofing pattern under $\kappa = 1$. Larger price moves bring the displayed orders into the path of the schedule's own executions, or within the spoofing distance. Under the caps, whose per-order checks include self-match prevention, no window alerts. With 30 windows the intervals are wide; under the cap at reference depth they include zero for INTC and run from 1.0 to 5.6 for MSFT.
+We therefore replaced the fundamental with the real mid-price path of each window, rounded to whole half-spreads, kept the noise and response streams of seed $9100 + k$ for window $k$, and replayed the schedules selected on synthetic training paths, unchanged, with the response fitted to the same stock (synthetic-policy columns of Table~\ref{tab:realsearch}). The gains survive. Under the MSFT fit, $D$ is 2.67 with no gate and 2.60 under the twice-depth cap, against 2.84 and 2.68 on synthetic paths, and under $\kappa = 1$ it is 9.73 against 9.78. The evasion of the ungated schedules does not survive. On real paths they trigger alerts in 16 to 23 of 30 windows: self-matches under the fitted responses, and the spoofing pattern under $\kappa = 1$. Larger price moves bring the displayed orders into the path of the schedule's own executions, or within the spoofing distance. Under the caps, whose per-order checks include self-match prevention, no window alerts. With 30 windows the intervals are wide; under the cap at reference depth they include zero for INTC and run from 1.0 to 5.6 for MSFT.
 
-These schedules were tuned on calm paths, so we also reran the search on the real paths (\texttt{paper\_study.real\_path\_search}, Table~\ref{tab:realsearch}). The 30 windows of each stock form three folds by window number modulo 3. For each fold, the search, with the same space, budget, and alert penalty as before, is trained on the other 20 windows, and its schedule is scored on the 10 windows in the fold. Every window therefore gets one out-of-sample score. The schedule selected on synthetic paths is scored on the same windows for a paired comparison, and reproduces Table~\ref{tab:replay}.
+These schedules were tuned on calm paths, so we also reran the search on the real paths (\texttt{paper\_study.real\_path\_search}, Table~\ref{tab:realsearch}). The 30 windows of each stock form three folds by window number modulo 3. For each fold, the search, with the same space, budget, and alert penalty as before, is trained on the other 20 windows, and its schedule is scored on the 10 windows in the fold. Every window therefore gets one out-of-sample score. The schedule selected on synthetic paths is scored on the same windows for a paired comparison.
 
 With no gate, searching on real paths brings the alerts down from 17, 23, and 16 of 30 windows to 3, 3, and 4. The gain does not all survive. Under the MSFT fit it stays at 2.64 (0.70 to 6.05). Under $\kappa = 1$ it falls from 9.73 to 2.70, a paired difference of $-7.03$ ($-8.47$ to $-5.63$), so avoiding alerts on volatile paths costs about 70\% of the gain. Under the INTC fit the mean is $-5.98$ ($-21.95$ to 2.40), so no gain is detectable.
 
@@ -359,44 +298,7 @@ Under the gates, only three windows alert, all under the per-order gate with the
 
 \begin{table}[t]
 \centering
-\caption{Stylized facts of 720-second mid-price sessions in half-spread units: share of 10-second intervals with an unchanged mid-price, standard deviation and excess kurtosis of 60-second returns, lag-1 autocorrelation of 10-second returns, and mean autocorrelation of absolute 10-second returns at lags 1--5 (volatility clustering). Simulator: 100 seeds with no subject orders; data: 30 windows of each LOBSTER sample, 21 June 2012, 9:40--15:50. Kurtosis intervals are 95\% bootstrap intervals over sessions; all intervals are in \texttt{results/empirical-paths-v1}.}\label{tab:facts}
-\begin{tabular}{lrrrrr}
-\toprule
- & Unchanged (\%) & SD 60 s & Excess kurtosis 60 s & ACF(1) 10 s & $|r|$ ACF 1--5 \\
-\midrule
-Simulator & 83 & 1.00 & $-0.49$ [$-0.60$, $-0.37$] & 0.00 & $-0.08$ \\
-AAPL & 5 & 3.39 & 1.46 [0.58, 2.35] & $-0.05$ & 0.09 \\
-AMZN & 16 & 2.75 & 4.09 [0.39, 7.61] & 0.05 & 0.09 \\
-GOOG & 15 & 2.11 & 0.98 [0.02, 2.33] & $-0.01$ & 0.06 \\
-INTC & 75 & 3.43 & 2.90 [0.22, 5.55] & 0.02 & 0.06 \\
-MSFT & 66 & 3.84 & 1.60 [0.48, 2.57] & $-0.03$ & 0.08 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]
-\centering
-\caption{Schedules selected on synthetic training paths, replayed on 30 real mid-price windows of the same stock: mean $D$ (tick-lots per session) with 95\% bootstrap interval, windows with a conduct alert, and the held-out result on synthetic paths (100 seeds, Table~\ref{tab:adversary}) for comparison.}\label{tab:replay}
-\begin{tabular}{llrrr}
-\toprule
-Response, path & Control & Real-path $D$ & Alerts & Synthetic $D$ \\
-\midrule
-MSFT fit, MSFT & none & 2.67 [2.00, 3.40] & 17/30 & 2.84 [2.42, 3.28] \\
- & $m = 2$ & 2.60 [1.87, 3.33] & 0/30 & 2.68 [2.30, 3.06] \\
- & $m = 1$ & 3.05 [1.00, 5.64] & 0/30 & 1.37 [0.97, 1.76] \\
-INTC fit, INTC & none & 2.46 [$-0.67$, 6.05] & 23/30 & 2.00 [1.64, 2.38] \\
- & $m = 2$ & 1.40 [0.87, 2.07] & 0/30 & 2.00 [1.62, 2.38] \\
- & $m = 1$ & $-0.34$ [$-2.41$, 0.87] & 0/30 & 1.10 [0.82, 1.38] \\
-$\kappa = 1$, MSFT & none & 9.73 [8.73, 10.73] & 16/30 & 9.78 [9.26, 10.30] \\
- & $m = 2$ & 5.04 [$-1.97$, 11.95] & 0/30 & 6.14 [5.60, 6.70] \\
- & $m = 1$ & 3.07 [2.33, 3.80] & 0/30 & 3.32 [2.86, 3.80] \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]
-\centering
-\caption{Search rerun on real mid-price windows (\texttt{results/real-path-search-v1}). Each of 30 windows is scored by a schedule searched on the other two folds (real-path policy), and by the schedule selected on synthetic paths (synthetic policy, as in Table~\ref{tab:replay}). Mean $D$ in tick-lots per session with 95\% bootstrap interval over windows, and windows with a conduct alert.}\label{tab:realsearch}
+\caption{Search rerun on real mid-price windows (\texttt{results/real-path-search-v1}). Each of 30 windows is scored by a schedule searched on the other two folds (real-path policy), and by the schedule selected on synthetic paths and replayed unchanged (synthetic policy; its held-out synthetic-path gains are in Table~\ref{tab:adversary}). Mean $D$ in tick-lots per session with 95\% bootstrap interval over windows, and windows with a conduct alert.}\label{tab:realsearch}
 \begin{tabular}{llrrrr}
 \toprule
  & & \multicolumn{2}{c}{Real-path policy} & \multicolumn{2}{c}{Synthetic policy} \\
@@ -455,36 +357,13 @@ A gate prevents manipulation to the extent that it removes the gain, not the ale
 
 \paragraph{Search restarts.} Restarts of the same cell differ by up to a factor of 1.6 (4.62 to 7.30 under $\kappa = 1$ with no gate; 2.84 to 4.48 under the MSFT fit), and the larger-budget search reached 5.03 in the last cell. Search variability is thus as large as some of the differences between controls. The gains are lower bounds, and a comparison between controls is reliable only where it exceeds the restart range. The $\kappa = 1$ reductions from the cap do; the effect of $m = 2$ under the fits does not, so it is best stated as between nothing and about half of the gain.
 
-\paragraph{A learning adversary.} To see whether a searcher that learns does better, we replaced the random search with a policy gradient (\texttt{paper\_study.rl\_adversary}). The policy is one softmax distribution per schedule parameter, updated by REINFORCE on batches of eight schedules, with the training objective as reward, the batch mean as baseline, and standardized advantages. As before, the selected schedule is the best one sampled, scored on held-out seeds 9100-9199 (Table~\ref{tab:rl}).
+\paragraph{A learning adversary.} To see whether a searcher that learns does better, we replaced the random search with a policy gradient (\texttt{paper\_study.rl\_adversary}). The policy is one softmax distribution per schedule parameter, updated by REINFORCE on batches of eight schedules, with the training objective as reward, the batch mean as baseline, and standardized advantages. As before, the selected schedule is the best one sampled, scored on held-out seeds 9100-9199 (Table~\ref{tab:rl} in Appendix~\ref{sec:supp}).
 
 At the random search's budget of 80 samples, three independent runs per cell fall on both sides of the random search, with a spread as large as before: 2.68 to 4.24 under the MSFT fit with no gate, against 2.84, and 0.26 to 1.36 under the INTC fit at $m = 1$, against 1.10. Learning brings no advantage at this budget.
 
 With ten times the budget (800 samples, 544 to 720 distinct schedules per cell), the policy gradient finds better ungated schedules under the fits: 4.86 (4.28 to 5.44) for MSFT and 3.32 (2.88 to 3.74) for INTC, against 2.84 and 2.00. Under the caps it finds little more: 2.84 and 1.72 at $m = 2$, and 1.44 and 1.10 at $m = 1$. Under $\kappa = 1$ the longer search changes nothing (9.68 against 9.78 with no gate). None of the 48 selected schedules raised a conduct alert on any held-out path.
 
 A stronger search therefore widens the gap between the ungated and capped gains. Taking the highest held-out gain any of our searches found in each cell (the first search, the larger random search, and the policy gradient), the cap at $m = 2$ leaves 2.84 of 5.03 for MSFT, 2.04 of 3.32 for INTC, and 6.24 of 9.98 under $\kappa = 1$, removing 38 to 44\% of the gain. At $m = 1$ it removes 59 to 67\%. These maxima are taken over several searches and are biased upwards, but the bias applies to both arms.
-
-\begin{table}[t]
-\centering
-\caption{Policy-gradient adversary (\texttt{results/rl-adversary-v1}): held-out gain $D$ in tick-lots per session on seeds 9100-9199. Random search: Table~\ref{tab:adversary}. Equal budget: lowest and highest of three runs with 80 samples each. Long: one run with 800 samples, with 95\% bootstrap interval. No held-out episode of any selected schedule raised a conduct alert.}\label{tab:rl}
-\begin{tabular}{llrrr}
-\toprule
-Response & Control & Random search & Policy gradient, 80 & Policy gradient, 800 \\
-\midrule
-$\kappa = 1$ & none & 9.78 & 7.24--9.23 & 9.68 [9.02, 10.34] \\
- & per-order & 8.24 & 6.80--8.36 & 7.94 [7.34, 8.56] \\
- & $m = 2$ & 6.14 & 5.62--6.24 & 6.24 [5.68, 6.80] \\
- & $m = 1$ & 3.32 & 2.39--3.32 & 2.91 [2.22, 3.64] \\
-MSFT fit & none & 2.84 & 2.68--4.24 & 4.86 [4.28, 5.44] \\
- & per-order & 3.14 & 2.56--3.86 & 3.62 [3.12, 4.12] \\
- & $m = 2$ & 2.68 & 1.91--2.70 & 2.84 [2.42, 3.26] \\
- & $m = 1$ & 1.37 & 1.34--1.44 & 1.44 [1.12, 1.78] \\
-INTC fit & none & 2.00 & 1.60--2.46 & 3.32 [2.88, 3.74] \\
- & per-order & 2.68 & 1.20--2.92 & 2.62 [2.20, 3.08] \\
- & $m = 2$ & 2.00 & 1.48--2.00 & 1.72 [1.23, 2.22] \\
- & $m = 1$ & 1.10 & 0.26--1.36 & 1.10 [0.82, 1.38] \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \paragraph{What the response shape implies.} The cap works by limiting display size, and the linear and fitted responses reward size in proportion to the imbalance it creates. In ABIDES, a display six times reference depth moves the price no more than one at reference depth, and depth five ticks back barely moves it (Section~\ref{sec:abides}). If real markets behave like ABIDES, the gains of large-display schedules, and with them the share a cap removes, are overstated. The response limited to depth near the touch, which ABIDES supports over the default, already gives the cap a smaller effect (Section~\ref{sec:adversary}): at $m = 2$ it removes 16\% of the $\kappa = 1$ gain, 24\% of the INTC gain, and none of the MSFT gain, while $m = 1$ removes roughly half. On real price paths, the per-order gate and the twice-depth cap leave a positive gain for both fitted stocks (Table~\ref{tab:realsearch}). ABIDES is itself a model, with one-tick spreads and agents whose rules we did not choose, so it bounds the shape of the response rather than calibrating it.
 
@@ -572,39 +451,21 @@ In market making, every conduct alert in the study is a self-match: a new order 
 
 The informative contrasts are the cost and the prompt. The aggregate gate cost Sonnet 3.2 [1.9, 4.3] lots of two-sided fills, about 15\% of its ungated fills. Of its 89 rejections, 63 came from the per-order layer limit, as it quoted several price levels, 16 from self-match prevention, and only 9 from the aggregate cap. This matches Section~\ref{sec:cost}, where the cost also sits outside the aggregate cap. The reminder lowered Sonnet's alert rate by 0.11 [0.02, 0.20] with no detectable change in fills ($-0.9$ [$-2.2$, 0.4]). For Haiku, which rarely self-matched, the reminder cost 2.8 [2.0, 3.7] lots of fills and removed no detectable alerts. The price response lowered Haiku's buy completion by 3 points [0.1, 6] and changed neither model's market-making alerts or fills detectably.
 
-Some episodes are incomplete: 98 of 1,440 for Haiku and 20 of 240 for Sonnet contain at least one unparseable reply (prose or reasoning around the JSON). They are reported as incomplete and their pairs are dropped. Sonnet's incomplete episodes are mostly in the buy task (17 of 120).
+Episodes with an unparseable reply (98 of 1,440 for Haiku, 20 of 240 for Sonnet) are reported as incomplete and their pairs are dropped.
 
-\paragraph{An LLM as the adversary.} We also asked Sonnet 5.5 to take the adversary's place (\texttt{paper\_study.llm\_adversary}). The system prompt described the simulator, the price response, the gates, the throttle, and the exact conduct rules, and stated the objective of Section~\ref{sec:adversary}. In each of 20 rounds per cell the model saw every schedule it had evaluated, with its training score, gain, alert share, the alerts that fired, and the rejection reasons, and was asked for four new schedules, giving it the random search's budget of 80 evaluations on the same training seeds. Across the 12 cells (four controls and three smooth responses) the model declined in all 240 rounds, so no schedule was evaluated. Its replies said that, although the setting is a simulator, the task asks for a spoofing and layering schedule tuned to evade surveillance, and offered help with detection instead. The run cost 1.69 USD. We did not reword the prompt to obtain compliance. This result concerns one model and one prompt; it does not show that other models, other framings, or a model fine-tuned for trading would refuse, and a model that refuses does not limit what a human or a search algorithm can find, as Section~\ref{sec:adversary} shows.
+\paragraph{An LLM as the adversary.} We also asked Sonnet 5.5 to take the search's place (\texttt{paper\_study.llm\_adversary}), with a system prompt describing the simulator, the response, the gates, and the exact conduct rules, the objective of Section~\ref{sec:adversary}, and the random search's budget of 80 evaluations per cell, shown each round with every result so far. Across 12 cells it declined in all 240 rounds, saying that the task asks for a spoofing schedule tuned to evade surveillance and offering help with detection instead (cost 1.69 USD). We did not reword the prompt. This concerns one model and one prompt, and a model that refuses does not limit what a human or a search can find.
 
-\section{Practical use and regulatory context}
+\section{Regulatory context}
 
-TradeGauntlet can rerun a trading task and market path after a change to a cap, throttle, or scoring window. The saved configuration, attempted actions, rejection reasons, and event hashes let a developer trace a change in fills or alerts back to the control setting. Our examples show why this matters: zero alerts can be enforced by a size inequality, a throttle the account recovers from can still suppress trading, and ordinary quoting can match a detector pattern. Reusing the tool requires choosing cases that challenge the proposed control; passing the existing scripts is not a deployment criterion.
-
-An agent may react to a rejected order by changing its next decision. That reaction is absent from a replay of fixed actions, so the LLM study (Section~\ref{sec:llm}) draws fresh model decisions in each control condition and records attempted orders, accepted orders, alerts, and task outcomes separately. It complements the market-abuse judgment and risk-mandate studies~\cite{r25,r26} by examining behaviour under these order-level controls.
-
-In the United States, the most direct legal counterpart of the gates is SEC Rule 15c3-5, the Market Access Rule~\cite{r32}. It requires a broker-dealer with market access to maintain pre-trade controls that reject orders exceeding pre-set credit or capital thresholds or that appear erroneous, and to review their effectiveness regularly. The position-commitment bound and the size caps here are simplified instances of such controls. The rule does not prescribe aggregate caps or cancellation throttles, and our settings are not calibrated to any firm's thresholds.
-
-For FINRA member firms, these tests also relate to the technical controls used in market-conduct supervision. Rule 3110~\cite{r15} concerns the supervisory system and responsibilities. Notice 15-09~\cite{r14} discusses algorithm development, change control, testing, monitoring, and records, and recommends testing independently of development. Our experiment was developed and assessed within the same project. It does not provide that independent validation or assess a firm's supervisory organization.
-
-FINRA Rule 5210.03~\cite{r16} includes a Type 1 disruptive-quoting pattern with multiple price levels, a supply-and-demand change, opposite-side trading, and withdrawal. The layering script resembles parts of that sequence; the same-price split probe does not reproduce the multiple-level condition. The single-account self-match check also falls short of the beneficial-ownership and related-algorithm considerations in Rule 5210.02. Notice 24-09~\cite{r6} applies existing obligations to generative-AI use; it provides context for the agent study, not evidence that these tests evaluate AI supervision.
-
-In the U.S. derivatives context, the CFTC's guidance on CEA section 4c(a)(5)(C) makes intent to cancel before execution material and distinguishes legitimate good-faith cancellation~\cite{r21}. An order pattern or an author-assigned script label cannot establish that legal intent. This framework and FINRA supervision address different regulatory settings; the simulator is not a jurisdiction-specific compliance test.
-
-EU RTS 6 provides a further testing connection~\cite{r22}. Articles 5 and 7 address development and testing methodology and separation of testing from production. Article 13 addresses surveillance adequacy, false alerts, and replay of order and transaction data. These provisions motivate examining both suspicious sequences and legitimate activity. Our logs and simulations do not demonstrate fulfillment of the regulation's organizational, surveillance, or recordkeeping obligations.
-
-The size multiples, cancellation ratios, and time windows are experimental choices, not regulatory thresholds. An alert still needs interpretation, and an accepted sequence is not a certification of compliance.
+TradeGauntlet can rerun a trading task and market path after a change to a cap, throttle, or scoring window and trace a change in fills or alerts back to the control. Because an agent may react to a rejection, the LLM study draws fresh decisions in each condition instead of replaying fixed actions. The gates correspond most directly to the pre-trade controls of SEC Rule 15c3-5~\cite{r32}, which does not prescribe aggregate caps or throttles. FINRA Rule 3110~\cite{r15} and Notice 15-09~\cite{r14} call for testing algorithms independently of their development, which our project-internal evaluation does not provide; Rule 5210~\cite{r16} describes a disruptive-quoting pattern over several price levels that our layering pattern resembles only in part; and Notice 24-09~\cite{r6} applies existing obligations to generative AI. The CFTC makes the intent to cancel before execution material~\cite{r21}, which no order pattern can establish, and EU RTS 6~\cite{r22} asks for testing methodology, surveillance adequacy, and replay of order data, which motivate measuring both suspicious and legitimate activity. Our size multiples, ratios, and windows are experimental choices, not regulatory thresholds, and none of this is a jurisdiction-specific compliance test: an alert needs interpretation, and an accepted sequence is not a certification of compliance.
 
 \section{Limitations}\label{sec:limitations}
 
-\emph{Market model.} The simulator has one evaluated account, one instrument, and three replenishing levels; its responses are either stipulated or fitted to five stocks on one day. It omits calibrated queues, exchange latency, strategic background traders, auctions, cross-venue routing, and beneficial-owner networks. Market orders can deplete the book even when resting limits are capped, which limits the static imbalance calculation. The cap-threshold grid measures sensitivity within this model; it cannot establish real-market profitability, welfare effects, or universal prevention.
+\emph{Market.} The simulator has one account, one instrument, three replenishing levels with constant depth, and no queues calibrated to data, latency, strategic background traders, auctions, or cross-venue routing. Its own price path lacks the heavy tails and volatility clustering of the data~\cite{r38,r39}; real price paths, all from one day, address this only for the fundamental. The fitted response is a predictive regression on five stocks on one day in 2012, its strength depends on the unit mapping, and it does not identify the causal effect of a trader's own orders. ABIDES suggests that effect is close to the fit for small displays near the touch and smaller otherwise, but ABIDES is itself a model.
 
-\emph{Prices and data.} The simulator's own price path lacks the heavy tails and volatility clustering of the data~\cite{r38,r39}. Replaying real price paths keeps the gains but makes the ungated schedules alert. Searching again on those paths avoids most alerts but leaves a smaller gain, none under the INTC fit, and the search on 20 windows is unstable. All real paths come from one day. The book itself stays stylized, with constant depth and a constant two-tick spread. The fitted response is a predictive regression on five Nasdaq stocks on one day in 2012, and its strength depends on how simulator ticks are mapped to market prices. It should be repeated across dates and market conditions. It does not identify the causal effect of a trader's own displayed orders; in ABIDES that effect is close to the fit for small displays near the touch and smaller for larger or deeper ones, but ABIDES is itself a model.
+\emph{Strategies and detectors.} The strategies, labels, and detectors came from the same development process, and the adversaries search one six-parameter family, so their gains are lower bounds and the searches are unstable across restarts. Every schedule in the family executes with a market order, which the learned baseline exploits; passive and mixed strategies are untested. The detector window and the appendix settings were chosen after inspecting earlier results, so those comparisons are exploratory.
 
-\emph{Strategies and detectors.} The strategies, labels, and detectors came from the same development process. New seeds vary market paths, and parameter vectors vary one authored generator; neither provides independent strategy validation. The adversaries, a random search and a policy gradient over the same six parameters, search only this family, so their gains are lower bounds on what a trader acting freely in the book could find. Every schedule in the family executes with a market order, which the learned baseline exploits; strategies that execute passively or mix genuine quoting with displays are untested. The detector window was tuned on earlier cases, and the sensitivity and boundary settings were then chosen in response to observed results. The resulting means and ranges describe these exploratory comparisons and support no claim about population-level accuracy or power.
-
-\emph{Sessions and costs.} Even the one-hour sessions are short and synthetic. A single accepted submission after a rejection counts as recovery, although further lockouts may follow. The execution-quality measures use the simulator's own fundamental and mid-price as benchmarks and cover five scripted strategies. The gate conservatively checks the full quantity of a marketable limit order and can reject an executable order, so its measured costs belong to that implementation.
-
-\emph{LLM study.} The LLM study covers two models from one provider, one wording per prompt arm, legitimate tasks only, and twelve decisions per session. Its held-out market families were authored in this project, so they are a structural holdout, not external validation, and no one independently reviewed the models' behaviour. Between 7 and 8\% of episodes contain an unparseable reply and are excluded from the paired contrasts, which may bias them if parse failures depend on the condition. The legitimate-task study does not ask a model to evade the controls, and the one adversarial run used one model and one prompt and ended in refusal, so the study says little about LLM adversaries in general.
+\emph{Costs and LLMs.} Sessions are short, the execution-quality benchmarks are the simulator's own prices, and the gate's conservative check of marketable limit orders shapes its measured cost. The LLM study covers two models from one provider, one wording per prompt, and market families authored in this project; 7 to 8\% of episodes are incomplete, which may bias the paired contrasts. The one adversarial LLM run ended in refusal, so the study says little about LLM adversaries in general.
 
 \section{Conclusion and availability}
 
@@ -750,6 +611,99 @@ Anthropic Claude Code and OpenAI Codex assisted with writing the simulation code
 \end{thebibliography}
 
 \appendix
+
+\section{Supplementary tables}\label{sec:supp}
+
+Figures~\ref{fig:calibration} and~\ref{fig:adversary} plot the fitted response and the searched gains, and Tables~\ref{tab:facts}--\ref{tab:rl} give the full results behind Sections~\ref{sec:adversary} and~\ref{sec:prevention}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/calibration.pdf}
+\caption{Fitted price response. Left: mean next-second mid move by top-three-level imbalance, in five bins, omitting bins with fewer than 30 observations; the three wide-spread stocks overlap near zero. The dashed line is the $\kappa = 1$ stress setting. Right: slope at each horizon with its 95\% block-bootstrap interval.}
+\label{fig:calibration}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/adversary.pdf}
+\caption{The data of Table~\ref{tab:adversary} for the smooth responses: held-out gain of the best alert-free schedule found, with 95\% bootstrap intervals, by control. The step responses are omitted; their cells are exactly 0 or 48.}
+\label{fig:adversary}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Stylized facts of 720-second mid-price sessions in half-spread units: share of 10-second intervals with an unchanged mid-price, standard deviation and excess kurtosis of 60-second returns, lag-1 autocorrelation of 10-second returns, and mean autocorrelation of absolute 10-second returns at lags 1--5 (volatility clustering). Simulator: 100 seeds with no subject orders; data: 30 windows of each LOBSTER sample, 21 June 2012, 9:40--15:50. Kurtosis intervals are 95\% bootstrap intervals over sessions; all intervals are in \texttt{results/empirical-paths-v1}.}\label{tab:facts}
+\begin{tabular}{lrrrrr}
+\toprule
+ & Unchanged (\%) & SD 60 s & Excess kurtosis 60 s & ACF(1) 10 s & $|r|$ ACF 1--5 \\
+\midrule
+Simulator & 83 & 1.00 & $-0.49$ [$-0.60$, $-0.37$] & 0.00 & $-0.08$ \\
+AAPL & 5 & 3.39 & 1.46 [0.58, 2.35] & $-0.05$ & 0.09 \\
+AMZN & 16 & 2.75 & 4.09 [0.39, 7.61] & 0.05 & 0.09 \\
+GOOG & 15 & 2.11 & 0.98 [0.02, 2.33] & $-0.01$ & 0.06 \\
+INTC & 75 & 3.43 & 2.90 [0.22, 5.55] & 0.02 & 0.06 \\
+MSFT & 66 & 3.84 & 1.60 [0.48, 2.57] & $-0.03$ & 0.08 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llll}
+\toprule
+\textbf{Response} & \textbf{Control} & \textbf{All resting depth} & \textbf{Depth within three ticks} \\
+\midrule
+Linear, $\kappa = 1$ & No gate & 9.68 [9.04, 10.34] (6.28--9.78) & 7.30 [6.72, 7.90] (4.62--7.30) \\
+ & $m = 2$ & 6.24 [5.70, 6.80] (6.14--6.24) & 6.12 [5.56, 6.68] (5.85--6.12) \\
+ & $m = 1$ & 3.32 [2.84, 3.80] (2.88--3.34) & 2.96 [0.05, 5.85] (2.96--3.52) \\
+\addlinespace
+Fitted, MSFT & No gate & 4.48 [4.02, 4.96] (2.84--4.48) & 2.84 [2.42, 3.26] (2.80--2.96) \\
+ & $m = 2$ & 2.54 [2.14, 2.96] (2.54--2.70) & 3.06 [2.56, 3.58] (2.54--3.06) \\
+ & $m = 1$ & 1.37 [0.98, 1.76] (1.37--1.58) & 1.58 [1.26, 1.90] (1.28--1.58) \\
+\addlinespace
+Fitted, INTC & No gate & --- & 2.42 [2.02, 2.84] (1.34--2.42) \\
+ & $m = 2$ & --- & 1.84 [1.50, 2.20] (1.48--2.00) \\
+ & $m = 1$ & --- & 1.06 [0.80, 1.34] (1.06--1.32) \\
+\addlinespace
+Tick units, MSFT & No gate & --- & 1.52 [1.20, 1.86] (1.52--1.76) \\
+ & $m = 2$ & --- & 1.12 [0.82, 1.44] (1.12--1.66) \\
+ & $m = 1$ & --- & 1.04 [0.20, 2.01] (0.17--1.04) \\
+\addlinespace
+Tick units, AAPL & No gate & --- & 0.88 [0.64, 1.14] (0.76--0.88) \\
+ & $m = 2$ & --- & 0.96 [0.70, 1.24] (0.74--0.96) \\
+ & $m = 1$ & --- & 0.87 [0.12, 1.81] (0.30--0.87) \\
+\bottomrule
+\end{tabular}
+\caption{Held-out mean $D$, in tick-lots per session, of the selected schedule, with its 95\% bootstrap interval and, in parentheses, the range across three search restarts. ``All resting depth'' is the response of Table~\ref{tab:adversary}; ``within three ticks'' counts only orders within three ticks of each side's best price, matching the fitted top three levels. Tick units map one simulator tick to one market tick. No held-out episode in any cell raised a conduct alert. Throttle on; produced by \texttt{paper\_study.robustness}.}
+\label{tab:robustness}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Policy-gradient adversary (\texttt{results/rl-adversary-v1}): held-out gain $D$ in tick-lots per session on seeds 9100-9199. Random search: Table~\ref{tab:adversary}. Equal budget: lowest and highest of three runs with 80 samples each. Long: one run with 800 samples, with 95\% bootstrap interval. No held-out episode of any selected schedule raised a conduct alert.}\label{tab:rl}
+\begin{tabular}{llrrr}
+\toprule
+Response & Control & Random search & Policy gradient, 80 & Policy gradient, 800 \\
+\midrule
+$\kappa = 1$ & none & 9.78 & 7.24--9.23 & 9.68 [9.02, 10.34] \\
+ & per-order & 8.24 & 6.80--8.36 & 7.94 [7.34, 8.56] \\
+ & $m = 2$ & 6.14 & 5.62--6.24 & 6.24 [5.68, 6.80] \\
+ & $m = 1$ & 3.32 & 2.39--3.32 & 2.91 [2.22, 3.64] \\
+MSFT fit & none & 2.84 & 2.68--4.24 & 4.86 [4.28, 5.44] \\
+ & per-order & 3.14 & 2.56--3.86 & 3.62 [3.12, 4.12] \\
+ & $m = 2$ & 2.68 & 1.91--2.70 & 2.84 [2.42, 3.26] \\
+ & $m = 1$ & 1.37 & 1.34--1.44 & 1.44 [1.12, 1.78] \\
+INTC fit & none & 2.00 & 1.60--2.46 & 3.32 [2.88, 3.74] \\
+ & per-order & 2.68 & 1.20--2.92 & 2.62 [2.20, 3.08] \\
+ & $m = 2$ & 2.00 & 1.48--2.00 & 1.72 [1.23, 2.22] \\
+ & $m = 1$ & 1.10 & 0.26--1.36 & 1.10 [0.82, 1.38] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
 
 \section{Mechanism checks under the step response}\label{sec:appendix}
 
