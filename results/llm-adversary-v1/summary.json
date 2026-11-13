@@ -1,0 +1,464 @@
+{
+  "mode": "live",
+  "model": "claude-sonnet-5-5",
+  "committed_usd": "1.691900",
+  "cells": [
+    {
+      "control": "none",
+      "response": "linear_k1",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 20
+      },
+      "input_tokens": 35700,
+      "output_tokens": 7699,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 2,
+          "lots_total": 80,
+          "price_spread_ticks": 4,
+          "submission_gap_s": 2,
+          "lifetime_overlap": "disjoint",
+          "execution_delay_s": 2
+        },
+        "train_score": 10.2,
+        "test": {
+          "n": 100,
+          "mean_D": 9.78,
+          "D_ci95": [
+            9.26,
+            10.3
+          ],
+          "positive_D": 100,
+          "alerts": 0,
+          "positive_D_no_alert": 100,
+          "mean_filled_lots": 24,
+          "mean_rejected": 0,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "none",
+      "response": "fitted_msft",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 20
+      },
+      "input_tokens": 35720,
+      "output_tokens": 7313,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 2,
+          "lots_total": 20,
+          "price_spread_ticks": 0,
+          "submission_gap_s": 0,
+          "lifetime_overlap": "full",
+          "execution_delay_s": 2
+        },
+        "train_score": 4.2,
+        "test": {
+          "n": 100,
+          "mean_D": 2.84,
+          "D_ci95": [
+            2.42,
+            3.28
+          ],
+          "positive_D": 79,
+          "alerts": 0,
+          "positive_D_no_alert": 79,
+          "mean_filled_lots": 24,
+          "mean_rejected": 0,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "none",
+      "response": "fitted_intc",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 20
+      },
+      "input_tokens": 35720,
+      "output_tokens": 7066,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 4,
+          "lots_total": 80,
+          "price_spread_ticks": 1,
+          "submission_gap_s": 1,
+          "lifetime_overlap": "disjoint",
+          "execution_delay_s": 2
+        },
+        "train_score": 3.2,
+        "test": {
+          "n": 100,
+          "mean_D": 2.0,
+          "D_ci95": [
+            1.64,
+            2.38
+          ],
+          "positive_D": 66,
+          "alerts": 0,
+          "positive_D_no_alert": 66,
+          "mean_filled_lots": 24,
+          "mean_rejected": 0,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "legacy",
+      "response": "linear_k1",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 20
+      },
+      "input_tokens": 36660,
+      "output_tokens": 6164,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 2,
+          "lots_total": 40,
+          "price_spread_ticks": 3,
+          "submission_gap_s": 5,
+          "lifetime_overlap": "full",
+          "execution_delay_s": 10
+        },
+        "train_score": 8.4,
+        "test": {
+          "n": 100,
+          "mean_D": 8.24,
+          "D_ci95": [
+            7.62,
+            8.88
+          ],
+          "positive_D": 100,
+          "alerts": 0,
+          "positive_D_no_alert": 100,
+          "mean_filled_lots": 24,
+          "mean_rejected": 5.75,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "legacy",
+      "response": "fitted_msft",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 19
+      },
+      "input_tokens": 36680,
+      "output_tokens": 6571,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 4,
+          "lots_total": 80,
+          "price_spread_ticks": 4,
+          "submission_gap_s": 10,
+          "lifetime_overlap": "disjoint",
+          "execution_delay_s": 0
+        },
+        "train_score": 3.8,
+        "test": {
+          "n": 100,
+          "mean_D": 3.14,
+          "D_ci95": [
+            2.68,
+            3.6
+          ],
+          "positive_D": 80,
+          "alerts": 0,
+          "positive_D_no_alert": 80,
+          "mean_filled_lots": 24,
+          "mean_rejected": 5.75,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "legacy",
+      "response": "fitted_intc",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 20
+      },
+      "input_tokens": 36680,
+      "output_tokens": 7212,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 3,
+          "lots_total": 40,
+          "price_spread_ticks": 2,
+          "submission_gap_s": 1,
+          "lifetime_overlap": "full",
+          "execution_delay_s": 20
+        },
+        "train_score": 2.8,
+        "test": {
+          "n": 100,
+          "mean_D": 2.68,
+          "D_ci95": [
+            2.26,
+            3.12
+          ],
+          "positive_D": 77,
+          "alerts": 0,
+          "positive_D_no_alert": 77,
+          "mean_filled_lots": 24,
+          "mean_rejected": 12,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "linear_k1",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 18
+      },
+      "input_tokens": 36540,
+      "output_tokens": 6376,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 2,
+          "lots_total": 40,
+          "price_spread_ticks": 1,
+          "submission_gap_s": 10,
+          "lifetime_overlap": "full",
+          "execution_delay_s": 0
+        },
+        "train_score": 7.6,
+        "test": {
+          "n": 100,
+          "mean_D": 6.14,
+          "D_ci95": [
+            5.6,
+            6.7
+          ],
+          "positive_D": 97,
+          "alerts": 0,
+          "positive_D_no_alert": 97,
+          "mean_filled_lots": 24,
+          "mean_rejected": 12,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "fitted_msft",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 19
+      },
+      "input_tokens": 36560,
+      "output_tokens": 6549,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 3,
+          "lots_total": 60,
+          "price_spread_ticks": 4,
+          "submission_gap_s": 2,
+          "lifetime_overlap": "disjoint",
+          "execution_delay_s": 2
+        },
+        "train_score": 3.6,
+        "test": {
+          "n": 100,
+          "mean_D": 2.68,
+          "D_ci95": [
+            2.3,
+            3.06
+          ],
+          "positive_D": 80,
+          "alerts": 0,
+          "positive_D_no_alert": 80,
+          "mean_filled_lots": 24,
+          "mean_rejected": 5.75,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "aggregate_2x",
+      "response": "fitted_intc",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 19
+      },
+      "input_tokens": 36560,
+      "output_tokens": 7014,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 2,
+          "lots_total": 20,
+          "price_spread_ticks": 4,
+          "submission_gap_s": 5,
+          "lifetime_overlap": "staggered",
+          "execution_delay_s": 5
+        },
+        "train_score": 3.2,
+        "test": {
+          "n": 100,
+          "mean_D": 2.0,
+          "D_ci95": [
+            1.62,
+            2.38
+          ],
+          "positive_D": 66,
+          "alerts": 0,
+          "positive_D_no_alert": 66,
+          "mean_filled_lots": 24,
+          "mean_rejected": 0,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "linear_k1",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 19
+      },
+      "input_tokens": 36540,
+      "output_tokens": 6387,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 4,
+          "lots_total": 20,
+          "price_spread_ticks": 3,
+          "submission_gap_s": 1,
+          "lifetime_overlap": "full",
+          "execution_delay_s": 5
+        },
+        "train_score": 4.6,
+        "test": {
+          "n": 100,
+          "mean_D": 3.32,
+          "D_ci95": [
+            2.86,
+            3.8
+          ],
+          "positive_D": 82,
+          "alerts": 0,
+          "positive_D_no_alert": 82,
+          "mean_filled_lots": 24,
+          "mean_rejected": 24,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "fitted_msft",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 20
+      },
+      "input_tokens": 36560,
+      "output_tokens": 6763,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 3,
+          "lots_total": 30,
+          "price_spread_ticks": 1,
+          "submission_gap_s": 1,
+          "lifetime_overlap": "staggered",
+          "execution_delay_s": 40
+        },
+        "train_score": 2.18,
+        "test": {
+          "n": 100,
+          "mean_D": 1.3665,
+          "D_ci95": [
+            0.971,
+            1.7645
+          ],
+          "positive_D": 51,
+          "alerts": 0,
+          "positive_D_no_alert": 51,
+          "mean_filled_lots": 22.21,
+          "mean_rejected": 25.53,
+          "episodes_with_response": 100
+        }
+      }
+    },
+    {
+      "control": "aggregate_1x",
+      "response": "fitted_intc",
+      "best_params": null,
+      "train_score": null,
+      "evaluations": 0,
+      "problems": {
+        "unparseable_reply": 19
+      },
+      "input_tokens": 36560,
+      "output_tokens": 6780,
+      "test": null,
+      "random_search": {
+        "best_params": {
+          "n_orders": 7,
+          "lots_total": 70,
+          "price_spread_ticks": 5,
+          "submission_gap_s": 0,
+          "lifetime_overlap": "full",
+          "execution_delay_s": 5
+        },
+        "train_score": 2.4,
+        "test": {
+          "n": 100,
+          "mean_D": 1.1,
+          "D_ci95": [
+            0.82,
+            1.38
+          ],
+          "positive_D": 43,
+          "alerts": 0,
+          "positive_D_no_alert": 43,
+          "mean_filled_lots": 24,
+          "mean_rejected": 72,
+          "episodes_with_response": 100
+        }
+      }
+    }
+  ],
+  "inference_scope": "Bootstrap 95% intervals over 100 held-out market seeds for the selected policy; one model run per cell, so variation across runs of the model is not measured."
+}

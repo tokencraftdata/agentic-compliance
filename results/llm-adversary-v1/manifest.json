@@ -1,0 +1,28 @@
+{
+  "source_sha256": {
+    "paper_study/llm_adversary.py": "192056326dd762392aa81624d59d2834a69bad379f3c11ef03a58de5de665afc",
+    "paper_study/adversary.py": "358204a2d0404a34c37bf255d82f2420cb5e48c5a87e48100e3178cd08cc6de2",
+    "agent_study/provider.py": "5bcb6ac9c5be9518398fe1b0f23c71cc1da456ac12abbbe9f2e1143ff1ccb045",
+    "paper_study/sensitivity.py": "78556cdf2f08eb2f1b516e693620ec0da3cb087a20a98a943b049ee47d0e22e4",
+    "config.json": "8a0422b72fdcbebbef86719b59106f6f5b5bd685a5038c00fb7d0d93f99028c3",
+    "pilot/__init__.py": "5e20084f50635f2fa263bb89cfb656075c6c3aa8dec8d763063771e4af6af941",
+    "pilot/detectors.py": "768016731d4ba82f34e07432546d62ff8af10f9d1ba1de9122fb085ed620b7a3",
+    "pilot/evasion_family.py": "44d65fc2f248aa71e0523bad412550655b1cf6d5cbe80725fdbb783b78fd4994",
+    "pilot/market.py": "13d9b05331421a2be1a44ed59e8ea4c237329c5a58db14343788b4458dd3182c",
+    "pilot/negative_controls.py": "a0cbe38c0857bc373c481f66353e2780877810ed59339d790054b650a92ba910",
+    "pilot/review_study.py": "f4b927b3affdb6e6e76460c55572e20ce7eabc004339bbcfaf6244b489db20f8",
+    "pilot/revision.py": "740ad371f8f461ba8e301906ce56bef55688948eaa74daef100db30a437039bb",
+    "pilot/run.py": "c87cf5ea4d140901488787538dc5914710766a094aa56cfd67546de8a3a905fb",
+    "pilot/stats.py": "d16e6ac40db92f73ecf84a8659306af01fb82094e084d5238775e8bf52855ebe",
+    "pilot/strategies.py": "1d1526b44e7761a789ee29848a753754b2701ae416e373fef869c6f73b119543",
+    "pilot/throttle_isolation.py": "a3ca65be6657e3b5f06f253250ac783ecf681897a1f234fea5e38737df7f8163",
+    "pilot/window_sweep.py": "b8ea46048d98eb29b2bc71d0ae279f6747f4355b99ff42ed05fe81a4ca97031b"
+  },
+  "python": "3.9.6",
+  "files": {
+    "episodes.jsonl.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "plan.json": "cf0fe7c212f29f1dd3c80bf83bfebd0ba4b6e79969935f878ddb748eeef89815",
+    "search_log.jsonl.gz": "d96206a004b8eea5e45b53a9d00f300fab86eb04354c156937e9568ddf451fdc",
+    "summary.json": "d4091121d2a1cebab22551fecbf739b6d56f538987dd0b163667ec1e6148f48c"
+  }
+}
