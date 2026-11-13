@@ -1,7 +1,7 @@
 # TradeGauntlet
 
 TradeGauntlet is the name for this project's custom limit-order-book simulator and
-workflow for evaluating trading controls. It was built for the compliance study;
+workflow for evaluating compliance controls around autonomous trading agents. It was built for the compliance study;
 it does not wrap ABIDES or connect to an exchange. The repository name remains
 `agentic-compliance`.
 
@@ -41,7 +41,10 @@ source and saved evidence when comparing versions. A successful replay checks
 the implementation against its recorded execution; it does not independently
 validate the market assumptions or the script's assigned intent.
 
-The current checks use one subject account, one instrument, synthetic prices
-and fixed trading scripts. The LLM-agent runner is under `agent_study/`; its
-saved run is in `results/agent-llm-v1`. Independently authored test scenarios
-remain pending. The paper's source is in [paper/arxiv](../paper/arxiv/main.tex).
+The custom engine uses one subject account and one instrument. The experiments
+cover scripted, searched, and LLM traders, synthetic and real price paths, and
+price responses fitted to one day of Nasdaq data. Separate ABIDES experiments
+check aspects of the response in a richer market. The LLM-agent runner is under
+`agent_study/`, with saved runs in `results/agent-llm-v1`. Independently authored
+test scenarios remain pending. The paper's source is in
+[paper/arxiv](../paper/arxiv/main.tex).

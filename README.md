@@ -1,10 +1,10 @@
-# TradeGauntlet: alerts are not enough to test trading compliance controls
+# TradeGauntlet: Evaluating Compliance Controls for Autonomous Trading Agents
 
-A small, fully reproducible limit-order-book simulator for testing pre-trade gates
-and surveillance rules against traders who adapt to them, and the paper that
-reports what it finds.
+A replayable limit-order-book simulator for studying agentic compliance: how
+autonomous trading agents interact with pre-trade gates and surveillance rules,
+what the controls prevent, and what they cost in task performance.
 
-**Paper:** [TradeGauntlet: Alerts Are Not Enough to Test Trading Compliance Controls](output/pdf/tradegauntlet_arxiv.pdf)
+**Paper:** [TradeGauntlet: Evaluating Compliance Controls for Autonomous Trading Agents](output/pdf/tradegauntlet_arxiv.pdf)
 (source in [`paper/arxiv/`](paper/arxiv/README.md)).
 
 All trading is simulated. Nothing here measures real-market detection accuracy or
@@ -12,32 +12,33 @@ establishes legal compliance.
 
 ## What it measures
 
-Controls are usually judged by counting alerts. TradeGauntlet scores them on three
-separate measurements, on identical market paths and against an adversary that
-searches for gaps:
+TradeGauntlet evaluates LLM agents pursuing legitimate tasks, then uses scripted
+probes and searching adversaries to test weaknesses beyond the behavior observed
+in those runs. It separates three measurements:
 
 - **Detection:** does a conduct rule or baseline detector alert?
 - **Prevention:** does a gate remove the gain from moving the price, or only the alert?
 - **Cost:** what do the controls cost legitimate traders in fills, P&L and false alerts?
 
-The paper's four findings:
+The LLM study records 1,440 Haiku sessions and 240 Sonnet sessions, with 1,342 and
+220 complete episodes, respectively. All conduct alerts were self-matches, which
+the gates reject outright. The aggregate-gate condition reduced Sonnet's two-sided
+fills by about 15%. A conduct reminder reduced Sonnet's alert rate but cost Haiku
+fills without a detectable alert benefit.
 
-1. **Zero alerts can be built in.** A detector that shares a threshold with a gate
-   cannot alert on gated traffic. The only alerts two LLM market makers raised were
-   self-matches that the gates block outright.
-2. **Detection fails against a searching adversary.** A random search and a policy
-   gradient find split-order schedules that evade the conduct rules under every
-   control, on held-out paths, and, after a search on real Nasdaq price paths, in
-   most real windows. Two baseline detectors catch them.
-3. **Prevention is partial and depends on the adversary.** A cap at twice reference
-   depth removes 38 to 44% of the gain of the strongest schedules found, but little
-   of a weaker search's.
-4. **Prevention has a cost.** Legitimate makers gain from the same price response,
-   the cancellation throttle carries most of their cost, and the baselines flag 23%
-   of a large maker's sessions.
+Random search and a policy gradient find split-order schedules that evade the
+implemented conduct rules. The learned baseline alone catches all 2,400 tested
+searched episodes and flags 15/100 large-maker sessions. Combining detectors raises
+that false-alert count to 23/100 without improving recall on this test set.
+
+Aggregate caps reduce response-dependent gains unevenly. Their effect is smaller
+when only near-touch depth affects prices. The paper labels ratios of the highest
+held-out scores across search experiments as descriptive: those maxima were
+selected after examining test results and do not use a common final test set.
 
 The price response is fitted to five LOBSTER samples and its shape is checked in the
-ABIDES agent-based market. Claude Sonnet 5.5, asked to act as the adversary, refused.
+ABIDES agent-based market. A separate adversarial prompt elicited refusals from
+Claude Sonnet 5.5 in all 240 rounds, yielding no candidate schedules to evaluate.
 
 ## Layout
 
@@ -109,6 +110,6 @@ More: [workflow guide](docs/tradegauntlet.md), [LLM-agent run book](docs/llm-age
 
 ## Citation and license
 
-> Sandip Nandi, Aishwarya Bose, Apurba Bose, and Soovadeep Bakshi. *TradeGauntlet: Alerts Are Not Enough to Test Trading Compliance Controls.* Preprint, 2026.
+> Sandip Nandi, Aishwarya Bose, Apurba Bose, and Soovadeep Bakshi. *TradeGauntlet: Evaluating Compliance Controls for Autonomous Trading Agents.* Preprint, 2026.
 
 Code and data are released under the [MIT License](LICENSE).
