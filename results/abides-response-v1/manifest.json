@@ -1,0 +1,12 @@
+{
+  "source_sha256": {
+    "paper_study/abides_response.py": "2f40fda24c063eef85fedf689e6f7b61ad82b194c5301b76ad280a8ecc918142",
+    "paper_study/abides_check.py": "10cdba1a2264bdc54b227f234eb037e54c76e1ca101764d969933e09ae746218"
+  },
+  "python": "3.9.6",
+  "files": {
+    "episodes.jsonl.gz": "f2ff0b7477a3d7b222ec6cee5232a83f5c497e1dcc2a9c1cee4f45e53c3dec17",
+    "plan.json": "2c2ac5a2ce16ce3126938df93b44cc1644e1eeeb13a551c87b9ed6bdeba7a762",
+    "summary.json": "a9de7c626e29d8c35b863fc2d0113ffdb8382ab99fd3121f92481cd2a474e51c"
+  }
+}
