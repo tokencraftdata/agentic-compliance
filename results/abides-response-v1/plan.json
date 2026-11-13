@@ -1,0 +1,170 @@
+{
+  "spec": {
+    "status": "Exploratory robustness check; markets, arms, seeds, horizons and analysis fixed before running",
+    "markets": [
+      {
+        "name": "rmsc04",
+        "overrides": {}
+      },
+      {
+        "name": "thin_book",
+        "overrides": {
+          "num_value_agents": 20
+        }
+      }
+    ],
+    "end_time": "10:00:00",
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100
+    ],
+    "arms": [
+      {
+        "name": "none",
+        "c": 0,
+        "ticks_behind": 1
+      },
+      {
+        "name": "c1",
+        "c": 1,
+        "ticks_behind": 1
+      },
+      {
+        "name": "c2",
+        "c": 2,
+        "ticks_behind": 1
+      },
+      {
+        "name": "c6",
+        "c": 6,
+        "ticks_behind": 1
+      },
+      {
+        "name": "c2_far",
+        "c": 2,
+        "ticks_behind": 5
+      }
+    ],
+    "orders_per_cycle": 6,
+    "probe_offsets_s": [
+      1,
+      2,
+      5
+    ],
+    "cycle_s": 60,
+    "first_cycle_after_open_s": 120,
+    "fundamental_grid_s": 1,
+    "fundamental_seed_salt": 7919,
+    "bootstrap_resamples": 4000,
+    "bootstrap_seed": 20261121,
+    "tradegauntlet_slopes": {
+      "fitted_msft": 0.478911,
+      "fitted_intc": 0.347866,
+      "fitted_aapl": 0.017851
+    }
+  },
+  "abides_commit": "f9cbe51342b7dedd9587e4e069040d68a5c6477f",
+  "source_sha256": {
+    "paper_study/abides_response.py": "2f40fda24c063eef85fedf689e6f7b61ad82b194c5301b76ad280a8ecc918142",
+    "paper_study/abides_check.py": "10cdba1a2264bdc54b227f234eb037e54c76e1ca101764d969933e09ae746218"
+  },
+  "python": "3.9.6"
+}

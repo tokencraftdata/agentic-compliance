@@ -55,6 +55,7 @@ Main result folders:
 | `baselines-v1` | Order-to-trade ratio and learned detector |
 | `execution-quality-v1` | Fill rate, shortfall, edge, markout and inventory of legitimate scripts |
 | `abides-check-v1`, `abides-check-v2` | Display gain in ABIDES RMSC04 (v2 pairs arms on one fundamental path) |
+| `abides-response-v1` | Whether the agent's own display moves the ABIDES midpoint (1, 2, 5 s; RMSC04 and a thin book) |
 | `agent-llm-v1` | LLM-agent study: frozen protocols, replayable traces, paired contrasts (`report-*/contrasts.md`) |
 | `sensitivity-v1`, `boundary-v1` | Step-response mechanism checks (paper appendix) |
 

@@ -1,0 +1,318 @@
+{
+  "markets": [
+    {
+      "market": "rmsc04",
+      "median_half_spread_cents": 0.5,
+      "median_reference_depth": 158.0,
+      "observational_slope_1s": 0.789214,
+      "observational_slope_1s_ci95": [
+        0.619619,
+        0.96507
+      ],
+      "arms": [
+        {
+          "arm": "c1",
+          "display_multiple": 1,
+          "ticks_behind": 1,
+          "paired_cycles": 2800,
+          "mean_induced_imbalance": 0.153388,
+          "display_lots_filled_per_cycle": 4.986429,
+          "effect_1s_half_spreads": 0.090032,
+          "effect_1s_ci95": [
+            0.051804,
+            0.130357
+          ],
+          "effect_1s_mde80_naive": 0.061215,
+          "effect_2s_half_spreads": 0.159286,
+          "effect_2s_ci95": [
+            0.093571,
+            0.224643
+          ],
+          "effect_2s_mde80_naive": 0.092661,
+          "effect_5s_half_spreads": 0.458542,
+          "effect_5s_ci95": [
+            0.328806,
+            0.599284
+          ],
+          "effect_5s_mde80_naive": 0.18491,
+          "causal_slope_1s": 0.587011,
+          "causal_slope_1s_ci95": [
+            0.333738,
+            0.838328
+          ],
+          "tradegauntlet_expected_1s_effect": {
+            "fitted_msft": 0.073459,
+            "fitted_intc": 0.053358,
+            "fitted_aapl": 0.002738
+          }
+        },
+        {
+          "arm": "c2",
+          "display_multiple": 2,
+          "ticks_behind": 1,
+          "paired_cycles": 2800,
+          "mean_induced_imbalance": 0.2607,
+          "display_lots_filled_per_cycle": 6.548214,
+          "effect_1s_half_spreads": 0.106824,
+          "effect_1s_ci95": [
+            0.062545,
+            0.152252
+          ],
+          "effect_1s_mde80_naive": 0.066932,
+          "effect_2s_half_spreads": 0.161071,
+          "effect_2s_ci95": [
+            0.098571,
+            0.2225
+          ],
+          "effect_2s_mde80_naive": 0.090373,
+          "effect_5s_half_spreads": 0.487134,
+          "effect_5s_ci95": [
+            0.357756,
+            0.631127
+          ],
+          "effect_5s_mde80_naive": 0.18549,
+          "causal_slope_1s": 0.409706,
+          "causal_slope_1s_ci95": [
+            0.238475,
+            0.579045
+          ],
+          "tradegauntlet_expected_1s_effect": {
+            "fitted_msft": 0.124852,
+            "fitted_intc": 0.090689,
+            "fitted_aapl": 0.004654
+          }
+        },
+        {
+          "arm": "c6",
+          "display_multiple": 6,
+          "ticks_behind": 1,
+          "paired_cycles": 2800,
+          "mean_induced_imbalance": 0.495298,
+          "display_lots_filled_per_cycle": 8.680357,
+          "effect_1s_half_spreads": 0.090389,
+          "effect_1s_ci95": [
+            0.04716,
+            0.132857
+          ],
+          "effect_1s_mde80_naive": 0.063517,
+          "effect_2s_half_spreads": 0.1625,
+          "effect_2s_ci95": [
+            0.093929,
+            0.23
+          ],
+          "effect_2s_mde80_naive": 0.09117,
+          "effect_5s_half_spreads": 0.533595,
+          "effect_5s_ci95": [
+            0.409789,
+            0.667382
+          ],
+          "effect_5s_mde80_naive": 0.184638,
+          "causal_slope_1s": 0.182481,
+          "causal_slope_1s_ci95": [
+            0.094849,
+            0.268021
+          ],
+          "tradegauntlet_expected_1s_effect": {
+            "fitted_msft": 0.237204,
+            "fitted_intc": 0.172297,
+            "fitted_aapl": 0.008842
+          }
+        },
+        {
+          "arm": "c2_far",
+          "display_multiple": 2,
+          "ticks_behind": 5,
+          "paired_cycles": 2800,
+          "mean_induced_imbalance": 0.262098,
+          "display_lots_filled_per_cycle": 0.756786,
+          "effect_1s_half_spreads": 0.006788,
+          "effect_1s_ci95": [
+            -0.022143,
+            0.037143
+          ],
+          "effect_1s_mde80_naive": 0.036446,
+          "effect_2s_half_spreads": 0.014643,
+          "effect_2s_ci95": [
+            -0.027857,
+            0.055
+          ],
+          "effect_2s_mde80_naive": 0.052625,
+          "effect_5s_half_spreads": 0.155468,
+          "effect_5s_ci95": [
+            0.066095,
+            0.26073
+          ],
+          "effect_5s_mde80_naive": 0.131994,
+          "causal_slope_1s": 0.025903,
+          "causal_slope_1s_ci95": [
+            -0.086329,
+            0.141126
+          ],
+          "tradegauntlet_expected_1s_effect": {
+            "fitted_msft": 0.125522,
+            "fitted_intc": 0.091175,
+            "fitted_aapl": 0.004679
+          }
+        }
+      ]
+    },
+    {
+      "market": "thin_book",
+      "median_half_spread_cents": 1.0,
+      "median_reference_depth": 91.5,
+      "observational_slope_1s": 0.231114,
+      "observational_slope_1s_ci95": [
+        -0.04527,
+        0.516836
+      ],
+      "arms": [
+        {
+          "arm": "c1",
+          "display_multiple": 1,
+          "ticks_behind": 1,
+          "paired_cycles": 2604,
+          "mean_induced_imbalance": 0.153007,
+          "display_lots_filled_per_cycle": 1.305684,
+          "effect_1s_half_spreads": 0.070686,
+          "effect_1s_ci95": [
+            0.016667,
+            0.131012
+          ],
+          "effect_1s_mde80_naive": 0.078517,
+          "effect_2s_half_spreads": 0.159476,
+          "effect_2s_ci95": [
+            0.056753,
+            0.283158
+          ],
+          "effect_2s_mde80_naive": 0.152035,
+          "effect_5s_half_spreads": 0.336565,
+          "effect_5s_ci95": [
+            0.178376,
+            0.515511
+          ],
+          "effect_5s_mde80_naive": 0.253815,
+          "causal_slope_1s": 0.462021,
+          "causal_slope_1s_ci95": [
+            0.114475,
+            0.848436
+          ],
+          "tradegauntlet_expected_1s_effect": {
+            "fitted_msft": 0.073277,
+            "fitted_intc": 0.053226,
+            "fitted_aapl": 0.002731
+          }
+        },
+        {
+          "arm": "c2",
+          "display_multiple": 2,
+          "ticks_behind": 1,
+          "paired_cycles": 2605,
+          "mean_induced_imbalance": 0.259841,
+          "display_lots_filled_per_cycle": 1.916699,
+          "effect_1s_half_spreads": 0.059129,
+          "effect_1s_ci95": [
+            0.005337,
+            0.117692
+          ],
+          "effect_1s_mde80_naive": 0.080731,
+          "effect_2s_half_spreads": 0.146821,
+          "effect_2s_ci95": [
+            0.047144,
+            0.260903
+          ],
+          "effect_2s_mde80_naive": 0.153078,
+          "effect_5s_half_spreads": 0.357642,
+          "effect_5s_ci95": [
+            0.195174,
+            0.535338
+          ],
+          "effect_5s_mde80_naive": 0.281804,
+          "causal_slope_1s": 0.227611,
+          "causal_slope_1s_ci95": [
+            0.030898,
+            0.458792
+          ],
+          "tradegauntlet_expected_1s_effect": {
+            "fitted_msft": 0.124441,
+            "fitted_intc": 0.09039,
+            "fitted_aapl": 0.004638
+          }
+        },
+        {
+          "arm": "c6",
+          "display_multiple": 6,
+          "ticks_behind": 1,
+          "paired_cycles": 2606,
+          "mean_induced_imbalance": 0.49369,
+          "display_lots_filled_per_cycle": 2.466616,
+          "effect_1s_half_spreads": 0.055064,
+          "effect_1s_ci95": [
+            0.001716,
+            0.113486
+          ],
+          "effect_1s_mde80_naive": 0.080965,
+          "effect_2s_half_spreads": 0.154661,
+          "effect_2s_ci95": [
+            0.052028,
+            0.275096
+          ],
+          "effect_2s_mde80_naive": 0.157578,
+          "effect_5s_half_spreads": 0.399845,
+          "effect_5s_ci95": [
+            0.225943,
+            0.5974
+          ],
+          "effect_5s_mde80_naive": 0.285551,
+          "causal_slope_1s": 0.111574,
+          "causal_slope_1s_ci95": [
+            -0.001582,
+            0.227532
+          ],
+          "tradegauntlet_expected_1s_effect": {
+            "fitted_msft": 0.236434,
+            "fitted_intc": 0.171738,
+            "fitted_aapl": 0.008813
+          }
+        },
+        {
+          "arm": "c2_far",
+          "display_multiple": 2,
+          "ticks_behind": 5,
+          "paired_cycles": 2624,
+          "mean_induced_imbalance": 0.260621,
+          "display_lots_filled_per_cycle": 0.608232,
+          "effect_1s_half_spreads": 0.043561,
+          "effect_1s_ci95": [
+            -0.002643,
+            0.094115
+          ],
+          "effect_1s_mde80_naive": 0.071303,
+          "effect_2s_half_spreads": 0.060398,
+          "effect_2s_ci95": [
+            0.004996,
+            0.117523
+          ],
+          "effect_2s_mde80_naive": 0.091087,
+          "effect_5s_half_spreads": 0.229615,
+          "effect_5s_ci95": [
+            0.101734,
+            0.385255
+          ],
+          "effect_5s_mde80_naive": 0.227522,
+          "causal_slope_1s": 0.167155,
+          "causal_slope_1s_ci95": [
+            -0.009491,
+            0.35596
+          ],
+          "tradegauntlet_expected_1s_effect": {
+            "fitted_msft": 0.124814,
+            "fitted_intc": 0.090661,
+            "fitted_aapl": 0.004652
+          }
+        }
+      ]
+    }
+  ],
+  "abides_commit": "f9cbe51342b7dedd9587e4e069040d68a5c6477f",
+  "inference_scope": "Cluster-bootstrap 95% intervals over 100 seeds; cycles within a seed are not independent. Effects in half-spreads of mid change, display minus no display."
+}
