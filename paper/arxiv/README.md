@@ -27,13 +27,4 @@ embedded and none are Type 3, as arXiv prefers.
 ## Uploading to arXiv
 
 Upload `main.tex`, `arxiv.sty` and `figures/` (not the PDF): arXiv compiles the
-source itself. Before uploading:
-
-1. Proposed primary category: **q-fin.TR** (Trading and Market Microstructure).
-   A first submission can require [endorsement](https://info.arxiv.org/help/endorsement.html).
-2. Make the repository public, or the code link in the paper will not resolve.
-3. Choose the paper's [license](https://info.arxiv.org/help/license/index.html);
-   it cannot be changed for a posted version.
-4. Check that the title, abstract and authors in the form match `main.tex`, and
-   that the AI-assistance disclosure is current
-   ([arXiv policy](https://info.arxiv.org/help/moderation/index.html#policy-for-authors-use-of-generative-ai-language-tools)).
+source itself.
