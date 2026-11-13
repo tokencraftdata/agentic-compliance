@@ -1,10 +1,10 @@
-# TradeGauntlet: testing the limits of trading compliance controls
+# TradeGauntlet: alerts are not enough to test trading compliance controls
 
-A small, fully reproducible limit-order-book simulator for stress-testing pre-trade
-gates and surveillance rules against traders who adapt to them, and the paper that
+A small, fully reproducible limit-order-book simulator for testing pre-trade gates
+and surveillance rules against traders who adapt to them, and the paper that
 reports what it finds.
 
-**Paper:** [TradeGauntlet: Testing the Limits of Trading Compliance Controls](output/pdf/tradegauntlet_arxiv.pdf)
+**Paper:** [TradeGauntlet: Alerts Are Not Enough to Test Trading Compliance Controls](output/pdf/tradegauntlet_arxiv.pdf)
 (source in [`paper/arxiv/`](paper/arxiv/README.md)).
 
 All trading is simulated. Nothing here measures real-market detection accuracy or
@@ -12,20 +12,32 @@ establishes legal compliance.
 
 ## What it measures
 
-Controls are compared on identical simulated market paths, scoring three things
-separately: whether a rule alerts, whether a gate removes the gain from moving the
-price, and how much legitimate trading the gate blocks. The paper uses this to show:
+Controls are usually judged by counting alerts. TradeGauntlet scores them on three
+separate measurements, on identical market paths and against an adversary that
+searches for gaps:
 
-- a detector that shares a threshold with a gate cannot alert on gated traffic, so
-  zero alerts there measure the gate, not the detector;
-- a price response fitted to Nasdaq order-book data (five LOBSTER samples);
-- a seeded search over split-order schedules that evades the implemented conduct
-  rules, scored on held-out paths with bootstrap intervals;
-- two baseline detectors (an order-to-trade ratio and a learned classifier);
-- the execution-quality cost of each control to legitimate traders;
-- stylized facts against the data, and the adversary replayed on real price paths;
-- a check in the independent ABIDES market simulator;
-- Claude Haiku 5.5 and Sonnet 5.5 trading legitimate tasks under the same controls.
+- **Detection:** does a conduct rule or baseline detector alert?
+- **Prevention:** does a gate remove the gain from moving the price, or only the alert?
+- **Cost:** what do the controls cost legitimate traders in fills, P&L and false alerts?
+
+The paper's four findings:
+
+1. **Zero alerts can be built in.** A detector that shares a threshold with a gate
+   cannot alert on gated traffic. The only alerts two LLM market makers raised were
+   self-matches that the gates block outright.
+2. **Detection fails against a searching adversary.** A random search and a policy
+   gradient find split-order schedules that evade the conduct rules under every
+   control, on held-out paths, and, after a search on real Nasdaq price paths, in
+   most real windows. Two baseline detectors catch them.
+3. **Prevention is partial and depends on the adversary.** A cap at twice reference
+   depth removes 38 to 44% of the gain of the strongest schedules found, but little
+   of a weaker search's.
+4. **Prevention has a cost.** Legitimate makers gain from the same price response,
+   the cancellation throttle carries most of their cost, and the baselines flag 23%
+   of a large maker's sessions.
+
+The price response is fitted to five LOBSTER samples and its shape is checked in the
+ABIDES agent-based market. Claude Sonnet 5.5, asked to act as the adversary, refused.
 
 ## Layout
 
@@ -97,6 +109,6 @@ More: [workflow guide](docs/tradegauntlet.md), [LLM-agent run book](docs/llm-age
 
 ## Citation and license
 
-> Sandip Nandi, Aishwarya Bose, Apurba Bose, and Soovadeep Bakshi. *TradeGauntlet: Testing the Limits of Trading Compliance Controls.* Preprint, 2026.
+> Sandip Nandi, Aishwarya Bose, Apurba Bose, and Soovadeep Bakshi. *TradeGauntlet: Alerts Are Not Enough to Test Trading Compliance Controls.* Preprint, 2026.
 
 Code and data are released under the [MIT License](LICENSE).
