@@ -101,6 +101,18 @@ All of this runs offline with a scripted stand-in model and seeded synthetic dat
 
 What this doesn't show: behaviour with live models, real traffic, real latency or real cost. A live evaluation on Bedrock is next, and I'll publish the results whatever they are.
 
+## The drawbacks, and what I did about each
+
+A bot this strict has costs. These are the ones I know of.
+
+- **The checker reads patterns, not meaning.** It caught a wrong amount, code or status, but not a wrong *reason* in plain words. Now each decline code maps to one cause, and an answer that gives a different one ("code 05 because the card expired") is blocked. It's still a phrase table, so an unfamiliar wording gets through.
+- **Strict means more handoffs.** "I won't guess" is safe, but it resolves nothing. Now, when the model's answer can't be verified, code states what the record shows: status, amount, code and the next step. With a faulty scripted model and no repair call, refusals fell from 41.0% to 9.6% of turns. Help-page questions have no record to fall back on, so they still end in a refusal.
+- **A repair costs a second model call.** It can be switched off: a failed draft goes straight to the record-built answer, at 2.0 model calls per turn instead of 2.9 in the same run. I haven't measured this on live traffic.
+- **The rules need upkeep.** A report shows how often each rule fires, which learned rules never fire, and what is waiting on a person. Reviewers still have to keep labelling mistakes.
+- **It's only as good as the records.** An audit fails ingestion when a help page is too old or disagrees with the retry and code tables, and an answer that cites an old page gets a "may be out of date" note. A page that is wrong in some other way is still repeated.
+- **It can't fix anything, and it reads English only.** Read-only is deliberate: a request to change something becomes a ticket for a person. A message in another language goes to a person, with a reply in that language, instead of being answered unchecked.
+- **It's unproven live.** Nothing above changes that.
+
 ## If you're building one
 
 - Make "not found" a real answer.

@@ -50,6 +50,16 @@ It's boring on purpose. In payments, boring is the feature.
 
 I looked at what's out there before writing this up. The large deployments I found share one habit: new AI capability goes behind a person first, and the handoff to a human is designed in, not bolted on. Klarna's public reversal in 2025 says the same thing from the other direction. The research agrees: retrieval alone doesn't make a model state the right number, and agents that pass a task once often fail it on the next try. That's why I run every eval case 16 times, not once.
 
+## What it costs
+
+Being this strict isn't free, and I'd rather say so than have someone find out.
+
+The checker reads patterns, not meaning. It used to miss a wrong *reason* given in plain words, such as "code 05 because the card expired". I added a table that maps each decline code to one cause and blocks an answer that gives another. It's still a table, so an unfamiliar wording gets through.
+
+Strict also means more refusals. "I won't guess" is safe, but it resolves nothing. So when the model's answer can't be verified, code now states what the record shows: status, amount, code and the next step. With a faulty scripted model and no repair call, refusals fell from 41.0% to 9.6% of turns. Questions about help pages have no record to fall back on, so they still end in a refusal.
+
+The rest is upkeep and scope. Rules and reviewer labels need owners. The bot repeats whatever its records and help pages say, so I added an audit that flags pages that are too old or disagree with the rule tables. It is read-only on purpose, and it reads English only: a message in another language goes to a person.
+
 ## Where it stands
 
 All of this runs offline, on synthetic data, with a scripted stand-in for the model:

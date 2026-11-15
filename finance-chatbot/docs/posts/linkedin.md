@@ -12,7 +12,7 @@ I designed and built finbot, an open-source reference implementation in Python o
 
 Offline, on synthetic data: 259 hallucinations injected on purpose, none reached the user. 0 of 29 prompt-injection attacks succeeded with guardrails on, against 21 of 29 without.
 
-These numbers come from a scripted model, not live traffic. A live evaluation is next.
+The drawbacks, stated plainly: the checks are pattern-based, so an unfamiliar wording can get through. Strict means some chats still end in "I won't guess" or a handoff, though the bot now answers from the record itself before it refuses. It is read-only and English only: other languages go to a person. And these numbers come from a scripted model, not live traffic. A live evaluation is next.
 
 Code and write-up: https://github.com/tokencraftdata/finbot
 
