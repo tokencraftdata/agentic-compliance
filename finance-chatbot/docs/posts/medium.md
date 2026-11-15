@@ -102,6 +102,6 @@ What this doesn't show: behaviour with live models, real traffic, real latency o
 - Plan for failure: a breaker per model, a turn deadline, turns saved only when complete.
 - Treat retrieved documents, and free text inside your own records, as untrusted input.
 
-finbot is a personal reference project. It runs on synthetic data and has no connection to any company. The code is Python on Amazon Bedrock: [link to the repository]
+finbot is a personal reference project. It runs on synthetic data and has no connection to any company. The code is Python on Amazon Bedrock: [github.com/tokencraftdata/agentic-compliance](https://github.com/tokencraftdata/agentic-compliance/tree/finance-chatbot/finance-chatbot)
 
 If you run payment support in production, I'd like to hear where you think this is wrong.

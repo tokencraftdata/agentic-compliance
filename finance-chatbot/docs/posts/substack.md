@@ -52,6 +52,6 @@ All of this runs offline, on synthetic data, with a scripted stand-in for the mo
 
 What I don't know yet is how it behaves with live models, real traffic, real latency and real cost. That's the next step, and I'll write about the results whatever they are.
 
-finbot is a personal reference project with no connection to any company. The code is here: [link to the repository]
+finbot is a personal reference project with no connection to any company. The code is here: [github.com/tokencraftdata/agentic-compliance](https://github.com/tokencraftdata/agentic-compliance/tree/finance-chatbot/finance-chatbot)
 
 If you work on payment support, reply and tell me where you think this breaks. That's the most useful thing you could send me.

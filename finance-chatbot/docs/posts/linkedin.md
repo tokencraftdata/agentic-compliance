@@ -14,7 +14,7 @@ Offline results on synthetic data: 238 hallucinations injected on purpose, none 
 
 The numbers come from a scripted model, not live traffic. A live evaluation is next.
 
-Write-up and code: [link]
+Code and write-up: https://github.com/tokencraftdata/agentic-compliance/tree/finance-chatbot/finance-chatbot
 
 If you work on payment support, I'd like to hear where this falls short.
 

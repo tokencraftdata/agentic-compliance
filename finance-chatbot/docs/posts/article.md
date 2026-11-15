@@ -263,7 +263,7 @@ Where finbot is weaker: every product above runs on real traffic, and finbot doe
 - **Plan for failure.** Breakers per model, a turn deadline, save-at-the-end turns and de-duplicated messages.
 - **Treat retrieved documents as untrusted input.** Screen them, filter by access inside the query, and never let model answers become sources. The same goes for merchant descriptors and notes inside your own records.
 
-finbot is a personal reference project. It runs on synthetic data and has no connection to any company. The code is Python on Amazon Bedrock. [Link to the repository]
+finbot is a personal reference project. It runs on synthetic data and has no connection to any company. The code is Python on Amazon Bedrock: [github.com/tokencraftdata/agentic-compliance](https://github.com/tokencraftdata/agentic-compliance/tree/finance-chatbot/finance-chatbot)
 
 *If you run payment support in production, I'd like to hear where you think this is wrong.*
 
