@@ -6,7 +6,7 @@ It is built around three ideas:
 
 | | What it does | Evidence (offline, scripted model, synthetic data) |
 |---|---|---|
-| **Hallucination gate** | Every amount, code, status, transaction id and link in an answer is checked against this turn's tool results before anyone sees it. One guided repair, then an honest "I won't guess". Retry and processor-cascade advice must match policy tables in code | 238 hallucinations of 11 kinds injected on purpose, none reached the user; 0 of 3,192 on two fresh held-out sets; 0 of 448 correct answers falsely blocked |
+| **Hallucination gate** | Every amount, code, status, transaction id and link in an answer is checked against this turn's tool results before anyone sees it. One guided repair, then an answer built by code from the record, and only then an honest "I won't guess". Reasons given in plain words are checked against the recorded code. Retry and processor-cascade advice must match policy tables in code | 259 hallucinations of 12 kinds injected on purpose, none reached the user; 0 of 3,514 on two fresh held-out sets; 0 of 1,468 correct answers falsely blocked |
 | **Adaptive guardrails** | Guardrails improve from reviewer-labelled mistakes, never from raw chat and without retraining. Each proposed rule must fix its own evidence, match no fair question and break no case in the eval and red-team suites, then runs in shadow and a canary before an admin promotes it. Built-in guards are never changed automatically | Escalation to a person, a check on promises the bot can't keep, and a session risk score in the baseline; gate replays 18 guard cases, 27 + 170 eval cases and 35 red-team cases per proposal |
 | **Resilience** | Stateless workers, sessions as versioned records with leases, turns saved only when complete, de-duplicated messages, a model failover chain with a circuit breaker per model, a 90-second turn deadline, fail-closed guardrails | Tests crash a worker at each point of a turn, take the session over, and reject the late worker's write; failover mid-turn keeps the same checks; in the routing simulator a two-hour processor outage moves approval from 80.4% to 80.5% |
 
@@ -31,6 +31,29 @@ Read more: [hallucination control](docs/reliability.md#3-hallucination-control),
 | The model chooses which tenant to query | Cross-merchant data leak through prompt injection | The tenant comes from the auth session. Tool schemas are `strict` with no `tenant_id` field. Tools re-check ownership |
 | No per-turn audit trail | Failures can't be diagnosed | One structured audit record per turn (masked text, tools, statuses, guard reasons, latency) |
 
+## Known drawbacks, and what finbot does about each
+
+A strict, checked bot has costs. These are the ones I know of, what the code now does about each, and what is still open.
+
+| Drawback | What finbot does | Still open |
+|---|---|---|
+| The checker reads numbers, codes and statuses, not a wrong reason in plain words | `finbot/reasons.py`: each decline code and gateway error maps to one cause, and an answer that states a different cause ("code 05 because the card expired") is blocked | It is a phrase table. A cause worded in a way the table doesn't know gets through to the grounding check |
+| Being strict means more refusals and handoffs | `finbot/recordanswer.py`: when the model's answer can't be verified, code states what the record shows (status, amount, code, policy next step) instead of refusing. With a faulty scripted model and repair switched off, refusals fell from 41.0% to 9.6% of turns | Help-page questions have no record to fall back on, so they still end in "I won't guess" |
+| A repair costs a second model call | `FINBOT_REPAIR_ATTEMPTS=0` skips it: a failed draft goes straight to the record-built answer (2.0 model calls per turn instead of 2.9 in the same run). `scripts/ops_report.py` reports repair, refusal and handoff rates, calls per turn and latency from the audit log | The record-built answer is plainer than a repaired one |
+| Rules and reviewer labelling need upkeep | `guard_controller.py upkeep`: hits per rule, learned rules that never fire, proposals waiting on a person, labels per 1,000 turns | A person still has to do the reviewing |
+| Only as good as the records and help pages | `scripts/kb_audit.py` fails an ingestion run when a help page is past its age limit or disagrees with the retry and code tables. An answer citing an old page gets a "may be out of date" note added by code | A page that is wrong in a way the tables don't cover is still repeated |
+| English only | A message in another language goes to a person with a reply in that language (Spanish, French, German, Portuguese), and a non-English answer is blocked, because every check reads English | It hands over; it doesn't answer in other languages |
+| Read-only | Unchanged, on purpose: requests to change something become tickets a person carries out | |
+| Unproven on live traffic | The eval, stress test and red team run against Bedrock with one environment variable, and `ops_report.py` reads a live audit log | Not run yet: it needs an AWS account and a model budget |
+
+```bash
+python3 scripts/ops_report.py --demo
+```
+
+```bash
+python3 scripts/kb_audit.py
+```
+
 ## Layout
 
 ```
@@ -40,7 +63,12 @@ finbot/container.py      composition root: builds and wires every component; tes
 finbot/service.py        trust boundary facade: token -> Principal -> authorize -> validate -> worker
 finbot/security.py       JWT verification (HS256 dev, JWKS/OIDC prod), deny-by-default Authorizer
 finbot/control.py        control plane: drain/restore models, routing mode, audited, shared by all workers
-finbot/verification.py   hallucination gate: verifier chain + one bounded repair
+finbot/verification.py   hallucination gate: verifier chain, one bounded repair, record-built answer
+finbot/reasons.py        plain-word reasons checked against the recorded decline code or gateway error
+finbot/recordanswer.py   the answer code builds from the record when the model's can't be verified
+finbot/language.py       language detection: non-English messages go to a person, non-English answers are blocked
+finbot/freshness.py      stale help pages, and help pages that disagree with the retry and code tables
+finbot/opsmetrics.py     repair, record-answer, refusal and handoff rates from the turn audit log
 finbot/untrusted.py      prompt-injection defences: normalise + screen, tool-result sanitising, spotlighting, leak canary
 finbot/queue.py          queue worker (SQS / in-memory): ack, retry-later, dead-letter
 finbot/worker_main.py    queue worker process for a container: one turn at a time, clean SIGTERM, heartbeat
@@ -56,7 +84,7 @@ finbot/guardrails.py     Bedrock ApplyGuardrail, local fallback, deterministic e
 finbot/tools.py          typed read-only tools: transaction DB, log search, KB (tenant-scoped)
 finbot/memory.py         per-entity ledger, focus switching, typed state rendering
 finbot/knowledge.py      heading-aware chunks, hybrid BM25 + Titan search
-finbot/orchestrator.py   turn pipeline as ordered stages (risk lock, input guard, learned policy, focus,
+finbot/orchestrator.py   turn pipeline as ordered stages (risk lock, input guard, language, learned policy, focus,
                          write request, model + hallucination gate), append-only history, audit
 finbot/pii.py            card data and secrets: detection and masking, used on every path
 finbot/replies.py        every fixed reply (decided by code, not written by the model)
@@ -154,7 +182,7 @@ Read [docs/reliability.md](docs/reliability.md) for the full picture. In short:
 
 - **Session store:** each session is a durable, versioned case record (ledger, focus, history) with a TTL. Workers are stateless, so any worker can serve any session.
 - **Crash recovery:** a lease plus a compare-and-swap commit. A crash mid-turn commits nothing, and the replacement re-runs the turn. A resent message is answered from the journal without calling the model again. A late writer is rejected. An external action whose outcome was never recorded is reconciled with the system of record before anything is retried.
-- **Hallucination:** a deterministic evidence guard checks amounts, codes, ids, status polarity, unknown outcomes, lifecycle claims and URLs. It gives one verifier-guided repair attempt, then falls back to "I won't guess", with Bedrock contextual grounding on top. Answers that promise outcomes the bot can't grant ("you'll get a refund", "guaranteed") get the same repair. The stress test injects 210 hallucinations of 10 kinds on the dev split and 1,392 on the held-out split, and none leak; 448 correct answers produce no false blocks.
+- **Hallucination:** a deterministic evidence guard checks amounts, codes, ids, status polarity, unknown outcomes, lifecycle claims and URLs. It gives one verifier-guided repair attempt, then states what the record shows, and only then falls back to "I won't guess", with Bedrock contextual grounding on top. A cause given in plain words must match the recorded code, and answers must be in English. Answers that promise outcomes the bot can't grant ("you'll get a refund", "guaranteed") get the same repair. The stress test injects 259 hallucinations of 12 kinds on the dev split and 1,734 on the held-out split, and none leak; 1,468 correct answers produce no false blocks.
 - **Payment retries and routing:** retry rules and next steps are computed in code per decline code or gateway error, and worded for the asker's role. A guard blocks retry advice that breaks the policy (hard declines, "retry now" on soft declines, any definite claim on a timeout).
 - **Model orchestrator engine:** every model call goes through an ordered failover chain (for example Bedrock us-east-1, then us-west-2, then the Claude API). Each model has its own circuit breaker (closed, open, half-open probe), refusals fall back to the next model, failover works mid-turn, and optional routing sends simple turns to a faster model. Run `/status` in the CLI to see each model's breaker state and failovers. Breaker state is shared through the session store, so a replacement worker after a crash skips a model another worker already found down. Guards run around the engine, so a backup model's answer gets the same checks. See [how the layers fit together](docs/reliability.md#7-how-the-layers-compose-guardrail-boundary-crash-recovery-resilience).
 - **System retries:** one backoff layer with circuit breakers for each model and each backend. Guardrail failures fail closed. Outages roll the turn back so a resend works. After two unverifiable answers in a row the user is directed to a human, with a reference.

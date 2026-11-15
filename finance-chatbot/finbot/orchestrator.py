@@ -4,11 +4,13 @@
     mask card data                    (pii.py: before anything else sees the text)
     1 risk lock                       session locked after repeated attacks -> a person
     2 input guard                     prompt attack, denied topic, PII     -> fixed reply
+    2b language                       not English                          -> a person, fixed reply
     3 learned guard policy            block, or escalate to a person       -> fixed reply
     4 focus                           which transaction this turn is about (code, not the model)
     5 write request                   refund/cancel/retry/...              -> ticket, fixed reply
     6 model                           Claude tool loop (read-only, tenant-scoped)
-                                        -> hallucination gate: verify, one repair, verify
+                                        -> hallucination gate: verify, one repair, verify,
+                                           then a record-built answer before any refusal
                                         -> mask, prompt-leak canary, output guardrail
   finish                              handoff after repeated failures, card notice, audit
 
@@ -28,6 +30,7 @@ import time
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Any
 
 from . import auditlog, replies
@@ -36,15 +39,26 @@ from .actions import detect as detect_write_request
 from .adaptive.policy import BASELINE, GuardPolicy
 from .adaptive.risk import next_score
 from .adaptive.source import PolicySource, StaticPolicySource
+from .freshness import stale_dates
 from .guardrails import BLOCKED_INPUT_MSG, BLOCKED_OUTPUT_MSG
+from .language import detect as detect_language
 from .memory import SessionMemory
 from .models import ModelOrchestrator, ModelTarget
 from .pii import CARD_REASONS, mask_pii, mask_value
+from .recordanswer import record_answer
 from .resilience import GuardrailUnavailable, ServiceUnavailable
 from .tickets import InMemoryTickets, TicketStore
 from .tools import TXN_ID, Session, ToolBox
 from .untrusted import SPOTLIGHT_RULE, ToolResultScreen, leaks_prompt
-from .verification import EvidenceVerifier, HallucinationGate, PolicyVerifier, TicketVerifier, VerifierChain
+from .verification import (
+    EvidenceVerifier,
+    HallucinationGate,
+    LanguageVerifier,
+    PolicyVerifier,
+    ReasonVerifier,
+    TicketVerifier,
+    VerifierChain,
+)
 
 SYSTEM_PROMPT = """You are a support assistant for a payments and financial-services company. You help merchants, customers and support staff understand transactions, declines, refunds, fees and product behaviour.
 
@@ -59,6 +73,7 @@ How you answer:
 - Never ask for or repeat full card numbers, CVV, passwords or one-time codes.
 - When a transaction record includes "guidance", it is the authoritative retry policy and next step, computed from our rules. Give the user its next_step (it is already written for their role) and, if relevant, what to tell the cardholder (tell_the_cardholder). If retryable is false, never suggest retrying the same payment; only the alternatives in retry_only_if (for example another card, or checking the status first) are allowed. If retryable is true, state the retry_rule including its timing.
 - Direct people to whoever can actually fix the problem: the cardholder's bank for issuer declines, the merchant's settings or integration for risk blocks and request errors, support for anything you cannot verify.
+- Always answer in English.
 - Be concise: lead with the answer, then the reason, then the next step for the user.
 """ + SPOTLIGHT_RULE
 
@@ -175,16 +190,19 @@ class Chatbot:
         self.intake = TicketIntake(self.tickets)
         self.check_provenance = True   # tool ids must come from the user (off only in red-team ablations)
         self.sleep = time.sleep  # injectable for tests
+        self.today = date.today  # injectable for tests (help-page age)
         names = set(toolbox.processors.names()) if getattr(toolbox, "processors", None) else None
         self.gate = HallucinationGate(VerifierChain([
             EvidenceVerifier(names),
+            ReasonVerifier(),
+            LanguageVerifier(),
             PolicyVerifier(lambda: t.policy if (t := current_turn()) else BASELINE),
             TicketVerifier(lambda: set(t.tickets) if (t := current_turn()) else set()),
         ]), repair_attempts=settings.repair_attempts)
         self.screen = ToolResultScreen(guardrail)  # third-party text in tool results
         self._wrapped: tuple | None = None
         # The pipeline, in order. Each stage returns a Reply to end the turn, or None.
-        self.stages = (self._risk_lock, self._input_guard, self._learned_policy, self._track_focus,
+        self.stages = (self._risk_lock, self._input_guard, self._language, self._learned_policy, self._track_focus,
                        self._write_request, self._model_answer)
 
     def engine(self) -> ModelOrchestrator:
@@ -262,6 +280,17 @@ class Chatbot:
         ctx.text = g.text      # the guard may mask more (Bedrock anonymizer)
         ctx.notes += g.reasons
         return None
+
+    def _language(self, cs: ChatSession, ctx: TurnContext) -> Reply | None:
+        """Every check reads English. A message in another language goes to a person, with
+        a reply in that language where we have one, instead of being answered unchecked."""
+        lang = detect_language(ctx.text)
+        if lang == "en":
+            return None
+        answer = self._fixed(cs, replies.ENGLISH_ONLY_EN)
+        if lang in replies.ENGLISH_ONLY:
+            answer = f"{self._fixed(cs, replies.ENGLISH_ONLY[lang])}\n\n{answer}"
+        return Reply(answer, "language", [f"language:{lang}"], escalated=True)
 
     def _learned_policy(self, cs: ChatSession, ctx: TurnContext) -> Reply | None:
         d = ctx.policy.input_decision(ctx.text)
@@ -354,8 +383,12 @@ class Chatbot:
             out = self._loop(cs, run_tool, retry_log, "strong" if tiered else None, route["models"])
             return out, retry_log
 
-        gate = self.gate.run(answer, tool_log, lambda: cs.memory.focus, regenerate)
+        fallback = (lambda log: record_answer(log, cs.memory.focus)) if self.settings.record_fallback else None
+        gate = self.gate.run(answer, tool_log, lambda: cs.memory.focus, regenerate, fallback)
         tool_log, answer = gate.tool_log, gate.answer
+        if gate.records_only:
+            cs.pending_notice = ("Your previous answer was withheld by the evidence check; the user saw a "
+                                 "summary of the record written by code.")
         if gate.action == "block":
             cs.pending_notice = ("Your previous answer was withheld by the evidence check "
                                  f"({', '.join(gate.reasons)}); the user saw a fallback message.")
@@ -370,7 +403,11 @@ class Chatbot:
         if g_out.action == "block":
             cs.pending_notice = "Your previous answer was withheld by the output guardrail."
             return Reply(g_out.text, "output_guardrail", g_out.reasons, tool_log, route=route)
-        return Reply(g_out.text, None, gate.reasons + g_out.reasons, tool_log, repaired=gate.repaired, route=route)
+        final, notes = g_out.text, gate.reasons + g_out.reasons
+        if old := stale_dates(final, tool_log, self.settings.kb_max_age_days, self.today()):
+            final += replies.STALE_SOURCE.format(date=old[0])   # said by code, not left to the model
+            notes = [*notes, "stale_source"]
+        return Reply(final, None, notes, tool_log, repaired=gate.repaired, route=route)
 
     def _loop(self, cs: ChatSession, run_tool, tool_log: list[dict], tier: str | None,
               models_used: list[str]) -> str:

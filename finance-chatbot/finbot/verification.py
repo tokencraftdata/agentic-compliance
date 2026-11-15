@@ -40,6 +40,27 @@ class EvidenceVerifier:
         return evidence_check(answer, tool_log, focus, self.known_processors)
 
 
+class ReasonVerifier:
+    """A cause stated in plain words must be the cause the record carries (finbot/reasons.py)."""
+    name = "reason"
+
+    def check(self, answer, tool_log, focus):
+        from .reasons import reason_check
+        reasons = reason_check(answer, tool_log)
+        return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons) if reasons else GuardResult("allow", answer)
+
+
+class LanguageVerifier:
+    """Answers are in English, the only language the other verifiers can read."""
+    name = "language"
+
+    def check(self, answer, tool_log, focus):
+        from .language import detect
+        lang = detect(answer, min_hits=3)
+        return GuardResult("allow", answer) if lang == "en" else \
+            GuardResult("block", BLOCKED_OUTPUT_MSG, [f"non_english_answer:{lang}"])
+
+
 class PolicyVerifier:
     """The learned commitment rules of the guard policy serving this turn: promises
     the bot can't keep ("you'll get a refund", "guaranteed"). A violation gets the
@@ -100,6 +121,7 @@ class GateResult:
     answer: str                 # verified answer, or the fallback message
     reasons: list[str]
     repaired: bool = False
+    records_only: bool = False  # the model's answer failed; this one was built by code from the record
     tool_log: list[dict] = field(default_factory=list)  # all tool calls incl. the repair's
 
 
@@ -109,13 +131,18 @@ class HallucinationGate:
         self.repair_attempts = repair_attempts
 
     def run(self, answer: str, tool_log: list[dict], focus: Callable[[], str | None],
-            regenerate: Callable[[str], tuple[str, list[dict]]]) -> GateResult:
+            regenerate: Callable[[str], tuple[str, list[dict]]],
+            fallback: Callable[[list[dict]], str | None] | None = None) -> GateResult:
         """regenerate(feedback) -> (new_answer, new_tool_log); it runs the model loop
-        on the strong tier with the feedback appended to the history."""
+        on the strong tier with the feedback appended to the history.
+
+        fallback(tool_log) -> an answer built by code from the records, or None. It is
+        tried when the model's answer still fails, and is verified like any other answer.
+        With repair_attempts=0 a failed draft goes straight to it: no second model call."""
         log = list(tool_log)
         g = self.chain.check(answer, log, focus())
         if g.action == "allow":
-            return GateResult("allow", answer, g.reasons, False, log)
+            return GateResult("allow", answer, g.reasons, tool_log=log)
         first = g.reasons
         for _ in range(self.repair_attempts):
             answer, retry_log = regenerate(REPAIR_PROMPT.format(reasons=", ".join(g.reasons)))
@@ -124,5 +151,9 @@ class HallucinationGate:
             # earlier result cannot vouch for a claim the repair made.
             g = self.chain.check(answer, retry_log or log, focus())
             if g.action == "allow":
-                return GateResult("allow", answer, [f"repaired:{r}" for r in first], True, log)
-        return GateResult("block", g.text, g.reasons, False, log)
+                return GateResult("allow", answer, [f"repaired:{r}" for r in first], repaired=True, tool_log=log)
+        built = fallback(log) if fallback else None
+        if built and self.chain.check(built, log, focus()).action == "allow":
+            return GateResult("allow", built, [f"records_only:{r}" for r in g.reasons],
+                              records_only=True, tool_log=log)
+        return GateResult("block", g.text, g.reasons, tool_log=log)

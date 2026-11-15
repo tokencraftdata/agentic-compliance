@@ -81,8 +81,9 @@ class TurnPaths(unittest.TestCase):
         return b
 
     def audit_text(self):
-        with open(self.audit) as f:   # drop the float timestamp: 10+6 digits look card-like to leaked()
-            return re.sub(r'"ts": [\d.]+', '"ts": 0', f.read())
+        # Drop the float timestamp and the random session id: long digit runs look card-like to leaked().
+        with open(self.audit) as f:
+            return re.sub(r'"session": "[^"]+"', '"session": ""', re.sub(r'"ts": [\d.]+', '"ts": 0', f.read()))
 
     def test_blocked_turn_stores_no_card_data(self):
         b = self.bot()
@@ -93,8 +94,8 @@ class TurnPaths(unittest.TestCase):
         self.assertFalse(leaked(self.audit_text()))
         q = os.path.join(self.dir, "review.jsonl")
         b.feedback(cs, t, "down", queue_path=q)
-        with open(q) as f:
-            self.assertFalse(leaked(f.read()))
+        with open(q) as f:   # the review record carries the random session id too
+            self.assertFalse(leaked(re.sub(r'"session": "[^"]+"', '"session": ""', f.read())))
 
     def test_unavailable_turn_stores_no_card_data(self):
         down = ModelOrchestrator([ModelTarget("only", OutageLLM(FakeLLM(), down=True), attempts=1)],

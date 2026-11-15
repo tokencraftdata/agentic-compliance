@@ -2,7 +2,7 @@
 
 *finbot is an open project on Amazon Bedrock: Claude answers, but code decides what it is allowed to claim.*
 
-I started from one rule: a payments support bot must never tell someone something about their money that the records don't back up. Sounding helpful comes second. finbot is my attempt at sticking to that. It's a Python project on Amazon Bedrock, and every answer about a transaction gets checked against the tool results before anyone sees it. In an offline stress test I injected 238 hallucinations on purpose. None of them reached the user.
+I started from one rule: a payments support bot must never tell someone something about their money that the records don't back up. Sounding helpful comes second. finbot is my attempt at sticking to that. It's a Python project on Amazon Bedrock, and every answer about a transaction gets checked against the tool results before anyone sees it. In an offline stress test I injected 259 hallucinations on purpose. None of them reached the user.
 
 The project rests on three ideas. A **hallucination gate**: code checks every fact in an answer before it's sent. **Adaptive guardrails**: the rules improve from mistakes a reviewer has labelled, without retraining anything and without letting chat text rewrite them. And **resilience**: the bot stays correct when a model or a worker goes down halfway through a conversation.
 
@@ -184,10 +184,10 @@ Everything below runs offline, with a scripted stand-in for the model and seeded
 
 | Check | Result |
 |---|---|
-| Automated tests (guards, crashes, failover, leases, security, queue, ingestion, injection, processor routing, card data, tickets, deployment) | 261 passing |
+| Automated tests (guards, crashes, failover, leases, security, queue, ingestion, injection, processor routing, card data, tickets, deployment) | 284 passing |
 | Evaluation set (lookups, not-found, tenant isolation, context bleed, PII, retry advice, processor routing, prompt attacks) | 27 of 27; held-out set 170 of 170; fresh held-out sets 172 of 172 and 177 of 177 |
-| Hallucination stress: 11 kinds of injected errors, including invented cascades, outages, promises and tickets | 0 of 238 reached the user; 0 of 3,192 on two fresh held-out test sets |
-| False alarms on correct answers about failed payments | 0 of 448 blocked |
+| Hallucination stress: 12 kinds of injected errors, including invented cascades, outages, promises, tickets and wrong reasons | 0 of 259 reached the user; 0 of 3,514 on two fresh held-out test sets |
+| False alarms on correct answers about failed payments | 0 of 1,468 blocked |
 | Consistency: every case run 16 times, with half the answers deliberately corrupted | Every case passed all 16 runs; held-out set, all 8 of 8 |
 
 What this **doesn't** show: how it behaves with live Bedrock models, real traffic, real latency or real cost. The AWS adapters (DynamoDB, SQS, OpenSearch, Bedrock embeddings) are written but haven't run against a live account yet. A live evaluation is next, and I'll publish the results whatever they are.
@@ -270,15 +270,15 @@ The failures I started from aren't mine alone. Here are chatbot problems that ar
 | Models agree with the user | Five assistants consistently sided with the user's stated belief over the correct answer (Sharma et al., 2024) | "But it was approved, right?" changes nothing. A status claim must match the record whatever the user says |
 | Defences break against attackers who adapt | Twelve published defences against jailbreaks and prompt injection were bypassed, most with attack success above 90% (Nasr et al., 2025) | finbot's screens would fall too, and my red team doesn't adapt. So the design limits the damage: read-only tools, one customer's data, and lookups only for ids the user typed |
 
-### The drawbacks of doing it this way
+### The drawbacks, and what I did about each
 
-- **The checker reads patterns, not meaning.** It catches a wrong amount, code, status or link. It won't catch a wrong *reason* given in plain words with no number in it.
-- **Strict means more handoffs.** "I won't guess" and escalation are safe, but they resolve fewer chats, so you need people to hand off to. A bot tuned only for resolution rate will look better than this one.
-- **A repair costs a second model call.** That adds latency and cost on exactly the turns that went wrong. I haven't measured either on live traffic.
-- **The rules need upkeep.** Retry tables, cascade rules, processor code mappings and escalation rules all have owners now. Adaptive guardrails only improve if reviewers keep labelling mistakes.
-- **It's only as good as the records.** If the system of record or a help page is wrong, the bot repeats the error, and the checker agrees with it.
-- **It can't fix anything.** The bot is read-only and English only. It explains and hands off; it doesn't refund, retry or cancel.
-- **It's unproven live.** Every number in this article comes from a scripted model and synthetic data.
+- **The checker reads patterns, not meaning.** It caught a wrong amount, code, status or link, but not a wrong *reason* given in plain words. Now each decline code maps to one cause, and an answer that gives a different one ("code 05 because the card expired") is blocked. It's still a phrase table: a cause worded in a way the table doesn't know gets through.
+- **Strict means more handoffs.** "I won't guess" is safe, but it resolves nothing. Now, when the model's answer can't be verified, code states what the record shows: status, amount, code and the next step. With a faulty scripted model and no repair call, refusals fell from 41.0% to 9.6% of turns. Help-page questions have no record to fall back on, so they still end in a refusal.
+- **A repair costs a second model call.** It can now be switched off: a failed draft goes straight to the record-built answer, at 2.0 model calls per turn instead of 2.9 in the same run. A report reads repair, refusal and handoff rates and latency from the audit log. I haven't measured any of this on live traffic.
+- **The rules need upkeep.** Retry tables, cascade rules, processor code mappings and escalation rules all have owners now. The controller reports how often each rule fires, which learned rules never fire, and what is waiting on a person. Reviewers still have to keep labelling mistakes.
+- **It's only as good as the records.** An audit now fails ingestion when a help page is past its age limit or disagrees with the retry and code tables, and an answer that cites an old page gets a "may be out of date" note. A page that is wrong in some other way is still repeated.
+- **It can't fix anything, and it reads English only.** Read-only is deliberate: a request to change something becomes a ticket for a person. A message in another language now goes to a person, with a reply in that language, instead of being answered unchecked.
+- **It's unproven live.** Nothing above changes that. Every number in this article comes from a scripted model and synthetic data.
 
 *Sources for this section:* [Cursor's support bot (CX Today)](https://www.cxtoday.com/conversational-ai/a-contact-center-chatbot-invents-company-policies-now-customers-want-out/); [the $1 Tahoe (VentureBeat)](https://venturebeat.com/ai/a-chevy-for-1-car-dealer-chatbots-show-perils-of-ai-for-customer-service); [NYC's MyCity bot (StateScoop)](https://statescoop.com/mamdani-kill-nyc-ai-chatbot/); Magesh et al., [Hallucination-Free? Assessing the Reliability of Leading AI Legal Research Tools](https://arxiv.org/abs/2405.20362); Laban et al., [LLMs Get Lost In Multi-Turn Conversation](https://arxiv.org/abs/2505.06120); Sharma et al., [Towards Understanding Sycophancy in Language Models](https://arxiv.org/abs/2310.13548); Nasr et al., [The Attacker Moves Second](https://arxiv.org/abs/2510.09023).
 

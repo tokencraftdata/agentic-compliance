@@ -543,3 +543,19 @@ Considered and not built, or built differently:
 - Rejected: full CaMeL interpreter and FIDES (too large for a read-only bot), MELON (re-runs the
   model per tool step, too slow for the 90 s deadline), LLM-judge step monitors (weak against
   adaptive attacks), MiniCheck (needs a self-hosted model).
+
+## 14. Known drawbacks and their mitigations
+
+A strict, checked bot has costs. Each one below has a mitigation in code and a part that stays open.
+
+| Drawback | Mitigation | Where |
+|---|---|---|
+| The checker reads numbers, codes and statuses, not a wrong reason in plain words | `ReasonVerifier`: a failure key maps to one cause, a cause to its phrases; an answer affirming a cause the turn's records don't carry is blocked. Applies only when one failed transaction was looked up | `finbot/reasons.py` |
+| Strictness means refusals and handoffs | After a failed repair the gate asks for a record-built answer: validated fields and code-table wording only, verified by the same chain. It counts as an answer, so it does not move the session towards a handoff | `finbot/recordanswer.py`, `HallucinationGate.run(fallback=...)` |
+| A repair is a second model call | `FINBOT_REPAIR_ATTEMPTS=0` goes straight to the record-built answer. The audit log carries what is needed to price the trade | `finbot/opsmetrics.py`, `scripts/ops_report.py` |
+| Rules and labels need upkeep | `GuardrailController.upkeep`: hits per rule, idle learned rules, work waiting on a person, labels per 1,000 turns. Retiring a rule is a loosening and still needs an admin | `finbot/adaptive/controller.py` |
+| Only as good as the sources | An audit that fails ingestion on stale pages and on pages that disagree with the retry and code tables; a note added by code when an answer cites an old page | `finbot/freshness.py`, `scripts/kb_audit.py` |
+| English only | Stage 2b sends non-English messages to a person with a fixed reply in that language; `LanguageVerifier` blocks non-English answers, which the other verifiers could not read | `finbot/language.py` |
+| Unproven live | Not fixable offline. Eval, stress test and red team take a live provider through one environment variable | `scripts/run_eval.py` |
+
+What stays open: the reason check is a phrase table, help-page questions have no record to fall back on, a wrong page that the tables don't cover is still repeated, and none of this has met live traffic.

@@ -224,7 +224,7 @@ class Outages(unittest.TestCase):
 
 class Escalation(unittest.TestCase):
     def run_twice(self, role):
-        b = bot(repair_attempts=0)
+        b = bot(repair_attempts=0, record_fallback=False)
         b.llm = HallucinatingLLM(b.llm, "status_flip")
         cs = b.new_session("m_100", ["support"], role)
         first = b.ask(cs, f"why did {DECLINED} fail?")

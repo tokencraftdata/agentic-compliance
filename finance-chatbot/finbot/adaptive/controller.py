@@ -37,7 +37,7 @@ from ..security import Authorizer, Principal
 from .gate import Gate
 from .policy import BASELINE, GuardPolicy
 from .proposers import Proposal, Proposer
-from .signals import Label, LabelLog, shadow_stats, version_stats
+from .signals import Label, LabelLog, rule_usage, shadow_stats, version_stats
 from .source import CONTROL_KEY, ControlStore
 
 PROPOSALS_KEY = "guard_proposals"
@@ -228,6 +228,26 @@ class GuardrailController:
             sh = shadow_stats(self.turn_audit_path, state["shadow"]["version"])
             out["shadow"] = {**sh.to_dict(), "needed_for_promotion": self.min_shadow_turns}
         return out
+
+    def upkeep(self, who: Principal, idle_after_turns: int = 1000) -> dict[str, Any]:
+        """What needs a person's attention to keep the rules healthy: learned rules that
+        never fire (candidates to retire, which is a loosening and needs an admin), work
+        waiting on a person, and how much reviewing the traffic is costing."""
+        self.authz.can_control(who)
+        active, props = self.active(), self._proposals()
+        turns, hits = rule_usage(self.turn_audit_path)
+        waiting = [pid for pid, item in props["items"].items() if item["status"] in ("awaiting_approval", "report")]
+        labels = self.labels.all()
+        return {
+            "turns": turns,
+            "rules": [{"id": r.id, "kind": r.kind, "learned": r.source != "baseline", "hits": hits[r.id]}
+                      for r in active.rules],
+            "idle_learned_rules": [r.id for r in active.rules if r.source != "baseline" and not hits[r.id]
+                                   and turns >= idle_after_turns],
+            "waiting_on_a_person": waiting,
+            "labels": len(labels),
+            "labels_per_1000_turns": round(1000 * len(labels) / turns, 1) if turns else None,
+        }
 
     # ------------------------------------------------------------------ internals
 

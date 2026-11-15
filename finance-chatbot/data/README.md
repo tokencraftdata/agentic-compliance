@@ -95,8 +95,8 @@ After fixing them, seed 1013 is no longer a clean held-out measure. Two fresh sp
 
 | Seed | Eval | Hallucinations leaked |
 |---|---|---|
-| 2027 | 149/149 | 0 of 831 |
-| 31337 | 155/155 | 0 of 853 |
+| 2027 | 172/172 | 0 of 1,734 |
+| 31337 | 177/177 | 0 of 1,780 |
 
 To measure again after changing the bot, generate a new seed:
 

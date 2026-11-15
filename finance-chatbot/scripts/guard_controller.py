@@ -111,6 +111,7 @@ def main() -> None:
     lb.add_argument("--phrase", default="")
     sub.add_parser("cycle")
     sub.add_parser("status")
+    sub.add_parser("upkeep")
     for name in ("approve", "reject"):
         p = sub.add_parser(name)
         p.add_argument("proposal")
@@ -135,6 +136,8 @@ def main() -> None:
         show(ctl.run_cycle(ADMIN))
     elif a.cmd == "status":
         show(ctl.status(ADMIN))
+    elif a.cmd == "upkeep":
+        show(ctl.upkeep(ADMIN))
     elif a.cmd == "approve":
         show(ctl.approve(ADMIN, a.proposal, a.reason))
     elif a.cmd == "reject":

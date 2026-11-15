@@ -10,7 +10,7 @@ I designed and built finbot, an open-source reference implementation in Python o
 
 3. Resilience. Stateless workers, sessions that survive a crash mid-turn, de-duplicated messages, and model failover with a circuit breaker per model.
 
-Offline, on synthetic data: 238 hallucinations injected on purpose, none reached the user. 0 of 29 prompt-injection attacks succeeded with guardrails on, against 21 of 29 without.
+Offline, on synthetic data: 259 hallucinations injected on purpose, none reached the user. 0 of 29 prompt-injection attacks succeeded with guardrails on, against 21 of 29 without.
 
 These numbers come from a scripted model, not live traffic. A live evaluation is next.
 

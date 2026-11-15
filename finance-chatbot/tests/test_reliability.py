@@ -163,7 +163,7 @@ class HallucinationTests(unittest.TestCase):
 
     def test_repair_disabled_falls_back_instead_of_leaking(self):
         s = Settings(llm_provider="fake", guardrail_provider="local", kb_path="/nonexistent", data_dir="",
-                     repair_attempts=0)
+                     repair_attempts=0, record_fallback=False)
         bot = new_bot(s)
         bot.llm = HallucinatingLLM(bot.llm, "status_flip")
         t = bot.ask(bot.new_session("m_100", ["support"]), f"why did {DECLINED} fail?")

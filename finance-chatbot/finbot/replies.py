@@ -34,6 +34,21 @@ TICKET_RETRY_POLICY = {
 TICKET_EXISTS = " This request was already open as {id}, so no duplicate was created."
 TICKET_NOT_FOUND = ("I couldn't find {txn} for your account, so I haven't opened a ticket. "
                     "Please check the transaction ID.")
+RECORD_ONLY = "I couldn't verify a fuller explanation, so here is only what the record shows."
+RECORD_NOT_FOUND = "I couldn't find {txn} for your account. Please check the transaction ID."
+STALE_SOURCE = " Note: the help page cited was last updated on {date} and may be out of date."
+ENGLISH_ONLY = {
+    "es": "Lo siento, por ahora solo puedo ayudar en inglés. He pasado tu consulta a un especialista de soporte "
+          "(referencia {ref}).",
+    "fr": "Désolé, je ne peux aider qu'en anglais pour le moment. J'ai transmis votre demande à un spécialiste "
+          "du support (référence {ref}).",
+    "de": "Entschuldigung, ich kann derzeit nur auf Englisch helfen. Ich habe Ihre Anfrage an einen "
+          "Support-Spezialisten weitergegeben (Referenz {ref}).",
+    "pt": "Desculpe, por enquanto só posso ajudar em inglês. Passei o seu pedido a um especialista de suporte "
+          "(referência {ref}).",
+}
+ENGLISH_ONLY_EN = ("I can only help in English for now, so I've passed this to a support specialist "
+                   "(reference {ref}). You can also contact {contact} and quote that reference.")
 CARD_NOTICE = ("I removed card details from your message. Please don't share card numbers, security codes "
                "or PINs here: we never need them.")
 

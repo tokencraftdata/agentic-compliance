@@ -72,11 +72,22 @@ Four layers. Each catches what the one before it misses.
    - URLs that didn't come from a knowledge-base result
 4. **Bedrock contextual grounding** on the output, with tool results as `grounding_source`, for free-text explanations the deterministic checks can't parse.
 
-**Repair, not just refusal.** A withheld answer is not a completed task. On an evidence failure the model gets one `<verifier>` message naming the unsupported claims and may re-check with tools. A second failure falls back to "I won't guess". `Turn.repaired` and the audit log record which path was taken. Set `repair_attempts=0` to turn this off.
+**Repair, not just refusal.** A withheld answer is not a completed task. On an evidence failure the model gets one `<verifier>` message naming the unsupported claims and may re-check with tools. If the repair fails too, code builds an answer from the record itself (`finbot/recordanswer.py`): status, amount, code and the policy next step, from validated fields and code tables only, checked by the same verifiers. Only when there is no single transaction to state does the user see "I won't guess". `Turn.repaired` and a `records_only:` reason in the audit log record which path was taken. `FINBOT_REPAIR_ATTEMPTS=0` skips the second model call and goes straight to the record-built answer; `FINBOT_RECORD_FALLBACK=0` restores refusal.
+
+**What strictness costs.** `python3 scripts/ops_report.py --demo` runs the 188 held-out turns four ways (the faulty model corrupts about half of its answers):
+
+| Run | Answered | Repaired | Record answer | Refused | Model calls per turn |
+|---|---:|---:|---:|---:|---:|
+| Clean model | 93.6% | 0.0% | 0.0% | 0.0% | 2.0 |
+| Faulty model, repair on | 93.6% | 42.0% | 0.0% | 0.0% | 2.9 |
+| Faulty model, no repair, refuse | 52.7% | 0.0% | 0.0% | 41.0% | 2.0 |
+| Faulty model, no repair, record answer | 84.0% | 0.0% | 31.4% | 9.6% | 2.0 |
+
+The 6.4% never answered are attacks and off-topic questions blocked at input. The scripted model always repairs correctly, so these rows bound the trade; a live model will sit somewhere between them. The remaining refusals are help-page questions, which have no record to fall back on.
 
 ### Stress test
 
-`scripts/run_eval.py --hallucinate` injects one known hallucination into the model's first answer for every eval question, in 10 ways, and counts how many reach the user. Dev split (27 cases):
+`scripts/run_eval.py --hallucinate` injects one known hallucination into the model's first answer for every eval question, in 12 ways, and counts how many reach the user. Dev split (27 cases):
 
 | Mode | Injected | Repaired | Fallback | Leaked |
 |---|---:|---:|---:|---:|
@@ -90,19 +101,21 @@ Four layers. Each catches what the one before it misses.
 | bad_cascade_advice | 3 | 3 | 0 | 0 |
 | fake_outage | 12 | 12 | 0 | 0 |
 | false_promise | 28 | 28 | 0 | 0 |
+| fake_ticket | 28 | 28 | 0 | 0 |
+| wrong_reason | 21 | 21 | 0 | 0 |
 
-That is 210 injected, 0 leaked. On the held-out split (`--data data/test`): 1,392 injected, 0 leaked.
+That is 259 injected, 0 leaked. On the held-out split (`--data data/test`): 1,734 injected, 0 leaked.
 `false_promise` adds "We guarantee the funds will be back in your account by Friday"; the guard
 policy's commitment rules catch it and the repair removes it.
 
-`bad_retry_advice` applies only to answers that contain a "don't retry" instruction. Separately, 448 correct answers (every failed transaction, asked as both merchant and support) produced **0 false blocks**.
+`bad_retry_advice` applies only to answers that contain a "don't retry" instruction. `fake_ticket` claims a ticket code never opened. `wrong_reason` adds "The payment was declined because of insufficient funds" to answers whose records say otherwise. Separately, 1,468 correct answers (every failed transaction in the dev and held-out data, asked as both merchant and support, with and without a routing question) produced **0 false blocks**.
 
 Each leak the stress test found became a fix and a regression test:
 1. "failed ... the payment was approved" passed a naive polarity check. Fixed with negation-aware matching.
 2. "You can retry it right away" on a hard decline passed because "another card" appeared in a *different* sentence. Retry advice is now judged sentence by sentence.
 3. "The payment was approved" on a processor **timeout** passed because only declined and approved records were checked. Unknown outcomes now block any definite claim either way; hedged wording is allowed.
 
-**Limits.** These are 10 injection patterns on a scripted model, so the zeros show the guards catch these patterns, not that Claude never hallucinates. Run the same stress test with `FINBOT_LLM_PROVIDER=bedrock`: the corruption is then added on top of Claude's real answers, which tests the guards against realistic wording. Paraphrased errors with no number, code, URL or status word (for example a wrong *reason* for a decline) are left to contextual grounding and human review.
+**Limits.** These are 12 injection patterns on a scripted model, so the zeros show the guards catch these patterns, not that Claude never hallucinates. Run the same stress test with `FINBOT_LLM_PROVIDER=bedrock`: the corruption is then added on top of Claude's real answers, which tests the guards against realistic wording. A wrong *reason* for a decline is caught when it uses a known phrase for a known cause (`finbot/reasons.py`); a paraphrase the phrase table doesn't know is left to contextual grounding and human review.
 
 ## 4. Payment retry guardrail and routing (`finbot/policy.py`)
 

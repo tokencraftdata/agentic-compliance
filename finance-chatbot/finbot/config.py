@@ -65,7 +65,13 @@ class Settings:
 
     # Session limits
     max_tool_rounds: int = 6
-    repair_attempts: int = 1  # regenerate once with verifier feedback before falling back
+    # Regenerate once with verifier feedback before falling back. 0 = never call the model a
+    # second time: a failed draft is replaced by the record-built answer (or the refusal).
+    repair_attempts: int = field(default_factory=lambda: int(_env("FINBOT_REPAIR_ATTEMPTS", "1")))
+    # When the model's answer can't be verified, state what the record shows instead of refusing.
+    record_fallback: bool = field(default_factory=lambda: _env("FINBOT_RECORD_FALLBACK", "1") != "0")
+    # A cited help page older than this many days gets a "may be out of date" note. 0 = off.
+    kb_max_age_days: int = field(default_factory=lambda: int(_env("FINBOT_KB_MAX_AGE_DAYS", "540")))
     llm_retry_attempts: int = 3  # per model target: transient errors (429/5xx/timeouts), full-jitter backoff
     # Model orchestrator (finbot/models.py)
     model_chain: str = field(default_factory=lambda: _env("FINBOT_MODEL_CHAIN"))  # ordered failover chain

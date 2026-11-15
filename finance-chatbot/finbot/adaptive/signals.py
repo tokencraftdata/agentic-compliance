@@ -160,3 +160,21 @@ def shadow_stats(audit_path: str | None, version: int, max_examples: int = 5) ->
                 examples.append({"text": r.get("user_text_masked", "")[:200], "live": r.get("blocked_by"),
                                  "shadow": sh.get("input"), "reasons": sh.get("reasons", [])})
     return ShadowStats(version, turns, diverged, tuple(examples))
+
+
+def rule_usage(audit_path: str | None) -> tuple[int, Counter[str]]:
+    """Upkeep view: turns seen, and how often each rule id fired (as a block, an
+    escalation, or a commitment the gate repaired or replaced)."""
+    turns, hits = 0, Counter[str]()
+    for r in _records(audit_path):
+        if r.get("policy") is None:
+            continue
+        turns += 1
+        fired = set()
+        for reason in r.get("reasons", []):
+            parts = str(reason).split(":")
+            for kind in ("input_block", "escalate", "commitment"):
+                if kind in parts[:-1]:
+                    fired.add(parts[parts.index(kind) + 1])
+        hits.update(fired)
+    return turns, hits
