@@ -38,6 +38,12 @@ from .store import LeaseHeld, SessionExpired, StaleWrite
 log = logging.getLogger("finbot.queue")
 
 
+def _masked(body: dict) -> dict:
+    """A queue body with card data masked (DLQ copies are kept for days and read by people)."""
+    from .guardrails import mask_pii
+    return {**body, "text": mask_pii(body["text"])[0]} if isinstance(body.get("text"), str) else body
+
+
 @dataclass
 class Message:
     body: dict
@@ -55,7 +61,7 @@ class InMemoryQueue:
         self.visibility_s, self.clock = visibility_s, clock
 
     def send(self, body: dict) -> None:
-        self.items.append(Message(body, handle=str(len(self.items))))
+        self.items.append(Message(_masked(body), handle=str(len(self.items))))
 
     def receive(self, max_messages: int = 10) -> list[Message]:
         now = self.clock()
@@ -90,7 +96,8 @@ class SqsQueue:
 
     def send(self, body: dict) -> None:
         # FIFO queue keyed by session keeps one session's turns in order.
-        self.sqs.send_message(QueueUrl=self.url, MessageBody=json.dumps(body),
+        # Masked at enqueue: the queue never holds card data, even for the seconds before a worker.
+        self.sqs.send_message(QueueUrl=self.url, MessageBody=json.dumps(_masked(body)),
                               MessageGroupId=body["session_id"], MessageDeduplicationId=body["msg_id"])
 
     def receive(self, max_messages: int = 10) -> list[Message]:
@@ -112,8 +119,8 @@ class SqsQueue:
         fifo = {"MessageGroupId": m.body.get("session_id", "dlq"),
                 "MessageDeduplicationId": f"dlq-{m.body.get('msg_id', m.handle)[:120]}"} \
             if self.dlq_url.endswith(".fifo") else {}
-        self.sqs.send_message(QueueUrl=self.dlq_url, MessageBody=json.dumps({**m.body, "dlq_reason": reason}),
-                              **fifo)
+        body = json.dumps({**_masked(m.body), "dlq_reason": reason})
+        self.sqs.send_message(QueueUrl=self.dlq_url, MessageBody=body, **fifo)
         self.ack(m)
 
 
@@ -149,7 +156,7 @@ class QueueConsumer:
                 self.source.dead_letter(m, "tenant mismatch")  # forged or corrupted message: never process
                 self.stats.dead_lettered += 1
                 return
-            r = self.worker.handle(b["session_id"], b["msg_id"], b["text"])
+            r = self.worker.handle(b["session_id"], b["msg_id"], b["text"])   # handle() masks card data
         except (KeyError, SessionExpired) as e:
             self.source.dead_letter(m, f"session gone: {type(e).__name__}")
             self.stats.dead_lettered += 1

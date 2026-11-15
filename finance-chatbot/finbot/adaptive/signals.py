@@ -46,7 +46,7 @@ MAX_TEXT = 2000
 class Label:
     id: str
     label: str
-    text: str            # the user's message, or the answer for commitment labels (already PII-masked)
+    text: str            # the user's message, or the answer for commitment labels (masked on add)
     phrase: str = ""     # optional: the words the reviewer highlighted
     reviewer: str = ""
     session: str = ""
@@ -70,7 +70,8 @@ class LabelLog:
     def add(self, label: str, text: str, phrase: str = "", reviewer: str = "", session: str = "") -> Label:
         if label not in LABELS:
             raise ValueError(f"unknown label {label!r}; known: {', '.join(LABELS)}")
-        text, phrase = text.strip()[:MAX_TEXT], phrase.strip()[:200]
+        from ..guardrails import mask_pii  # labels are kept and read by people: never card data
+        text, phrase = mask_pii(text.strip())[0][:MAX_TEXT], mask_pii(phrase.strip())[0][:200]
         if not text:
             raise ValueError("label needs the text it is about")
         if phrase and phrase.lower() not in text.lower():

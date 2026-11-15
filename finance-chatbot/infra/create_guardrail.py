@@ -35,6 +35,15 @@ PII = [
     {"type": "PHONE", "action": "ANONYMIZE"},
 ]
 
+# Patterns Bedrock's built-in PII types do not cover. finbot also masks these locally
+# (guardrails.mask_pii) before any text reaches Bedrock, the model, storage or logs.
+REGEXES = [
+    {"name": "CardTrackData", "description": "Magnetic-stripe track 1 or 2 data",
+     "pattern": r"%?B\d{12,19}\^[^^]{0,26}\^\d{4}|;?\d{12,19}=\d{4}", "action": "BLOCK"},
+    {"name": "CardSecurityCode", "description": "CVV/CVC phrasings the PII type can miss",
+     "pattern": r"(?i)\b(cvv2?|cvc2?|security code)\b\W{0,3}(is\W{1,3})?\d{3,4}\b", "action": "BLOCK"},
+]
+
 
 def main():
     p = argparse.ArgumentParser()
@@ -52,7 +61,7 @@ def main():
             {"type": "HATE", "inputStrength": "MEDIUM", "outputStrength": "MEDIUM"},
             {"type": "INSULTS", "inputStrength": "MEDIUM", "outputStrength": "MEDIUM"},
         ]},
-        sensitiveInformationPolicyConfig={"piiEntitiesConfig": PII},
+        sensitiveInformationPolicyConfig={"piiEntitiesConfig": PII, "regexesConfig": REGEXES},
         contextualGroundingPolicyConfig={"filtersConfig": [
             {"type": "GROUNDING", "threshold": 0.75},
             {"type": "RELEVANCE", "threshold": 0.5},

@@ -71,9 +71,15 @@ class IngestionPipeline:
                     if doc_id in existing:      # a previously clean doc turned bad: pull it
                         self.store.delete_ids(existing[doc_id]["ids"])
                     continue
+                # Mask the whole document BEFORE chunking: a card number split across a chunk
+                # boundary or an overlap would otherwise survive in both halves.
+                doc = dict(doc)
+                for key in ("html", "title"):
+                    doc[key], found = mask_pii(str(doc.get(key, "")))
+                    rep.masked_pii += len(found)
                 chunks = self.chunker.chunk(doc)
-                for c in chunks:
-                    c.text, found = mask_pii(c.text)
+                for c in chunks:   # Claude-written context could repeat a number: mask that too
+                    c.context, found = mask_pii(c.context or "")
                     rep.masked_pii += len(found)
                 records = []
                 for i in range(0, len(chunks), self.batch_size):

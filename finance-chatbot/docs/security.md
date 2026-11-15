@@ -96,7 +96,7 @@ Both are fixed, and a regression test now screens every knowledge-base chunk. Se
 | Authentication: JWT signature, alg, exp, nbf, iss, aud; HS256 for dev, JWKS for production | done (`security.py`) |
 | Authorization: deny by default; an unknown session and another tenant's session give the same 403 | done (`service.py`) |
 | Secrets: IAM roles, no static keys, Secrets Manager for the JWT secret | code done; set up in AWS |
-| PII / PCI: card numbers and SSNs masked on input, output and ingestion; full card numbers never stored | done |
+| PII / PCI: card data masked at every edge; see section 4a | done (`guardrails.mask_pii`, `tests/test_pci.py`) |
 | Audit: blocked reasons, tools, screened fields per turn | done (`audit.jsonl`) |
 | Lockout after repeated blocked injections | done (session risk score, `adaptive/risk.py`) |
 | Rate limiting per tenant and user | **not yet** |
@@ -105,6 +105,40 @@ Both are fixed, and a regression test now screens every knowledge-base chunk. Se
 | Output escaping in the client (no HTML from model text) | client task |
 | Dependency pinning and scanning | not yet |
 | Monitoring and alerts: spikes in blocked injections, screened fields, cross-tenant denials | metrics exist; alerts not set up |
+
+## 4a. Cardholder data (PCI DSS)
+
+The rule: card data is masked **before** it is stored, logged, queued, shown to a person or sent
+to the model, on every path, including turns that are blocked or fail. An audit found several
+paths where that was not true; all are fixed and each has a test in `tests/test_pci.py`.
+
+| Data | Becomes | Note |
+|---|---|---|
+| PAN, Luhn-valid (13-19 digits) | `[CARD ••••1111]` | last four only, which PCI DSS allows to display |
+| 15-19 digits in card-like groups, Luhn fails | `[NUMBER REDACTED]` | a mistyped card is still card data |
+| Track 1 / track 2 data | `[TRACK DATA REDACTED]` | sensitive authentication data: never stored |
+| CVV/CVC ("cvv 123", "security code is 123", "cvc2: 1234", "3 digits on the back are 123") | `[REDACTED]` | never stored |
+| Expiry ("exp 12/27"), PIN ("my PIN is 4321") | `[REDACTED]` | |
+
+Before matching, zero-width characters are removed and full-width digits are converted, and
+separators may be spaces, dots, dashes, underscores, slashes or a line break. Dates, amounts,
+phone numbers and 13-14 digit order numbers that fail Luhn are left alone.
+
+| Path | Where it is masked |
+|---|---|
+| User message, before the guardrails, model, history, audit, review queue, labels, shadow logs | `Chatbot.ask` (also on blocked, unavailable and session-risk turns) |
+| Model output, before history (persisted and replayed) and before the user, on every guardrail provider | `_mask_blocks`, `Chatbot._ask` |
+| Tool results (every tool, every string field) before the model, memory and grounding | `ToolResultScreen._walk` |
+| Tool inputs written to the audit log | `_mask_values` |
+| Turn journal (also on crash recovery) | `Worker.handle`, `SessionStore.begin_turn`, `DynamoSessionStore.begin_turn` (journal items now expire with the session) |
+| Queue bodies and dead-letter copies | `SqsQueue.send`, `SqsQueue.dead_letter`, `InMemoryQueue.send` |
+| Reviewer labels | `LabelLog.add` |
+| Ingestion: the whole document before chunking (a number split across chunks), titles, Claude-written context; the local index too | `IngestionPipeline`, `Index.upsert_page` |
+| Bedrock guardrail | PII types plus regexes for track data and CVV phrasings (`infra/create_guardrail.py`); a second layer, not a replacement for local masking |
+
+Still out of scope for code: the cardholder-data environment itself (network segmentation,
+key management, retention policy for CloudWatch and S3), and a QSA review. Raw text exists only
+in the API process memory before masking, and in the client's own request.
 
 ## 5. Research basis
 

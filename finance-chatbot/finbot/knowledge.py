@@ -145,7 +145,9 @@ class Index:
 
     def upsert_page(self, page: dict) -> int:
         """Replace all chunks of a page (idempotent re-ingest on new versions)."""
+        from .guardrails import mask_pii
         keep = [c for c in self.chunks if c.page_id != page["page_id"]]
+        page = {**page, "html": mask_pii(page.get("html", ""))[0], "title": mask_pii(page.get("title", ""))[0]}
         new = chunk_page(page)
         if self.embed:
             for c in new:

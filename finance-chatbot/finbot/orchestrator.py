@@ -27,7 +27,7 @@ from typing import Any
 from .adaptive.policy import BASELINE, GuardPolicy
 from .adaptive.risk import next_score
 from .adaptive.source import PolicySource, StaticPolicySource
-from .guardrails import BLOCKED_INPUT_MSG, BLOCKED_OUTPUT_MSG
+from .guardrails import BLOCKED_INPUT_MSG, BLOCKED_OUTPUT_MSG, mask_pii
 from .memory import SessionMemory
 from .models import ModelOrchestrator, ModelTarget
 from .resilience import GuardrailUnavailable, ServiceUnavailable
@@ -69,6 +69,31 @@ RISK_MSG = ("I've paused this conversation and passed it to a support specialist
 
 # The guard policy serving the current turn (per session: canary or active).
 _POLICY: contextvars.ContextVar[GuardPolicy] = contextvars.ContextVar("guard_policy", default=BASELINE)
+
+
+
+def _mask_values(value: Any) -> Any:
+    """mask_pii over every string in a JSON-like value (tool inputs in the audit log)."""
+    if isinstance(value, str):
+        return mask_pii(value)[0]
+    if isinstance(value, dict):
+        return {k: _mask_values(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_mask_values(v) for v in value]
+    return value
+
+
+def _mask_blocks(content: list) -> list:
+    """Mask card data in the model's text blocks before they enter history (persisted and
+    replayed). Other blocks (tool_use, thinking with signatures) are kept untouched."""
+    out = []
+    for b in content:
+        if getattr(b, "type", None) == "text" and mask_pii(b.text)[1]:
+            masked = mask_pii(b.text)[0]
+            b = b.model_copy(update={"text": masked}) if hasattr(b, "model_copy") else \
+                type(b)(**{**vars(b), "text": masked})
+        out.append(b)
+    return out
 
 
 @dataclass
@@ -139,7 +164,10 @@ class Chatbot:
         hist_len, mem, notice = len(cs.history), copy.deepcopy(cs.memory), cs.pending_notice
         token = _POLICY.set(self.policies.for_session(cs.session.session_id))
         try:
-            return self._ask(cs, user_text, t0)
+            # Card data is masked before anything else sees the text: guards, the model,
+            # history, audit, review queue and shadow logs, on blocked paths too.
+            user_text, premasked = mask_pii(user_text)
+            return self._ask(cs, user_text, t0, premasked)
         except ServiceUnavailable as e:
             del cs.history[hist_len:]
             cs.memory, cs.pending_notice = mem, notice
@@ -154,13 +182,14 @@ class Chatbot:
         except Exception as e:  # fail closed: no unguarded input or output
             raise GuardrailUnavailable(f"guardrail unavailable: {type(e).__name__}") from e
 
-    def _ask(self, cs: ChatSession, user_text: str, t0: float) -> Turn:
+    def _ask(self, cs: ChatSession, user_text: str, t0: float, premasked: list[str] | None = None) -> Turn:
         policy = _POLICY.get()
         if cs.memory.risk >= policy.risk_threshold:  # locked: a person takes it from here
             msg = RISK_MSG.format(ref=self._ref(cs), contact=self.settings.support_contact)
             return self._finish(cs, user_text, msg, "session_risk", [f"risk:{cs.memory.risk:g}"], [], t0,
                                 escalated=True)
         g_in = self._guard(self.guard.check_input, user_text)
+        g_in.reasons = list(dict.fromkeys([*(premasked or []), *g_in.reasons]))
         if g_in.action == "block":
             if any(r.startswith("prompt_attack") for r in g_in.reasons):  # off-topic is not an attack
                 cs.memory.risk = next_score(cs.memory.risk, attack=True, text=user_text)
@@ -223,6 +252,7 @@ class Chatbot:
                                  f"({', '.join(gate.reasons)}); the user saw a fallback message.")
             return self._finish(cs, text, gate.answer, "evidence_guard", gate.reasons, tool_log, t0, route=route)
 
+        answer = mask_pii(answer)[0]  # local pass on every provider; Bedrock's anonymizer is a second layer
         if leaks_prompt(answer, SYSTEM_PROMPT):  # canary: an injection that got the model to recite its rules
             cs.pending_notice = "Your previous answer was withheld: it repeated your instructions."
             return self._finish(cs, text, BLOCKED_OUTPUT_MSG, "output_guardrail", ["prompt_leak"], tool_log, t0,
@@ -245,7 +275,7 @@ class Chatbot:
             resp = engine.create(SYSTEM_PROMPT, cs.history, self.toolbox.schemas(), tier=tier,
                                  deadline=cs.deadline)
             models_used.append(engine.last_target or "unknown")
-            cs.history.append({"role": "assistant", "content": resp.content})
+            cs.history.append({"role": "assistant", "content": _mask_blocks(resp.content)})
             if resp.stop_reason == "refusal":
                 answer = "I can't help with that request."
                 break
@@ -314,7 +344,7 @@ class Chatbot:
                     "focus": turn.focus, "latency_ms": turn.latency_ms, "repaired": turn.repaired,
                     "escalated": turn.escalated, "tier": turn.tier, "models": turn.models_used,
                     "policy": turn.policy_version, "risk": cs.memory.risk, **({"shadow": shadow} if shadow else {}),
-                    "tools": [{"name": c["name"], "input": c["input"], "status": c["result"]["status"],
+                    "tools": [{"name": c["name"], "input": _mask_values(c["input"]), "status": c["result"]["status"],
                                **({"screened": c["result"]["screened"]} if c["result"].get("screened") else {})}
                               for c in tool_log]}) + "\n")
         return turn

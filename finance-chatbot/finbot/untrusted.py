@@ -147,7 +147,8 @@ class ToolResultScreen:
             if reasons:
                 rep.removed.append(f"{path}:{reasons[0]}")
                 return REMOVED
-            return clean(value, self.max_field)
+            from .guardrails import mask_pii  # lazy: guardrails imports this module lazily too
+            return clean(mask_pii(value)[0], self.max_field)
         return value
 
     def _split_payload(self, data, rep: ScreenReport):

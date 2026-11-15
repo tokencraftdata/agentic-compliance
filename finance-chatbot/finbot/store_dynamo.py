@@ -322,6 +322,8 @@ class DynamoSessionStore:
     # ---------------------------------------------------------------- turns
 
     def begin_turn(self, session_id, msg_id, worker, user_text):
+        from .guardrails import mask_pii
+        user_text = mask_pii(user_text)[0]
         now = self.clock()
         pk, sk = f"S#{session_id}", f"T#{msg_id}"
         r = self.t.get(pk, sk)
@@ -335,7 +337,8 @@ class DynamoSessionStore:
         try:
             self.t.put({"pk": pk, "sk": sk, "msg_id": msg_id, "turn_no": n + 1, "status": "started",
                         "worker": worker, "attempts": 1, "user_text": user_text, "answer": None, "meta": None,
-                        "started": now, "committed": None}, ("attribute_not_exists(pk)", {}, {}))
+                        "started": now, "committed": None, "expires": now + self.idle_ttl},
+                       ("attribute_not_exists(pk)", {}, {}))
         except ConditionFailed:
             return self.begin_turn(session_id, msg_id, worker, user_text)  # raced: re-read
         return None
