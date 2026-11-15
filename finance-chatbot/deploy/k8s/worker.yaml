@@ -1,0 +1,98 @@
+# Queue workers: stateless, interchangeable, scaled on queue depth.
+# Any pod can serve any session; the session lease in DynamoDB decides who owns
+# a session right now, and the compare-and-swap commit rejects a late writer.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finbot-worker
+  namespace: finbot
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: finbot-worker}
+  strategy:
+    rollingUpdate: {maxUnavailable: 0, maxSurge: 1}
+  template:
+    metadata:
+      labels: {app: finbot-worker}
+    spec:
+      serviceAccountName: finbot-worker
+      automountServiceAccountToken: true          # needed for IRSA web identity
+      # Longer than turn_deadline_s (90 s) plus one long poll (20 s): SIGTERM lets the
+      # turn in hand finish. A pod killed anyway loses only an uncommitted turn.
+      terminationGracePeriodSeconds: 120
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: {app: finbot-worker}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: worker
+          image: REGISTRY/finbot:VERSION
+          command: ["python", "-m", "finbot.worker_main"]
+          envFrom:
+            - configMapRef: {name: finbot-config}
+          env:
+            - {name: FINBOT_HEARTBEAT_FILE, value: /tmp/heartbeat}
+          # Liveness: the loop touches the heartbeat after every poll (a long poll
+          # returns within 20 s; one turn takes at most ~90 s).
+          livenessProbe:
+            exec:
+              command: ["python", "-c", "import os,sys,time; sys.exit(time.time()-os.path.getmtime('/tmp/heartbeat') > 150)"]
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          resources:
+            requests: {cpu: 250m, memory: 512Mi}
+            limits: {memory: 1Gi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: finbot-worker
+  namespace: finbot
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: {app: finbot-worker}
+---
+# Scale on visible messages (KEDA). Each pod handles one turn at a time, so
+# queueLength is "turns waiting per pod".
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: finbot-worker
+  namespace: finbot
+spec:
+  scaleTargetRef: {name: finbot-worker}
+  minReplicaCount: 2
+  maxReplicaCount: 50
+  cooldownPeriod: 300
+  triggers:
+    - type: aws-sqs-queue
+      authenticationRef: {name: finbot-keda-aws}
+      metadata:
+        queueURL: https://sqs.us-east-1.amazonaws.com/ACCOUNT_ID/finbot-turns.fifo
+        queueLength: "2"
+        awsRegion: us-east-1
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: finbot-keda-aws
+  namespace: finbot
+spec:
+  podIdentity: {provider: aws}

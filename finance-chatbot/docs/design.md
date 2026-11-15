@@ -291,3 +291,147 @@ The baseline ships with escalation and commitment rules and is checked against
 rules pass the gate on 18/18 guard cases, 27/27 dev, 170/170 held-out, 33/33 red team; one false
 block on a built-in guard goes to engineering), runs 120 turns with the shadow policy logged
 (one turn diverges, as expected), promotes through a 10% canary and rolls back.
+
+## 11. Deployment
+
+How finbot runs as a service on AWS with Kubernetes (EKS). The worker process
+(`finbot/worker_main.py`), the container image (`Dockerfile`) and reference manifests
+(`deploy/k8s/`) are in the repo; they have **not** been run against a live account or
+cluster yet. The HTTP adapter around `ChatService` is not in the repo.
+
+```
+ client ──HTTPS──► load balancer ──► api pods (ChatService: verify token, own session?, validate)
+                                         │  enqueue {session_id, msg_id, tenant_id, text}
+                                         ▼
+                         SQS FIFO  (group = session_id, dedup = msg_id) ──► DLQ after 5 receives
+                                         │ long poll, one message per pod at a time
+                                         ▼
+                  worker pods (stateless, any pod, any session) ── Worker.handle
+                     claim lease ─ load committed state ─ journal turn ─ run turn ─ CAS commit
+                       │            │                                     │
+                       │            └─ DynamoDB: sessions, leases, turn journal, breaker health,
+                       │                         control config, guard policy
+                       └─ Bedrock (model chain across regions, Guardrails), OpenSearch (KB),
+                          transaction DB and log search (read-only, tenant-scoped)
+```
+
+### 11.1 Access
+
+Two kinds of access, kept apart.
+
+**People and clients.** Every request carries a token from the identity provider (OIDC:
+Cognito, Okta, Entra ID), verified against its public JWKS (`JwksJwtVerifier`: signature,
+`exp`, `iss`, `aud`). Tenant, role and groups come only from the verified token, never from
+the request body. `Authorizer` is deny-by-default:
+
+| Role | May |
+|---|---|
+| `merchant` | chat, only in sessions of its own tenant |
+| `support` | chat; read the review queue; label mistakes for the guard controller |
+| `admin` | model control plane (drain, restore, routing); guard controller (cycle, approve, promote, rollback) |
+
+An unknown session and someone else's session both return 403, so session ids cannot be probed.
+Queue consumers check the tenant again, so a forged queue message cannot cross tenants.
+
+**Workloads.** No static AWS keys anywhere: each Kubernetes service account maps to its own
+IAM role (IRSA or EKS Pod Identity), and the cluster holds no secrets (tokens are checked with
+public keys).
+
+| Identity | Allowed | Not allowed |
+|---|---|---|
+| `finbot-api` | verify tokens; read session owner; `sqs:SendMessage` to the turn queue | any model call, the vector index, transaction data |
+| `finbot-worker` | `bedrock:InvokeModel` and `ApplyGuardrail` on the listed models; DynamoDB on the session table; receive/delete/change-visibility on the queue, send to the DLQ; read the vector index; read-only transaction and log access | writing the vector index; any write to payment systems |
+| `finbot-ingest` | read the help-doc sources; Bedrock embeddings; write the vector index | the session table, the queue, chat models |
+
+### 11.2 A cluster of workers
+
+Workers keep no state in memory between messages. Everything a turn needs is in the shared
+store: the committed session, the turn journal, model breaker health, control-plane config and
+the guard policy. So any pod can serve any session, pods can be added or removed at any time,
+and a rollout is just pods coming and going.
+
+Two workers never run the same session at once. A worker must hold the session's **lease**
+(60 s, renewed before every model call and before commit), and the commit is a
+**compare-and-swap** on version and lease, so a worker that lost its lease cannot overwrite
+newer work. Shared state that is not per-session is "last write wins" with a short cache:
+breaker open/closed, drained models (re-read every 2 s), the active guard policy (re-read every
+2 s).
+
+### 11.3 Routing
+
+| What is routed | How | Where |
+|---|---|---|
+| A message to a worker | SQS FIFO, `MessageGroupId = session_id`: one session's turns stay in order, different sessions run in parallel; `MessageDeduplicationId = msg_id` drops client resends | `queue.SqsQueue` |
+| A session to a pod | Not routed: no sticky sessions. Whichever pod receives the message claims the lease | `runtime.Worker` |
+| A turn to a model | Code chooses the tier (cheap model for simple turns only when an operator enables it; strong model for hard turns and every repair), then the failover chain with a breaker per model, e.g. `us-east-1` then `us-west-2` | `models.ModelOrchestrator`, `control.ControlPlane` |
+| A tool call to data | Tenant comes from the session, never from the model; tools are read-only | `tools.ToolBox` |
+| A turn to a person | Repeated unverifiable answers, an escalation rule, or a session risk lock | `orchestrator`, `adaptive` |
+| A failing message | Retried with backoff; after 5 receives it goes to the DLQ for a person | `queue.QueueConsumer` |
+| A payment to a processor | Not done by the bot: it reads routing traces and explains them | section 9 |
+
+Model routing is changed at runtime through the control plane (drain a region, switch tiered
+routing on) with an audit record, not by redeploying.
+
+### 11.4 Kubernetes
+
+| Workload | Kind | Scaling | Notes |
+|---|---|---|---|
+| `finbot-worker` | Deployment + PDB | KEDA on SQS queue depth (2 waiting turns per pod), 2 to 50 pods | one message at a time per pod; no inbound traffic |
+| `finbot-api` | Deployment + Service + HPA + PDB | CPU, 2 to 20 pods | trust boundary; never calls a model |
+| `finbot-ingest` | CronJob | one run at a time | incremental by document version |
+
+Settings that matter for correctness, not just tidiness:
+
+- `terminationGracePeriodSeconds: 120`, above the 90 s turn deadline plus one 20 s long poll.
+  On SIGTERM the worker stops receiving, finishes the turn in hand, and exits
+  (`test_sigterm_finishes_the_turn_in_hand_and_leaves_the_rest_queued`).
+- **Queue visibility timeout 150 s**, above the turn deadline plus margin. The worker refuses to
+  start otherwise; a shorter timeout would hand a healthy slow turn to a second pod mid-turn.
+- **One message per poll.** Concurrency comes from pods, so a stopping pod never holds a batch
+  it has to abandon.
+- **Liveness** is a heartbeat file touched after every poll; readiness does not apply because
+  workers take no traffic.
+- **Spread across zones**, `maxUnavailable: 0` on rollout, and a PDB so a node drain never
+  removes every worker.
+- **Restricted pods**: non-root, read-only root filesystem, no capabilities, default seccomp.
+- **Network**: default deny; workers accept nothing inbound; egress only to DNS and the VPC
+  endpoints for Bedrock, DynamoDB, SQS, STS and OpenSearch.
+
+Outside the cluster: the DynamoDB table (point-in-time recovery on, TTL on idle sessions),
+the FIFO queue and FIFO DLQ, the Bedrock guardrail (`infra/create_guardrail.py`), and the VPC
+endpoints. A whole-region outage is handled by the model chain for model calls; the store and
+queue stay single-region in this design.
+
+### 11.5 Crash recovery mid-turn
+
+A turn only counts once it is committed. Everything before the commit (model calls, tool
+calls, the repair attempt, failover) happens in memory and can be thrown away.
+
+```
+receive msg ─► claim lease ─► load committed v7 ─► journal "m42 started" ─► model/tools ... ─► renew lease ─► commit v8 + answer ─► ack
+     ▲                                                                          │ crash here
+     └────────── message reappears after the visibility timeout ◄───────────────┘ nothing committed
+```
+
+| Crash point | What happens | Tested by |
+|---|---|---|
+| Pod killed mid-turn (OOM, node lost, SIGKILL) | Nothing committed, message not acked. It becomes visible again; another pod waits out the 60 s lease, sees the journalled-but-uncommitted turn and re-runs it from v7. Committed once | `test_killed_pod_turn_is_rerun_once_by_another_pod`, `test_1_crash_mid_turn_...` |
+| Rollout or scale-in (SIGTERM) | The pod finishes the turn in hand, commits, stops receiving; queued messages go to other pods | `test_sigterm_finishes_...` |
+| Crash after commit, before ack or reply | The message is delivered again; the journal already has the answer for that `msg_id`, so it is returned with no model call | `test_2_crash_after_commit_...`, `test_ack_on_commit_and_dedupe_on_redelivery` |
+| Old pod comes back after another took over | Its heartbeat sees the new owner and stops; if it still tries, the CAS commit fails with `StaleWrite` | `test_3_late_worker_...`, `test_heartbeat_stops_a_superseded_worker_early` |
+| A model or dependency down | Not a crash: retries and failover inside the 90 s deadline; if nothing answers, the turn stays uncommitted and the message is retried later with the same `msg_id` | `test_outage_is_retried_later_then_answered` |
+| A message that always fails | Backoff, then the DLQ after 5 receives for a person | `test_forged_tenant_and_poison_messages_are_dead_lettered` |
+
+What the replacement inherits is only the committed record: tool-derived facts, focus,
+history and notices. It never inherits the dead worker's half-finished reasoning. Re-running a
+turn is safe because every tool is read-only. If write actions (refunds, retries) are added,
+they must use the action journal that already exists: record intent with an `op_id` before the
+call, pass `op_id` as the provider's idempotency key, and after a crash ask the provider what
+happened before trying again (`test_4_unknown_external_action_...`).
+
+The client side: send a stable `msg_id` with every message and reuse it on resend. A resend of
+a committed turn returns the stored answer; a resend of an uncommitted one runs it once.
+
+**Not done yet:** the HTTP adapter and result delivery to the client (polling or push), a
+timer-based lease heartbeat for single model calls longer than the lease, per-tenant rate
+limits at the API, and a live run of these manifests.

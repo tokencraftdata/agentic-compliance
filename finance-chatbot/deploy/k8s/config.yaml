@@ -1,0 +1,28 @@
+# Non-secret settings shared by every finbot pod. There are no secrets here:
+# AWS access comes from service accounts, tokens are verified with the
+# identity provider's public JWKS.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: finbot-config
+  namespace: finbot
+data:
+  AWS_REGION: us-east-1
+  FINBOT_LLM_PROVIDER: bedrock
+  # Ordered failover chain: one region, then another (breaker per target, shared via the store)
+  FINBOT_MODEL_CHAIN: "bedrock:anthropic.claude-opus-5-5@us-east-1,bedrock:anthropic.claude-opus-5-5@us-west-2"
+  FINBOT_GUARDRAIL: bedrock
+  FINBOT_GUARDRAIL_ID: REPLACE_ME
+  FINBOT_GUARDRAIL_VERSION: "1"
+  FINBOT_STORE_PROVIDER: dynamodb
+  FINBOT_DYNAMO_TABLE: finbot-sessions
+  FINBOT_QUEUE_URL: https://sqs.us-east-1.amazonaws.com/ACCOUNT_ID/finbot-turns.fifo
+  FINBOT_DLQ_URL: https://sqs.us-east-1.amazonaws.com/ACCOUNT_ID/finbot-turns-dlq.fifo
+  FINBOT_VISIBILITY_S: "150"
+  FINBOT_KB_PROVIDER: vector
+  FINBOT_VECTOR_STORE: opensearch:https://REPLACE_ME.us-east-1.aoss.amazonaws.com/finbot-kb
+  FINBOT_VECTOR_EMBEDDER: bedrock:amazon.titan-embed-text-v2:0@1024
+  FINBOT_AUTH: jwks
+  FINBOT_AUTH_ISSUER: https://login.example.com/
+  FINBOT_AUTH_AUDIENCE: finbot
+  FINBOT_AUTH_JWKS_URL: https://login.example.com/.well-known/jwks.json

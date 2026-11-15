@@ -108,7 +108,12 @@ class SqsQueue:
                                            VisibilityTimeout=int(min(43200, max(0, delay_s))))
 
     def dead_letter(self, m: Message, reason: str) -> None:
-        self.sqs.send_message(QueueUrl=self.dlq_url, MessageBody=json.dumps({**m.body, "dlq_reason": reason}))
+        # A FIFO queue's DLQ must also be FIFO, and FIFO sends need a group and a dedup id.
+        fifo = {"MessageGroupId": m.body.get("session_id", "dlq"),
+                "MessageDeduplicationId": f"dlq-{m.body.get('msg_id', m.handle)[:120]}"} \
+            if self.dlq_url.endswith(".fifo") else {}
+        self.sqs.send_message(QueueUrl=self.dlq_url, MessageBody=json.dumps({**m.body, "dlq_reason": reason}),
+                              **fifo)
         self.ack(m)
 
 

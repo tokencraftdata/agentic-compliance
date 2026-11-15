@@ -1,0 +1,41 @@
+# Workers accept no inbound traffic at all: work arrives through the queue.
+# Egress is DNS plus HTTPS. Restrict the HTTPS rule to your VPC endpoint subnets
+# (Bedrock, DynamoDB, SQS, STS, OpenSearch) so pods cannot reach the internet.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: finbot
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: egress-dns-and-aws-endpoints
+  namespace: finbot
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels: {k8s-app: kube-dns}
+      ports: [{protocol: UDP, port: 53}, {protocol: TCP, port: 53}]
+    - to:
+        - ipBlock: {cidr: 10.0.0.0/16}           # REPLACE: VPC endpoint subnets only
+      ports: [{protocol: TCP, port: 443}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-ingress-from-load-balancer
+  namespace: finbot
+spec:
+  podSelector:
+    matchLabels: {app: finbot-api}
+  policyTypes: [Ingress]
+  ingress:
+    - ports: [{protocol: TCP, port: 8080}]

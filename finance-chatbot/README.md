@@ -31,6 +31,7 @@ finbot/control.py        control plane: drain/restore models, routing mode, audi
 finbot/verification.py   hallucination gate: verifier chain + one bounded repair
 finbot/untrusted.py      prompt-injection defences: normalise + screen, tool-result sanitising, spotlighting, leak canary
 finbot/queue.py          queue worker (SQS / in-memory): ack, retry-later, dead-letter
+finbot/worker_main.py    queue worker process for a container: one turn at a time, clean SIGTERM, heartbeat
 finbot/store_dynamo.py   DynamoDB session store (same contract as store.py), single-table design
 finbot/ingestion/        sources (local, S3, SharePoint, web) -> chunk (+Claude context)
                          -> Bedrock embeddings -> vector DB (local, OpenSearch, pgvector, Chroma) | Bedrock KB
@@ -55,6 +56,7 @@ finbot/adaptive/         adaptive guardrails: versioned GuardPolicy (escalation,
 finbot/evalkit.py        eval scoring shared by run_eval.py and the gate
 finbot/redteam.py        red-team harness shared by run_redteam.py and the gate
 infra/create_guardrail.py   creates the Bedrock guardrail (topics, PII, prompt attack, grounding)
+Dockerfile, deploy/k8s/   worker image and reference EKS manifests (workers, API, ingestion, network policy)
 scripts/ingest.py        any source -> any vector store, incremental; or start a Bedrock KB sync
 scripts/generate_synthetic.py seeded synthetic merchants, transactions, logs, KB pages, eval set
 scripts/run_eval.py      runs data/eval.jsonl through the bot with deterministic checks
@@ -104,6 +106,12 @@ never touches the built-in guards, loosening needs an admin, and rollback is one
 guards in the baseline: escalation to a person (complaints, unauthorised payments, hardship),
 a check on promises the bot can't keep, and a session risk score for multi-turn jailbreaks.
 See [docs/design.md](docs/design.md#10-adaptive-guardrails).
+
+## Deployment
+
+Access, the worker cluster, routing, Kubernetes and crash recovery mid-turn are in
+[docs/design.md, section 11](docs/design.md). Reference manifests are in
+[deploy/k8s/](deploy/k8s/README.md); they have not been applied to a live cluster.
 
 ## Security
 

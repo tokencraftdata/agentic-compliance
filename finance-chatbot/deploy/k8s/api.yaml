@@ -1,0 +1,75 @@
+# API pods: the trust boundary. They verify the token, check the caller owns the
+# session, validate the message and enqueue it (FIFO, grouped by session_id,
+# deduplicated by the client's msg_id). They never call a model.
+#
+# NOTE: the repository has the service layer (finbot/service.py, ChatService) but
+# no HTTP adapter yet. Wrap ChatService in your framework of choice and map its
+# errors as documented there: AuthError 401, Forbidden 403, BadRequest 400,
+# LeaseHeld 409, unavailable 503 with retry_after_s.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finbot-api
+  namespace: finbot
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: finbot-api}
+  template:
+    metadata:
+      labels: {app: finbot-api}
+    spec:
+      serviceAccountName: finbot-api
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: api
+          image: REGISTRY/finbot-api:VERSION       # your HTTP adapter around ChatService
+          ports: [{containerPort: 8080, name: http}]
+          envFrom:
+            - configMapRef: {name: finbot-config}
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {memory: 512Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: finbot-api
+  namespace: finbot
+spec:
+  selector: {app: finbot-api}
+  ports: [{port: 80, targetPort: http}]
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: finbot-api
+  namespace: finbot
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: finbot-api}
+  minReplicas: 2
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource: {name: cpu, target: {type: Utilization, averageUtilization: 60}}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: finbot-api
+  namespace: finbot
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: {app: finbot-api}
