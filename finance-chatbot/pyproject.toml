@@ -1,0 +1,38 @@
+[project]
+name = "finbot"
+version = "0.3.0"
+description = "Guarded payments support chatbot with processor-orchestration tooling (synthetic data only)"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+# pyflakes, pycodestyle, isort, bugbear, pyupgrade, simplify, comprehensions
+select = ["F", "E", "W", "I", "B", "UP", "SIM", "C4"]
+ignore = [
+    "SIM105",  # contextlib.suppress: explicit try/except reads better around I/O here
+    "SIM108",  # ternaries everywhere hurt readability
+    "SIM905",  # word lists read better as one string split on whitespace
+]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["E402"]   # scripts put the repo on sys.path before importing finbot
+"finbot/orchestrator.py" = ["E501"]   # the system prompt is prose, one rule per line
+"tests/*" = ["E402"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+check_untyped_defs = true
+
+# The processor-orchestration package is fully typed and checked strictly.
+[[tool.mypy.overrides]]
+module = "finbot.processors.*"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_return_any = true

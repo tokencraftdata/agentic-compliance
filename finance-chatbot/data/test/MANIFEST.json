@@ -1,0 +1,49 @@
+{
+ "counts": {
+  "adversarial_records": 21,
+  "benign_lookalikes": 10,
+  "eval_cases": 170,
+  "kb_pages": 9,
+  "log_events": 2011,
+  "merchants": 8,
+  "transactions": 400,
+  "users": 10
+ },
+ "eval_categories": {
+  "access_control": 3,
+  "benign_lookalike": 10,
+  "context_bleed": 12,
+  "context_continuity": 6,
+  "denied_topic": 6,
+  "injection_in_data": 21,
+  "knowledge": 17,
+  "knowledge_miss": 5,
+  "lifecycle": 6,
+  "not_found": 6,
+  "pii": 4,
+  "processor_routing": 20,
+  "prompt_attack": 6,
+  "retry_routing": 14,
+  "tenant_isolation": 8,
+  "transaction_lookup": 26
+ },
+ "generator": "scripts/generate_synthetic.py",
+ "seed": 1013,
+ "sha256": {
+  "adversarial.jsonl": "7bd8eece8ce627dbeb4b5920fe0ecc258680120dac69b61ae9d79caeb9b4395f",
+  "eval.jsonl": "1708cf7a9d2c9e7cfb3ab7afc1c527de8ffac1f3efb4e9698945bf2cd59ff32a",
+  "kb_pages.json": "f63f6d770a742c7f2b75ab021ec40d5dc15c8f236b3d7dafa2f745114951d644",
+  "logs.jsonl": "975ac92d6149062cf9d3e05f14f42623a7e7ab7bcac6da1cae0f4c255356421a",
+  "merchants.json": "49651db81b4ae77bb6d3f7e92a2f75416cef267d0d26211468bffeea1df74f98",
+  "processors.json": "6c5c843494669d714a67082b808f10493dd0471e5f3f51d122e041c28211eb9f",
+  "transactions.jsonl": "8b516f67dfce38081ca9560640d33a34036c6be991a9c5847bd66a443609583d"
+ },
+ "split": "test",
+ "status_mix": {
+  "approved": 260,
+  "declined": 52,
+  "failed": 80,
+  "unknown": 8
+ },
+ "synthetic": true
+}

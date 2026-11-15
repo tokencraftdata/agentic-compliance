@@ -1,0 +1,191 @@
+{
+ "merchants": [
+  {
+   "category": "Grocery",
+   "country": "US",
+   "mcc": "5411",
+   "name": "Northwind Grocers",
+   "risk_rules": {
+    "block_score_above": 80,
+    "require_3ds_above": 500
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": false,
+   "tenant_id": "m_100"
+  },
+  {
+   "category": "Restaurants",
+   "country": "US",
+   "mcc": "5812",
+   "name": "Bluebird Bistro",
+   "risk_rules": {
+    "block_score_above": 70,
+    "require_3ds_above": 250
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": false,
+   "tenant_id": "m_200"
+  },
+  {
+   "category": "Electronics",
+   "country": "GB",
+   "mcc": "5732",
+   "name": "Voltline Electronics",
+   "risk_rules": {
+    "block_score_above": 70,
+    "require_3ds_above": 250
+   },
+   "settlement_schedule": "T+2",
+   "surcharging_enabled": true,
+   "tenant_id": "m_300"
+  },
+  {
+   "category": "Rideshare",
+   "country": "US",
+   "mcc": "4121",
+   "name": "Riverbend Rides",
+   "risk_rules": {
+    "block_score_above": 90,
+    "require_3ds_above": 250
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": true,
+   "tenant_id": "m_400"
+  },
+  {
+   "category": "Books",
+   "country": "GB",
+   "mcc": "5942",
+   "name": "Paper Lantern Books",
+   "risk_rules": {
+    "block_score_above": 70,
+    "require_3ds_above": 500
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": true,
+   "tenant_id": "m_500"
+  },
+  {
+   "category": "Clubs/subscriptions",
+   "country": "GB",
+   "mcc": "7997",
+   "name": "Summit Fitness Club",
+   "risk_rules": {
+    "block_score_above": 70,
+    "require_3ds_above": 100
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": false,
+   "tenant_id": "m_600"
+  },
+  {
+   "category": "Grocery",
+   "country": "GB",
+   "mcc": "5411",
+   "name": "Copperleaf Cafe",
+   "risk_rules": {
+    "block_score_above": 80,
+    "require_3ds_above": 250
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": false,
+   "tenant_id": "m_700"
+  },
+  {
+   "category": "Restaurants",
+   "country": "GB",
+   "mcc": "5812",
+   "name": "Orbit Gadgets",
+   "risk_rules": {
+    "block_score_above": 80,
+    "require_3ds_above": 500
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": true,
+   "tenant_id": "m_800"
+  }
+ ],
+ "users": [
+  {
+   "groups": [
+    "support"
+   ],
+   "role": "support",
+   "tenant_id": null,
+   "user_id": "u_support_1"
+  },
+  {
+   "groups": [
+    "support",
+    "risk"
+   ],
+   "role": "support",
+   "tenant_id": null,
+   "user_id": "u_risk_1"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_100",
+   "user_id": "u_m_100"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_200",
+   "user_id": "u_m_200"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_300",
+   "user_id": "u_m_300"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_400",
+   "user_id": "u_m_400"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_500",
+   "user_id": "u_m_500"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_600",
+   "user_id": "u_m_600"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_700",
+   "user_id": "u_m_700"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_800",
+   "user_id": "u_m_800"
+  }
+ ]
+}

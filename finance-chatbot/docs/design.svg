@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 880" width="1200" height="880" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .t { font-size: 13px; font-weight: 600; fill: #0F172A; }
+      .s { font-size: 11px; fill: #475569; }
+      .band { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; fill: #64748B; }
+      .note { font-size: 11px; fill: #64748B; }
+      .chip { font-size: 10px; font-weight: 600; fill: #6D28D9; }
+      .ln { stroke: #475569; stroke-width: 1.4; fill: none; }
+      .data { fill: #EEF2F7; stroke: #94A3B8; }
+      .guard { fill: #FEF3E2; stroke: #D97706; }
+      .mem { fill: #E6F4F1; stroke: #0F766E; }
+      .llm { fill: #EFEAFB; stroke: #6D28D9; }
+      .user { fill: #F1F5F9; stroke: #475569; }
+      .qual { fill: #F5F5F4; stroke: #78716C; }
+      .ctl { fill: #FDF2F8; stroke: #BE185D; }
+    </style>
+  </defs>
+  <rect width="1200" height="880" fill="#FFFFFF"/>
+
+  <text x="40" y="38" style="font-size:20px;font-weight:700;fill:#0F172A">finbot design: layers, control plane, ingestion</text>
+  <text x="40" y="58" class="note">Ports and adapters · factories pick each adapter from config (registry.py) · one composition root wires them (container.py) · all Python</text>
+
+  <!-- Row 1: clients -->
+  <text x="40" y="88" class="band">CLIENTS</text>
+  <rect x="40" y="98" width="260" height="52" rx="8" class="user"/>
+  <text x="54" y="120" class="t">Merchant / support app</text>
+  <text x="54" y="138" class="s">sends JWT + msg_id + text</text>
+  <text x="910" y="88" class="band">OPERATORS</text>
+  <rect x="910" y="98" width="250" height="52" rx="8" class="user"/>
+  <text x="924" y="120" class="t">Admin console</text>
+  <text x="924" y="138" class="s">admin JWT only</text>
+
+  <!-- Row 2: trust boundary -->
+  <text x="40" y="180" class="band">TRUST BOUNDARY</text>
+  <rect x="40" y="190" width="840" height="56" rx="8" class="guard"/>
+  <text x="56" y="213" class="t">ChatService (facade) · service.py, security.py</text>
+  <text x="56" y="232" class="s">verify JWT (HS256 dev, JWKS prod) → Principal: tenant, role, groups → Authorizer, deny by default → validate input</text>
+  <path d="M200,150 L200,188" class="ln" marker-end="url(#arr)"/>
+
+  <!-- Row 3: delivery -->
+  <text x="40" y="276" class="band">DELIVERY</text>
+  <rect x="40" y="286" width="250" height="56" rx="8" class="data"/>
+  <text x="56" y="309" class="t">SQS queue (FIFO per session)</text>
+  <text x="56" y="327" class="s">at-least-once, dead-letter queue</text>
+  <rect x="330" y="286" width="250" height="56" rx="8" class="data"/>
+  <text x="346" y="309" class="t">QueueConsumer · queue.py</text>
+  <text x="346" y="327" class="s">ack · retry later · dead-letter</text>
+  <rect x="620" y="286" width="260" height="56" rx="8" class="mem"/>
+  <text x="636" y="309" class="t">Worker · runtime.py</text>
+  <text x="636" y="327" class="s">stateless: lease, heartbeat, CAS commit</text>
+  <path d="M200,246 L200,284" class="ln" marker-end="url(#arr)"/>
+  <path d="M290,314 L328,314" class="ln" marker-end="url(#arr)"/>
+  <path d="M580,314 L618,314" class="ln" marker-end="url(#arr)"/>
+
+  <!-- Row 4: orchestration layer -->
+  <text x="40" y="372" class="band">ORCHESTRATION LAYER · ONE TURN · orchestrator.py · verification.py</text>
+  <rect x="40" y="382" width="840" height="104" rx="10" class="qual"/>
+  <rect x="56" y="404" width="148" height="68" rx="8" class="guard"/>
+  <text x="68" y="426" class="t">Input guard</text>
+  <text x="68" y="444" class="s">injection, topics,</text>
+  <text x="68" y="459" class="s">PII masking</text>
+  <rect x="221" y="404" width="148" height="68" rx="8" class="mem"/>
+  <text x="233" y="426" class="t">Typed state</text>
+  <text x="233" y="444" class="s">focus txn, ledger,</text>
+  <text x="233" y="459" class="s">no context bleed</text>
+  <rect x="386" y="404" width="148" height="68" rx="8" class="llm"/>
+  <text x="398" y="426" class="t">Model loop</text>
+  <text x="398" y="444" class="s">read-only tools,</text>
+  <text x="398" y="459" class="s">tenant from session</text>
+  <rect x="551" y="404" width="148" height="68" rx="8" class="guard"/>
+  <text x="563" y="426" class="t">Verify + repair</text>
+  <text x="563" y="444" class="s">evidence checks,</text>
+  <text x="563" y="459" class="s">1 repair, re-verify</text>
+  <rect x="716" y="404" width="148" height="68" rx="8" class="guard"/>
+  <text x="728" y="426" class="t">Output guard</text>
+  <text x="728" y="444" class="s">grounding, PII,</text>
+  <text x="728" y="459" class="s">escalate to human</text>
+  <path d="M204,438 L219,438" class="ln" marker-end="url(#arr)"/>
+  <path d="M369,438 L384,438" class="ln" marker-end="url(#arr)"/>
+  <path d="M534,438 L549,438" class="ln" marker-end="url(#arr)"/>
+  <path d="M699,438 L714,438" class="ln" marker-end="url(#arr)"/>
+  <path d="M610,404 C600,390 490,390 480,402" class="ln" marker-end="url(#arr)"/>
+  <text x="514" y="394" class="chip">repair</text>
+  <path d="M750,342 L750,380" class="ln" marker-end="url(#arr)"/>
+
+  <!-- Row 5: model engine -->
+  <text x="40" y="516" class="band">MODEL ENGINE · models.py · resilience.py</text>
+  <rect x="40" y="526" width="840" height="100" rx="10" class="llm"/>
+  <text x="56" y="548" class="t">ModelOrchestrator</text>
+  <text x="196" y="548" class="s">routing strategy: single | tiered · retries with jitter · 90 s turn deadline · refusal fallback</text>
+  <rect x="56" y="562" width="190" height="50" rx="8" fill="#FFFFFF" stroke="#6D28D9"/>
+  <text x="68" y="583" class="t">Bedrock us-east-1</text>
+  <text x="68" y="600" class="s">primary · own breaker</text>
+  <rect x="268" y="562" width="190" height="50" rx="8" fill="#FFFFFF" stroke="#6D28D9"/>
+  <text x="280" y="583" class="t">Bedrock us-west-2</text>
+  <text x="280" y="600" class="s">failover · own breaker</text>
+  <rect x="480" y="562" width="190" height="50" rx="8" fill="#FFFFFF" stroke="#6D28D9"/>
+  <text x="492" y="583" class="t">Claude API</text>
+  <text x="492" y="600" class="s">last resort · own breaker</text>
+  <rect x="692" y="562" width="172" height="50" rx="8" fill="#FFFFFF" stroke="#6D28D9" stroke-dasharray="5 3"/>
+  <text x="704" y="583" class="t">Fast tier (optional)</text>
+  <text x="704" y="600" class="s">simple turns only</text>
+  <path d="M246,587 L266,587" class="ln" marker-end="url(#arr)"/>
+  <path d="M458,587 L478,587" class="ln" marker-end="url(#arr)"/>
+  <path d="M460,472 L460,524" class="ln" marker-end="url(#arr)"/>
+
+  <!-- Row 6: adapters -->
+  <text x="40" y="656" class="band">ADAPTERS · chosen by factories in registry.py</text>
+  <rect x="40" y="666" width="196" height="56" rx="8" class="guard"/>
+  <text x="54" y="689" class="t">Bedrock Guardrails</text>
+  <text x="54" y="707" class="s">or local rules; fail closed</text>
+  <rect x="252" y="666" width="196" height="56" rx="8" class="data"/>
+  <text x="266" y="689" class="t">Tools · tools.py</text>
+  <text x="266" y="707" class="s">txn DB, logs, KB search</text>
+  <rect x="464" y="666" width="196" height="56" rx="8" class="data"/>
+  <text x="478" y="689" class="t">Vector DB / Bedrock KB</text>
+  <text x="478" y="707" class="s">access filter in the query</text>
+  <rect x="676" y="666" width="204" height="56" rx="8" class="mem"/>
+  <text x="690" y="689" class="t">Session store</text>
+  <text x="690" y="707" class="s">SQLite (dev) | DynamoDB (prod)</text>
+  <path d="M448,694 L462,694" class="ln" marker-end="url(#arr)"/>
+
+  <!-- Right column: control plane + shared state -->
+  <text x="910" y="180" class="band">CONTROL PLANE · control.py</text>
+  <rect x="910" y="190" width="250" height="152" rx="8" class="ctl"/>
+  <text x="924" y="213" class="t">Model control plane</text>
+  <text x="924" y="234" class="s">status: breaker, calls, failovers</text>
+  <text x="924" y="252" class="s">drain / restore a model</text>
+  <text x="924" y="270" class="s">routing: single | tiered</text>
+  <text x="924" y="288" class="s">admin only, audit-logged</text>
+  <text x="924" y="306" class="s">refuses to drain the last model</text>
+  <text x="924" y="324" class="s">no "force breaker closed"</text>
+  <path d="M1130,150 L1130,188" class="ln" marker-end="url(#arr)"/>
+
+  <text x="910" y="372" class="band">SHARED STATE</text>
+  <rect x="910" y="382" width="250" height="140" rx="8" class="mem"/>
+  <text x="924" y="405" class="t">DynamoDB table</text>
+  <text x="924" y="426" class="s">sessions, versioned state, TTL</text>
+  <text x="924" y="444" class="s">turn journal (dedupe by msg_id)</text>
+  <text x="924" y="462" class="s">leases, conditional commits</text>
+  <text x="924" y="480" class="s">breaker health per model</text>
+  <text x="924" y="498" class="s">control config (drained, routing)</text>
+  <path d="M1035,342 L1035,380" class="ln" marker-end="url(#arr)"/>
+  <text x="1042" y="366" class="chip">writes</text>
+  <path d="M880,314 L898,314 L898,410 L908,410" class="ln" marker-end="url(#arr)"/>
+  <text x="836" y="364" class="chip" transform="rotate(-90 893 364)">lease · commit</text>
+  <path d="M908,506 L890,506 L890,580 L882,580" class="ln" marker-end="url(#arr)"/>
+  <text x="896" y="546" class="chip">reads every 2 s</text>
+
+  <rect x="910" y="562" width="250" height="160" rx="8" class="qual"/>
+  <text x="924" y="584" class="t">Where Claude is used</text>
+  <text x="924" y="604" class="s">Opus: answers and every repair</text>
+  <text x="924" y="622" class="s">Sonnet / Haiku: optional fast tier</text>
+  <text x="924" y="640" class="s">Haiku: chunk context at ingestion</text>
+  <text x="924" y="658" class="s">(indexed, never used as evidence)</text>
+  <text x="924" y="682" class="t" style="font-size:12px">Not used for</text>
+  <text x="924" y="700" class="s">fact checks, authorization,</text>
+  <text x="924" y="716" class="s">writing to the knowledge base</text>
+
+  <!-- Row 7: ingestion -->
+  <text x="40" y="758" class="band">INGESTION · finbot/ingestion · scripts/ingest.py · Python</text>
+  <rect x="40" y="768" width="200" height="64" rx="8" class="data"/>
+  <text x="54" y="791" class="t">Sources</text>
+  <text x="54" y="809" class="s">local, S3,</text>
+  <text x="54" y="824" class="s">SharePoint, web</text>
+  <rect x="268" y="768" width="190" height="64" rx="8" class="guard"/>
+  <text x="282" y="791" class="t">Screen</text>
+  <text x="282" y="809" class="s">injection → quarantine</text>
+  <text x="282" y="824" class="s">card numbers masked</text>
+  <rect x="486" y="768" width="190" height="64" rx="8" class="data"/>
+  <text x="500" y="791" class="t">Chunk</text>
+  <text x="500" y="809" class="s">by headings, with overlap</text>
+  <text x="500" y="824" class="s">+ optional Claude context</text>
+  <rect x="704" y="768" width="190" height="64" rx="8" class="llm"/>
+  <text x="718" y="791" class="t">Embed</text>
+  <text x="718" y="809" class="s">Bedrock Titan v2 / Cohere</text>
+  <text x="718" y="824" class="s">retries + breaker</text>
+  <rect x="922" y="768" width="238" height="64" rx="8" class="data"/>
+  <text x="936" y="791" class="t">Write to vector DB</text>
+  <text x="936" y="809" class="s">OpenSearch, pgvector, Chroma</text>
+  <text x="936" y="824" class="s">incremental by version</text>
+  <path d="M240,800 L266,800" class="ln" marker-end="url(#arr)"/>
+  <path d="M458,800 L484,800" class="ln" marker-end="url(#arr)"/>
+  <path d="M676,800 L702,800" class="ln" marker-end="url(#arr)"/>
+  <path d="M894,800 L920,800" class="ln" marker-end="url(#arr)"/>
+  <path d="M1041,768 L1041,744 L562,744 L562,724" class="ln" marker-end="url(#arr)"/>
+  <text x="40" y="860" class="note">Managed alternative: a Bedrock Knowledge Base chunks, embeds and writes vectors from its own connectors (scripts/ingest.py --bedrock-kb). The chatbot reads either one through the same search interface.</text>
+</svg>

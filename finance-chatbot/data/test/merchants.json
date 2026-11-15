@@ -1,0 +1,191 @@
+{
+ "merchants": [
+  {
+   "category": "Grocery",
+   "country": "CA",
+   "mcc": "5411",
+   "name": "Harbor Lights Market",
+   "risk_rules": {
+    "block_score_above": 90,
+    "require_3ds_above": 500
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": false,
+   "tenant_id": "m_910"
+  },
+  {
+   "category": "Restaurants",
+   "country": "GB",
+   "mcc": "5812",
+   "name": "Juniper Noodle Bar",
+   "risk_rules": {
+    "block_score_above": 80,
+    "require_3ds_above": 100
+   },
+   "settlement_schedule": "T+2",
+   "surcharging_enabled": false,
+   "tenant_id": "m_920"
+  },
+  {
+   "category": "Electronics",
+   "country": "US",
+   "mcc": "5732",
+   "name": "Pixelforge Computers",
+   "risk_rules": {
+    "block_score_above": 70,
+    "require_3ds_above": 500
+   },
+   "settlement_schedule": "T+2",
+   "surcharging_enabled": false,
+   "tenant_id": "m_930"
+  },
+  {
+   "category": "Rideshare",
+   "country": "US",
+   "mcc": "4121",
+   "name": "Metro Cab Co",
+   "risk_rules": {
+    "block_score_above": 90,
+    "require_3ds_above": 250
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": false,
+   "tenant_id": "m_940"
+  },
+  {
+   "category": "Books",
+   "country": "US",
+   "mcc": "5942",
+   "name": "Inkwell Stationers",
+   "risk_rules": {
+    "block_score_above": 90,
+    "require_3ds_above": 500
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": true,
+   "tenant_id": "m_950"
+  },
+  {
+   "category": "Clubs/subscriptions",
+   "country": "CA",
+   "mcc": "7997",
+   "name": "Peak Yoga Studio",
+   "risk_rules": {
+    "block_score_above": 80,
+    "require_3ds_above": 500
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": false,
+   "tenant_id": "m_960"
+  },
+  {
+   "category": "Grocery",
+   "country": "US",
+   "mcc": "5411",
+   "name": "Saffron Street Deli",
+   "risk_rules": {
+    "block_score_above": 80,
+    "require_3ds_above": 100
+   },
+   "settlement_schedule": "T+2",
+   "surcharging_enabled": false,
+   "tenant_id": "m_970"
+  },
+  {
+   "category": "Restaurants",
+   "country": "US",
+   "mcc": "5812",
+   "name": "Nimbus Audio",
+   "risk_rules": {
+    "block_score_above": 80,
+    "require_3ds_above": 500
+   },
+   "settlement_schedule": "T+1",
+   "surcharging_enabled": false,
+   "tenant_id": "m_980"
+  }
+ ],
+ "users": [
+  {
+   "groups": [
+    "support"
+   ],
+   "role": "support",
+   "tenant_id": null,
+   "user_id": "u_support_1"
+  },
+  {
+   "groups": [
+    "support",
+    "risk"
+   ],
+   "role": "support",
+   "tenant_id": null,
+   "user_id": "u_risk_1"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_910",
+   "user_id": "u_m_910"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_920",
+   "user_id": "u_m_920"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_930",
+   "user_id": "u_m_930"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_940",
+   "user_id": "u_m_940"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_950",
+   "user_id": "u_m_950"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_960",
+   "user_id": "u_m_960"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_970",
+   "user_id": "u_m_970"
+  },
+  {
+   "groups": [
+    "merchant"
+   ],
+   "role": "merchant",
+   "tenant_id": "m_980",
+   "user_id": "u_m_980"
+  }
+ ]
+}

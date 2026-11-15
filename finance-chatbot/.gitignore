@@ -1,0 +1,9 @@
+audit.jsonl
+review_queue.jsonl
+kb_index.json
+sessions.db*
+__pycache__/
+kb_vectors.json*
+.venv/
+.mypy_cache/
+.ruff_cache/

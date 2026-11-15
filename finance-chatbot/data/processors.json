@@ -1,0 +1,66 @@
+{
+ "incidents": [
+  {
+   "end": "2026-11-06T16:00:00Z",
+   "kind": "outage",
+   "processor": "northstar",
+   "start": "2026-11-06T14:00:00Z",
+   "summary": "northstar refused connections; traffic failed over to other processors"
+  }
+ ],
+ "processors": [
+  {
+   "brands": [
+    "discover",
+    "mastercard",
+    "visa"
+   ],
+   "currencies": [
+    "CAD",
+    "USD"
+   ],
+   "fee_bps": 210,
+   "local_countries": [
+    "CA",
+    "US"
+   ],
+   "name": "northstar"
+  },
+  {
+   "brands": [
+    "amex",
+    "mastercard",
+    "visa"
+   ],
+   "currencies": [
+    "CAD",
+    "EUR",
+    "GBP",
+    "USD"
+   ],
+   "fee_bps": 240,
+   "local_countries": [
+    "GB"
+   ],
+   "name": "meridian"
+  },
+  {
+   "brands": [
+    "amex",
+    "discover",
+    "mastercard",
+    "visa"
+   ],
+   "currencies": [
+    "EUR",
+    "GBP",
+    "USD"
+   ],
+   "fee_bps": 260,
+   "local_countries": [
+    "US"
+   ],
+   "name": "keystone"
+  }
+ ]
+}

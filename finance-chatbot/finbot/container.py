@@ -1,0 +1,140 @@
+"""Composition root (dependency injection container).
+
+The ONLY place that knows concrete classes. Everything else receives its
+collaborators through the constructor, so tests swap any piece by passing an
+override instead of patching modules:
+
+    c = Container(Settings(...), overrides={"guardrail": MyGuard(), "store": SessionStore()})
+    c.service.send(token, sid, msg_id, "why did txn_... fail?")
+
+Each component is built lazily, once (singleton per container):
+
+    settings -> engine (ModelOrchestrator; LLM adapters from LLM_PROVIDERS)
+             -> guardrail (GUARDRAILS)       -> knowledge (Index or Bedrock KB)
+             -> toolbox (txn / log / kb adapters)
+             -> chatbot (orchestration layer: guards, gate, tool loop)
+             -> store (STORES: sqlite | dynamodb) -> worker -> control plane
+             -> verifier + authorizer -> service (trust boundary facade)
+"""
+from __future__ import annotations
+
+import os
+from collections.abc import Callable
+from functools import cached_property
+from typing import Any
+
+from .config import Settings
+
+
+class Container:
+    def __init__(self, settings: Settings | None = None, overrides: dict[str, Any] | None = None,
+                 clock: Callable[[], float] | None = None, audit_path: str | None = None):
+        self.settings = settings or Settings()
+        self.overrides = overrides or {}
+        self.clock, self.audit_path = clock, audit_path
+
+    def _get(self, name: str, build: Callable[[], Any]) -> Any:
+        return self.overrides[name] if name in self.overrides else build()
+
+    # ------------------------------------------------------------------ adapters
+
+    @cached_property
+    def engine(self):
+        from .llm import make_engine
+        return self._get("engine", lambda: make_engine(self.settings))
+
+    @cached_property
+    def guardrail(self):
+        from .guardrails import make_guardrail
+        return self._get("guardrail", lambda: make_guardrail(self.settings))
+
+    @cached_property
+    def embedder(self):
+        from .registry import EMBEDDERS
+        return self._get("embedder", lambda: EMBEDDERS.create(self.settings.embeddings, settings=self.settings))
+
+    @cached_property
+    def dataset(self):
+        from .app import load_dataset
+        from .tools import DEMO_DOCS, DEMO_LOGS, DEMO_TXNS
+        return self._get("dataset", lambda: load_dataset(self.settings.data_dir) or (DEMO_TXNS, DEMO_LOGS, DEMO_DOCS))
+
+    @cached_property
+    def knowledge(self):
+        def build():
+            from .knowledge import Index
+            s = self.settings
+            if s.kb_provider == "vector":
+                from .ingestion import VectorKnowledge, embedder_from, store_from
+                return VectorKnowledge(store_from(s.vector_store, region=s.aws_region),
+                                       embedder_from(s.vector_embedder, region=s.aws_region))
+            if s.kb_provider == "bedrock_kb":
+                from .ingestion import BedrockKnowledgeBase
+                return BedrockKnowledgeBase(s.bedrock_kb_id, s.aws_region)
+            if os.path.exists(self.settings.kb_path):
+                return Index.load(self.settings.kb_path, self.embedder)
+            kb = Index(embed=self.embedder)
+            for page in self.dataset[2]:
+                kb.upsert_page(page)
+            return kb
+        return self._get("knowledge", build)
+
+    @cached_property
+    def toolbox(self):
+        from .tools import InMemoryLogs, InMemoryTxns, ToolBox
+        txns, logs, _ = self.dataset
+        return self._get("toolbox", lambda: ToolBox(self._get("txns", lambda: InMemoryTxns(txns)),
+                                                    self._get("logs", lambda: InMemoryLogs(logs)),
+                                                    self.knowledge, processors=self.processors))
+
+    @cached_property
+    def processors(self):
+        from .processors import ProcessorDirectory
+        return self._get("processors", lambda: ProcessorDirectory.load(self.settings.data_dir))
+
+    @cached_property
+    def store(self):
+        from .registry import STORES
+        return self._get("store", lambda: STORES.create(self.settings.store_provider, settings=self.settings,
+                                                        clock=self.clock))
+
+    # ------------------------------------------------------------------ core
+
+    @cached_property
+    def chatbot(self):
+        from .orchestrator import Chatbot
+        return self._get("chatbot", lambda: Chatbot(self.engine, self.guardrail, self.toolbox, self.settings,
+                                                    self.audit_path))
+
+    @cached_property
+    def worker(self):
+        from .runtime import Worker
+        return self._get("worker", lambda: Worker(self.chatbot, self.store, lease_s=self.settings.lease_s))
+
+    @cached_property
+    def authorizer(self):
+        from .security import Authorizer
+        return self._get("authorizer", Authorizer)
+
+    @cached_property
+    def control(self):
+        from .control import ControlPlane
+        self.worker  # noqa: B018 - attaches shared health/config to the engine first
+        return self._get("control", lambda: ControlPlane(self.chatbot.engine(), self.store, self.authorizer,
+                                                         self.audit_path and self.audit_path + ".control"))
+
+    @cached_property
+    def verifier(self):
+        import time
+
+        from .security import make_verifier
+        return self._get("verifier", lambda: make_verifier(self.settings, self.clock or time.time))
+
+    @cached_property
+    def service(self):
+        from .service import ChatService
+        return self._get("service", lambda: ChatService(self.worker, self.verifier, self.control, self.authorizer))
+
+    def close(self) -> None:
+        if "store" in self.__dict__:
+            self.store.close()

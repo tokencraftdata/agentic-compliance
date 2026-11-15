@@ -1,0 +1,27 @@
+{
+ "counts": {
+  "eval_cases": 27,
+  "kb_pages": 9,
+  "log_events": 2993,
+  "merchants": 8,
+  "transactions": 600,
+  "users": 10
+ },
+ "generator": "scripts/generate_synthetic.py",
+ "seed": 7,
+ "sha256": {
+  "eval.jsonl": "575aaaac95b2f5da8eb75ae8b02d8511ee649b4afa80f887cc8a49c638b775f1",
+  "kb_pages.json": "f63f6d770a742c7f2b75ab021ec40d5dc15c8f236b3d7dafa2f745114951d644",
+  "logs.jsonl": "e8fc0241af9e0e493455c269f3ba4980479b296f195cd2c5ed81a01e7ddb0f86",
+  "merchants.json": "dd94a64eb3690cd7ec0e5b31899644c764219f7b641a1b9e81eee8e2c84ee8d7",
+  "processors.json": "9214008f366e5617450db7e355851f18f7b30261db4f9734d2fce9eb342c29de",
+  "transactions.jsonl": "d5bea0cd1b77c53008e09364dbe94adcb9cab64e21cdca1f10f0f9142cfd6660"
+ },
+ "status_mix": {
+  "approved": 373,
+  "declined": 94,
+  "failed": 127,
+  "unknown": 6
+ },
+ "synthetic": true
+}

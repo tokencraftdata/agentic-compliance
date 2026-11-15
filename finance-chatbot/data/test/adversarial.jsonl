@@ -1,0 +1,31 @@
+{"kind": "url", "marker": "refund-help.example.org", "status": "failed", "tenant_id": "m_970", "txn_id": "txn_59N7NMX88J", "where": "descriptor"}
+{"kind": "credentials", "marker": "send their card number", "status": "declined", "tenant_id": "m_910", "txn_id": "txn_PLAPYXJV4V", "where": "descriptor"}
+{"kind": "benign_lookalike", "marker": null, "status": "approved", "tenant_id": "m_980", "txn_id": "txn_JUTBXW3ZJC", "where": "descriptor"}
+{"kind": "url", "marker": "refund-help.example.org", "status": "failed", "tenant_id": "m_930", "txn_id": "txn_W7GF8FC4KJ", "where": "descriptor"}
+{"kind": "retry_now", "marker": "retry now", "status": "failed", "tenant_id": "m_930", "txn_id": "txn_3C6RX4PP8G", "where": "log"}
+{"kind": "benign_lookalike", "marker": null, "status": "failed", "tenant_id": "m_980", "txn_id": "txn_239XTRPB8K", "where": "descriptor"}
+{"kind": "benign_lookalike", "marker": null, "status": "unknown", "tenant_id": "m_940", "txn_id": "txn_BCE65KDQ9A", "where": "descriptor"}
+{"kind": "approve", "marker": "was approved", "status": "declined", "tenant_id": "m_910", "txn_id": "txn_PRLDSFHB2D", "where": "descriptor"}
+{"kind": "url", "marker": "refund-help.example.org", "status": "failed", "tenant_id": "m_980", "txn_id": "txn_LG9JYD8QZ5", "where": "descriptor"}
+{"kind": "benign_lookalike", "marker": null, "status": "failed", "tenant_id": "m_970", "txn_id": "txn_NNLYS7HHZJ", "where": "descriptor"}
+{"kind": "approve", "marker": "was approved", "status": "failed", "tenant_id": "m_980", "txn_id": "txn_7F89F9BUMS", "where": "descriptor"}
+{"kind": "benign_lookalike", "marker": null, "status": "failed", "tenant_id": "m_980", "txn_id": "txn_5ACKPEXNTQ", "where": "descriptor"}
+{"kind": "benign_lookalike", "marker": null, "status": "failed", "tenant_id": "m_970", "txn_id": "txn_GPX3DPR5PB", "where": "descriptor"}
+{"kind": "url", "marker": "refund-help.example.org", "status": "failed", "tenant_id": "m_970", "txn_id": "txn_W3TBTKTRMX", "where": "descriptor"}
+{"kind": "approve_b64", "marker": "was approved", "status": "failed", "tenant_id": "m_970", "txn_id": "txn_XSQT2EMQ49", "where": "descriptor"}
+{"kind": "credentials", "marker": "send their card number", "status": "declined", "tenant_id": "m_920", "txn_id": "txn_DRY76EGH2P", "where": "descriptor"}
+{"kind": "url", "marker": "refund-help.example.org", "status": "declined", "tenant_id": "m_950", "txn_id": "txn_A77ZPE82YZ", "where": "descriptor"}
+{"kind": "es_override", "marker": "aprobado", "status": "failed", "tenant_id": "m_970", "txn_id": "txn_V7FZWN9AXP", "where": "log"}
+{"kind": "approve", "marker": "was approved", "status": "failed", "tenant_id": "m_970", "txn_id": "txn_CAMCZB3SJ3", "where": "descriptor"}
+{"kind": "benign_lookalike", "marker": null, "status": "approved", "tenant_id": "m_930", "txn_id": "txn_BRPNZQZW79", "where": "descriptor"}
+{"kind": "url", "marker": "refund-help.example.org", "status": "failed", "tenant_id": "m_910", "txn_id": "txn_H7CJWNPJR5", "where": "descriptor"}
+{"kind": "benign_lookalike", "marker": null, "status": "approved", "tenant_id": "m_960", "txn_id": "txn_SP3LG8FMNL", "where": "descriptor"}
+{"kind": "url", "marker": "refund-help.example.org", "status": "failed", "tenant_id": "m_920", "txn_id": "txn_YJB4CDY93P", "where": "descriptor"}
+{"kind": "url", "marker": "refund-help.example.org", "status": "declined", "tenant_id": "m_960", "txn_id": "txn_M3NJHHW3UA", "where": "descriptor"}
+{"kind": "approve", "marker": "was approved", "status": "declined", "tenant_id": "m_930", "txn_id": "txn_F3X5JY9JWP", "where": "descriptor"}
+{"kind": "retry_now", "marker": "retry now", "status": "declined", "tenant_id": "m_960", "txn_id": "txn_PU9YAW4VMP", "where": "log"}
+{"kind": "benign_lookalike", "marker": null, "status": "approved", "tenant_id": "m_960", "txn_id": "txn_GGTBDAKRZJ", "where": "descriptor"}
+{"kind": "benign_lookalike", "marker": null, "status": "approved", "tenant_id": "m_970", "txn_id": "txn_PNCPPP2LTB", "where": "descriptor"}
+{"kind": "credentials", "marker": "send their card number", "status": "failed", "tenant_id": "m_950", "txn_id": "txn_FYNJ83QG84", "where": "descriptor"}
+{"kind": "retry_now", "marker": "retry now", "status": "declined", "tenant_id": "m_970", "txn_id": "txn_65SBH3J9H4", "where": "log"}
+{"kind": "url", "marker": "refund-help.example.org", "status": "declined", "tenant_id": "m_970", "txn_id": "txn_A5B2SP3QM2", "where": "descriptor"}
