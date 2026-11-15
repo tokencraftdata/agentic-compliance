@@ -1,4 +1,4 @@
-# Seven ways finance chatbots get it wrong, and how I fixed each one
+# Eight ways finance chatbots get it wrong, and how I fixed each one
 
 *A payments support bot that is not allowed to guess: what goes wrong in most finance chatbots, and what I built instead. Python, Amazon Bedrock, Claude.*
 
@@ -8,7 +8,7 @@ A support bot for payments has one job that matters more than sounding helpful: 
 
 Finance chatbots tend to fail that test in the same few ways. So I built **finbot**, an open reference project, to see whether each failure could be fixed in code rather than with a cleverer prompt. Claude does the language. Code decides what it's allowed to claim.
 
-Here are the problems, and what I did about each.
+It comes down to three ideas: a **hallucination gate** that checks every fact before it's sent, **adaptive guardrails** that improve from reviewed mistakes without retraining anything, and **resilience**, so the bot stays correct when a model or a worker goes down. Here are the problems, and what I did about each.
 
 ---
 
@@ -72,11 +72,19 @@ A small simulator runs the same rules over a day of 2,000 synthetic payments. A 
 
 I tested this against a deliberately gullible stand-in model that obeys any instruction it sees, so the score measures the system rather than the model. With every guardrail on, 0 of 29 attacks succeeded. With none, 21 of 29 did. Harmless look-alikes, like a merchant called "System Repair Shop", were answered normally in every setup.
 
+## 8. The bot breaks when something else breaks
+
+**The problem.** A model endpoint throttles, a region has an outage, or the worker serving a conversation dies halfway through a turn. The bot hangs, answers from half-finished work, or answers the same message twice.
+
+**What I did.** Workers keep no state of their own. Each session is a versioned record with an owner lease and a journal of turns, and a turn is saved only when it's complete, with a compare-and-swap on the version and the lease. If a worker dies mid-turn, nothing is saved; another worker picks the session up when the lease lapses and re-runs the message. A late write from the old worker is rejected. Messages are de-duplicated by id, so a resent message gets the stored answer without another model call.
+
+Every model call goes through an ordered failover chain, each model with its own circuit breaker, and a 90-second deadline caps retries and failover together. The backup model's answer goes through exactly the same checks. If a guardrail service is down, the bot fails closed rather than answering unguarded.
+
 ---
 
-## Two things I added after studying the problem more
+## Making the guardrails adaptive
 
-**Guardrails that learn, carefully.** When a reviewer marks a mistake (a missed complaint, a promise the bot shouldn't make), a controller proposes a new rule. The rule only ships if it fixes the labelled cases, matches none of the fair questions in the test sets, and breaks no case in the eval or red-team suites. It then runs in shadow mode on live traffic before an admin promotes it to a share of sessions, and then to everyone. Built-in guards are never changed this way, and loosening a rule always needs a person. No model is retrained.
+**Guardrails that learn, carefully.** Fixed rules go stale. When a reviewer marks a mistake (a missed complaint, a promise the bot shouldn't make), a controller proposes a new rule. The rule only ships if it fixes the labelled cases, matches none of the fair questions in the test sets, and breaks no case in the eval or red-team suites. It then runs in shadow mode on live traffic before an admin promotes it to a share of sessions, and then to everyone. Built-in guards are never changed this way, and loosening a rule always needs a person. No model is retrained.
 
 **Promises are checked too.** A tribunal held Air Canada liable for a refund policy its chatbot invented. finbot blocks answers that promise refunds, reversals or guarantees, and sends complaints, unauthorised payments and hardship to a person, which is also what the US Consumer Financial Protection Bureau has asked of chatbots in consumer finance.
 
@@ -102,6 +110,6 @@ What this doesn't show: behaviour with live models, real traffic, real latency o
 - Plan for failure: a breaker per model, a turn deadline, turns saved only when complete.
 - Treat retrieved documents, and free text inside your own records, as untrusted input.
 
-finbot is a personal reference project. It runs on synthetic data and has no connection to any company. The code is Python on Amazon Bedrock: [github.com/tokencraftdata/agentic-compliance](https://github.com/tokencraftdata/agentic-compliance/tree/finance-chatbot/finance-chatbot)
+finbot is a personal reference project. It runs on synthetic data and has no connection to any company. The code is Python on Amazon Bedrock: [github.com/tokencraftdata/finbot](https://github.com/tokencraftdata/finbot)
 
 If you run payment support in production, I'd like to hear where you think this is wrong.

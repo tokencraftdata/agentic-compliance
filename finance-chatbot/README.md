@@ -1,6 +1,18 @@
-# finbot: a guarded finance support chatbot
+# finbot: a payments support chatbot that isn't allowed to guess
 
-A general-purpose chatbot for finance and payments support. It runs on **Amazon Bedrock** (Claude), uses **Bedrock Guardrails**, and can switch to the **Claude API or an internal LLM gateway**. It is a personal reference project on synthetic data. It avoids the mistakes that keep showing up in finance chatbots and applies the findings of my MemoryKeeper study on agent memory.
+finbot is an open-source reference implementation of a finance support chatbot on **Amazon Bedrock** (Claude, Bedrock Guardrails). Claude writes the answer; code decides what it is allowed to claim. It runs on synthetic data and has no connection to any company.
+
+It is built around three ideas:
+
+| | What it does | Evidence (offline, scripted model, synthetic data) |
+|---|---|---|
+| **Hallucination gate** | Every amount, code, status, transaction id and link in an answer is checked against this turn's tool results before anyone sees it. One guided repair, then an honest "I won't guess". Retry and processor-cascade advice must match policy tables in code | 238 hallucinations of 11 kinds injected on purpose, none reached the user; 0 of 3,192 on two fresh held-out sets; 0 of 448 correct answers falsely blocked |
+| **Adaptive guardrails** | Guardrails improve from reviewer-labelled mistakes, never from raw chat and without retraining. Each proposed rule must fix its own evidence, match no fair question and break no case in the eval and red-team suites, then runs in shadow and a canary before an admin promotes it. Built-in guards are never changed automatically | Escalation to a person, a check on promises the bot can't keep, and a session risk score in the baseline; gate replays 18 guard cases, 27 + 170 eval cases and 35 red-team cases per proposal |
+| **Resilience** | Stateless workers, sessions as versioned records with leases, turns saved only when complete, de-duplicated messages, a model failover chain with a circuit breaker per model, a 90-second turn deadline, fail-closed guardrails | Tests crash a worker at each point of a turn, take the session over, and reject the late worker's write; failover mid-turn keeps the same checks; in the routing simulator a two-hour processor outage moves approval from 80.4% to 80.5% |
+
+Underneath all three: prompt-injection defences. Against a stand-in model that obeys any instruction it sees, 0 of 29 attacks succeed with guardrails on, 21 of 29 without.
+
+Read more: [hallucination control](docs/reliability.md#3-hallucination-control), [adaptive guardrails](docs/design.md#10-adaptive-guardrails), [crash recovery and failover](docs/reliability.md#2-crash-recovery-finbotruntimepy), [the article](docs/posts/article.md).
 
 ![finbot architecture](docs/architecture.svg)
 

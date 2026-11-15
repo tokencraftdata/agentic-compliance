@@ -1,7 +1,7 @@
 # Kubernetes manifests (reference)
 
 Example manifests for running finbot on EKS. The design and the reasons for
-each setting are in [docs/design.md, section 10](../../docs/design.md). These
+each setting are in [docs/design.md, section 11](../../docs/design.md). These
 files have not been applied to a live cluster; replace every `ACCOUNT_ID`,
 `REGISTRY`, `VERSION` and `REPLACE_ME` first.
 
