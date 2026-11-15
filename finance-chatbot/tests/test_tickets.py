@@ -12,7 +12,7 @@ from finbot.container import Container  # noqa: E402
 from finbot.faults import HallucinatingLLM  # noqa: E402
 from finbot.llm import FakeLLM  # noqa: E402
 from finbot.models import ModelOrchestrator, ModelTarget  # noqa: E402
-from finbot.orchestrator import CARD_NOTICE  # noqa: E402
+from finbot.replies import CARD_NOTICE  # noqa: E402
 from finbot.security import Forbidden, Principal  # noqa: E402
 from finbot.tickets import DONE, JsonFileTickets, TicketDesk  # noqa: E402
 from finbot.verification import TicketVerifier  # noqa: E402

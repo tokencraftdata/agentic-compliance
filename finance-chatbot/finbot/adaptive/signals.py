@@ -27,6 +27,7 @@ from collections.abc import Callable, Iterator
 from dataclasses import asdict, dataclass
 from typing import Any, Literal
 
+from ..pii import mask_pii
 from .policy import RuleKind
 
 LabelName = Literal["missed_attack", "missed_escalation", "broken_promise",
@@ -70,7 +71,7 @@ class LabelLog:
     def add(self, label: str, text: str, phrase: str = "", reviewer: str = "", session: str = "") -> Label:
         if label not in LABELS:
             raise ValueError(f"unknown label {label!r}; known: {', '.join(LABELS)}")
-        from ..guardrails import mask_pii  # labels are kept and read by people: never card data
+        # Labels are kept and read by people: never card data.
         text, phrase = mask_pii(text.strip())[0][:MAX_TEXT], mask_pii(phrase.strip())[0][:200]
         if not text:
             raise ValueError("label needs the text it is about")

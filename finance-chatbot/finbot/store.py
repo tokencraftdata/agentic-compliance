@@ -31,6 +31,8 @@ import threading
 import time
 from collections.abc import Callable
 
+from .pii import mask_pii
+
 
 class StoreError(Exception):
     pass
@@ -148,8 +150,7 @@ class SessionStore:
 
     def begin_turn(self, session_id: str, msg_id: str, worker: str, user_text: str) -> dict | None:
         """Journal the start of a turn. Returns the stored result if already committed."""
-        from .guardrails import mask_pii
-        user_text = mask_pii(user_text)[0]
+        user_text = mask_pii(user_text)[0]   # the journal never holds card data
         now = self.clock()
         with self._tx() as db:
             r = db.execute("SELECT status, answer, meta FROM turns WHERE session_id=? AND msg_id=?",

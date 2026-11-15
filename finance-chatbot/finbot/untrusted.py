@@ -32,6 +32,8 @@ import secrets
 import unicodedata
 from dataclasses import dataclass, field
 
+from .pii import mask_pii
+
 # ------------------------------------------------------------------ normalisation
 
 ZERO_WIDTH = re.compile("[​-‏ - ⁠-⁯﻿]")
@@ -147,7 +149,6 @@ class ToolResultScreen:
             if reasons:
                 rep.removed.append(f"{path}:{reasons[0]}")
                 return REMOVED
-            from .guardrails import mask_pii  # lazy: guardrails imports this module lazily too
             return clean(mask_pii(value)[0], self.max_field)
         return value
 

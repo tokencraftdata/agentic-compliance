@@ -62,6 +62,13 @@ class SessionMemory:
     consecutive_fallbacks: int = 0  # unverifiable answers in a row -> offer a human
     risk: float = 0.0  # session risk score (finbot/adaptive/risk.py); at the policy threshold -> a person
     tickets: list[dict] = field(default_factory=list)  # tickets code opened for people to act on
+    # Ids the USER typed. A tool may be called only with these (argument provenance, after
+    # CaMeL / Beurer-Kellner et al. 2025): an id that first appeared inside a tool result
+    # cannot steer the next call.
+    user_ids: list[str] = field(default_factory=list)
+    # Carried across a thread rollover: the user's earlier requests, built in code (not an LLM
+    # summary), so a fresh thread still knows what was asked (Laban et al. 2025).
+    recap: list[str] = field(default_factory=list)
 
     def update_focus(self, user_text: str) -> tuple[str | None, bool]:
         """Return (new_focus, changed). Decided in code, not by the model."""
@@ -111,6 +118,9 @@ class SessionMemory:
         others = [e for e in self.entities if e != self.focus]
         if others:
             lines.append(f"other_transactions_in_session (inactive, do not mix in): {others}")
+        if self.recap:
+            lines.append("earlier_requests_in_this_conversation (from a previous thread, oldest first): "
+                         + " | ".join(self.recap))
         if self.tickets:
             lines.append("tickets_opened_this_session (a person will act; nothing has been executed): "
                          + ", ".join(f"{t['id']} {t['kind']} {t.get('txn_id') or ''}".strip() for t in self.tickets))

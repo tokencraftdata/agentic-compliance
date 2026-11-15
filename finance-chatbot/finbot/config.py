@@ -82,6 +82,10 @@ class Settings:
     escalate_after_fallbacks: int = 2  # offer a human after this many unverifiable answers in a row
     support_contact: str = field(default_factory=lambda: _env("FINBOT_SUPPORT_CONTACT", "the Support Center"))
     max_turns_per_thread: int = 30  # then roll to a fresh thread seeded with typed state
+    # ...or earlier, when the history passes this size (characters, ~4 per token). Bounds the
+    # model's context and the stored session (DynamoDB items are capped at 400 KB).
+    max_history_chars: int = 120_000
+    recap_requests: int = 8   # user requests carried into a fresh thread (each cut to 200 characters)
 
     def resolved_model(self) -> str:
         if self.model:

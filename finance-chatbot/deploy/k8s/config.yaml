@@ -19,6 +19,10 @@ data:
   FINBOT_QUEUE_URL: https://sqs.us-east-1.amazonaws.com/ACCOUNT_ID/finbot-turns.fifo
   FINBOT_DLQ_URL: https://sqs.us-east-1.amazonaws.com/ACCOUNT_ID/finbot-turns-dlq.fifo
   FINBOT_VISIBILITY_S: "150"
+  # Audit records (turns, control plane, guard controller, tickets) as JSON lines on stdout
+  FINBOT_AUDIT: "-"
+  # Workers follow the guardrail controller's active / canary / shadow policy
+  FINBOT_GUARD_POLICY: store
   FINBOT_KB_PROVIDER: vector
   FINBOT_VECTOR_STORE: opensearch:https://REPLACE_ME.us-east-1.aoss.amazonaws.com/finbot-kb
   FINBOT_VECTOR_EMBEDDER: bedrock:amazon.titan-embed-text-v2:0@1024

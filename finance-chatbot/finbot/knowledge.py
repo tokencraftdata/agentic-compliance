@@ -23,6 +23,8 @@ from collections import Counter
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 
+from .pii import mask_pii
+
 TOKEN = re.compile(r"[a-z0-9_]+")
 HEADING = re.compile(r"<h([1-4])[^>]*>(.*?)</h\1>", re.I | re.S)
 TAG = re.compile(r"<[^>]+>")
@@ -145,7 +147,6 @@ class Index:
 
     def upsert_page(self, page: dict) -> int:
         """Replace all chunks of a page (idempotent re-ingest on new versions)."""
-        from .guardrails import mask_pii
         keep = [c for c in self.chunks if c.page_id != page["page_id"]]
         page = {**page, "html": mask_pii(page.get("html", ""))[0], "title": mask_pii(page.get("title", ""))[0]}
         new = chunk_page(page)

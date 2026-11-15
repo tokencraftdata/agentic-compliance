@@ -28,20 +28,16 @@ from __future__ import annotations
 
 import json
 import logging
+import random
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from .pii import mask_value
 from .runtime import Worker
 from .store import LeaseHeld, SessionExpired, StaleWrite
 
 log = logging.getLogger("finbot.queue")
-
-
-def _masked(body: dict) -> dict:
-    """A queue body with card data masked (DLQ copies are kept for days and read by people)."""
-    from .guardrails import mask_pii
-    return {**body, "text": mask_pii(body["text"])[0]} if isinstance(body.get("text"), str) else body
 
 
 @dataclass
@@ -61,7 +57,7 @@ class InMemoryQueue:
         self.visibility_s, self.clock = visibility_s, clock
 
     def send(self, body: dict) -> None:
-        self.items.append(Message(_masked(body), handle=str(len(self.items))))
+        self.items.append(Message(mask_value(body), handle=str(len(self.items))))
 
     def receive(self, max_messages: int = 10) -> list[Message]:
         now = self.clock()
@@ -97,7 +93,7 @@ class SqsQueue:
     def send(self, body: dict) -> None:
         # FIFO queue keyed by session keeps one session's turns in order.
         # Masked at enqueue: the queue never holds card data, even for the seconds before a worker.
-        self.sqs.send_message(QueueUrl=self.url, MessageBody=json.dumps(_masked(body)),
+        self.sqs.send_message(QueueUrl=self.url, MessageBody=json.dumps(mask_value(body)),
                               MessageGroupId=body["session_id"], MessageDeduplicationId=body["msg_id"])
 
     def receive(self, max_messages: int = 10) -> list[Message]:
@@ -119,7 +115,7 @@ class SqsQueue:
         fifo = {"MessageGroupId": m.body.get("session_id", "dlq"),
                 "MessageDeduplicationId": f"dlq-{m.body.get('msg_id', m.handle)[:120]}"} \
             if self.dlq_url.endswith(".fifo") else {}
-        body = json.dumps({**_masked(m.body), "dlq_reason": reason})
+        body = json.dumps({**mask_value(m.body), "dlq_reason": reason})
         self.sqs.send_message(QueueUrl=self.dlq_url, MessageBody=body, **fifo)
         self.ack(m)
 
@@ -137,7 +133,13 @@ class QueueConsumer:
                  on_result: Callable[[dict, dict], None] | None = None):
         self.source, self.worker, self.max_receives = source, worker, max_receives
         self.on_result = on_result or (lambda body, result: None)  # e.g. push to a websocket / write to a table
+        self.rng = random.Random()
         self.stats = ConsumerStats()
+
+    def _jitter(self, delay_s: float) -> float:
+        """Spread retries between half and the full delay, so workers that all saw the same
+        outage don't all come back at the same second."""
+        return delay_s * self.rng.uniform(0.5, 1.0)
 
     def poll_once(self) -> int:
         msgs = list(self.source.receive())
@@ -162,7 +164,7 @@ class QueueConsumer:
             self.stats.dead_lettered += 1
             return
         except LeaseHeld:
-            self.source.retry_later(m, 5)
+            self.source.retry_later(m, self._jitter(5))
             self.stats.retried += 1
             return
         except StaleWrite:
@@ -171,11 +173,11 @@ class QueueConsumer:
             return
         except Exception:  # noqa: BLE001 - keep the consumer alive; redeliver, then DLQ
             log.exception("turn failed for session %s msg %s", b.get("session_id"), b.get("msg_id"))
-            self.source.retry_later(m, min(300, 10 * 2 ** m.receive_count))
+            self.source.retry_later(m, self._jitter(min(300, 10 * 2 ** m.receive_count)))
             self.stats.retried += 1
             return
         if r.get("blocked_by") == "unavailable":
-            self.source.retry_later(m, r.get("retry_after_s", 30))
+            self.source.retry_later(m, self._jitter(r.get("retry_after_s", 30)))
             self.stats.retried += 1
             return
         self.on_result(b, r)

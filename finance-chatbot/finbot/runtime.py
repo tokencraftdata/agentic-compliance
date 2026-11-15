@@ -20,7 +20,6 @@ from __future__ import annotations
 import uuid
 from dataclasses import asdict
 
-from .guardrails import mask_pii
 from .memory import EntityState, Fact, SessionMemory
 from .orchestrator import Chatbot, ChatSession
 from .store import SessionStore
@@ -56,7 +55,8 @@ def load_session(d: dict) -> ChatSession:
         entities[eid] = ent
     mem = SessionMemory(entities=entities, focus=m["focus"], turns_in_thread=m["turns_in_thread"],
                         consecutive_fallbacks=m.get("consecutive_fallbacks", 0), risk=m.get("risk", 0.0),
-                        tickets=m.get("tickets", []))
+                        tickets=m.get("tickets", []), user_ids=m.get("user_ids", []),
+                        recap=m.get("recap", []))
     return ChatSession(Session(**d["session"]), mem, d["history"], d["pending_notice"])
 
 
@@ -74,7 +74,6 @@ class Worker:
         return cs.session.session_id
 
     def handle(self, session_id: str, msg_id: str, text: str) -> dict:
-        text = mask_pii(text)[0]   # the turn journal never stores card data
         self.store.claim(session_id, self.id, self.lease_s)          # LeaseHeld if another live owner
         version, state = self.store.load(session_id)
         prior = self.store.begin_turn(session_id, msg_id, self.id, text)

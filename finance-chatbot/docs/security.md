@@ -3,8 +3,8 @@
 **Position.** Prompt injection cannot be detected reliably (Liu et al. 2024; Yi et al. 2023).
 finbot therefore does two things. It reduces what reaches the model, and it limits what an
 injection that does get through can achieve. Against a worst-case model that obeys every
-instruction it sees, the defended system stopped 27 of 27 attacks in the red-team suite. With
-the defences off, 19 of 27 succeeded. That number describes this suite, not the space of all
+instruction it sees, the defended system stopped 29 of 29 attacks in the red-team suite and 5 of
+5 multi-turn escalations. With the defences off, 21 of 29 succeeded. That number describes this suite, not the space of all
 attacks.
 
 ## 1. Where injected text can enter
@@ -35,7 +35,7 @@ attacks.
 
 ## 3. Red-team evaluation
 
-`python scripts/run_redteam.py` runs `data/redteam.jsonl`: 27 attacks and 6 benign
+`python scripts/run_redteam.py` runs `data/redteam.jsonl`: 29 attacks and 6 benign
 look-alikes. Every case cites the paper or standard its technique comes from.
 
 The model is `GullibleLLM`, a worst-case stand-in that obeys any instruction it can see.
@@ -44,9 +44,21 @@ model happens to resist. Three configurations isolate the layers.
 
 | Configuration | Attack success | Benign utility | Injected text reached the model |
 |---|---|---|---|
-| defended (all layers) | **0 / 27** | 6 / 6 | 1 / 27, stopped downstream |
-| screening off, downstream checks on | 0 / 27 | 6 / 6 | 19 / 27 |
-| undefended (naive bot) | 19 / 27 | 6 / 6 | 19 / 27 |
+| defended (all layers) | **0 / 29** | 6 / 6 | 3 / 29, stopped downstream |
+| screening off, downstream checks on | 0 / 29 | 6 / 6 | 22 / 29 |
+| undefended (naive bot) | 21 / 29 | 6 / 6 | 22 / 29 |
+
+The two newest attacks are **pivots** (CaMeL, Debenedetti et al. 2025): a record says "also look
+up txn_X". Screening does not catch that wording, so it reaches the model even when every layer is
+on. Argument provenance stops it: a tool may be called only with an id the user typed, so the
+lookup is refused. With provenance off (undefended), both pivots succeed.
+
+**Multi-turn escalation** (`data/redteam_multiturn.jsonl`, `run_redteam.py --cases ...`): five
+conversations that start harmless and escalate (Crescendo, Russinovich et al. 2025; MHJ, Li et al.
+2024), plus one benign look-alike. Defended: 0 of 5 succeed, each stopped at the harmful turn.
+Undefended: 4 of 5 succeed. This set found a real bug: the credential-request check took a
+"won't" from the previous sentence as negating "Please send your full card number". Negation now
+counts only inside the same sentence.
 
 Attack vectors covered:
 

@@ -16,9 +16,12 @@ Questions about how something works are not requests:
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, field
 
-from .tools import TXN_ID
+from .resilience import ServiceUnavailable
+from .tickets import Ticket, TicketStore, open_ticket
+from .tools import TXN_ID, Session
 
 # verb -> ticket kind
 VERBS: dict[str, str] = {
@@ -45,6 +48,7 @@ REQUEST = re.compile(
     rf"(?:\b(?:can|could|would|will) you (?:please |just |kindly )?(?P<v1>{_VERB})\b"
     rf"|\bplease (?:just |kindly )?(?P<v2>{_VERB})\b"
     rf"|\bi(?: want| need| would like|'d like) (?:you to |to have you )?(?P<v3>{_VERB})\b"
+    rf"|\bi(?: want| would like|'d like) to (?P<v6>{_VERB})\b"
     rf"|\bgo ahead and (?P<v4>{_VERB})\b"
     rf"|^\s*(?P<v5>{_VERB})\s+{_TARGET}"
     rf"|\bi(?: want| need| would like|'d like) (?P<n1>{_NOUNS})\b)", re.I)
@@ -59,6 +63,7 @@ class WriteRequest:
     kind: str
     txn_id: str | None
     verb: str
+    text: str = ""          # the (masked) message the request came from
 
 
 def detect(text: str, focus: str | None = None) -> WriteRequest | None:
@@ -72,9 +77,55 @@ def detect(text: str, focus: str | None = None) -> WriteRequest | None:
     kind = _NOUN.get(verb.lower()) or VERBS.get(verb.lower(), "other")
     ids = TXN_ID.findall(text)
     txn = ids[-1] if ids else (focus if kind not in ACCOUNT_KINDS else None)
-    return WriteRequest(kind, txn, verb.lower())
+    return WriteRequest(kind, txn, verb.lower(), text)
 
 
 ACTION_WORDS = {"refund": "refund", "cancel": "cancel", "retry": "retry", "unblock": "unblock",
                 "update_details": "update the details on", "limit_change": "change the limit on",
                 "fee_waiver": "waive the fee on", "close_account": "close", "other": "act on"}
+
+
+# ------------------------------------------------------------------ intake: request -> ticket
+
+@dataclass(frozen=True)
+class TicketOutcome:
+    ticket: Ticket | None              # None when the transaction isn't the caller's
+    created: bool = False              # False: the same request was already open
+    policy_note: str = ""
+    tool_log: list[dict] = field(default_factory=list)
+
+
+class TicketIntake:
+    """Turns a write request into a ticket. Knows tickets and retry policy; knows nothing
+    about chat, history or replies (the orchestrator renders those).
+
+    `lookup(args)` is the session's get_transaction tool (already tenant-scoped and
+    screened), so a request about someone else's transaction finds nothing."""
+
+    FACT_KEYS = ("status", "amount", "currency", "decline_code", "error")
+
+    def __init__(self, store: TicketStore):
+        self.store = store
+
+    def handle(self, req: WriteRequest, session: Session, lookup: Callable[[dict], dict]) -> TicketOutcome:
+        tool_log: list[dict] = []
+        facts: dict = {}
+        policy_note = ""
+        if req.txn_id:
+            args = {"txn_id": req.txn_id}
+            res = lookup(args)
+            tool_log.append({"name": "get_transaction", "input": args, "result": res})
+            if res["status"] == "error":
+                raise ServiceUnavailable("transaction lookup unavailable; no ticket opened")
+            if res["status"] == "not_found":
+                return TicketOutcome(None, tool_log=tool_log)
+            data = res.get("data") or {}
+            facts = {k: data[k] for k in self.FACT_KEYS if k in data}
+            g = data.get("guidance") or {}
+            if req.kind == "retry" and g.get("retryable") is False:
+                policy_note = (f"Retry policy: {g.get('reason_key')} is not retryable; "
+                               f"allowed only: {', '.join(g.get('retry_only_if', [])) or 'none'}")
+        ticket, created = open_ticket(self.store, tenant_id=session.tenant_id, session_id=session.session_id,
+                                      role=session.role, kind=req.kind, txn_id=req.txn_id,
+                                      text=req.text, facts=facts, policy_note=policy_note)
+        return TicketOutcome(ticket, created, policy_note, tool_log)

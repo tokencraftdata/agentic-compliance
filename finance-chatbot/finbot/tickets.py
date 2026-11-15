@@ -2,9 +2,10 @@
 
     Ticket        what was asked, by which tenant and role, about which transaction,
                   with the verified facts and retry policy at the time (card data masked)
-    TicketStore   port: InMemoryTickets (tests, demo), JsonFileTickets (single host).
-                  Production: your ticketing system (Jira, ServiceNow, Zendesk) or a
-                  DynamoDB table behind the same three methods.
+    TicketStore   port: InMemoryTickets (tests, one process), JsonFileTickets (one host),
+                  DynamoTickets (every worker and the ticket desk share it; same table as
+                  the session store). Or your ticketing system (Jira, ServiceNow,
+                  Zendesk) behind the same four methods.
     TicketDesk    the human side: list, claim, resolve. Support or admin only, audited.
 
 Ticket ids are derived from (tenant, session, kind, transaction), so asking twice
@@ -24,7 +25,8 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass, field, replace
 from typing import Any, Protocol
 
-from .guardrails import mask_pii
+from . import auditlog
+from .pii import mask_pii, mask_value
 from .security import Authorizer, Forbidden, Principal
 
 OPEN, CLAIMED, DONE, REJECTED = "open", "claimed", "done", "rejected"
@@ -114,7 +116,7 @@ def open_ticket(store: TicketStore, *, tenant_id: str, session_id: str, role: st
                 txn_id: str | None, text: str, facts: dict[str, Any], policy_note: str = "",
                 clock: Callable[[], float] = time.time) -> tuple[Ticket, bool]:
     t = Ticket(ticket_id(tenant_id, session_id, kind, txn_id), tenant_id, session_id, role, kind, txn_id,
-               mask_pii(text)[0], {k: mask_pii(str(v))[0] for k, v in facts.items()}, policy_note,
+               mask_pii(text)[0], mask_value(facts), policy_note,
                OPEN, clock())
     return store.create_if_absent(t)
 
@@ -166,8 +168,42 @@ class TicketDesk:
 
     def _save(self, who: Principal, t: Ticket, op: str) -> Ticket:
         self.store.put(t)
-        if self.audit_path:
-            with open(self.audit_path, "a") as f:
-                f.write(json.dumps({"ts": self.clock(), "actor": who.subject, "op": op, "ticket": t.id,
-                                    "status": t.status}) + "\n")
+        auditlog.write(self.audit_path, "tickets", {"ts": self.clock(), "actor": who.subject, "op": op,
+                                                     "ticket": t.id, "status": t.status})
         return t
+
+
+class DynamoTickets:
+    """Tickets in the session store's DynamoDB table, so every worker pod and the people at
+    the desk see the same tickets. Items: pk "TICKETS", sk "K#<id>". create_if_absent is a
+    conditional put, so two workers racing on the same request create one ticket.
+    One partition is fine for a support desk's volume; shard pk by tenant beyond that."""
+
+    PK = "TICKETS"
+
+    def __init__(self, table: Any):
+        self.t = table
+
+    @staticmethod
+    def _item(t: Ticket) -> dict[str, Any]:
+        return {"pk": DynamoTickets.PK, "sk": f"K#{t.id}", "ticket": json.dumps(asdict(t))}
+
+    def create_if_absent(self, t: Ticket) -> tuple[Ticket, bool]:
+        from .store_dynamo import ConditionFailed
+        try:
+            self.t.put(self._item(t), ("attribute_not_exists(pk)", {}, {}))
+            return t, True
+        except ConditionFailed:
+            existing = self.get(t.id)
+            assert existing is not None
+            return existing, False
+
+    def get(self, ticket_id: str) -> Ticket | None:
+        r = self.t.get(self.PK, f"K#{ticket_id}")
+        return Ticket(**json.loads(r["ticket"])) if r else None
+
+    def put(self, t: Ticket) -> None:
+        self.t.put(self._item(t))
+
+    def all(self) -> list[Ticket]:
+        return [Ticket(**json.loads(r["ticket"])) for r in self.t.query(self.PK, "K#")]

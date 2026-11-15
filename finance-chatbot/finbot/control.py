@@ -20,9 +20,9 @@ half-open probe is the safe path back.
 """
 from __future__ import annotations
 
-import json
 import time
 
+from . import auditlog
 from .models import ModelOrchestrator
 from .registry import ROUTING
 from .security import Authorizer, Principal
@@ -80,7 +80,5 @@ class ControlPlane:
         self.engine.sync_control(force=True)
         rec = {"ts": time.time(), "actor": who.subject, "op": op, **detail, "config": cfg}
         self.log.append(rec)
-        if self.audit_path:
-            with open(self.audit_path, "a") as f:
-                f.write(json.dumps(rec) + "\n")
+        auditlog.write(self.audit_path, "control", rec)
         return rec

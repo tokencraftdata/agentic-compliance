@@ -38,11 +38,19 @@ from collections.abc import Callable
 from decimal import Decimal
 from typing import Any, Protocol
 
+from .pii import mask_pii
 from .store import LeaseHeld, SessionExpired, StaleWrite
 
 
 class ConditionFailed(Exception):
     pass
+
+
+class StateTooLarge(ValueError):
+    """The session would not fit in one DynamoDB item. Not retryable: the turn must shrink."""
+
+
+MAX_STATE_BYTES = 350_000   # under DynamoDB's 400 KB item limit, leaving room for the other attributes
 
 
 Cond = tuple[str, dict, dict] | None   # (expression, names, values)
@@ -322,8 +330,7 @@ class DynamoSessionStore:
     # ---------------------------------------------------------------- turns
 
     def begin_turn(self, session_id, msg_id, worker, user_text):
-        from .guardrails import mask_pii
-        user_text = mask_pii(user_text)[0]
+        user_text = mask_pii(user_text)[0]   # the journal never holds card data
         now = self.clock()
         pk, sk = f"S#{session_id}", f"T#{msg_id}"
         r = self.t.get(pk, sk)
@@ -353,9 +360,15 @@ class DynamoSessionStore:
         turn = self.t.get(f"S#{session_id}", f"T#{msg_id}")
         if turn is None:
             raise StaleWrite(f"turn {msg_id} was never claimed in session {session_id}")
-        new_meta = {**m, "state": json.dumps(state), "version": expected_version + 1, "updated": now,
+        blob = json.dumps(state)
+        if len(blob.encode()) > MAX_STATE_BYTES:
+            raise StateTooLarge(f"session state is {len(blob.encode())} bytes; the item limit is 400 KB "
+                                "(lower max_history_chars)")
+        new_meta = {**m, "state": blob, "version": expected_version + 1, "updated": now,
                     "expires": now + self.idle_ttl}
-        new_turn = {**turn, "status": "committed", "answer": answer, "meta": json.dumps(meta), "committed": now}
+        # The journal dedupes resends for as long as the session lives, not 30 min from turn start.
+        new_turn = {**turn, "status": "committed", "answer": answer, "meta": json.dumps(meta), "committed": now,
+                    "expires": now + self.idle_ttl}
         try:
             self.t.transact_put([
                 (new_meta, ("#v = :v AND #o = :me AND #l >= :now",

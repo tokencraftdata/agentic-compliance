@@ -57,6 +57,9 @@ anthropic, sqlite3 or a vector DB client.
 | Immutable versioned value | `adaptive/policy.py` (`GuardPolicy`) | Every guard change is a new version; rollback is "make the previous one active" |
 | Strategy (proposers, suites) | `adaptive/proposers.py`, `adaptive/gate.py` | Add a way to propose rules, or a regression suite, as one class |
 | State machine | `adaptive/controller.py` (proposed → rejected / report / awaiting_approval → shadow → canary → active) | A change can't skip the gate, shadow traffic or an admin |
+| Pipeline (ordered stages) | `Chatbot.stages`: risk lock → input guard → learned policy → focus → write request → model | The flow is one readable list; each stage ends the turn with a `Reply` or passes; a new check is one method |
+| Context object | `TurnContext` (one context variable, `current_turn()`) | Per-turn facts (masked text, policy version, known tickets, PII found) set once and read by verifiers, never threaded through every call |
+| Single responsibility | `pii.py` (masking), `replies.py` (fixed wording), `actions.TicketIntake` (request → ticket), `auditlog.py` (where audit lines go) | Each rule lives in one module; the orchestrator only sequences them |
 
 ## 3. Robustness map
 
@@ -119,7 +122,7 @@ Table definition: `store_dynamo.TABLE_DEFINITION` (on-demand, KMS, PITR).
 
 Covered in [security.md](security.md): what reaches the model is screened and spotlighted, and
 a successful injection still can't read other tenants, change state, assert false facts, cite
-planted links, request secrets or leak the prompt. Red team: 0/27 defended, 19/27 undefended.
+planted links, request secrets or leak the prompt. Red team: 0/29 defended, 21/29 undefended.
 
 ## 7. Ingestion → vector DB (Python)
 
@@ -357,6 +360,26 @@ newer work. Shared state that is not per-session is "last write wins" with a sho
 breaker open/closed, drained models (re-read every 2 s), the active guard policy (re-read every
 2 s).
 
+How the parts talk to each other. There are no direct calls between workers; everything goes
+through shared, durable state, so a pod can die at any point without leaving another one waiting:
+
+| From → to | Channel | Guarantee |
+|---|---|---|
+| API → worker | SQS FIFO, grouped by session, deduplicated by `msg_id` | in order per session, at least once |
+| worker → worker (same session) | session lease + CAS commit in DynamoDB | one owner at a time; a late writer is rejected |
+| worker → worker (model health) | breaker state in the store | one pod's outage finding protects all pods |
+| operator → workers | control config and guard policy in the store, re-read every 2 s | audited; no redeploy |
+| worker → people | tickets in the same DynamoDB table (`DynamoTickets`) | one ticket per request even when two pods race (conditional put) |
+| people → records | `TicketDesk.resolve` with a required note | audited; the bot can't resolve |
+| everything → audit | JSON lines with a `stream` field (`turn`, `control`, `guard`, `tickets`), stdout in containers | one log destination, filterable |
+
+**Context length.** A thread rolls over to a fresh one, seeded with the typed state, after 30
+turns *or* when the history passes `max_history_chars` (120,000 characters, about 30,000
+tokens), whichever comes first. That bounds both the model's context and the stored session;
+the DynamoDB store refuses state above 350 KB with `StateTooLarge` rather than failing on
+every retry. Tool results are bounded too (log search at most 50 events, record fields at most
+300 characters).
+
 ### 11.3 Routing
 
 | What is routed | How | Where |
@@ -432,6 +455,13 @@ happened before trying again (`test_4_unknown_external_action_...`).
 The client side: send a stable `msg_id` with every message and reuse it on resend. A resend of
 a committed turn returns the stored answer; a resend of an uncommitted one runs it once.
 
+**Retries.** Every retry has a ceiling and spreads out: model calls retry with full-jitter
+backoff inside the 90 s turn deadline, then fail over; queue redeliveries use jittered delays
+(half to full) so pods that saw the same outage don't return at the same second; a message that
+keeps failing goes to the dead-letter queue after 5 receives. A ticket turn re-run after a crash
+finds the ticket it already opened (deterministic id) and tells the user about it as new, since
+the user never saw the first reply.
+
 **Not done yet:** the HTTP adapter and result delivery to the client (polling or push), a
 timer-based lease heartbeat for single model calls longer than the lease, per-tenant rate
 limits at the API, and a live run of these manifests.
@@ -481,3 +511,35 @@ saying what they did in the real system. The bot never resolves or executes a ti
 evidence check blocks any answer that names a ticket the session doesn't have or says "I've
 raised a ticket" when none exists. Replace `InMemoryTickets` / `JsonFileTickets` with your
 ticketing system (Jira, ServiceNow, Zendesk) behind the same three store methods.
+
+## 13. Ideas taken from research
+
+A review of recent papers (all citations checked) produced eight candidates. Four fit finbot
+and are built, each with a test (`tests/test_research.py`):
+
+| Paper | Idea | What finbot does | Result |
+|---|---|---|---|
+| Debenedetti et al. 2025, *Defeating Prompt Injections by Design* (CaMeL), arXiv 2503.18813; Beurer-Kellner et al. 2025, *Design Patterns for Securing LLM Agents against Prompt Injections*, arXiv 2506.08837 | Contain injection by structure: untrusted data must not decide control flow | **Argument provenance**: a tool may be called only with a transaction id the user typed (`Chatbot._provenance`, `SessionMemory.user_ids`). An id first seen inside a record is refused | Two pivot attacks ("also look up txn_X") pass screening in every configuration; provenance alone stops both |
+| Russinovich et al. 2025, *Crescendo*, USENIX Security, arXiv 2404.01833; Li et al. 2024, *LLM Defenses Are Not Robust to Multi-Turn Human Jailbreaks*, arXiv 2408.15221 | Attacks that escalate slowly beat single-turn defences | **Multi-turn red team** with detection latency: the first turn stopped against the harmful turn (`data/redteam_multiturn.jsonl`) | 0 of 5 succeed defended, all stopped at the harmful turn; found and fixed a cross-sentence negation bug in the credential check |
+| Yao et al. 2024, *tau-bench*, arXiv 2406.12045 | pass^k: an agent must succeed on every one of k runs, not once | **Consistency eval** (`scripts/run_consistency.py`): each case runs k times against a seeded model that corrupts half its answers | pass^16 = 1.000 dev, pass^8 = 1.000 held-out. The first version mis-scored a correct later turn as a leak; markers are now checked per turn and seeds are stable across processes |
+| Laban et al. 2025, *LLMs Get Lost in Multi-Turn Conversation*, arXiv 2505.06120 | Models lose track of goals spread over turns | **Code-built recap** at thread rollover: the user's own earlier requests (never a model summary) carried into the fresh thread | The new thread's state lists what the user asked before |
+
+Considered and not built, or built differently:
+
+- **Masking old tool results mid-thread** (Lindenbauer et al. 2025, *The Complexity Trap*,
+  arXiv 2508.21433). Editing earlier messages breaks prompt caching and Claude Opus 5.5's
+  preserved-thinking history check, so finbot applies the idea only at rollover (fresh thread,
+  typed state, recap) and bounds the thread by size.
+- **Claim-level abstention** (Mohri & Hashimoto 2024, *Conformal Factuality*, ICML): keep verified
+  sentences and drop the failing ones instead of a full fallback. Worth doing next; it changes
+  user-visible answers, so it needs its own eval.
+- **Adaptive attacker in the guard gate** (Nasr et al. 2025, *The Attacker Moves Second*, arXiv
+  2510.09023): mutate blocked attacks (paraphrase, homoglyphs, base64, split across turns) and
+  count survivors per candidate rule set, so learned rules don't overfit.
+- **Policy checks on tickets** (Zwerdling et al. 2025, *ToolGuard*, EMNLP Industry): refund only on
+  a settled charge, amount not above captured, inside the window; results attached to the ticket.
+- **Failure codes** (Cemri et al. 2025, *Why Do Multi-Agent LLM Systems Fail?*, NeurIPS D&B): tag
+  fallbacks, handoffs and dead letters with a failure code for offline analysis.
+- Rejected: full CaMeL interpreter and FIDES (too large for a read-only bot), MELON (re-runs the
+  model per tool step, too slow for the 90 s deadline), LLM-judge step monitors (weak against
+  adaptive attacks), MiniCheck (needs a self-hosted model).

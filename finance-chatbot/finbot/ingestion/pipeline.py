@@ -19,8 +19,9 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field
 
-from ..guardrails import INJECTION, mask_pii
+from ..guardrails import INJECTION
 from ..knowledge import Chunk
+from ..pii import mask_pii
 from .vectorstores import PUBLIC
 
 

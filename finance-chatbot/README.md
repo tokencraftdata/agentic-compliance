@@ -44,7 +44,11 @@ finbot/guardrails.py     Bedrock ApplyGuardrail, local fallback, deterministic e
 finbot/tools.py          typed read-only tools: transaction DB, log search, KB (tenant-scoped)
 finbot/memory.py         per-entity ledger, focus switching, typed state rendering
 finbot/knowledge.py      heading-aware chunks, hybrid BM25 + Titan search
-finbot/orchestrator.py   turn pipeline, one verifier repair attempt, append-only history, audit, feedback queue
+finbot/orchestrator.py   turn pipeline as ordered stages (risk lock, input guard, learned policy, focus,
+                         write request, model + hallucination gate), append-only history, audit
+finbot/pii.py            card data and secrets: detection and masking, used on every path
+finbot/replies.py        every fixed reply (decided by code, not written by the model)
+finbot/auditlog.py       audit lines to a file or stdout, one "stream" field per source
 finbot/store.py          durable session store: versioned state, leases, turn and action journals, TTL
 finbot/runtime.py        stateless workers: claim, load, dedupe, run, commit; takeover recovery
 finbot/faults.py         fault injection: crashing worker, hallucinating model
@@ -120,13 +124,16 @@ Access, the worker cluster, routing, Kubernetes and crash recovery mid-turn are 
 Prompt injection is handled two ways: reduce what reaches the model (input screening,
 tool-result screening, spotlighting), and limit what a successful injection can do (read-only,
 tenant-scoped tools, evidence checks, KB-only links, no credential requests, leak canary).
-Red team against a model that obeys anything: 0 of 27 attacks succeed defended, 19 of 27
-undefended, with no loss on benign look-alikes. See [docs/security.md](docs/security.md),
+Red team against a model that obeys anything: 0 of 29 attacks succeed defended, 21 of 29
+undefended, with no loss on benign look-alikes; 0 of 5 multi-turn escalations succeed defended.
+Consistency (pass^k, tau-bench): every eval case passes all k runs with half the answers corrupted. See [docs/security.md](docs/security.md),
 which also maps each defence to the research it follows, including the author's
 MemoryKeeper study.
 
 ```bash
 python3 scripts/run_redteam.py -v
+python3 scripts/run_redteam.py --cases data/redteam_multiturn.jsonl -v
+python3 scripts/run_consistency.py --k 8
 ```
 
 ## Reliability

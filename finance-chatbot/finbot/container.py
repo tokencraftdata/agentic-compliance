@@ -23,6 +23,7 @@ from collections.abc import Callable
 from functools import cached_property
 from typing import Any
 
+from . import auditlog
 from .config import Settings
 
 
@@ -110,16 +111,22 @@ class Container:
     @cached_property
     def tickets(self):
         """Where write requests go for a person to execute (the bot never executes them)."""
-        from .tickets import InMemoryTickets, JsonFileTickets
-        return self._get("tickets", lambda: JsonFileTickets(self.settings.tickets_path)
-                         if self.settings.tickets_path else InMemoryTickets())
+        from .tickets import DynamoTickets, InMemoryTickets, JsonFileTickets
+
+        def build():
+            if self.settings.tickets_path:
+                return JsonFileTickets(self.settings.tickets_path)
+            if self.settings.store_provider == "dynamodb":   # shared by every worker pod and the desk
+                return DynamoTickets(self.store.t)
+            return InMemoryTickets()
+        return self._get("tickets", build)
 
     @cached_property
     def ticket_desk(self):
         """The human side: list, claim, resolve (support/admin, audited)."""
         from .tickets import TicketDesk
         return self._get("ticket_desk", lambda: TicketDesk(self.tickets, self.authorizer,
-                                                           self.audit_path and self.audit_path + ".tickets",
+                                                           auditlog.sibling(self.audit_path, ".tickets"),
                                                            self.clock or __import__("time").time))
 
     @cached_property
@@ -153,7 +160,7 @@ class Container:
         from .control import ControlPlane
         self.worker  # noqa: B018 - attaches shared health/config to the engine first
         return self._get("control", lambda: ControlPlane(self.chatbot.engine(), self.store, self.authorizer,
-                                                         self.audit_path and self.audit_path + ".control"))
+                                                         auditlog.sibling(self.audit_path, ".control")))
 
     @cached_property
     def guard_controller(self):
@@ -161,7 +168,7 @@ class Container:
         from .adaptive.defaults import default_controller
         return self._get("guard_controller", lambda: default_controller(
             self.store, self.settings.data_dir or "data", self.settings.guard_labels_path, self.authorizer,
-            self.audit_path and self.audit_path + ".guard", self.audit_path, self.clock))
+            auditlog.sibling(self.audit_path, ".guard"), self.audit_path, self.clock))
 
     @cached_property
     def verifier(self):

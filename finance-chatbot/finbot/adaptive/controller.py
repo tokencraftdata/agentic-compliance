@@ -28,11 +28,11 @@ Rules this enforces:
 """
 from __future__ import annotations
 
-import json
 import time
 from collections.abc import Callable, Sequence
 from typing import Any
 
+from .. import auditlog
 from ..security import Authorizer, Principal
 from .gate import Gate
 from .policy import BASELINE, GuardPolicy
@@ -243,6 +243,4 @@ class GuardrailController:
         self.store.write_control(PROPOSALS_KEY, props)
 
     def _audit(self, who: Principal, op: str, **detail: Any) -> None:
-        if self.audit_path:
-            with open(self.audit_path, "a") as f:
-                f.write(json.dumps({"ts": self.clock(), "actor": who.subject, "op": op, **detail}) + "\n")
+        auditlog.write(self.audit_path, "guard", {"ts": self.clock(), "actor": who.subject, "op": op, **detail})
