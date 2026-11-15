@@ -256,6 +256,32 @@ Where finbot is weaker: every product above runs on real traffic, and finbot doe
 - Consumer Financial Protection Bureau, Chatbots in consumer finance (Issue Spotlight, June 2023); [summary by Consumer Finance Monitor](https://www.consumerfinancemonitor.com/2023/06/08/new-cfpb-report-highlights-concerns-with-growing-use-of-chatbots-by-financial-institutions/)
 - Moffatt v. Air Canada, 2024 BCCRT 149; [summary by the American Bar Association](https://www.americanbar.org/groups/business_law/resources/business-law-today/2024-february/bc-tribunal-confirms-companies-remain-liable-information-provided-ai-chatbot/)
 
+## Problems others have documented, and whether this helps
+
+The failures I started from aren't mine alone. Here are chatbot problems that are on the public record, in news reports and in papers, and an honest note on how far finbot's design goes against each.
+
+| Documented problem | Where | How finbot helps, and where it doesn't |
+|---|---|---|
+| The bot invents a company policy | Cursor's support bot told users of a one-device limit that didn't exist, and people cancelled (2025). Air Canada's bot made up a refund rule (2024) | Policy answers must come from a help page and cite it. No good match means "I don't have documentation on that". It doesn't help if the help page itself is wrong |
+| A user talks the bot into a commitment | A Chevrolet dealer's bot agreed to sell a Tahoe for $1 and called it "legally binding" (2023) | The bot is read-only, the input is screened, and answers that promise or guarantee an outcome are blocked. New promise wordings still have to be learned |
+| The bot gives advice that breaks the law | New York City's MyCity bot told businesses they could take workers' tips and refuse cash (The Markup, 2024). The city moved to shut it down in 2026 | Legal and tax questions are refused before the model runs, and other answers must cite a source. An outdated source would still be repeated |
+| Specialist tools with retrieval still make things up | A Stanford and Yale study of legal research tools found false or misleading answers on more than 17% of queries for one product and more than 34% for another (Magesh et al., 2025) | This is why transaction facts are checked in code, not trusted to retrieval. Free-text policy answers get a weaker check: the source must exist and be cited |
+| Models lose the thread in long chats | Across six tasks, performance fell by an average of 39% when instructions arrived over several turns (Laban et al., 2025) | State is kept in code, one transaction is in focus at a time, and long chats restart on a fresh thread with a code-built recap |
+| Models agree with the user | Five assistants consistently sided with the user's stated belief over the correct answer (Sharma et al., 2024) | "But it was approved, right?" changes nothing. A status claim must match the record whatever the user says |
+| Defences break against attackers who adapt | Twelve published defences against jailbreaks and prompt injection were bypassed, most with attack success above 90% (Nasr et al., 2025) | finbot's screens would fall too, and my red team doesn't adapt. So the design limits the damage: read-only tools, one customer's data, and lookups only for ids the user typed |
+
+### The drawbacks of doing it this way
+
+- **The checker reads patterns, not meaning.** It catches a wrong amount, code, status or link. It won't catch a wrong *reason* given in plain words with no number in it.
+- **Strict means more handoffs.** "I won't guess" and escalation are safe, but they resolve fewer chats, so you need people to hand off to. A bot tuned only for resolution rate will look better than this one.
+- **A repair costs a second model call.** That adds latency and cost on exactly the turns that went wrong. I haven't measured either on live traffic.
+- **The rules need upkeep.** Retry tables, cascade rules, processor code mappings and escalation rules all have owners now. Adaptive guardrails only improve if reviewers keep labelling mistakes.
+- **It's only as good as the records.** If the system of record or a help page is wrong, the bot repeats the error, and the checker agrees with it.
+- **It can't fix anything.** The bot is read-only and English only. It explains and hands off; it doesn't refund, retry or cancel.
+- **It's unproven live.** Every number in this article comes from a scripted model and synthetic data.
+
+*Sources for this section:* [Cursor's support bot (CX Today)](https://www.cxtoday.com/conversational-ai/a-contact-center-chatbot-invents-company-policies-now-customers-want-out/); [the $1 Tahoe (VentureBeat)](https://venturebeat.com/ai/a-chevy-for-1-car-dealer-chatbots-show-perils-of-ai-for-customer-service); [NYC's MyCity bot (StateScoop)](https://statescoop.com/mamdani-kill-nyc-ai-chatbot/); Magesh et al., [Hallucination-Free? Assessing the Reliability of Leading AI Legal Research Tools](https://arxiv.org/abs/2405.20362); Laban et al., [LLMs Get Lost In Multi-Turn Conversation](https://arxiv.org/abs/2505.06120); Sharma et al., [Towards Understanding Sycophancy in Language Models](https://arxiv.org/abs/2310.13548); Nasr et al., [The Attacker Moves Second](https://arxiv.org/abs/2510.09023).
+
 ## If you're building one
 
 - **Make "not found" a real answer.** Most hallucinations in support bots start with an empty lookup.
@@ -265,7 +291,9 @@ Where finbot is weaker: every product above runs on real traffic, and finbot doe
 - **Plan for failure.** Breakers per model, a turn deadline, save-at-the-end turns and de-duplicated messages.
 - **Treat retrieved documents as untrusted input.** Screen them, filter by access inside the query, and never let model answers become sources. The same goes for merchant descriptors and notes inside your own records.
 
-finbot is a personal reference project. It runs on synthetic data and has no connection to any company. The code is Python on Amazon Bedrock: [github.com/tokencraftdata/finbot](https://github.com/tokencraftdata/finbot)
+finbot is a personal reference project. It runs on synthetic data and has no connection to any company. The code is Python on Amazon Bedrock.
+
+Code: [github.com/tokencraftdata/finbot](https://github.com/tokencraftdata/finbot)
 
 *If you run payment support in production, I'd like to hear where you think this is wrong.*
 
