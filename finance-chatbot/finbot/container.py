@@ -104,7 +104,23 @@ class Container:
     def chatbot(self):
         from .orchestrator import Chatbot
         return self._get("chatbot", lambda: Chatbot(self.engine, self.guardrail, self.toolbox, self.settings,
-                                                    self.audit_path, policies=self.guard_policy))
+                                                    self.audit_path, policies=self.guard_policy,
+                                                    tickets=self.tickets))
+
+    @cached_property
+    def tickets(self):
+        """Where write requests go for a person to execute (the bot never executes them)."""
+        from .tickets import InMemoryTickets, JsonFileTickets
+        return self._get("tickets", lambda: JsonFileTickets(self.settings.tickets_path)
+                         if self.settings.tickets_path else InMemoryTickets())
+
+    @cached_property
+    def ticket_desk(self):
+        """The human side: list, claim, resolve (support/admin, audited)."""
+        from .tickets import TicketDesk
+        return self._get("ticket_desk", lambda: TicketDesk(self.tickets, self.authorizer,
+                                                           self.audit_path and self.audit_path + ".tickets",
+                                                           self.clock or __import__("time").time))
 
     @cached_property
     def guard_policy(self):

@@ -73,6 +73,8 @@ class Settings:
     # Adaptive guardrails (finbot/adaptive): "static" = baseline policy, "store" = controller-managed
     guard_policy_source: str = field(default_factory=lambda: _env("FINBOT_GUARD_POLICY", "static"))
     guard_labels_path: str = field(default_factory=lambda: _env("FINBOT_GUARD_LABELS", "guard_labels.jsonl"))
+    # Write requests become tickets for people (finbot/tickets.py). Empty = in memory (dev/tests).
+    tickets_path: str = field(default_factory=lambda: _env("FINBOT_TICKETS"))
     fast_model: str = field(default_factory=lambda: _env("FINBOT_FAST_MODEL"))  # chain for simple turns
     model_breaker_threshold: int = 3   # consecutive failed calls before a model's breaker opens
     model_breaker_cooldown_s: float = 30  # first half-open probe after this; doubles on failed probes

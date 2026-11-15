@@ -24,6 +24,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
+from .actions import ACTION_WORDS, WriteRequest
+from .actions import detect as detect_write_request
 from .adaptive.policy import BASELINE, GuardPolicy
 from .adaptive.risk import next_score
 from .adaptive.source import PolicySource, StaticPolicySource
@@ -31,9 +33,10 @@ from .guardrails import BLOCKED_INPUT_MSG, BLOCKED_OUTPUT_MSG, mask_pii
 from .memory import SessionMemory
 from .models import ModelOrchestrator, ModelTarget
 from .resilience import GuardrailUnavailable, ServiceUnavailable
+from .tickets import InMemoryTickets, TicketStore, open_ticket
 from .tools import TXN_ID, Session, ToolBox
 from .untrusted import SPOTLIGHT_RULE, ToolResultScreen, leaks_prompt
-from .verification import EvidenceVerifier, HallucinationGate, PolicyVerifier, VerifierChain
+from .verification import EvidenceVerifier, HallucinationGate, PolicyVerifier, TicketVerifier, VerifierChain
 
 SYSTEM_PROMPT = """You are a support assistant for a payments and financial-services company. You help merchants, customers and support staff understand transactions, declines, refunds, fees and product behaviour.
 
@@ -43,7 +46,7 @@ How you answer:
 - If a tool returns status "error", say the system is temporarily unavailable. Don't invent an answer.
 - Product, policy and code-meaning questions: use search_knowledge_base and cite the source URL. If nothing relevant is found, say you don't have documentation on it rather than answering from general knowledge.
 - Session state arrives in system messages tagged <session_state>. Only the focus transaction is active. Do not carry details of other transactions into the current answer unless the user explicitly refers back to them by ID.
-- You are read-only: you cannot refund, retry, cancel or change anything. If asked, explain the proper channel.
+- You are read-only: you cannot refund, retry, cancel or change anything. Requests to change something are turned into tickets by the system, not by you. Never say you raised, created or opened a ticket; mention a ticket id only if <session_state> lists it.
 - Out of scope: investment advice, legal or tax advice, topics unrelated to our products. Decline briefly and offer what you can help with.
 - Never ask for or repeat full card numbers, CVV, passwords or one-time codes.
 - When a transaction record includes "guidance", it is the authoritative retry policy and next step, computed from our rules. Give the user its next_step (it is already written for their role) and, if relevant, what to tell the cardholder (tell_the_cardholder). If retryable is false, never suggest retrying the same payment; only the alternatives in retry_only_if (for example another card, or checking the status first) are allowed. If retryable is true, state the retry_rule including its timing.
@@ -67,8 +70,23 @@ ESCALATION_MSG = {
 RISK_MSG = ("I've paused this conversation and passed it to a support specialist (reference {ref}). "
             "Please contact {contact} and quote that reference.")
 
-# The guard policy serving the current turn (per session: canary or active).
+TICKET_MSG = {
+    "merchant": ("I can't make changes myself, so I've opened ticket {id} asking our team to {action} {target}. "
+                 "A person will review it and carry it out; nothing has been changed yet. "
+                 "Quote {id} if you contact {contact}."),
+    "support": "Ticket {id} opened for manual execution: {kind} on {target}. Nothing has been executed.",
+}
+TICKET_EXISTS = " This request was already open as {id}, so no duplicate was created."
+TICKET_NOT_FOUND = ("I couldn't find {txn} for your account, so I haven't opened a ticket. "
+                    "Please check the transaction ID.")
+CARD_NOTICE = ("I removed card details from your message. Please don't share card numbers, security codes "
+               "or PINs here: we never need them.")
+CARD_REASONS = {"pii:card", "pii:card_like", "pii:track_data", "pii:cvv", "pii:expiry", "pii:pin"}
+
+# Per-turn context (contextvars: safe if one Chatbot serves turns on several threads).
 _POLICY: contextvars.ContextVar[GuardPolicy] = contextvars.ContextVar("guard_policy", default=BASELINE)
+_TICKETS: contextvars.ContextVar[frozenset[str]] = contextvars.ContextVar("known_tickets", default=frozenset())
+_CARD_SEEN: contextvars.ContextVar[bool] = contextvars.ContextVar("card_seen", default=False)
 
 
 
@@ -126,13 +144,15 @@ class ChatSession:
 
 class Chatbot:
     def __init__(self, llm, guardrail, toolbox: ToolBox, settings, audit_path: str | None = None,
-                 policies: PolicySource | None = None):
+                 policies: PolicySource | None = None, tickets: TicketStore | None = None):
         self.llm, self.guard, self.toolbox, self.settings = llm, guardrail, toolbox, settings
         self.audit_path = audit_path
         self.policies: PolicySource = policies or StaticPolicySource()
+        self.tickets: TicketStore = tickets if tickets is not None else InMemoryTickets()
         self.sleep = time.sleep  # injectable for tests
         names = set(toolbox.processors.names()) if getattr(toolbox, "processors", None) else None
-        self.gate = HallucinationGate(VerifierChain([EvidenceVerifier(names), PolicyVerifier(_POLICY.get)]),
+        self.gate = HallucinationGate(VerifierChain([EvidenceVerifier(names), PolicyVerifier(_POLICY.get),
+                                                     TicketVerifier(lambda: set(_TICKETS.get()))]),
                                       repair_attempts=settings.repair_attempts)
         self.screen = ToolResultScreen(guardrail)  # third-party text in tool results
         self._wrapped: tuple | None = None
@@ -163,10 +183,12 @@ class Chatbot:
         t0 = time.time()
         hist_len, mem, notice = len(cs.history), copy.deepcopy(cs.memory), cs.pending_notice
         token = _POLICY.set(self.policies.for_session(cs.session.session_id))
+        tokens: list[contextvars.Token] = [_TICKETS.set(frozenset(t["id"] for t in cs.memory.tickets))]
         try:
             # Card data is masked before anything else sees the text: guards, the model,
             # history, audit, review queue and shadow logs, on blocked paths too.
             user_text, premasked = mask_pii(user_text)
+            tokens.append(_CARD_SEEN.set(bool(CARD_REASONS & set(premasked))))
             return self._ask(cs, user_text, t0, premasked)
         except ServiceUnavailable as e:
             del cs.history[hist_len:]
@@ -174,6 +196,8 @@ class Chatbot:
             msg = UNAVAILABLE_MSG.format(contact=self.settings.support_contact, ref=self._ref(cs))
             return self._finish(cs, user_text, msg, "unavailable", [str(e)], [], t0)
         finally:
+            for tok in reversed(tokens):
+                tok.var.reset(tok)
             _POLICY.reset(token)
 
     def _guard(self, fn, *args):
@@ -206,6 +230,10 @@ class Chatbot:
                               why=", ".join(learned.reasons))
             return self._finish(cs, text, msg, "escalation", list(learned.reasons), [], t0, escalated=True)
         cs.memory.risk = next_score(cs.memory.risk, attack=False, text=text)
+
+        request = detect_write_request(text, cs.memory.focus)
+        if request:   # decided in code, before any model call: read-only bot, a person executes
+            return self._ticket_turn(cs, text, request, t0)
 
         focus, changed = cs.memory.update_focus(text)
         if cs.memory.turns_in_thread >= self.settings.max_turns_per_thread:
@@ -331,6 +359,8 @@ class Chatbot:
             tmpl = HANDOFF_MSG["merchant" if cs.session.role == "merchant" else "support"]
             answer = f"{answer} {tmpl.format(ref=self._ref(cs), contact=self.settings.support_contact)}"
             cs.memory.consecutive_fallbacks = 0
+        if _CARD_SEEN.get():
+            answer = f"{CARD_NOTICE}\n\n{answer}"
         policy = _POLICY.get()
         turn = Turn(answer, blocked_by, reasons, tool_log, cs.memory.focus,
                     int((time.time() - t0) * 1000), repaired, escalated, route["tier"], route["models"],
@@ -348,6 +378,46 @@ class Chatbot:
                                **({"screened": c["result"]["screened"]} if c["result"].get("screened") else {})}
                               for c in tool_log]}) + "\n")
         return turn
+
+    def _ticket_turn(self, cs: ChatSession, text: str, req: WriteRequest, t0: float) -> Turn:
+        """Open a ticket for a person. Verifies the transaction belongs to this tenant first,
+        records the facts and retry policy at request time, and replies with a fixed template."""
+        tool_log: list[dict] = []
+        facts: dict = {}
+        policy_note = ""
+        if req.txn_id:
+            args = {"txn_id": req.txn_id}
+            res = self.screen.sanitize("get_transaction", self.toolbox.handler(cs.session)("get_transaction", args))
+            tool_log.append({"name": "get_transaction", "input": args, "result": res})
+            if res["status"] == "error":
+                raise ServiceUnavailable("transaction lookup unavailable; no ticket opened")
+            cs.memory.ingest_tool_result("get_transaction", args, res)
+            if res["status"] == "not_found":
+                return self._finish(cs, text, TICKET_NOT_FOUND.format(txn=req.txn_id), "write_request",
+                                    [f"write_request:{req.kind}", "txn_not_found"], tool_log, t0)
+            data = res.get("data") or {}
+            facts = {k: data[k] for k in ("status", "amount", "currency", "decline_code", "error") if k in data}
+            g = data.get("guidance") or {}
+            if req.kind == "retry" and g.get("retryable") is False:
+                policy_note = (f"Retry policy: {g.get('reason_key')} is not retryable; "
+                               f"allowed only: {', '.join(g.get('retry_only_if', [])) or 'none'}")
+        ticket, created = open_ticket(self.tickets, tenant_id=cs.session.tenant_id,
+                                      session_id=cs.session.session_id, role=cs.session.role, kind=req.kind,
+                                      txn_id=req.txn_id, text=text, facts=facts, policy_note=policy_note)
+        if not any(t["id"] == ticket.id for t in cs.memory.tickets):
+            cs.memory.tickets.append({"id": ticket.id, "kind": ticket.kind, "txn_id": ticket.txn_id})
+        role = "merchant" if cs.session.role == "merchant" else "support"
+        answer = TICKET_MSG[role].format(id=ticket.id, action=ACTION_WORDS.get(req.kind, "act on"),
+                                         kind=req.kind, target=req.txn_id or "your account",
+                                         contact=self.settings.support_contact)
+        if policy_note and role == "merchant":
+            answer += " Note: our retry policy says this payment shouldn't be retried as is; the team will check."
+        elif policy_note:
+            answer += f" {policy_note}."
+        if not created:
+            answer += TICKET_EXISTS.format(id=ticket.id)
+        return self._finish(cs, text, answer, None, [f"write_request:{req.kind}", f"ticket:{ticket.id}"],
+                            tool_log, t0, escalated=True)
 
     def _shadow(self, live: GuardPolicy, user_text: str, answer: str) -> dict | None:
         """Evaluate the shadow policy on this turn without enforcing it. The audit

@@ -59,7 +59,8 @@ class RefusingLLM:
 
 
 MODES = ("status_flip", "invented_amount", "invented_url", "stale_txn", "unlooked_status", "bad_retry_advice",
-         "fake_cascade", "bad_cascade_advice", "fake_outage", "false_promise")
+         "fake_cascade", "bad_cascade_advice", "fake_outage", "false_promise",
+         "fake_ticket")
 
 
 class HallucinatingLLM:
@@ -113,6 +114,8 @@ class HallucinatingLLM:
             if "Routing:" in text or "incident" in text or "northstar" in evidence:
                 return text, None
             return text + " The northstar processor was down at the time.", "northstar processor was down"
+        if self.mode == "fake_ticket":         # claim a ticket that code never opened
+            return text + " I've raised ticket TCK-9F3A21C7 for you.", "TCK-9F3A21C7"
         if self.mode == "false_promise":       # promise an outcome the bot can't grant
             return text + " We guarantee the funds will be back in your account by Friday.", \
                 "funds will be back in your account by Friday"

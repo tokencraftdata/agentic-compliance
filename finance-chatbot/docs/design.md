@@ -435,3 +435,49 @@ a committed turn returns the stored answer; a resend of an uncommitted one runs 
 **Not done yet:** the HTTP adapter and result delivery to the client (polling or push), a
 timer-based lease heartbeat for single model calls longer than the lease, per-tenant rate
 limits at the API, and a live run of these manifests.
+
+## 12. Predictable behaviour, card detection, and write requests
+
+**Predictable, not random.** The model's sampling can't be pinned: on Claude Opus 5.5 the API
+rejects `temperature` and `top_p`, and thinking is always on. So finbot does not rely on the
+model for anything that must be the same every time. Those decisions are code, with fixed
+replies, decided before any model call:
+
+| Decision | Made by | Same input, same result? |
+|---|---|---|
+| Who is asking, which tenant, which data | verified token, tenant-scoped tools | yes |
+| Card data in the message | `mask_pii`, then a fixed notice to the user | yes |
+| Prompt attack, denied topic, escalation to a person | input guard, guard policy rules | yes |
+| A request to change something | `actions.detect`, then a ticket and a fixed reply | yes |
+| Is a fact in the answer true; is retry or cascade advice allowed | evidence checks against the records | yes |
+| The wording of an answer | Claude (effort set explicitly, `medium` by default) | facts yes, wording may vary |
+
+The model writes sentences; it does not decide policy, and anything it writes is checked
+before the user sees it.
+
+**Card detection.** Card numbers (any common separator, Luhn-valid or card-shaped), track data,
+security codes, expiry dates and PINs are masked before the text reaches anything else (see
+`docs/security.md` 4a). When a message contained card data, the reply starts with a fixed
+line: *"I removed card details from your message. Please don't share card numbers, security
+codes or PINs here: we never need them."*
+
+**No write actions.** finbot has no tool that changes anything. When a user asks it to change
+something (refund, cancel, retry, unblock, update details, change a limit, waive a fee, close an
+account), code:
+
+1. recognises the request before any model call (`finbot/actions.py`); a question about how
+   something works ("how do refunds work?", "refund policy?") is not a request;
+2. looks the transaction up for this tenant; someone else's transaction gets "not found" and no
+   ticket;
+3. opens a ticket (`finbot/tickets.py`) with the masked request, the verified facts at that
+   moment and, for retries, the retry policy ("05 is not retryable");
+4. replies with a fixed template: the ticket id, that a person will do it, and that **nothing has
+   changed yet**.
+
+The ticket id is derived from tenant, session, kind and transaction, so asking twice, or a turn
+re-run after a crash, never opens a second ticket. People work tickets through `TicketDesk`
+(support or admin only, audited): list, claim, then resolve as `done` or `rejected` with a note
+saying what they did in the real system. The bot never resolves or executes a ticket, and the
+evidence check blocks any answer that names a ticket the session doesn't have or says "I've
+raised a ticket" when none exists. Replace `InMemoryTickets` / `JsonFileTickets` with your
+ticketing system (Jira, ServiceNow, Zendesk) behind the same three store methods.

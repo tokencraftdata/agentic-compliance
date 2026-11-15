@@ -32,6 +32,8 @@ finbot/verification.py   hallucination gate: verifier chain + one bounded repair
 finbot/untrusted.py      prompt-injection defences: normalise + screen, tool-result sanitising, spotlighting, leak canary
 finbot/queue.py          queue worker (SQS / in-memory): ack, retry-later, dead-letter
 finbot/worker_main.py    queue worker process for a container: one turn at a time, clean SIGTERM, heartbeat
+finbot/actions.py        write-request detection: refund/cancel/retry/... asked of a read-only bot
+finbot/tickets.py        tickets for people to execute write requests; TicketDesk to claim and resolve
 finbot/store_dynamo.py   DynamoDB session store (same contract as store.py), single-table design
 finbot/ingestion/        sources (local, S3, SharePoint, web) -> chunk (+Claude context)
                          -> Bedrock embeddings -> vector DB (local, OpenSearch, pgvector, Chroma) | Bedrock KB

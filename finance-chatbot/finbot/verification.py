@@ -13,6 +13,7 @@ new Verifier class, with no change to the turn pipeline.
 """
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Protocol
@@ -50,6 +51,27 @@ class PolicyVerifier:
 
     def check(self, answer, tool_log, focus):
         reasons = self.policy().answer_violations(answer)
+        return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons) if reasons else GuardResult("allow", answer)
+
+
+TICKET_ID = re.compile(r"\bTCK-[A-Z0-9]{6,}\b")
+TICKET_CLAIM = re.compile(r"\b(i|we)(\s+have|'ve|\s+just)?\s+(raised|created|opened|logged|filed|submitted)\b[^.]{0,40}"
+                          r"\b(ticket|case|request)\b", re.I)
+
+
+class TicketVerifier:
+    """Only code opens tickets. An answer may mention a ticket id only if this session
+    has it, and may say "I've raised a ticket" only if one exists."""
+    name = "tickets"
+
+    def __init__(self, known: Callable[[], set[str]]):
+        self.known = known
+
+    def check(self, answer, tool_log, focus):
+        known = self.known()
+        reasons = [f"ungrounded_ticket:{t}" for t in sorted(set(TICKET_ID.findall(answer)) - known)]
+        if not known and TICKET_CLAIM.search(answer):
+            reasons.append("claims_ticket_created")
         return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons) if reasons else GuardResult("allow", answer)
 
 

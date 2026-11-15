@@ -100,6 +100,8 @@ Both are fixed, and a regression test now screens every knowledge-base chunk. Se
 | Audit: blocked reasons, tools, screened fields per turn | done (`audit.jsonl`) |
 | Lockout after repeated blocked injections | done (session risk score, `adaptive/risk.py`) |
 | Rate limiting per tenant and user | **not yet** |
+| Write actions: none in the bot; change requests become tickets a person executes (`actions.py`, `tickets.py`) | done |
+| Invented tickets: an answer naming a ticket the session doesn't have, or claiming one was raised, is blocked | done (`TicketVerifier`) |
 | Escalation to a person: complaints, unauthorised payments, stolen cards, hardship, bereavement | done (`escalate` rules, `adaptive/policy.py`) |
 | Guard changes: reviewer labels, regression gate, shadow, canary, admin approval, rollback, audit | done (`adaptive/controller.py`) |
 | Output escaping in the client (no HTML from model text) | client task |
