@@ -106,7 +106,7 @@ I also wrote a small simulator that runs the same routing rules over a day of sy
 | One processor down for 2 hours | 80.5% | 50 |
 | A large card issuer down | 65.2% | 400 |
 
-The processor outage barely registers, because failover and a circuit breaker on each processor soak it up. The bank outage costs about 15 points of approval, and sending eight times as many payments to a second processor doesn't help. So when a merchant asks whether to try another processor, the honest answer depends on whose failure it was, and the routing record tells you that.
+The processor outage barely registers, because failover and a circuit breaker on each processor soak it up. The bank outage costs about 15 points of approval, and sending nine times as many payments to a second processor doesn't help. So when a merchant asks whether to try another processor, the honest answer depends on whose failure it was, and the routing record tells you that.
 
 *The cascade rules are an example policy for the synthetic data, not any network's or processor's actual rules.*
 
@@ -184,7 +184,7 @@ Everything below runs offline, with a scripted stand-in for the model and seeded
 
 | Check | Result |
 |---|---|
-| Automated tests (guards, crashes, failover, leases, security, queue, ingestion, injection, processor routing, card data, tickets, deployment) | 284 passing |
+| Automated tests (guards, crashes, failover, leases, security, queue, ingestion, injection, processor routing, card data, tickets, deployment) | 288 passing |
 | Evaluation set (lookups, not-found, tenant isolation, context bleed, PII, retry advice, processor routing, prompt attacks) | 27 of 27; held-out set 170 of 170; fresh held-out sets 172 of 172 and 177 of 177 |
 | Hallucination stress: 12 kinds of injected errors, including invented cascades, outages, promises, tickets and wrong reasons | 0 of 259 reached the user; 0 of 3,514 on two fresh held-out test sets |
 | False alarms on correct answers about failed payments | 0 of 1,468 blocked |

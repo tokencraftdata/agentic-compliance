@@ -66,7 +66,7 @@ All of this runs offline, on synthetic data, with a scripted stand-in for the mo
 
 - 259 hallucinations injected on purpose, none reached the user
 - 0 of 29 prompt-injection attacks succeeded with guardrails on, against 21 of 29 without
-- 284 automated tests, and a held-out eval of 170 cases that passes
+- 288 automated tests, and a held-out eval of 170 cases that passes
 
 What I don't know yet is how it behaves with live models, real traffic, real latency and real cost. That's the next step, and I'll write about the results whatever they are.
 

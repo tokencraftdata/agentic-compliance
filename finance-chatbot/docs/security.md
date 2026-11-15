@@ -107,7 +107,7 @@ Both are fixed, and a regression test now screens every knowledge-base chunk. Se
 |---|---|
 | Authentication: JWT signature, alg, exp, nbf, iss, aud; HS256 for dev, JWKS for production | done (`security.py`) |
 | Authorization: deny by default; an unknown session and another tenant's session give the same 403 | done (`service.py`) |
-| Secrets: IAM roles, no static keys, Secrets Manager for the JWT secret | code done; set up in AWS |
+| Secrets: IAM roles through the boto3 default chain, no static keys; production sign-in verifies with the identity provider's public keys (JWKS), so no shared secret is stored. The HS256 secret is for development only and comes from the environment | done in code; roles and the identity provider are set up in AWS |
 | PII / PCI: card data masked at every edge; see section 4a | done (`guardrails.mask_pii`, `tests/test_pci.py`) |
 | Audit: blocked reasons, tools, screened fields per turn | done (`audit.jsonl`) |
 | Lockout after repeated blocked injections | done (session risk score, `adaptive/risk.py`) |

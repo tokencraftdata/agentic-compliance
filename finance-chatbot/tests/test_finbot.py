@@ -84,8 +84,9 @@ class Guards(unittest.TestCase):
 
     def test_evidence_guard_blocks_invented_amount(self):
         log = [{"name": "get_transaction", "input": {"txn_id": "txn_A1B2C3D4"},
-                "result": {"status": "found", "source": "txn_db", "data": {"amount": "129.00"}}}]
+                "result": {"status": "found", "source": "txn_db", "data": {"amount": "129.00", "currency": "USD"}}}]
         self.assertEqual(evidence_check("It was 129.00 USD.", log, "txn_A1B2C3D4").action, "allow")
+        self.assertIn("ungrounded_currency:EUR", evidence_check("It was 129.00 EUR.", log, "txn_A1B2C3D4").reasons)
         self.assertEqual(evidence_check("It was 130.00 USD.", log, "txn_A1B2C3D4").action, "block")
 
     def test_evidence_guard_blocks_claims_about_missing_txn(self):

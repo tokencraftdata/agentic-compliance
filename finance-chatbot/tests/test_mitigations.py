@@ -275,5 +275,60 @@ class Upkeep(unittest.TestCase):
         store.close()
 
 
+class StatedDetails(unittest.TestCase):
+    """The README says every stated fact is checked: these are the ones beyond amounts and codes."""
+    REC = {"txn_id": DECLINED, "status": "declined", "amount": "129.00", "currency": "USD", "decline_code": "05",
+           "created_at": "2026-11-12T14:03:11Z", "card_brand": "visa", "last4": "4242"}
+
+    def reasons(self, answer, rec=None):
+        from finbot.guardrails import evidence_check
+        return evidence_check(answer, lookup(rec or self.REC), DECLINED).reasons
+
+    def test_wrong_details_are_blocked(self):
+        for answer, reason in [
+                ("It was declined for 129.00 EUR.", "ungrounded_currency:EUR"),
+                ("It was declined for $130.", "ungrounded_amount:130"),
+                ("It was declined for 500 dollars.", "ungrounded_amount:500"),
+                ("It was declined. A 3% fee applies.", "ungrounded_percentage:3"),
+                ("It was declined. The card ending 9999 was used.", "ungrounded_card_digits:9999"),
+                ("It was declined on a Mastercard card.", "ungrounded_card_brand:mastercard"),
+                ("It was declined on 2026-10-01.", "ungrounded_date:2026-10-01"),
+                ("It was declined on October 1, 2026.", "ungrounded_date:2026-10-01"),
+                ("It was declined at 09:15 UTC.", "ungrounded_time:09:15"),
+                ("It was declined: N7 came back from the issuer.", "ungrounded_code:N7"),
+                ("The payment was reversed.", "ungrounded_status:reversed"),
+                ("The payment is still pending.", "ungrounded_status:pending")]:
+            with self.subTest(answer=answer):
+                self.assertIn(reason, self.reasons(answer))
+
+    def test_the_records_own_details_pass(self):
+        ok = ("Transaction txn_A1B2C3D4 was declined for $129.00 (129.00 USD) on 12 November 2026 at 14:03, "
+              "on the Visa card ending 4242, with decline code 05. Use another card.")
+        self.assertEqual(self.reasons(ok), [])
+        open_rec = {**self.REC, "status": "unknown", "decline_code": None, "error": "PROCESSOR_TIMEOUT"}
+        self.assertEqual(self.reasons("The payment is still pending: check its status before retrying.", open_rec), [])
+
+    def test_help_answers_cite_their_page_or_admit_there_is_none(self):
+        from finbot.guardrails import citation_check
+        hit = {"name": "search_knowledge_base", "input": {"query": "q"}, "result": {
+            "status": "found", "source": "knowledge_base",
+            "data": [{"source_url": "https://wiki.example.com/surcharge", "text": "capped at 3 percent"}]}}
+        miss = {"name": "search_knowledge_base", "input": {"query": "q"},
+                "result": {"status": "not_found", "source": "knowledge_base", "data": None}}
+        self.assertEqual(citation_check("Surcharges are capped at 3 percent.", [hit]), ["help_answer_without_citation"])
+        self.assertEqual(citation_check("Capped at 3 percent (https://wiki.example.com/surcharge).", [hit]), [])
+        self.assertEqual(citation_check("Refunds take 5 days.", [miss]), ["answer_without_documentation"])
+        self.assertEqual(citation_check("I don't have documentation on that.", [miss]), [])
+        self.assertEqual(citation_check("It was declined.", lookup(self.REC) + [miss]), [])   # a record answers it
+
+    def test_out_of_scope_advice_in_an_answer_is_blocked(self):
+        for text in ["You should buy shares in the processor, it is a good investment.",
+                     "You could sue the bank; this fee is also tax deductible."]:
+            b = bot(record_fallback=False, repair_attempts=0)
+            b.llm = says(text)
+            t = b.ask(b.new_session("m_100", ["support"]), f"why did {DECLINED} fail?")
+            self.assertEqual(t.blocked_by, "output_guardrail", text)
+
+
 if __name__ == "__main__":
     unittest.main()

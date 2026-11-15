@@ -57,7 +57,7 @@ anthropic, sqlite3 or a vector DB client.
 | Immutable versioned value | `adaptive/policy.py` (`GuardPolicy`) | Every guard change is a new version; rollback is "make the previous one active" |
 | Strategy (proposers, suites) | `adaptive/proposers.py`, `adaptive/gate.py` | Add a way to propose rules, or a regression suite, as one class |
 | State machine | `adaptive/controller.py` (proposed → rejected / report / awaiting_approval → shadow → canary → active) | A change can't skip the gate, shadow traffic or an admin |
-| Pipeline (ordered stages) | `Chatbot.stages`: risk lock → input guard → learned policy → focus → write request → model | The flow is one readable list; each stage ends the turn with a `Reply` or passes; a new check is one method |
+| Pipeline (ordered stages) | `Chatbot.stages`: risk lock → input guard → language → learned policy → focus → write request → model | The flow is one readable list; each stage ends the turn with a `Reply` or passes; a new check is one method |
 | Context object | `TurnContext` (one context variable, `current_turn()`) | Per-turn facts (masked text, policy version, known tickets, PII found) set once and read by verifiers, never threaded through every call |
 | Single responsibility | `pii.py` (masking), `replies.py` (fixed wording), `actions.TicketIntake` (request → ticket), `auditlog.py` (where audit lines go) | Each rule lives in one module; the orchestrator only sequences them |
 
@@ -65,7 +65,7 @@ anthropic, sqlite3 or a vector DB client.
 
 | Failure | Handled by | Proven by |
 |---|---|---|
-| Hallucinated amount, status, code, URL, retry advice | `HallucinationGate`: verify, one repair on the strong tier, re-verify against the repair's own tool results, else fallback | `run_eval.py --hallucinate` (0 of 103 leaked), `test_layers.Gate` |
+| Hallucinated amount, status, code, URL, retry advice | `HallucinationGate`: verify, one repair on the strong tier, re-verify against the repair's own tool results, else a record-built answer, else refusal | `run_eval.py --hallucinate` (0 of 259 leaked), `test_layers.Gate` |
 | Model 429/5xx/timeout | `retry_call` with jitter, per-model breaker, failover to the next target | `test_model_engine`, `test_boundaries` |
 | Model refuses | refusal fallback to the next target, output still verified | `test_boundaries.test_refusal_fallback_cannot_bypass_guards` |
 | Guardrail service down | fail closed | `test_boundaries` |

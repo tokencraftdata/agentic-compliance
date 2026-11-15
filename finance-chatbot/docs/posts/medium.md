@@ -94,7 +94,7 @@ Every model call goes through an ordered failover chain, each model with its own
 
 All of this runs offline with a scripted stand-in model and seeded synthetic data.
 
-- 284 automated tests pass.
+- 288 automated tests pass.
 - The eval set passes 27 of 27, and a held-out set 170 of 170.
 - I injected 259 hallucinations of 12 kinds on purpose. None reached the user. On two freshly generated test sets, 0 of 3,514.
 - 1,468 correct answers about failed payments produced no false blocks.

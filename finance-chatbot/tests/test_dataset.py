@@ -70,9 +70,12 @@ class LifecycleChecks(unittest.TestCase):
         self.assertIn("refund_amount_mismatch:partial", evidence_check("It was fully refunded.", log, "txn_X").reasons)
 
     def test_relative_dates_are_not_from_records(self):
-        log = self.log({"amount": "100.00", "status": "succeeded"})
+        log = self.log({"amount": "100.00", "status": "succeeded", "at": "2026-11-24T09:00:00Z"})
         self.assertIn("unverifiable_relative_date", evidence_check("It was refunded yesterday.", log, "txn_X").reasons)
         self.assertEqual(evidence_check("It was refunded on 2026-11-24.", log, "txn_X").action, "allow")
+        self.assertEqual(evidence_check("It was refunded on 24 November 2026.", log, "txn_X").action, "allow")
+        wrong_day = evidence_check("It was refunded on 2026-11-25.", log, "txn_X")
+        self.assertIn("ungrounded_date:2026-11-25", wrong_day.reasons)
 
 
 if __name__ == "__main__":

@@ -47,6 +47,8 @@ DENIED_TOPICS = {
                                     r"investment advice|(buy|sell) (shares|stocks?)|"
                                     r"invest in (stocks?|shares|crypto))\b",
                                     re.I),
+    "legal_tax_advice": re.compile(r"\b(legal advice|tax advice|tax[- ]deductible|(should|can|could) (i|we|you) sue|"
+                                   r"take legal action|file a lawsuit)\b", re.I),
 }
 
 
@@ -65,6 +67,9 @@ class LocalGuardrail:
         return GuardResult("masked" if reasons else "allow", masked, reasons)
 
     def check_output(self, text: str, grounding: str, query: str) -> GuardResult:
+        for name, pat in DENIED_TOPICS.items():   # out-of-scope advice in an answer, however it got there
+            if pat.search(text):
+                return GuardResult("block", BLOCKED_OUTPUT_MSG, [f"denied_topic:{name}"])
         masked, reasons = mask_pii(text)
         return GuardResult("masked" if reasons else "allow", masked, reasons)
 
@@ -349,6 +354,92 @@ def credential_request_check(answer: str) -> list[str]:
     return ["credential_request"] if any(not negated(m) for m in hits) else []
 
 
+# ------------------------------------------------------------------ other stated details
+
+CURRENCIES = ("USD EUR GBP CAD AUD NZD JPY CHF SEK NOK DKK PLN CZK HUF INR CNY HKD SGD MXN BRL ZAR AED SAR "
+              "ILS TRY KRW THB").split()
+CURRENCY = re.compile(r"\b(" + "|".join(CURRENCIES) + r")\b")
+_NUM = r"\d[\d,]*(?:\.\d+)?"
+MONEY = re.compile(rf"[$€£]\s?({_NUM})|\b({_NUM})\s?(?:{'|'.join(CURRENCIES)}|dollars?|euros?|pounds?)\b")
+PERCENT = re.compile(r"\b(\d+(?:\.\d+)?)\s?(?:%|percent\b)")
+LAST4 = re.compile(r"\b(?:ending|ends)(?: in| with)?\s+(\d{4})\b|\blast[ -]?(?:4|four)(?: digits)?\D{0,12}(\d{4})\b",
+                   re.I)
+ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+CLOCK = re.compile(r"\b\d{1,2}:\d{2}(?::\d{2})?\b")
+_MONTHS = ("january february march april may june july august september october november december").split()
+_MONTH = "(" + "|".join(f"{m}|{m[:3]}" for m in _MONTHS) + r")\.?"
+WORD_DATE = re.compile(rf"\b(?:(\d{{1,2}})(?:st|nd|rd|th)?\s+{_MONTH},?\s+(\d{{4}})|"
+                       rf"{_MONTH}\s+(\d{{1,2}})(?:st|nd|rd|th)?,?\s+(\d{{4}}))\b", re.I)
+BRANDS = re.compile(r"\b(visa|mastercard|amex|american express|discover|maestro|jcb|unionpay|diners)\b", re.I)
+OTHER_STATUS = re.compile(r"\b(it|the (payment|transaction|charge)|txn_\w+)\s+(is|was|has been|remains)\s+(still\s+)?"
+                          r"(pending|processing|reversed|voided|cancell?ed|captured|authori[sz]ed|on hold|"
+                          r"charged back)\b", re.I)
+NO_DOCS = ("don't have documentation", "do not have documentation", "no documentation", "not documented",
+           "couldn't find", "could not find", "don't have information", "can't find", "cannot find", "won't guess")
+
+
+def _numbers(text: str) -> set[float]:
+    return {float(n.replace(",", "")) for n in re.findall(_NUM, text) if n.replace(",", "").replace(".", "")}
+
+
+def detail_check(answer: str, tool_log: list[dict]) -> list[str]:
+    """Details beyond amounts and codes: currency, money written loosely ("$130"), percentages,
+    card digits and brand, dates and times, known failure keys, and status words. Each must
+    appear in this turn's tool data."""
+    from .reasons import KEY_CAUSE
+    found = [c for c in tool_log if c["result"]["status"] == "found"]
+    blob = " ".join(json.dumps(c["result"]["data"]) for c in found)
+    low, numbers = blob.lower(), _numbers(blob)
+    txns = [c["result"]["data"] for c in found if c["name"] == "get_transaction"]
+    reasons = [f"ungrounded_currency:{c}" for c in sorted(set(CURRENCY.findall(answer))) if c not in blob]
+    for m in MONEY.finditer(answer):
+        value = (m.group(1) or m.group(2)).replace(",", "")
+        if float(value) not in numbers:
+            reasons.append(f"ungrounded_amount:{value}")
+    for pct in set(PERCENT.findall(answer)):
+        if not re.search(rf"(?<![\d.]){re.escape(pct)}\s?(%|percent)", low):
+            reasons.append(f"ungrounded_percentage:{pct}")
+    for m in LAST4.finditer(answer):
+        if (digits := m.group(1) or m.group(2)) not in blob:
+            reasons.append(f"ungrounded_card_digits:{digits}")
+    reasons += [f"ungrounded_date:{d}" for d in sorted(set(ISO_DATE.findall(answer))) if d not in blob]
+    reasons += [f"ungrounded_time:{t}" for t in sorted(set(CLOCK.findall(answer))) if t not in blob]
+    for m in WORD_DATE.finditer(answer):
+        day, month, year = (m.group(1), m.group(2), m.group(3)) if m.group(1) else (m.group(5), m.group(4), m.group(6))
+        iso = f"{year}-{[x[:3] for x in _MONTHS].index(month[:3].lower()) + 1:02d}-{int(day):02d}"
+        if iso not in blob:
+            reasons.append(f"ungrounded_date:{iso}")
+    if txns:
+        reasons += [f"ungrounded_card_brand:{b}" for b in sorted({b.lower() for b in BRANDS.findall(answer)})
+                    if b not in low]
+        reasons += [f"ungrounded_code:{k}" for k in KEY_CAUSE
+                    if not k.isdigit() and re.search(rf"\b{re.escape(k)}\b", answer) and k not in blob]
+        open_outcome = any(str(t.get("status", "")).lower() in UNKNOWN_STATUSES for t in txns)
+        for x in _sentences(answer):
+            for m in OTHER_STATUS.finditer(x):
+                word = m.group(5).lower()
+                if open_outcome and word in ("pending", "processing"):
+                    continue
+                if word[:6] not in low and _affirmed(OTHER_STATUS, x):
+                    reasons.append(f"ungrounded_status:{word}")
+    return list(dict.fromkeys(reasons))
+
+
+def citation_check(answer: str, tool_log: list[dict]) -> list[str]:
+    """A help-page answer cites the page it came from; with no page found, it says so."""
+    kb = [c for c in tool_log if c["name"] == "search_knowledge_base"]
+    if not kb or any(c["result"]["status"] == "found" for c in tool_log if c["name"] != "search_knowledge_base"):
+        return []
+    hits = [h for c in kb if c["result"]["status"] == "found" for h in (c["result"]["data"] or [])
+            if isinstance(h, dict)]
+    admits = any(p in answer.lower() for p in NO_DOCS)
+    if hits and not admits and not any(h.get("source_url") and h["source_url"] in answer for h in hits):
+        return ["help_answer_without_citation"]
+    if not hits and all(c["result"]["status"] == "not_found" for c in tool_log) and not admits:
+        return ["answer_without_documentation"]
+    return []
+
+
 def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
                    known_processors: set[str] | None = None) -> GuardResult:
     """Deterministic hallucination checks against this turn's tool evidence.
@@ -386,6 +477,8 @@ def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
         if url.rstrip(".,;:") not in kb_urls:
             reasons.append(f"unverified_url:{url}")
     reasons += credential_request_check(answer)
+    reasons += detail_check(answer, tool_log)
+    reasons += citation_check(answer, tool_log)
     reasons += lifecycle_check(answer, tool_log)
     reasons += routing_check(answer, tool_log, known_processors or KNOWN_PROCESSORS)
     pos, neg = bool(POSITIVE.search(answer)), bool(NEGATIVE.search(answer))

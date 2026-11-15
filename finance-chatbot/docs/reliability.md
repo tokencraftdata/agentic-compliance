@@ -70,6 +70,13 @@ Four layers. Each catches what the one before it misses.
    - status claims with no lookup this turn, or about a transaction that wasn't found
    - refund, dispute or settlement claims with no matching field or document
    - URLs that didn't come from a knowledge-base result
+   - a currency, a loosely written amount ("$130", "500 dollars"), a percentage, card digits or brand, a date or a time that isn't in this turn's tool data (`detail_check`)
+   - a status word the record doesn't carry ("reversed", "voided", "pending" on a settled outcome), and a named failure key (N7, RISK_BLOCKED) that isn't in the record
+   - a cause in plain words that contradicts the recorded code (`finbot/reasons.py`)
+   - a help-page answer that doesn't cite its page, or an answer given when no page was found (`citation_check`)
+   - an answer that isn't in English
+
+   Not checked in code: a wrong merchant name, a numeric code written without the word "code", and free-text explanations in general.
 4. **Bedrock contextual grounding** on the output, with tool results as `grounding_source`, for free-text explanations the deterministic checks can't parse.
 
 **Repair, not just refusal.** A withheld answer is not a completed task. On an evidence failure the model gets one `<verifier>` message naming the unsupported claims and may re-check with tools. If the repair fails too, code builds an answer from the record itself (`finbot/recordanswer.py`): status, amount, code and the policy next step, from validated fields and code tables only, checked by the same verifiers. Only when there is no single transaction to state does the user see "I won't guess". `Turn.repaired` and a `records_only:` reason in the audit log record which path was taken. `FINBOT_REPAIR_ATTEMPTS=0` skips the second model call and goes straight to the record-built answer; `FINBOT_RECORD_FALLBACK=0` restores refusal.
