@@ -4,6 +4,8 @@
 
 I started from one rule: a payments support bot must never tell someone something about their money that the records don't back up. Sounding helpful comes second. finbot is my attempt at sticking to that. It's a Python project on Amazon Bedrock, and every answer about a transaction gets checked against the tool results before anyone sees it. In an offline stress test I injected 238 hallucinations on purpose. None of them reached the user.
 
+The project rests on three ideas. A **hallucination gate**: code checks every fact in an answer before it's sent. **Adaptive guardrails**: the rules improve from mistakes a reviewer has labelled, without retraining anything and without letting chat text rewrite them. And **resilience**: the bot stays correct when a model or a worker goes down halfway through a conversation.
+
 Below are the mistakes that keep coming up in finance chatbots, and what I did about each one.
 
 ## Seven ways finance chatbots go wrong
