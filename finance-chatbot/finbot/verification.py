@@ -17,6 +17,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Protocol
 
+from .adaptive.policy import GuardPolicy
 from .guardrails import BLOCKED_OUTPUT_MSG, GuardResult, evidence_check
 
 
@@ -38,6 +39,20 @@ class EvidenceVerifier:
         return evidence_check(answer, tool_log, focus, self.known_processors)
 
 
+class PolicyVerifier:
+    """The learned commitment rules of the guard policy serving this turn: promises
+    the bot can't keep ("you'll get a refund", "guaranteed"). A violation gets the
+    same one repair as an ungrounded fact."""
+    name = "policy"
+
+    def __init__(self, policy: Callable[[], GuardPolicy]):
+        self.policy = policy
+
+    def check(self, answer, tool_log, focus):
+        reasons = self.policy().answer_violations(answer)
+        return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons) if reasons else GuardResult("allow", answer)
+
+
 class VerifierChain:
     def __init__(self, verifiers: list[Verifier]):
         self.verifiers = verifiers
@@ -51,9 +66,10 @@ class VerifierChain:
         return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons) if reasons else GuardResult("allow", answer)
 
 
-REPAIR_PROMPT = ("<verifier>Your previous answer was NOT shown to the user because these claims are not "
-                 "supported by this turn's tool results: {reasons}. Rewrite the answer using only facts from "
-                 "tool results (call tools again if needed). If the data is missing, say so.</verifier>")
+REPAIR_PROMPT = ("<verifier>Your previous answer was NOT shown to the user because these checks failed: "
+                 "{reasons}. Rewrite the answer using only facts from tool results (call tools again if "
+                 "needed), and don't promise outcomes the records don't show. If the data is missing, say so."
+                 "</verifier>")
 
 
 @dataclass

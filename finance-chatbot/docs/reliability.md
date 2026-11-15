@@ -76,16 +76,24 @@ Four layers. Each catches what the one before it misses.
 
 ### Stress test
 
-`scripts/run_eval.py --hallucinate` injects one known hallucination into the model's first answer for every eval question, in 5 ways, and counts how many reach the user:
+`scripts/run_eval.py --hallucinate` injects one known hallucination into the model's first answer for every eval question, in 10 ways, and counts how many reach the user. Dev split (27 cases):
 
 | Mode | Injected | Repaired | Fallback | Leaked |
 |---|---:|---:|---:|---:|
-| status_flip | 20 | 20 | 0 | 0 |
-| invented_amount | 20 | 20 | 0 | 0 |
-| invented_url | 20 | 20 | 0 | 0 |
-| stale_txn | 20 | 20 | 0 | 0 |
-| unlooked_status | 20 | 20 | 0 | 0 |
-| bad_retry_advice | 3 | 3 | 0 | 0 |
+| status_flip | 28 | 28 | 0 | 0 |
+| invented_amount | 28 | 28 | 0 | 0 |
+| invented_url | 28 | 28 | 0 | 0 |
+| stale_txn | 28 | 28 | 0 | 0 |
+| unlooked_status | 28 | 28 | 0 | 0 |
+| bad_retry_advice | 5 | 5 | 0 | 0 |
+| fake_cascade | 22 | 22 | 0 | 0 |
+| bad_cascade_advice | 3 | 3 | 0 | 0 |
+| fake_outage | 12 | 12 | 0 | 0 |
+| false_promise | 28 | 28 | 0 | 0 |
+
+That is 210 injected, 0 leaked. On the held-out split (`--data data/test`): 1,392 injected, 0 leaked.
+`false_promise` adds "We guarantee the funds will be back in your account by Friday"; the guard
+policy's commitment rules catch it and the repair removes it.
 
 `bad_retry_advice` applies only to answers that contain a "don't retry" instruction. Separately, 448 correct answers (every failed transaction, asked as both merchant and support) produced **0 false blocks**.
 
@@ -94,7 +102,7 @@ Each leak the stress test found became a fix and a regression test:
 2. "You can retry it right away" on a hard decline passed because "another card" appeared in a *different* sentence. Retry advice is now judged sentence by sentence.
 3. "The payment was approved" on a processor **timeout** passed because only declined and approved records were checked. Unknown outcomes now block any definite claim either way; hedged wording is allowed.
 
-**Limits.** These are 5 injection patterns on a scripted model, so the zeros show the guards catch these patterns, not that Claude never hallucinates. Run the same stress test with `FINBOT_LLM_PROVIDER=bedrock`: the corruption is then added on top of Claude's real answers, which tests the guards against realistic wording. Paraphrased errors with no number, code, URL or status word (for example a wrong *reason* for a decline) are left to contextual grounding and human review.
+**Limits.** These are 10 injection patterns on a scripted model, so the zeros show the guards catch these patterns, not that Claude never hallucinates. Run the same stress test with `FINBOT_LLM_PROVIDER=bedrock`: the corruption is then added on top of Claude's real answers, which tests the guards against realistic wording. Paraphrased errors with no number, code, URL or status word (for example a wrong *reason* for a decline) are left to contextual grounding and human review.
 
 ## 4. Payment retry guardrail and routing (`finbot/policy.py`)
 

@@ -49,12 +49,18 @@ finbot/policy.py         payment retry rules and role-based next steps (example 
 finbot/resilience.py     backoff with jitter, circuit breakers, transient-error classification
 finbot/processors/       processor orchestration: dialect adapters, routing rule chain, cascade policy,
                          PaymentOrchestrator engine, seeded simulator, read-side views for the bot
+finbot/adaptive/         adaptive guardrails: versioned GuardPolicy (escalation, commitment, learned input rules),
+                         session risk score, reviewer labels, proposers, regression gate, controller
+                         (shadow, canary, approve, rollback)
+finbot/evalkit.py        eval scoring shared by run_eval.py and the gate
+finbot/redteam.py        red-team harness shared by run_redteam.py and the gate
 infra/create_guardrail.py   creates the Bedrock guardrail (topics, PII, prompt attack, grounding)
 scripts/ingest.py        any source -> any vector store, incremental; or start a Bedrock KB sync
 scripts/generate_synthetic.py seeded synthetic merchants, transactions, logs, KB pages, eval set
 scripts/run_eval.py      runs data/eval.jsonl through the bot with deterministic checks
 scripts/run_redteam.py   prompt-injection red team (data/redteam.jsonl) with a worst-case model and ablations
 scripts/simulate_routing.py  routing scenarios (steady, processor outage, degradation, issuer outage)
+scripts/guard_controller.py  adaptive guardrail controller: label, cycle, status, approve, promote, rollback, demo
 data/                    synthetic dev split (600 txns, 27-case eval) + data/test/ held-out split
                          (400 txns, 170-case eval, 21 planted attacks); routing traces on every
                          transaction; see data/README.md
@@ -75,7 +81,11 @@ tests/test_injection.py     19 tests: screening, spotlighting, KB screening, URL
 tests/test_ingestion.py     14 tests: sources, quarantine, incremental sync, PII masking, access filter, Claude context
 tests/test_processors.py    33 tests: adapters, routing rules, cascade policy, engine + breakers, simulator,
                             routing tools, routing evidence checks, generated traces
+tests/test_adaptive.py      27 tests: rule safety, baseline vs guard cases, escalation, commitment repair, risk lock,
+                            canary/shadow, proposers, Claude drafts, gate, controller lifecycle and authorization
 ```
+
+212 tests in all.
 
 ## Design
 
@@ -84,6 +94,16 @@ for model orchestration; DynamoDB session store; queue workers; JWT security; mu
 ingestion into a vector DB. See [docs/design.md](docs/design.md).
 
 ![finbot design: layers, control plane, ingestion](docs/design.svg)
+
+## Adaptive guardrails
+
+Guardrails improve from reviewed mistakes, not from raw chat and not by training the model.
+A reviewer labels a mistake; the controller proposes a rule, gates it against the eval sets and
+the red team, runs it in shadow on live traffic, and an admin promotes it through a canary. It
+never touches the built-in guards, loosening needs an admin, and rollback is one call. New
+guards in the baseline: escalation to a person (complaints, unauthorised payments, hardship),
+a check on promises the bot can't keep, and a session risk score for multi-turn jailbreaks.
+See [docs/design.md](docs/design.md#10-adaptive-guardrails).
 
 ## Security
 
@@ -105,7 +125,7 @@ Read [docs/reliability.md](docs/reliability.md) for the full picture. In short:
 
 - **Session store:** each session is a durable, versioned case record (ledger, focus, history) with a TTL. Workers are stateless, so any worker can serve any session.
 - **Crash recovery:** a lease plus a compare-and-swap commit. A crash mid-turn commits nothing, and the replacement re-runs the turn. A resent message is answered from the journal without calling the model again. A late writer is rejected. An external action whose outcome was never recorded is reconciled with the system of record before anything is retried.
-- **Hallucination:** a deterministic evidence guard checks amounts, codes, ids, status polarity, unknown outcomes, lifecycle claims and URLs. It gives one verifier-guided repair attempt, then falls back to "I won't guess", with Bedrock contextual grounding on top. The stress test injects 103 hallucinations and none leak; 448 correct answers produce no false blocks.
+- **Hallucination:** a deterministic evidence guard checks amounts, codes, ids, status polarity, unknown outcomes, lifecycle claims and URLs. It gives one verifier-guided repair attempt, then falls back to "I won't guess", with Bedrock contextual grounding on top. Answers that promise outcomes the bot can't grant ("you'll get a refund", "guaranteed") get the same repair. The stress test injects 210 hallucinations of 10 kinds on the dev split and 1,392 on the held-out split, and none leak; 448 correct answers produce no false blocks.
 - **Payment retries and routing:** retry rules and next steps are computed in code per decline code or gateway error, and worded for the asker's role. A guard blocks retry advice that breaks the policy (hard declines, "retry now" on soft declines, any definite claim on a timeout).
 - **Model orchestrator engine:** every model call goes through an ordered failover chain (for example Bedrock us-east-1, then us-west-2, then the Claude API). Each model has its own circuit breaker (closed, open, half-open probe), refusals fall back to the next model, failover works mid-turn, and optional routing sends simple turns to a faster model. Run `/status` in the CLI to see each model's breaker state and failovers. Breaker state is shared through the session store, so a replacement worker after a crash skips a model another worker already found down. Guards run around the engine, so a backup model's answer gets the same checks. See [how the layers fit together](docs/reliability.md#7-how-the-layers-compose-guardrail-boundary-crash-recovery-resilience).
 - **System retries:** one backoff layer with circuit breakers for each model and each backend. Guardrail failures fail closed. Outages roll the turn back so a resend works. After two unverifiable answers in a row the user is directed to a human, with a reference.
@@ -155,7 +175,11 @@ python3 -m finbot.app
 python3 scripts/simulate_routing.py
 ```
 
-Code hygiene (ruff and mypy settings are in `pyproject.toml`; `finbot/processors/` is type-checked strictly):
+```bash
+python3 scripts/guard_controller.py demo
+```
+
+Code hygiene (ruff and mypy settings are in `pyproject.toml`; `finbot/processors/` and `finbot/adaptive/` are type-checked strictly):
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install ruff mypy

@@ -54,7 +54,7 @@ def load_session(d: dict) -> ChatSession:
         ent.facts = {k: [Fact(**f) for f in v] for k, v in e["facts"].items()}
         entities[eid] = ent
     mem = SessionMemory(entities=entities, focus=m["focus"], turns_in_thread=m["turns_in_thread"],
-                        consecutive_fallbacks=m.get("consecutive_fallbacks", 0))
+                        consecutive_fallbacks=m.get("consecutive_fallbacks", 0), risk=m.get("risk", 0.0))
     return ChatSession(Session(**d["session"]), mem, d["history"], d["pending_notice"])
 
 

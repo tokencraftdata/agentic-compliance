@@ -30,9 +30,9 @@ warn_unused_ignores = true
 warn_redundant_casts = true
 check_untyped_defs = true
 
-# The processor-orchestration package is fully typed and checked strictly.
+# The processor-orchestration and adaptive-guardrail packages are fully typed and checked strictly.
 [[tool.mypy.overrides]]
-module = "finbot.processors.*"
+module = ["finbot.processors.*", "finbot.adaptive.*"]
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 warn_return_any = true

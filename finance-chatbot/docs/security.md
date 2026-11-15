@@ -29,6 +29,8 @@ attacks.
 | Push dangerous retry advice | Retry advice must match the policy table; "retry right away" is always blocked | `retry_advice_check` |
 | Extract the system prompt | Canary: any 8 consecutive words of the system prompt in an answer block it (it holds no secrets anyway) | `untrusted.leaks_prompt` |
 | Plant a lasting "fact" | Model answers never enter the knowledge base; feedback goes to human review | `Chatbot.feedback` |
+| Make promises the bot can't keep | Commitment rules on every answer ("you'll get a refund", "we will reverse", "guaranteed"); a violation gets one repair, then the fallback | `adaptive/policy.py`, `PolicyVerifier` |
+| Spread a jailbreak over many turns | Session risk score: +2 per blocked attack, +1 for probing language, decays on clean turns; at the threshold the session goes to a person and stays locked, across worker takeover | `adaptive/risk.py`, `Chatbot._ask` |
 | Blame or reroute through a processor | Processor names, cascade claims, outage claims and "send it to another processor" advice must match the routing trace, logs or health record; cascade advice must match the code-computed policy | `guardrails.routing_check` |
 
 ## 3. Red-team evaluation
@@ -96,7 +98,10 @@ Both are fixed, and a regression test now screens every knowledge-base chunk. Se
 | Secrets: IAM roles, no static keys, Secrets Manager for the JWT secret | code done; set up in AWS |
 | PII / PCI: card numbers and SSNs masked on input, output and ingestion; full card numbers never stored | done |
 | Audit: blocked reasons, tools, screened fields per turn | done (`audit.jsonl`) |
-| Rate limiting per tenant and user; lockout after repeated blocked injections | **not yet** |
+| Lockout after repeated blocked injections | done (session risk score, `adaptive/risk.py`) |
+| Rate limiting per tenant and user | **not yet** |
+| Escalation to a person: complaints, unauthorised payments, stolen cards, hardship, bereavement | done (`escalate` rules, `adaptive/policy.py`) |
+| Guard changes: reviewer labels, regression gate, shadow, canary, admin approval, rollback, audit | done (`adaptive/controller.py`) |
 | Output escaping in the client (no HTML from model text) | client task |
 | Dependency pinning and scanning | not yet |
 | Monitoring and alerts: spikes in blocked injections, screened fields, cross-tenant denials | metrics exist; alerts not set up |

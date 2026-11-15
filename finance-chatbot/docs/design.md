@@ -54,6 +54,9 @@ anthropic, sqlite3 or a vector DB client.
 | Adapter (processor dialects) | `processors/adapters.py` (`ADAPTERS` registry) | Three response dialects become one canonical code set |
 | Strategy + chain (routing rules) | `processors/routing.py` (`RULES` registry, `Router`) | Add or reorder a routing rule without touching the engine |
 | Policy object | `processors/cascade.py`, `policy.py` | Money-relevant decisions live in code, not in the model |
+| Immutable versioned value | `adaptive/policy.py` (`GuardPolicy`) | Every guard change is a new version; rollback is "make the previous one active" |
+| Strategy (proposers, suites) | `adaptive/proposers.py`, `adaptive/gate.py` | Add a way to propose rules, or a regression suite, as one class |
+| State machine | `adaptive/controller.py` (proposed → rejected / report / awaiting_approval → shadow → canary → active) | A change can't skip the gate, shadow traffic or an admin |
 
 ## 3. Robustness map
 
@@ -225,3 +228,66 @@ Payment ─► Router (capability → health → cost → local) ─► candidat
 
 The example rules (attempt limit, which outcomes cascade) are for the synthetic data. Replace
 them with your networks' and acquirers' current rules before production.
+
+## 10. Adaptive guardrails
+
+finbot's guardrails improve from reviewed mistakes without training the model and without
+letting chat text rewrite the rules. Code in `finbot/adaptive/`.
+
+```
+reviewer labels ──► proposers ──► gate ──► shadow ──► canary ──► active
+ (review queue)     (rules +      (own      (logged,   (% of      (all
+                     regression    cases,    not        sessions)  sessions)
+                     cases)        benign,   enforced)
+                                   suites)
+       ▲                                                              │
+       └───────── turn audit: drift per version, shadow divergence ◄──┘
+```
+
+**What the policy holds.** A `GuardPolicy` is a versioned, immutable set of learned rules on top
+of the built-in guards:
+
+| Rule kind | Runs on | Effect |
+|---|---|---|
+| `input_block` | user text (same decoded views as the injection screen) | blocked like a prompt attack |
+| `escalate` | user text | the turn goes to a person: complaints, unauthorised payments, stolen cards, hardship, bereavement |
+| `commitment` | the answer, as a verifier | promises the bot can't keep ("you'll get a refund", "guaranteed") get one repair, then the fallback |
+| `risk_threshold` | session risk score | +2 per blocked attack, +1 for probing language, -0.5 per clean turn; at the threshold the session goes to a person and stays locked |
+
+The baseline ships with escalation and commitment rules and is checked against
+`data/guard_cases.jsonl`.
+
+**Rules the controller enforces.**
+
+- **Built-in guards are never changed.** The prompt-attack screen, PII masking, evidence checks,
+  retry and cascade policy and tenant scoping are code. A false positive on one of them comes back
+  as a `report` for engineering, never as an automatic change. Baseline rules change by code
+  review only; the controller can remove only rules it learned.
+- **Only a reviewer's label starts a change.** Raw chat text never becomes a rule. A label says
+  what went wrong (missed attack, missed escalation, broken promise, or a false block); the
+  reviewer may highlight the phrase. Without a highlight, a rule needs wording shared by at least
+  two labelled messages. Claude may draft a regex (`ClaudeProposer`), with the examples passed as
+  data; the draft is validated and gated like any other.
+- **The gate checks three things.** The change fixes its own evidence. A new input rule matches
+  none of the benign corpus (fair questions from the eval sets and the benign red-team cases).
+  Replaying the guard cases, the dev eval, the held-out eval and the red team, no case that passed
+  before fails after (case-level, not just the same score). Rules with nested quantifiers, empty
+  matches or more than 200 characters are refused.
+- **Tightening reaches shadow automatically; nothing reaches users without an admin.** Shadow runs
+  on every turn and is logged with whether it would have decided differently. Loosening needs an
+  admin approval with a reason, and is re-gated first.
+- **Promotion needs shadow traffic.** `promote` refuses until the shadow policy has seen
+  `min_shadow_turns` real turns. Canary uses a stable hash of the session id, so a conversation
+  never switches policy midway.
+- **Every step is audited and reversible.** Labels, cycles, approvals, promotions and rollbacks are
+  logged with who, what and why. Earlier versions are kept, so rollback is one call (canary first,
+  then shadow, then the previous active).
+- **No weight training.** Prompts, retrieval and rules adapt; model weights do not. If you ever
+  fine-tune, use only reviewer-approved examples and run the same gate and rollout.
+- **Fail closed.** If the stored state can't be read, workers keep the last good policy, or the
+  baseline. Guards never switch off.
+
+**Demo:** `python3 scripts/guard_controller.py demo` labels five mistakes, runs a cycle (three
+rules pass the gate on 18/18 guard cases, 27/27 dev, 170/170 held-out, 33/33 red team; one false
+block on a built-in guard goes to engineering), runs 120 turns with the shadow policy logged
+(one turn diverges, as expected), promotes through a 10% canary and rolls back.

@@ -59,7 +59,7 @@ class RefusingLLM:
 
 
 MODES = ("status_flip", "invented_amount", "invented_url", "stale_txn", "unlooked_status", "bad_retry_advice",
-         "fake_cascade", "bad_cascade_advice", "fake_outage")
+         "fake_cascade", "bad_cascade_advice", "fake_outage", "false_promise")
 
 
 class HallucinatingLLM:
@@ -113,6 +113,9 @@ class HallucinatingLLM:
             if "Routing:" in text or "incident" in text or "northstar" in evidence:
                 return text, None
             return text + " The northstar processor was down at the time.", "northstar processor was down"
+        if self.mode == "false_promise":       # promise an outcome the bot can't grant
+            return text + " We guarantee the funds will be back in your account by Friday.", \
+                "funds will be back in your account by Friday"
         if self.mode == "status_flip":
             if "was declined" in text:
                 return text.replace("was declined", "was approved"), "was approved"

@@ -104,7 +104,23 @@ class Container:
     def chatbot(self):
         from .orchestrator import Chatbot
         return self._get("chatbot", lambda: Chatbot(self.engine, self.guardrail, self.toolbox, self.settings,
-                                                    self.audit_path))
+                                                    self.audit_path, policies=self.guard_policy))
+
+    @cached_property
+    def guard_policy(self):
+        """Where turns get the learned guard policy: fixed baseline, or the adaptive
+        controller's state in the shared store (FINBOT_GUARD_POLICY=store).
+        An override may be a GuardPolicy or a PolicySource."""
+        from .adaptive.policy import GuardPolicy
+        from .adaptive.source import StaticPolicySource, StorePolicySource
+
+        def build():
+            if self.settings.guard_policy_source == "store":
+                import time
+                return StorePolicySource(self.store, self.clock or time.time, self.settings.control_sync_s)
+            return StaticPolicySource()
+        src = self._get("guard_policy", build)
+        return StaticPolicySource(src) if isinstance(src, GuardPolicy) else src
 
     @cached_property
     def worker(self):
@@ -122,6 +138,14 @@ class Container:
         self.worker  # noqa: B018 - attaches shared health/config to the engine first
         return self._get("control", lambda: ControlPlane(self.chatbot.engine(), self.store, self.authorizer,
                                                          self.audit_path and self.audit_path + ".control"))
+
+    @cached_property
+    def guard_controller(self):
+        """Adaptive guardrail controller (finbot/adaptive): labels -> gate -> shadow -> canary -> active."""
+        from .adaptive.defaults import default_controller
+        return self._get("guard_controller", lambda: default_controller(
+            self.store, self.settings.data_dir or "data", self.settings.guard_labels_path, self.authorizer,
+            self.audit_path and self.audit_path + ".guard", self.audit_path, self.clock))
 
     @cached_property
     def verifier(self):

@@ -1,7 +1,8 @@
 """Turn pipeline:
 
   user text
-    -> input guardrail (block / mask PII)
+    -> session risk lock, input guardrail (block / mask PII)
+    -> learned guard policy: block, or escalate to a person (finbot/adaptive)
     -> focus detection + typed session state         (memory.py)
     -> Claude tool loop (read-only, tenant-scoped)    (tools.py, llm.py)
     -> hallucination gate: verify, one repair, verify (verification.py)
@@ -14,6 +15,7 @@ message after each user message instead of editing earlier turns.
 """
 from __future__ import annotations
 
+import contextvars
 import copy
 import json
 import time
@@ -22,13 +24,16 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
-from .guardrails import BLOCKED_OUTPUT_MSG
+from .adaptive.policy import BASELINE, GuardPolicy
+from .adaptive.risk import next_score
+from .adaptive.source import PolicySource, StaticPolicySource
+from .guardrails import BLOCKED_INPUT_MSG, BLOCKED_OUTPUT_MSG
 from .memory import SessionMemory
 from .models import ModelOrchestrator, ModelTarget
 from .resilience import GuardrailUnavailable, ServiceUnavailable
 from .tools import TXN_ID, Session, ToolBox
 from .untrusted import SPOTLIGHT_RULE, ToolResultScreen, leaks_prompt
-from .verification import EvidenceVerifier, HallucinationGate, VerifierChain
+from .verification import EvidenceVerifier, HallucinationGate, PolicyVerifier, VerifierChain
 
 SYSTEM_PROMPT = """You are a support assistant for a payments and financial-services company. You help merchants, customers and support staff understand transactions, declines, refunds, fees and product behaviour.
 
@@ -54,6 +59,16 @@ HANDOFF_MSG = {
     "support": ("This was unverifiable twice in a row: escalate to tier 2 with reference {ref}. "
                 "The session record has the full context."),
 }
+ESCALATION_MSG = {
+    "merchant": ("This needs a person rather than a bot, so I've passed it to a support specialist "
+                 "(reference {ref}). You can also contact {contact} and quote that reference."),
+    "support": "Route this to a human: it matches the escalation policy ({why}). Reference {ref}.",
+}
+RISK_MSG = ("I've paused this conversation and passed it to a support specialist (reference {ref}). "
+            "Please contact {contact} and quote that reference.")
+
+# The guard policy serving the current turn (per session: canary or active).
+_POLICY: contextvars.ContextVar[GuardPolicy] = contextvars.ContextVar("guard_policy", default=BASELINE)
 
 
 @dataclass
@@ -68,6 +83,8 @@ class Turn:
     escalated: bool = False  # human handoff offered on this turn
     tier: str | None = None  # routing tier chosen for this turn (None = single chain)
     models_used: list = field(default_factory=list)  # model target per call, shows failovers
+    question: str = ""  # the user's text as the model saw it (PII-masked)
+    policy_version: int | None = None  # guard policy version that served the turn
 
 
 @dataclass
@@ -83,12 +100,14 @@ class ChatSession:
 
 
 class Chatbot:
-    def __init__(self, llm, guardrail, toolbox: ToolBox, settings, audit_path: str | None = None):
+    def __init__(self, llm, guardrail, toolbox: ToolBox, settings, audit_path: str | None = None,
+                 policies: PolicySource | None = None):
         self.llm, self.guard, self.toolbox, self.settings = llm, guardrail, toolbox, settings
         self.audit_path = audit_path
+        self.policies: PolicySource = policies or StaticPolicySource()
         self.sleep = time.sleep  # injectable for tests
         names = set(toolbox.processors.names()) if getattr(toolbox, "processors", None) else None
-        self.gate = HallucinationGate(VerifierChain([EvidenceVerifier(names)]),
+        self.gate = HallucinationGate(VerifierChain([EvidenceVerifier(names), PolicyVerifier(_POLICY.get)]),
                                       repair_attempts=settings.repair_attempts)
         self.screen = ToolResultScreen(guardrail)  # third-party text in tool results
         self._wrapped: tuple | None = None
@@ -118,6 +137,7 @@ class Chatbot:
         (so resending the same message is safe) and tell the user what to do."""
         t0 = time.time()
         hist_len, mem, notice = len(cs.history), copy.deepcopy(cs.memory), cs.pending_notice
+        token = _POLICY.set(self.policies.for_session(cs.session.session_id))
         try:
             return self._ask(cs, user_text, t0)
         except ServiceUnavailable as e:
@@ -125,6 +145,8 @@ class Chatbot:
             cs.memory, cs.pending_notice = mem, notice
             msg = UNAVAILABLE_MSG.format(contact=self.settings.support_contact, ref=self._ref(cs))
             return self._finish(cs, user_text, msg, "unavailable", [str(e)], [], t0)
+        finally:
+            _POLICY.reset(token)
 
     def _guard(self, fn, *args):
         try:
@@ -133,10 +155,28 @@ class Chatbot:
             raise GuardrailUnavailable(f"guardrail unavailable: {type(e).__name__}") from e
 
     def _ask(self, cs: ChatSession, user_text: str, t0: float) -> Turn:
+        policy = _POLICY.get()
+        if cs.memory.risk >= policy.risk_threshold:  # locked: a person takes it from here
+            msg = RISK_MSG.format(ref=self._ref(cs), contact=self.settings.support_contact)
+            return self._finish(cs, user_text, msg, "session_risk", [f"risk:{cs.memory.risk:g}"], [], t0,
+                                escalated=True)
         g_in = self._guard(self.guard.check_input, user_text)
         if g_in.action == "block":
+            if any(r.startswith("prompt_attack") for r in g_in.reasons):  # off-topic is not an attack
+                cs.memory.risk = next_score(cs.memory.risk, attack=True, text=user_text)
             return self._finish(cs, user_text, g_in.text, "input_guardrail", g_in.reasons, [], t0)
         text = g_in.text  # PII-masked
+
+        learned = policy.input_decision(text)
+        if learned.action == "block":
+            cs.memory.risk = next_score(cs.memory.risk, attack=True, text=text)
+            return self._finish(cs, text, BLOCKED_INPUT_MSG, "input_guardrail", list(learned.reasons), [], t0)
+        if learned.action == "escalate":
+            tmpl = ESCALATION_MSG["merchant" if cs.session.role == "merchant" else "support"]
+            msg = tmpl.format(ref=self._ref(cs), contact=self.settings.support_contact,
+                              why=", ".join(learned.reasons))
+            return self._finish(cs, text, msg, "escalation", list(learned.reasons), [], t0, escalated=True)
+        cs.memory.risk = next_score(cs.memory.risk, attack=False, text=text)
 
         focus, changed = cs.memory.update_focus(text)
         if cs.memory.turns_in_thread >= self.settings.max_turns_per_thread:
@@ -237,7 +277,8 @@ class Chatbot:
         docs, then flow back through normal ingestion."""
         with open(queue_path, "a") as f:
             f.write(json.dumps({"session": cs.session.session_id, "rating": rating, "comment": comment,
-                                "answer": turn.answer, "focus": turn.focus,
+                                "question": turn.question, "answer": turn.answer, "focus": turn.focus,
+                                "policy": turn.policy_version,
                                 "tools": [{"name": c["name"], "status": c["result"]["status"]}
                                           for c in turn.tools_called]}) + "\n")
 
@@ -248,20 +289,23 @@ class Chatbot:
         return cs.session.session_id[:8].upper()
 
     def _finish(self, cs, user_text, answer, blocked_by, reasons, tool_log, t0, repaired=False,
-                route: dict | None = None) -> Turn:
+                route: dict | None = None, escalated: bool = False) -> Turn:
         route = route or {"tier": None, "models": []}
         # Direct the user to a human when the bot keeps failing to verify an answer.
         if blocked_by in ("evidence_guard", "output_guardrail"):
             cs.memory.consecutive_fallbacks += 1
         elif blocked_by is None:
             cs.memory.consecutive_fallbacks = 0
-        escalated = cs.memory.consecutive_fallbacks >= self.settings.escalate_after_fallbacks
-        if escalated:
+        if cs.memory.consecutive_fallbacks >= self.settings.escalate_after_fallbacks:
+            escalated = True
             tmpl = HANDOFF_MSG["merchant" if cs.session.role == "merchant" else "support"]
             answer = f"{answer} {tmpl.format(ref=self._ref(cs), contact=self.settings.support_contact)}"
             cs.memory.consecutive_fallbacks = 0
+        policy = _POLICY.get()
         turn = Turn(answer, blocked_by, reasons, tool_log, cs.memory.focus,
-                    int((time.time() - t0) * 1000), repaired, escalated, route["tier"], route["models"])
+                    int((time.time() - t0) * 1000), repaired, escalated, route["tier"], route["models"],
+                    user_text, policy.version)
+        shadow = self._shadow(policy, user_text, answer if blocked_by is None else "")
         if self.audit_path:
             with open(self.audit_path, "a") as f:
                 f.write(json.dumps({
@@ -269,7 +313,20 @@ class Chatbot:
                     "user_text_masked": user_text, "blocked_by": blocked_by, "reasons": reasons,
                     "focus": turn.focus, "latency_ms": turn.latency_ms, "repaired": turn.repaired,
                     "escalated": turn.escalated, "tier": turn.tier, "models": turn.models_used,
+                    "policy": turn.policy_version, "risk": cs.memory.risk, **({"shadow": shadow} if shadow else {}),
                     "tools": [{"name": c["name"], "input": c["input"], "status": c["result"]["status"],
                                **({"screened": c["result"]["screened"]} if c["result"].get("screened") else {})}
                               for c in tool_log]}) + "\n")
         return turn
+
+    def _shadow(self, live: GuardPolicy, user_text: str, answer: str) -> dict | None:
+        """Evaluate the shadow policy on this turn without enforcing it. The audit
+        record says what it would have done and whether that differs from live."""
+        shadow = self.policies.shadow()
+        if shadow is None or shadow.version == live.version:
+            return None
+        s_in, l_in = shadow.input_decision(user_text), live.input_decision(user_text)
+        s_out = shadow.answer_violations(answer) if answer else []
+        l_out = live.answer_violations(answer) if answer else []
+        return {"version": shadow.version, "input": s_in.action, "reasons": [*s_in.reasons, *s_out],
+                "diverged": s_in.action != l_in.action or bool(s_out) != bool(l_out)}

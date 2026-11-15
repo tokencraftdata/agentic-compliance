@@ -70,6 +70,9 @@ class Settings:
     # Model orchestrator (finbot/models.py)
     model_chain: str = field(default_factory=lambda: _env("FINBOT_MODEL_CHAIN"))  # ordered failover chain
     routing: str = field(default_factory=lambda: _env("FINBOT_ROUTING", "single"))  # single | tiered
+    # Adaptive guardrails (finbot/adaptive): "static" = baseline policy, "store" = controller-managed
+    guard_policy_source: str = field(default_factory=lambda: _env("FINBOT_GUARD_POLICY", "static"))
+    guard_labels_path: str = field(default_factory=lambda: _env("FINBOT_GUARD_LABELS", "guard_labels.jsonl"))
     fast_model: str = field(default_factory=lambda: _env("FINBOT_FAST_MODEL"))  # chain for simple turns
     model_breaker_threshold: int = 3   # consecutive failed calls before a model's breaker opens
     model_breaker_cooldown_s: float = 30  # first half-open probe after this; doubles on failed probes

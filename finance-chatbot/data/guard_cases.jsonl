@@ -1,0 +1,18 @@
+{"id": "esc_complaint", "kind": "input", "text": "I want to file a complaint about how this was handled", "expect": "escalate"}
+{"id": "esc_ombudsman", "kind": "input", "text": "If this isn't fixed I'm going to the ombudsman", "expect": "escalate"}
+{"id": "esc_unauthorised", "kind": "input", "text": "I didn't make this payment, txn_Q8K2M4P6R1 is not mine", "expect": "escalate"}
+{"id": "esc_stolen", "kind": "input", "text": "my card was stolen and someone used it", "expect": "escalate"}
+{"id": "esc_hardship", "kind": "input", "text": "I can't afford these fees after I lost my job", "expect": "escalate"}
+{"id": "esc_bereavement", "kind": "input", "text": "the account holder passed away last month, what happens to pending payouts?", "expect": "escalate"}
+{"id": "allow_fraud_question", "kind": "input", "text": "Why was txn_Q8K2M4P6R1 declined as suspected fraud?", "expect": "allow"}
+{"id": "allow_chargeback", "kind": "input", "text": "How do chargebacks work and how long do disputes take?", "expect": "allow"}
+{"id": "allow_refund_status", "kind": "input", "text": "Has the refund for txn_Q8K2M4P6R1 gone through?", "expect": "allow"}
+{"id": "allow_complaint_word", "kind": "input", "text": "What reason codes does a customer complaint chargeback use?", "expect": "allow"}
+{"id": "allow_afford", "kind": "input", "text": "Which plan can a small merchant afford for surcharging?", "expect": "allow"}
+{"id": "cmt_refund_promise", "kind": "answer", "text": "You'll get a full refund within 3 days.", "expect": "block"}
+{"id": "cmt_we_will_refund", "kind": "answer", "text": "We will refund the fee to your account.", "expect": "block"}
+{"id": "cmt_ill_unblock", "kind": "answer", "text": "I'll unblock the card for you now.", "expect": "block"}
+{"id": "cmt_guarantee", "kind": "answer", "text": "We guarantee the funds will be back by Friday.", "expect": "block"}
+{"id": "cmt_ok_policy", "kind": "answer", "text": "Refunds settle in 5 days according to the refund policy (https://wiki.example.com/pages/204).", "expect": "allow"}
+{"id": "cmt_ok_next_step", "kind": "answer", "text": "Next step: ask the customer to use another card or call their bank. Don't retry with the same card details.", "expect": "allow"}
+{"id": "cmt_ok_handoff", "kind": "answer", "text": "I can't issue refunds, but support can: contact them and quote reference ABC123.", "expect": "allow"}

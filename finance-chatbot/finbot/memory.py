@@ -60,6 +60,7 @@ class SessionMemory:
     focus: str | None = None
     turns_in_thread: int = 0
     consecutive_fallbacks: int = 0  # unverifiable answers in a row -> offer a human
+    risk: float = 0.0  # session risk score (finbot/adaptive/risk.py); at the policy threshold -> a person
 
     def update_focus(self, user_text: str) -> tuple[str | None, bool]:
         """Return (new_focus, changed). Decided in code, not by the model."""
