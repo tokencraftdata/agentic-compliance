@@ -63,9 +63,11 @@ class FakeLLM:
         user = next(m for m in reversed(messages) if m["role"] == "user" and isinstance(m["content"], str)
                     and not m["content"].startswith("<verifier>"))
         text = user["content"]
-        focus = re.search(r"focus_transaction: (txn_\w+)", "\n".join(
+        from .domains import by_id, find_ids
+        from .domains.base import _PREFIXES
+        focus = re.search(rf"focus_(?:transaction|record): ((?:{'|'.join(_PREFIXES)})_\w+)", "\n".join(
             m["content"] for m in messages if m["role"] == "system" and isinstance(m["content"], str)))
-        ids = re.findall(r"txn_[A-Za-z0-9]{6,}", text)
+        ids = find_ids(text)
         tid = ids[-1] if ids else (focus.group(1) if focus and re.search(r"\b(it|this|that)\b", text, re.I) else None)
         tool_names = {t["name"] for t in tools}
         processors: list[str] = next((t["input_schema"]["properties"]["processor"]["enum"] for t in tools
@@ -74,7 +76,11 @@ class FakeLLM:
         if named and HEALTH_CUE.search(text):
             return NS(stop_reason="tool_use", content=[
                 NS(type="tool_use", id=f"t{self.calls}h", name="get_processor_health", input={"processor": named[0]})])
-        if tid:
+        domain = by_id(tid)
+        if domain is not None and domain.tool in tool_names:
+            return NS(stop_reason="tool_use", content=[
+                NS(type="tool_use", id=f"t{self.calls}d", name=domain.tool, input={domain.id_arg: tid})])
+        if tid and "get_transaction" in tool_names:
             calls = [NS(type="tool_use", id=f"t{self.calls}a", name="get_transaction", input={"txn_id": tid}),
                      NS(type="tool_use", id=f"t{self.calls}b", name="search_transaction_logs",
                         input={"txn_id": tid, "limit": 10})]
@@ -86,6 +92,7 @@ class FakeLLM:
             NS(type="tool_use", id=f"t{self.calls}k", name="search_knowledge_base", input={"query": text})])
 
     def _answer(self, results: list[dict]):
+        from .domains import DOMAINS
         parts: list[str] = []
         for r in results:
             if r["status"] == "error":
@@ -93,7 +100,10 @@ class FakeLLM:
                     parts.append("That system is temporarily unavailable, so I can't check right now. "
                                  "Please try again in a few minutes.")
                 continue
-            if r["source"] == "txn_db":
+            domain = next((d for d in DOMAINS.values() if d.source == r["source"]), None)
+            if domain is not None:
+                parts.append(self._domain(domain, r))
+            elif r["source"] == "txn_db":
                 if r["status"] == "not_found":
                     parts.append("I could not find that transaction for your account.")
                 else:
@@ -118,6 +128,19 @@ class FakeLLM:
                     h = r["data"][0]
                     parts.append(f"{h['text']} (source: {h['source_url']})")
         return NS(stop_reason="end_turn", content=[NS(type="text", text=" ".join(parts))])
+
+    @staticmethod
+    def _domain(domain, r: dict) -> str:
+        if r["status"] == "not_found":
+            return f"I could not find that {domain.noun} for your account."
+        d = r["data"]
+        s = domain.summary(d) or f"I have the {domain.noun} record but can't read its details."
+        g = d.get("guidance") or {}
+        if g:
+            s += f" {g['meaning']} Next step: {g['next_step']}"
+            if g.get("retry_rule"):
+                s += f" Policy: {g['retry_rule']}"
+        return s
 
     @staticmethod
     def _routing(d: dict) -> str:

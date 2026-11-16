@@ -80,7 +80,7 @@ def demo() -> None:
         texts += [t for c in load_cases(os.path.join(DATA, "test", "eval.jsonl")) for t in c["turns"]]
         bot = Container(s, overrides={"store": store}, audit_path=turn_audit).chatbot
         for t in texts[:120]:
-            bot.ask(bot.new_session("m_100", ["support"], "merchant"), t)
+            bot.ask(bot.new_session("m_100", ["support"], "customer"), t)
         st = ctl.status(ADMIN)
         sh = st["shadow"]
         print(f"   shadow v{sh['version']}: {sh['turns']} turns observed, {sh['diverged']} would have differed")

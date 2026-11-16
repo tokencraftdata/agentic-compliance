@@ -1,0 +1,16 @@
+{"case_id": "kyc_N6YU7JV5", "decided_on": "2026-11-09", "level": "enhanced", "status": "verified", "submitted_on": "2026-09-16", "tenant_id": "m_910"}
+{"case_id": "kyc_8YNLFRD1", "level": "standard", "review_reason": "", "status": "pending", "submitted_on": "2026-11-13", "tenant_id": "m_910"}
+{"case_id": "kyc_QFV4RWFS", "decided_on": "2026-11-09", "level": "enhanced", "status": "verified", "submitted_on": "2026-10-22", "tenant_id": "m_920"}
+{"case_id": "kyc_BF1JR1RF", "level": "standard", "review_reason": "", "status": "pending", "submitted_on": "2026-11-07", "tenant_id": "m_920"}
+{"case_id": "kyc_ZY9LK8RS", "decided_on": "2026-11-14", "level": "standard", "status": "verified", "submitted_on": "2026-10-20", "tenant_id": "m_930"}
+{"case_id": "kyc_CD371VWL", "level": "standard", "review_reason": "", "status": "pending", "submitted_on": "2026-11-10", "tenant_id": "m_930"}
+{"case_id": "kyc_TKDBHTVG", "decided_on": "2026-11-11", "level": "enhanced", "reason_key": "SELFIE_MISMATCH", "status": "rejected", "submitted_on": "2026-11-05", "tenant_id": "m_940"}
+{"case_id": "kyc_MMX8B599", "level": "standard", "review_reason": "", "status": "pending", "submitted_on": "2026-11-12", "tenant_id": "m_940"}
+{"case_id": "kyc_J48BCYXU", "decided_on": "2026-11-11", "level": "standard", "reason_key": "ADDRESS_UNVERIFIED", "status": "rejected", "submitted_on": "2026-10-16", "tenant_id": "m_950"}
+{"case_id": "kyc_2AS79D58", "level": "standard", "review_reason": "manual_screening_queue", "status": "in_review", "submitted_on": "2026-11-09", "tenant_id": "m_950"}
+{"case_id": "kyc_50CNAX5Y", "decided_on": "2026-11-14", "level": "standard", "status": "verified", "submitted_on": "2026-10-20", "tenant_id": "m_960"}
+{"case_id": "kyc_LK5SCFB6", "level": "standard", "review_reason": "manual_screening_queue", "status": "in_review", "submitted_on": "2026-11-10", "tenant_id": "m_960"}
+{"case_id": "kyc_H929S3QD", "decided_on": "2026-11-11", "level": "standard", "status": "verified", "submitted_on": "2026-10-26", "tenant_id": "m_970"}
+{"case_id": "kyc_GTA3H2SD", "documents_required": ["proof_of_address", "selfie"], "level": "standard", "review_reason": "", "status": "needs_documents", "submitted_on": "2026-11-13", "tenant_id": "m_970"}
+{"case_id": "kyc_2JA77S3T", "decided_on": "2026-11-13", "level": "enhanced", "status": "verified", "submitted_on": "2026-10-29", "tenant_id": "m_980"}
+{"case_id": "kyc_078LNJ90", "documents_required": ["proof_of_address", "selfie"], "level": "standard", "review_reason": "", "status": "needs_documents", "submitted_on": "2026-11-09", "tenant_id": "m_980"}

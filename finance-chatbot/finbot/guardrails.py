@@ -22,10 +22,10 @@ from dataclasses import dataclass, field
 
 from .pii import mask_pii  # noqa: F401  (re-exported: guardrails.mask_pii is used across the code)
 
-BLOCKED_INPUT_MSG = ("I can help with payments, transactions, and account questions. "
-                     "I can't help with that request.")
+BLOCKED_INPUT_MSG = ("I can help with questions about your accounts, transfers, payments, identity "
+                     "verification and loans. I can't help with that request.")
 BLOCKED_OUTPUT_MSG = ("I couldn't verify an answer from our records, so I won't guess. "
-                      "Please share the transaction ID or contact support.")
+                      "Please share the reference ID or contact support.")
 
 
 @dataclass
@@ -164,7 +164,8 @@ RECORD_CLAIMS = [
 NEGATION = re.compile(r"(\b(not|never|no|neither|nor|avoid|stop)\b|n't)\W+(\w+\W+){0,2}$", re.I)
 # "retry" as advice, not as a noun ("retry policy", "retry rule", "retry limit").
 RETRY_ADVICE = re.compile(r"\b(retry(?!\s+(policy|rule|rules|limit|limits|logic|count|window|attempts?)\b)|"
-                          r"retrying|re-try|try (it |the payment |the charge )?again|resubmit|"
+                          r"retrying|re-try|try (it |the payment |the charge )?again|resubmit|resend|"
+                          r"send it again|re-?initiate|re-?apply|apply again|"
                           r"charge (it |the card )?again|run it again)\b", re.I)
 RETRY_NOW = re.compile(r"\b(retry|try (it )?again)\b[^.]{0,25}\b(now|immediately|right away|straight away)\b|"
                        r"\bkeep (retrying|trying)\b", re.I)
@@ -175,13 +176,14 @@ def retry_advice_check(answer: str, tool_log: list[dict]) -> list[str]:
     reasons = []
     # Judge each sentence on its own: "use another card" in one sentence must not
     # excuse "you can retry it right away" in the next.
+    from .domains import record_tools
     sentences = _sentences(answer)
     for call in tool_log:
         res = call["result"]
-        if call["name"] != "get_transaction" or res["status"] != "found":
+        if call["name"] not in record_tools() or res["status"] != "found":
             continue
         g = res["data"].get("guidance")
-        if not g:
+        if not g or "retryable" not in g:      # no rule about sending again for this record
             continue
         allowed = g.get("retry_only_if", [])
         if not g["retryable"] and any(_affirmed(RETRY_ADVICE, s) and not any(q in s.lower() for q in allowed)
@@ -206,7 +208,8 @@ def _affirmed(pattern: re.Pattern, text: str, hedges: bool = False) -> bool:
     for m in pattern.finditer(text):
         # Look back at most 40 characters, and never past the start of the sentence: a
         # "won't" in the previous sentence must not cancel a claim made in this one.
-        before = re.split(r"[.!?;]\s", text[max(0, m.start() - 40):m.start()])[-1]
+        # A comma ends a clause too: in "Don't worry, you're covered" the "Don't" is not about "covered".
+        before = re.split(r"[.!?;,]\s", text[max(0, m.start() - 40):m.start()])[-1]
         if NEGATION.search(before) or (hedges and HEDGE.search(before)):
             continue
         return True
@@ -452,18 +455,19 @@ def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
     - Every URL cited must come from a knowledge-base result this turn.
     Free-text explanations are left to the contextual grounding filter.
     """
+    from .domains import find_ids, id_of, record_tools
     reasons: list[str] = []
     found_txns, missing_txns, evidence, statuses = set(), set(), [], {}
     for call in tool_log:
         res = call["result"]
-        tid = call["input"].get("txn_id")
-        if call["name"] == "get_transaction":
+        tid = id_of(call["input"])
+        if call["name"] in record_tools():     # a payment, or any domain plug-in's record
             if res["status"] == "found":
                 found_txns.add(tid)
-            elif res["status"] == "not_found":  # an outage ("error") is not a missing transaction
+            elif res["status"] == "not_found":  # an outage ("error") is not a missing record
                 missing_txns.add(tid)
-            if res["status"] == "found":
-                statuses[tid] = str(res["data"].get("status", "")).lower()
+        if call["name"] == "get_transaction" and res["status"] == "found":
+            statuses[tid] = str(res["data"].get("status", "")).lower()
         if res["status"] == "found":
             evidence.append(json.dumps(res["data"]))
     blob = " ".join(evidence)
@@ -503,8 +507,7 @@ def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
         if claim.search(answer) and needs not in low_blob:
             reasons.append(f"ungrounded_{needs}_claim")
 
-    from .tools import TXN_ID
-    for tid in set(TXN_ID.findall(answer)):
+    for tid in set(find_ids(answer)):
         if tid not in found_txns and tid not in missing_txns and tid != focus_txn:
             reasons.append(f"unverified_txn_reference:{tid}")
     for amt in set(AMOUNT.findall(answer)):
@@ -516,7 +519,8 @@ def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
     if missing_txns and not found_txns:
         low = answer.lower()
         says_missing = any(p in low for p in ("not found", "couldn't find", "could not find",
-                                               "no record", "doesn't exist", "does not exist", "no transaction"))
+                                               "no record", "doesn't exist", "does not exist", "no transaction",
+                                               "can't find", "cannot find"))
         if not says_missing or pos or neg:
             reasons.append("claims_about_missing_transaction")
     if reasons:

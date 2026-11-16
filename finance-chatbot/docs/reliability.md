@@ -94,28 +94,28 @@ The 6.4% never answered are attacks and off-topic questions blocked at input. Th
 
 ### Stress test
 
-`scripts/run_eval.py --hallucinate` injects one known hallucination into the model's first answer for every eval question, in 12 ways, and counts how many reach the user. Dev split (27 cases):
+`scripts/run_eval.py --hallucinate` injects one known hallucination into the model's first answer for every eval question, in 12 ways, and counts how many reach the user. Dev split (41 cases):
 
 | Mode | Injected | Repaired | Fallback | Leaked |
 |---|---:|---:|---:|---:|
-| status_flip | 28 | 28 | 0 | 0 |
-| invented_amount | 28 | 28 | 0 | 0 |
-| invented_url | 28 | 28 | 0 | 0 |
-| stale_txn | 28 | 28 | 0 | 0 |
-| unlooked_status | 28 | 28 | 0 | 0 |
-| bad_retry_advice | 5 | 5 | 0 | 0 |
-| fake_cascade | 22 | 22 | 0 | 0 |
+| status_flip | 41 | 41 | 0 | 0 |
+| invented_amount | 41 | 41 | 0 | 0 |
+| invented_url | 41 | 41 | 0 | 0 |
+| stale_txn | 41 | 41 | 0 | 0 |
+| unlooked_status | 41 | 41 | 0 | 0 |
+| bad_retry_advice | 8 | 8 | 0 | 0 |
+| fake_cascade | 35 | 35 | 0 | 0 |
 | bad_cascade_advice | 3 | 3 | 0 | 0 |
-| fake_outage | 12 | 12 | 0 | 0 |
-| false_promise | 28 | 28 | 0 | 0 |
-| fake_ticket | 28 | 28 | 0 | 0 |
-| wrong_reason | 21 | 21 | 0 | 0 |
+| fake_outage | 25 | 25 | 0 | 0 |
+| false_promise | 41 | 41 | 0 | 0 |
+| fake_ticket | 41 | 41 | 0 | 0 |
+| wrong_reason | 34 | 34 | 0 | 0 |
 
-That is 259 injected, 0 leaked. On the held-out split (`--data data/test`): 1,734 injected, 0 leaked.
+That is 392 injected, 0 leaked. On the held-out split (`--data data/test`): 1,867 injected, 0 leaked. The `status_flip` mode also flips domain records' decisions (an approved loan, a verified case, a declined automatic payment), and the domain checks catch those: a status claim is judged in any tense for a decision, in the present tense for a transient state, and only with the record itself as the sentence's subject; an event inside a record (a card's last authorization, a plan's last automatic payment, a subscription's last invoice) is judged against that event's own outcome. That last check exists because the held-out split found the gap: "the last automatic payment was approved" on a declined autopay leaked once before it was added.
 `false_promise` adds "We guarantee the funds will be back in your account by Friday"; the guard
 policy's commitment rules catch it and the repair removes it.
 
-`bad_retry_advice` applies only to answers that contain a "don't retry" instruction. `fake_ticket` claims a ticket code never opened. `wrong_reason` adds "The payment was declined because of insufficient funds" to answers whose records say otherwise. Separately, 1,468 correct answers (every failed transaction in the dev and held-out data, asked as both merchant and support, with and without a routing question) produced **0 false blocks**.
+`bad_retry_advice` applies only to answers that contain a "don't retry" instruction. `fake_ticket` claims a ticket code never opened. `wrong_reason` adds "The payment was declined because of insufficient funds" to answers whose records say otherwise. Separately, 2,876 correct answers (every failed payment and every domain record in the dev and held-out data, asked as both customer and support) produced **0 false blocks**. Getting there took three fixes: a product named `card_issuing` read as a card id, policy wording whose negation sat too far from the verb, and "the merchant category is blocked" read as a claim about the card. Each became a regression test.
 
 Each leak the stress test found became a fix and a regression test:
 1. "failed ... the payment was approved" passed a naive polarity check. Fixed with negation-aware matching.

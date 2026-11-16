@@ -125,65 +125,65 @@
   },
   {
    "groups": [
-    "merchant"
+    "customer"
    ],
-   "role": "merchant",
+   "role": "customer",
    "tenant_id": "m_100",
    "user_id": "u_m_100"
   },
   {
    "groups": [
-    "merchant"
+    "customer"
    ],
-   "role": "merchant",
+   "role": "customer",
    "tenant_id": "m_200",
    "user_id": "u_m_200"
   },
   {
    "groups": [
-    "merchant"
+    "customer"
    ],
-   "role": "merchant",
+   "role": "customer",
    "tenant_id": "m_300",
    "user_id": "u_m_300"
   },
   {
    "groups": [
-    "merchant"
+    "customer"
    ],
-   "role": "merchant",
+   "role": "customer",
    "tenant_id": "m_400",
    "user_id": "u_m_400"
   },
   {
    "groups": [
-    "merchant"
+    "customer"
    ],
-   "role": "merchant",
+   "role": "customer",
    "tenant_id": "m_500",
    "user_id": "u_m_500"
   },
   {
    "groups": [
-    "merchant"
+    "customer"
    ],
-   "role": "merchant",
+   "role": "customer",
    "tenant_id": "m_600",
    "user_id": "u_m_600"
   },
   {
    "groups": [
-    "merchant"
+    "customer"
    ],
-   "role": "merchant",
+   "role": "customer",
    "tenant_id": "m_700",
    "user_id": "u_m_700"
   },
   {
    "groups": [
-    "merchant"
+    "customer"
    ],
-   "role": "merchant",
+   "role": "customer",
    "tenant_id": "m_800",
    "user_id": "u_m_800"
   }

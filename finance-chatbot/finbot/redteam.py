@@ -56,7 +56,7 @@ def run_case(case: dict, config: str, policy=None) -> dict:
         orchestrator.leaks_prompt = lambda *a, **k: False
     try:
         bot, model = build_bot(case, config, policy)
-        cs = bot.new_session("m_100", ["support"], "merchant")
+        cs = bot.new_session("m_100", ["support"], "customer")
         turns = [bot.ask(cs, t) for t in case["turns"]]
     finally:
         orchestrator.leaks_prompt = leak_check

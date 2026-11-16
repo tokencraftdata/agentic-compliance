@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1276" viewBox="0 0 1200 1276"><defs><marker id="a-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9ca3af"/></marker><marker id="a-code" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#047857"/></marker><marker id="a-block" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b91c1c"/></marker><marker id="a-model" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1d4ed8"/></marker><marker id="a-people" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b45309"/></marker><marker id="a-data" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6d28d9"/></marker></defs><rect width="1200" height="1276" fill="#ffffff"/>
+<text x="40" y="54" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="32" font-weight="bold" fill="#1f2937" text-anchor="start">One answer through the hallucination gate</text>
+<text x="40" y="88" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="normal" fill="#4b5563" text-anchor="start">The model&#x27;s answer is a draft. Code checks it against this turn&#x27;s records before anyone sees it.</text>
+<rect x="40" y="120" width="520" height="74" rx="10" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="58" y="152" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#1d4ed8" text-anchor="start">Draft answer from Claude</text>
+<text x="58" y="180" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">written from the tool results of this turn</text>
+<path d="M 300 194 L 300 222" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<rect x="40" y="224" width="520" height="330" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="58" y="256" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#047857" text-anchor="start">Verifier chain (plain Python, no second model)</text>
+<circle cx="70" cy="286" r="6" fill="#047857"/>
+<text x="86" y="292" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" text-anchor="start"><tspan font-weight="bold" fill="#1f2937">Evidence  </tspan><tspan font-weight="normal" fill="#1f2937">amounts, currencies, dates, codes, ids, links</tspan></text>
+<circle cx="70" cy="328" r="6" fill="#047857"/>
+<text x="86" y="334" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" text-anchor="start"><tspan font-weight="bold" fill="#1f2937">Reason  </tspan><tspan font-weight="normal" fill="#1f2937">a cause in plain words matches the record&#x27;s code</tspan></text>
+<circle cx="70" cy="370" r="6" fill="#047857"/>
+<text x="86" y="376" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" text-anchor="start"><tspan font-weight="bold" fill="#1f2937">Domain  </tspan><tspan font-weight="normal" fill="#1f2937">status, cause and reason keys of every record</tspan></text>
+<circle cx="70" cy="412" r="6" fill="#047857"/>
+<text x="86" y="418" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" text-anchor="start"><tspan font-weight="bold" fill="#1f2937">Policy  </tspan><tspan font-weight="normal" fill="#1f2937">no promises the bot can&#x27;t keep: refunds, guarantees</tspan></text>
+<circle cx="70" cy="454" r="6" fill="#047857"/>
+<text x="86" y="460" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" text-anchor="start"><tspan font-weight="bold" fill="#1f2937">Tickets  </tspan><tspan font-weight="normal" fill="#1f2937">no ticket the code didn&#x27;t open</tspan></text>
+<circle cx="70" cy="496" r="6" fill="#047857"/>
+<text x="86" y="502" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" text-anchor="start"><tspan font-weight="bold" fill="#1f2937">Language  </tspan><tspan font-weight="normal" fill="#1f2937">English, the language every check reads</tspan></text>
+<text x="58" y="540" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start" font-style="italic">every verifier runs; any one can block</text>
+<path d="M 300 554 L 300 590" fill="none" stroke="#b91c1c" stroke-width="2.5" marker-end="url(#a-block)"/>
+<text x="310" y="578" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">fails</text>
+<rect x="40" y="592" width="520" height="92" rx="10" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="58" y="622" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#1d4ed8" text-anchor="start">1. One guided repair</text>
+<text x="58" y="648" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">the model is told exactly which claims failed;</text>
+<text x="58" y="670" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">re-checked against the repair&#x27;s own tool calls</text>
+<path d="M 300 684 L 300 720" fill="none" stroke="#b91c1c" stroke-width="2.5" marker-end="url(#a-block)"/>
+<text x="310" y="708" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">fails again</text>
+<rect x="40" y="722" width="520" height="92" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="58" y="752" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#047857" text-anchor="start">2. Answer built from the record</text>
+<text x="58" y="778" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">code states validated fields and the policy next step;</text>
+<text x="58" y="800" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">checked by the same chain</text>
+<path d="M 300 814 L 300 850" fill="none" stroke="#b91c1c" stroke-width="2.5" marker-end="url(#a-block)"/>
+<text x="310" y="838" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">no single record to state</text>
+<rect x="40" y="852" width="520" height="74" rx="10" fill="#fef2f2" stroke="#b91c1c" stroke-width="2"/>
+<text x="58" y="882" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#b91c1c" text-anchor="start">3. “I can&#x27;t verify that, so I won&#x27;t guess.”</text>
+<text x="58" y="908" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">two in a row: handed to a person with a reference</text>
+<rect x="600" y="224" width="560" height="80" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="618" y="256" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#047857" text-anchor="start">Passes</text>
+<text x="618" y="284" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="normal" fill="#1f2937" text-anchor="start">→ output guard → the user sees it</text>
+<path d="M 560 300 L 598 270" fill="none" stroke="#047857" stroke-width="2.5" marker-end="url(#a-code)"/>
+<path d="M 560 640 L 580 640 L 580 290 L 598 290" fill="none" stroke="#047857" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#a-code)"/>
+<path d="M 560 770 L 586 770 L 586 296 L 598 296" fill="none" stroke="#047857" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#a-code)"/>
+<rect x="600" y="340" width="560" height="600" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2"/>
+<text x="618" y="372" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#1f2937" text-anchor="start">Worked example (synthetic data)</text>
+<text x="618" y="410" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" text-anchor="start"><tspan font-weight="bold" fill="#b45309">User  </tspan><tspan font-weight="normal" fill="#1f2937">Will claim clm_R5S4T3U2 be approved?</tspan></text>
+<rect x="618" y="428" width="524" height="128" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="634" y="454" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" fill="#6d28d9" text-anchor="start">get_claim  →  record</text>
+<text x="634" y="478" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">status: in_review · claimed: 18500.00 USD</text>
+<text x="634" y="500" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">policy_type: business_property</text>
+<line x1="634" y1="518" x2="1126" y2="518" stroke="#9ca3af" stroke-dasharray="4 4"/>
+<text x="634" y="542" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#b91c1c" text-anchor="start">adjuster_notes, fraud_score: stripped, the model never sees them</text>
+<text x="618" y="590" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" text-anchor="start"><tspan font-weight="bold" fill="#1d4ed8">Draft  </tspan><tspan font-weight="normal" fill="#1f2937">“Good news, it was approved. You&#x27;re covered.”</tspan></text>
+<rect x="618" y="606" width="524" height="96" rx="8" fill="#fef2f2" stroke="#b91c1c" stroke-width="1.5"/>
+<text x="634" y="632" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" fill="#b91c1c" text-anchor="start">Blocked</text>
+<text x="634" y="656" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">status_mismatch:claim:record=in_review,claimed=approved</text>
+<text x="634" y="680" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">reason_mismatch:claimed=coverage_opinion</text>
+<text x="618" y="734" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#047857" text-anchor="start">After one repair</text>
+<text x="618" y="762" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">“Claim clm_R5S4T3U2 (business_property) for</text>
+<text x="618" y="786" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">18500.00 USD is in review; no decision has been made</text>
+<text x="618" y="810" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">yet. No action is needed now. The decision can&#x27;t be</text>
+<text x="618" y="834" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">predicted in chat.”</text>
+<text x="618" y="880" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#4b5563" text-anchor="start">The model can&#x27;t hint at the adjuster&#x27;s notes:</text>
+<text x="618" y="904" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#4b5563" text-anchor="start">they never reached it.</text>
+<rect x="40" y="990" width="1120" height="150" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2"/>
+<text x="60" y="1022" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#1f2937" text-anchor="start">Measured offline (scripted model, synthetic data)</text>
+<text x="60" y="1078" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" font-weight="bold" fill="#047857" text-anchor="start">12</text>
+<text x="110" y="1066" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">kinds of injected</text>
+<text x="110" y="1088" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">hallucination</text>
+<text x="335" y="1078" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" font-weight="bold" fill="#047857" text-anchor="start">0</text>
+<text x="365" y="1066" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">reached the user, on two</text>
+<text x="365" y="1088" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">splits and two fresh seeds</text>
+<text x="610" y="1078" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" font-weight="bold" fill="#047857" text-anchor="start">0</text>
+<text x="640" y="1066" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">false blocks on correct</text>
+<text x="640" y="1088" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">answers</text>
+<text x="885" y="1078" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" font-weight="bold" fill="#047857" text-anchor="start">1</text>
+<text x="915" y="1066" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">repair, then code answers</text>
+<text x="915" y="1088" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">from the record, then a</text>
+<text x="915" y="1110" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">refusal</text>
+<text x="60" y="1124" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start" font-style="italic">Live-traffic results on Bedrock are not measured yet.</text>
+<rect x="40" y="1180" width="22" height="22" rx="5" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="72" y="1197" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">code decides</text>
+<rect x="191.2" y="1180" width="22" height="22" rx="5" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="223.2" y="1197" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">model writes</text>
+<rect x="342.4" y="1180" width="22" height="22" rx="5" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="374.4" y="1197" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">records and documents</text>
+<rect x="571.0" y="1180" width="22" height="22" rx="5" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="603.0" y="1197" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">people act</text>
+<rect x="705.0" y="1180" width="22" height="22" rx="5" fill="#fef2f2" stroke="#b91c1c" stroke-width="2"/>
+<text x="737.0" y="1197" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">blocked or refused</text>
+<text x="40" y="1230" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">finbot · open source · synthetic data · github.com/tokencraftdata/finbot</text>
+</svg>

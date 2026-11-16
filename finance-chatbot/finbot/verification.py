@@ -50,6 +50,17 @@ class ReasonVerifier:
         return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons) if reasons else GuardResult("allow", answer)
 
 
+class DomainVerifier:
+    """Records from domain plug-ins (accounts, transfers, KYC, lending): the status, the cause
+    and the reason keys an answer states must be the ones on the record (finbot/domains/checks.py)."""
+    name = "domain"
+
+    def check(self, answer, tool_log, focus):
+        from .domains.checks import domain_check
+        reasons = domain_check(answer, tool_log)
+        return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons) if reasons else GuardResult("allow", answer)
+
+
 class LanguageVerifier:
     """Answers are in English, the only language the other verifiers can read."""
     name = "language"

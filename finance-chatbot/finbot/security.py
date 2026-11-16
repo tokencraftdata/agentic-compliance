@@ -23,7 +23,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-CHAT_ROLES = {"support", "merchant"}
+CHAT_ROLES = {"support", "customer", "merchant"}  # "merchant" is a legacy alias of "customer"
 
 
 class AuthError(Exception):

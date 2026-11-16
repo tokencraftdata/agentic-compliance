@@ -82,11 +82,20 @@ class Container:
 
     @cached_property
     def toolbox(self):
+        from .domains import enabled
         from .tools import InMemoryLogs, InMemoryTxns, ToolBox
         txns, logs, _ = self.dataset
         return self._get("toolbox", lambda: ToolBox(self._get("txns", lambda: InMemoryTxns(txns)),
                                                     self._get("logs", lambda: InMemoryLogs(logs)),
-                                                    self.knowledge, processors=self.processors))
+                                                    self.knowledge, processors=self.processors,
+                                                    records=self.records, domains=enabled(self.settings.domains)))
+
+    @cached_property
+    def records(self):
+        """Records of the domain plug-ins (accounts, transfers, KYC, lending)."""
+        from .app import load_records
+        from .tools import DEMO_RECORDS, InMemoryRecords
+        return self._get("records", lambda: InMemoryRecords(load_records(self.settings.data_dir) or DEMO_RECORDS))
 
     @cached_property
     def processors(self):

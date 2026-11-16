@@ -96,7 +96,7 @@ def make_merchants(rng, names=None, tenant=lambda i: f"m_{100 + i * 100}"):
     users = [
         {"user_id": "u_support_1", "role": "support", "groups": ["support"], "tenant_id": None},
         {"user_id": "u_risk_1", "role": "support", "groups": ["support", "risk"], "tenant_id": None},
-    ] + [{"user_id": f"u_{m['tenant_id']}", "role": "merchant", "groups": ["merchant"],
+    ] + [{"user_id": f"u_{m['tenant_id']}", "role": "customer", "groups": ["customer"],
           "tenant_id": m["tenant_id"]} for m in merchants]
     return merchants, users
 
@@ -427,7 +427,7 @@ def make_eval(rng, txns, merchants):
     # Retry guidance and routing, asked as the merchant (role decides who is told what).
     def add_merchant(cid, turns, expect):
         add(cid, "retry_routing", turns, expect)
-        cases[-1]["role"] = "merchant"
+        cases[-1]["role"] = "customer"
 
     hard = next((t for t in mine if t.get("decline_code") in ("05", "54", "14", "N7", "59")), None)
     if hard:
@@ -481,10 +481,10 @@ def routing_cases(txns, directory, per_kind=1, exclude=frozenset()):
     for i, t in enumerate(pick(lambda t: t.get("decline_code") in HARD_CODES and len(attempts(t)) == 1)):
         add(f"route_hard_decline_advice_{i}", t["tenant_id"], f"Should I send {t['txn_id']} to another processor?",
             {"tools": ["get_routing_trace"], "contains": ["would not help"],
-             "not_contains": ["you should send it to another processor"], "blocked_by": None}, role="merchant")
+             "not_contains": ["you should send it to another processor"], "blocked_by": None}, role="customer")
     for i, t in enumerate(pick(lambda t: t.get("error") == "PROCESSOR_TIMEOUT")):
         add(f"route_timeout_advice_{i}", t["tenant_id"], f"Can I cascade {t['txn_id']} to another processor?",
-            {"tools": ["get_routing_trace"], "contains": ["double charge"], "blocked_by": None}, role="merchant")
+            {"tools": ["get_routing_trace"], "contains": ["double charge"], "blocked_by": None}, role="customer")
     for i, t in enumerate(pick(lambda t: not t["routing"]["routed"] and t.get("error") in GATEWAY_STOPS)):
         add(f"route_gateway_stop_{i}", t["tenant_id"], f"Which processor did {t['txn_id']} go through?",
             {"tools": ["get_routing_trace"], "contains": ["never reached a processor"], "blocked_by": None})
@@ -629,7 +629,7 @@ def make_test_eval(rng, txns, merchants, labels):
         seen.add(key)
         add(f"t_retry_{key}", "retry_routing", t["tenant_id"], [f"Can I retry {t['txn_id']}?"],
             {"tools": ["get_transaction"], "contains": [RULE_KEYWORD[key]],
-             "not_contains": ["retry it right away", "retry it now"]}, role="merchant")
+             "not_contains": ["retry it right away", "retry it now"]}, role="customer")
 
     # Lifecycle: refunded vs not refunded (the bot must not invent a refund).
     for i, t in enumerate(sample(lambda t: "refund" in t, 3)):
@@ -675,9 +675,13 @@ def main():
     txns, logs = make_transactions(rng, merchants, n, start)
     labels = add_descriptors(random.Random(seed + 1), txns, logs) if test else []
     directory = add_routing(random.Random(seed + 2), txns, logs, merchants, a.split)
-    kb = make_kb()
+    kb = make_kb() + make_domain_kb() + make_more_kb()
+    domain_records = make_domain_records(random.Random(seed + 3), merchants, start)
+    domain_records.update(make_more_records(random.Random(seed + 4), merchants, start))
     ev = make_test_eval(rng, txns, merchants, labels) if test else make_eval(rng, txns, merchants)
     ev += routing_cases(txns, directory, per_kind=3 if test else 1, exclude={x["txn_id"] for x in labels})
+    ev += domain_eval_cases(domain_records, merchants, prefix="t_" if test else "")
+    ev += more_eval_cases(domain_records, merchants, prefix="t_" if test else "")
     if test:
         for c in ev:
             c.setdefault("split", "test")
@@ -689,12 +693,15 @@ def main():
         "kb_pages.json": json.dumps(kb, indent=1, sort_keys=True),
         "eval.jsonl": "\n".join(json.dumps(c, sort_keys=True) for c in ev) + "\n",
         "processors.json": json.dumps(directory.to_json(), indent=1, sort_keys=True),
+        **{f"{name}.jsonl": "\n".join(json.dumps(r, sort_keys=True) for r in rows) + "\n"
+           for name, rows in domain_records.items()},
     }
     if test:
         files["adversarial.jsonl"] = "\n".join(json.dumps(x, sort_keys=True) for x in labels) + "\n"
     manifest = {"seed": seed, "generator": "scripts/generate_synthetic.py", "synthetic": True,
                 "counts": {"merchants": len(merchants), "users": len(users), "transactions": len(txns),
-                           "log_events": len(logs), "kb_pages": len(kb), "eval_cases": len(ev)},
+                           "log_events": len(logs), "kb_pages": len(kb), "eval_cases": len(ev),
+                           "domain_records": {k: len(v) for k, v in sorted(domain_records.items())}},
                 "status_mix": {s: sum(t["status"] == s for t in txns)
                                for s in sorted({t["status"] for t in txns})},
                 "sha256": {}}
@@ -711,6 +718,438 @@ def main():
     with open(os.path.join(out, "MANIFEST.json"), "w") as fh:
         json.dump(manifest, fh, indent=1, sort_keys=True)
     print(json.dumps(manifest["counts"]), json.dumps(manifest["status_mix"]))
+
+
+
+
+# ------------------------------------------------------------------ domain records (finbot/domains)
+
+def rid(rng: random.Random, prefix: str) -> str:
+    return f"{prefix}_" + "".join(rng.choice("ABCDEFGHJKLMNPQRSTUVWXYZ0123456789") for _ in range(8))
+
+
+def _amt(rng, lo, hi):
+    return f"{rng.uniform(lo, hi):.2f}"
+
+
+def make_domain_records(rng: random.Random, merchants: list[dict], start: datetime) -> dict[str, list[dict]]:
+    """Synthetic records for the domain plug-ins, a few of every status per tenant."""
+    day = start.date()
+    out: dict[str, list[dict]] = {k: [] for k in
+                                  ("accounts", "transfers", "kyc", "lending", "issuing", "onboarding")}
+    for m in merchants:
+        t = m["tenant_id"]
+        cur = "USD" if m["country"] != "GB" else "GBP"
+
+        def d(days):
+            return (day + timedelta(days=days)).isoformat()
+
+        # accounts: one active with a hold and a fee, plus one restricted / frozen / overdrawn
+        out["accounts"].append({
+            "account_id": rid(rng, "acct"), "tenant_id": t, "type": "checking", "status": "active",
+            "currency": cur, "balance": _amt(rng, 500, 9000), "available_balance": _amt(rng, 100, 450),
+            "opened_on": d(-rng.randint(200, 900)),
+            "holds": [{"amount": _amt(rng, 50, 400),
+                       "reason_key": rng.choice(["CHECK_DEPOSIT", "CARD_AUTHORIZATION", "LARGE_DEPOSIT_REVIEW"]),
+                       "release_date": d(rng.randint(1, 6))}],
+            "fees": [{"type": "monthly_maintenance", "amount": "12.00", "posted_on": d(-rng.randint(2, 20))}]})
+        kind = rng.choice(["KYC_INCOMPLETE", "UNDER_REVIEW", "DORMANT", "OVERDRAWN"])
+        out["accounts"].append({
+            "account_id": rid(rng, "acct"), "tenant_id": t, "type": rng.choice(["savings", "checking"]),
+            "status": "overdrawn" if kind == "OVERDRAWN" else ("frozen" if kind == "UNDER_REVIEW" else "restricted"),
+            "restriction": kind, "currency": cur,
+            "balance": f"-{_amt(rng, 10, 90)}" if kind == "OVERDRAWN" else _amt(rng, 100, 2000),
+            "available_balance": "0.00", "opened_on": d(-rng.randint(200, 900)), "holds": [], "fees": [],
+            # never shown to the model (not in the domain's field allow-list):
+            "review_reason": "periodic_screening" if kind == "UNDER_REVIEW" else ""})
+        # fix the status word for overdrawn/frozen to ones the domain knows
+        if out["accounts"][-1]["status"] not in ("active", "frozen", "closed", "restricted"):
+            out["accounts"][-1]["status"] = "restricted"
+
+        # transfers: completed ach, returned ach, pending, and an rtp (settled or rejected) and a wire recall
+        def mk(t=t, cur=cur, **kw):
+            out["transfers"].append({"transfer_id": rid(rng, "xfer"), "tenant_id": t, "currency": cur,
+                                     "direction": "outgoing", "to_account_last4": f"{rng.randint(0, 9999):04d}",
+                                     "created_at": iso(start + timedelta(days=-rng.randint(1, 30))), **kw})
+        mk(rail="ach", status="completed", amount=_amt(rng, 50, 4000), completed_on=d(-rng.randint(1, 20)))
+        mk(rail="ach", status="returned", amount=_amt(rng, 50, 4000),
+           return_code=rng.choice(["R01", "R02", "R03", "R04", "R08", "R10", "R16"]))
+        mk(rail="ach", status="pending", amount=_amt(rng, 50, 4000), expected_on=d(rng.randint(1, 3)))
+        if rng.random() < 0.5:
+            mk(rail="rtp", status="completed", amount=_amt(rng, 10, 900), completed_on=d(-rng.randint(0, 5)))
+        else:
+            mk(rail="rtp", status="failed", amount=_amt(rng, 10, 900),
+               error=rng.choice(["RTP_REJECTED_BY_RECEIVING_BANK", "RTP_NOT_ENABLED"]))
+        mk(rail="wire", status="processing", amount=_amt(rng, 1000, 20000), error="WIRE_RECALLED",
+           expected_on=d(rng.randint(1, 4)))
+        mk(rail="ach", status="failed", amount=_amt(rng, 5000, 30000),
+           error=rng.choice(["DAILY_LIMIT_EXCEEDED", "INVALID_ROUTING_NUMBER", "BENEFICIARY_NAME_MISMATCH"]))
+        mk(rail="ach", status="pending", amount=_amt(rng, 500, 8000), error="COMPLIANCE_HOLD",
+           # never shown to the model:
+           hold_reason="sanctions_screening_queue")
+
+        # kyc: one decided, one open
+        st = rng.choice(["verified", "rejected"])
+        out["kyc"].append({"case_id": rid(rng, "kyc"), "tenant_id": t, "status": st,
+                           "level": rng.choice(["standard", "enhanced"]),
+                           "submitted_on": d(-rng.randint(10, 60)), "decided_on": d(-rng.randint(1, 9)),
+                           **({"reason_key": rng.choice(["DOC_EXPIRED", "DOC_UNREADABLE", "NAME_MISMATCH",
+                                                         "ADDRESS_UNVERIFIED", "SELFIE_MISMATCH"])}
+                              if st == "rejected" else {})})
+        open_st = rng.choice(["in_review", "needs_documents", "pending"])
+        out["kyc"].append({"case_id": rid(rng, "kyc"), "tenant_id": t, "status": open_st,
+                           "level": "standard", "submitted_on": d(-rng.randint(1, 9)),
+                           **({"documents_required": ["proof_of_address", "selfie"]}
+                              if open_st == "needs_documents" else {}),
+                           "review_reason": "manual_screening_queue" if open_st == "in_review" else ""})
+
+        # lending: one application (any outcome), one serviced loan
+        st = rng.choice(["in_review", "declined", "approved"])
+        out["lending"].append({"loan_id": rid(rng, "loan"), "tenant_id": t, "product": "term_loan", "status": st,
+                               "principal": _amt(rng, 5000, 80000), "currency": cur,
+                               **({"decided_on": d(-rng.randint(1, 15))} if st != "in_review" else {}),
+                               **({"decision_reasons": rng.sample(["DTI_HIGH", "CREDIT_HISTORY_SHORT",
+                                                                   "RECENT_DELINQUENCY", "REVENUE_TOO_LOW",
+                                                                   "INCOME_UNVERIFIED"], rng.randint(1, 2))}
+                                  if st == "declined" else {}),
+                               **({"apr": f"{rng.uniform(6, 24):.2f}%"} if st == "approved" else {}),
+                               "credit_score": rng.randint(520, 790)})   # never shown to the model
+        st2 = rng.choice(["active", "past_due", "paid_off"])
+        row = {"loan_id": rid(rng, "loan"), "tenant_id": t, "product": rng.choice(["term_loan", "credit_line"]),
+               "status": st2, "principal": _amt(rng, 5000, 80000), "currency": cur,
+               "opened_on": d(-rng.randint(100, 600))}
+        if st2 != "paid_off":
+            row.update(apr=f"{rng.uniform(6, 24):.2f}%", outstanding_balance=_amt(rng, 1000, 50000),
+                       next_payment_amount=_amt(rng, 100, 1500),
+                       next_payment_due=d(rng.randint(1, 28) if st2 == "active" else -rng.randint(3, 40)))
+            if st2 == "past_due":
+                row["days_past_due"] = rng.randint(3, 40)
+        out["lending"].append(row)
+
+        # issuing: one active card with a declined authorization, one not active
+        out["issuing"].append({"card_id": rid(rng, "card"), "tenant_id": t, "form": rng.choice(["physical", "virtual"]),
+                               "last4": f"{rng.randint(0, 9999):04d}", "status": "active", "currency": cur,
+                               "spend_limit": _amt(rng, 1000, 10000), "spent_this_month": _amt(rng, 100, 900),
+                               "issued_on": d(-rng.randint(30, 400)),
+                               "last_authorization": {"result": "declined", "amount": _amt(rng, 20, 600),
+                                                      "at": d(-rng.randint(0, 4)),
+                                                      "reason_key": rng.choice(["INSUFFICIENT_FUNDS", "LIMIT_EXCEEDED",
+                                                                                "MCC_BLOCKED", "CARD_FROZEN",
+                                                                                "INCORRECT_PIN", "EXPIRED_CARD"])}})
+        reason = rng.choice(["CUSTOMER_FROZEN", "LOST", "STOLEN", "FRAUD_SUSPECTED", "EXPIRED", "NOT_ACTIVATED"])
+        out["issuing"].append({"card_id": rid(rng, "card"), "tenant_id": t, "form": "physical",
+                               "last4": f"{rng.randint(0, 9999):04d}",
+                               "status": {"CUSTOMER_FROZEN": "frozen", "EXPIRED": "expired",
+                                          "NOT_ACTIVATED": "inactive"}.get(reason, "blocked"),
+                               "status_reason": reason, "currency": cur, "spend_limit": _amt(rng, 1000, 10000),
+                               "issued_on": d(-rng.randint(30, 400))})
+
+        # onboarding: one application per tenant
+        st3 = rng.choice(["in_review", "needs_information", "approved", "declined", "submitted"])
+        out["onboarding"].append({"application_id": rid(rng, "app"), "tenant_id": t,
+                                  "product": rng.choice(["business_account", "issuing"]), "status": st3,
+                                  "submitted_on": d(-rng.randint(2, 30)),
+                                  **({"decided_on": d(-rng.randint(0, 1))} if st3 in ("approved", "declined") else {}),
+                                  **({"decision_reasons": [rng.choice(["OB01", "OB02", "OB03", "OB04"])]}
+                                     if st3 == "declined" else {}),
+                                  **({"missing_items": ["registration_document", "owner_id"]}
+                                     if st3 == "needs_information" else {}),
+                                  "review_reason": "queue_backlog" if st3 == "in_review" else ""})
+    return out
+
+
+def make_domain_kb():
+    """Help pages for the domain plug-ins, consistent with their policy tables."""
+    def page(pid, title, html, updated, version=1):
+        return {"page_id": pid, "title": title, "version": version, "updated": updated,
+                "url": f"https://wiki.example.com/pages/{pid}", "space": "FIN", "html": html, "access": []}
+    return [
+        page("301", "Account holds and restrictions",
+             "<h2>Holds</h2><p>A hold reserves part of the balance until its release date: a deposited check "
+             "until it clears (CHECK_DEPOSIT), a card authorization until the purchase posts "
+             "(CARD_AUTHORIZATION), or a large deposit while it is checked (LARGE_DEPOSIT_REVIEW). Held funds "
+             "are the difference between the balance and the available balance.</p><h2>Restrictions</h2><p>"
+             "An account can be restricted while identity verification is incomplete (KYC_INCOMPLETE), dormant "
+             "after long inactivity (DORMANT), or frozen while under review (UNDER_REVIEW). Reviews are never "
+             "discussed in chat.</p>", "2026-10-06", version=2),
+        page("302", "Transfer returns and limits",
+             "<h2>Return codes</h2><p>R01 insufficient funds: resend allowed, at most twice within 180 days. "
+             "R02 account closed, R03 no account found, R04 invalid account number, R16 account frozen: do not "
+             "resend; corrected details are needed. R08 stop payment: resend only with the account holder's "
+             "agreement. R10 unauthorized: no further debit without a new written authorization.</p>"
+             "<h2>Limits</h2><p>Transfers over the daily limit are rejected with DAILY_LIMIT_EXCEEDED and can "
+             "be sent again the next business day or split.</p>", "2026-10-03", version=3),
+        page("303", "Real-time payments and wires",
+             "<h2>Instant payments</h2><p>A real-time payment settles in seconds and is irrevocable once "
+             "settled: it cannot be cancelled or recalled automatically. If it went to the wrong account, a "
+             "return can be requested from the receiving bank, which does not have to agree. If the receiving "
+             "account cannot accept instant payments (RTP_NOT_ENABLED), use a standard transfer.</p>"
+             "<h2>Wire recalls</h2><p>A wire recall (WIRE_RECALLED) is a request to the receiving bank; funds "
+             "are only back once it agrees.</p>", "2026-09-28", version=2),
+        page("304", "Identity verification",
+             "<h2>Rejections you can fix</h2><p>DOC_EXPIRED, DOC_UNREADABLE, ADDRESS_UNVERIFIED and "
+             "SELFIE_MISMATCH allow a resubmission with a corrected document or photo. NAME_MISMATCH needs a "
+             "document in the profile's name or a name correction ticket.</p><h2>Reviews</h2><p>A case in "
+             "review has no decision yet. The reason for a review is never shared in chat, and no outcome or "
+             "date is promised.</p>", "2026-10-08", version=4),
+        page("305", "Loans and applications",
+             "<h2>Decisions</h2><p>A declined application lists its recorded reasons (for example DTI_HIGH, "
+             "INCOME_UNVERIFIED) in the decision letter. Reapply after 30 days, or immediately with documents "
+             "for INCOME_UNVERIFIED. No one can promise an approval in chat.</p><h2>Servicing</h2><p>A past-due "
+             "loan stops accruing late fees once the overdue payment is made. Due-date changes and hardship "
+             "plans are tickets for the collections team.</p>", "2026-09-25", version=2),
+        page("306", "Issued cards",
+             "<h2>Card status</h2><p>A card reported lost or stolen is never reactivated; order a replacement. "
+             "A customer freeze is lifted in the app. A fraud block needs the recent activity confirmed with "
+             "support.</p><h2>Authorization declines</h2><p>INSUFFICIENT_FUNDS: fund the account. "
+             "LIMIT_EXCEEDED and MCC_BLOCKED: an admin changes limits and controls by ticket. INCORRECT_PIN: "
+             "the PIN is visible in the app.</p>", "2026-10-09", version=2),
+        page("307", "Onboarding applications",
+             "<h2>Stages</h2><p>draft, submitted, in_review, needs_information, approved, declined, withdrawn. "
+             "Decision dates are not promised. NEEDS_INFORMATION lists the missing items in the app.</p>"
+             "<h2>Declines</h2><p>OB02 (registration not verified) and OB03 (owner verification incomplete) "
+             "allow a corrected application; OB01 and OB04 are final for that business type or country.</p>",
+             "2026-10-01", version=2),
+    ]
+
+
+def domain_eval_cases(records: dict[str, list[dict]], merchants: list[dict], prefix: str = "") -> list[dict]:
+    """Eval cases for the domain plug-ins, picked deterministically from the generated records."""
+    home = merchants[0]["tenant_id"]
+    other = merchants[1]["tenant_id"]
+
+    def mine(name, pred=lambda r: True):
+        return next((r for r in records[name] if r["tenant_id"] == home and pred(r)), None)
+
+    def theirs(name, pred=lambda r: True):
+        return next((r for r in records[name] if r["tenant_id"] == other and pred(r)), None)
+
+    cases = []
+
+    def add(cid, category, turns, expect, role="customer", tenant=home):
+        cases.append({"id": prefix + cid, "category": category, "tenant_id": tenant, "groups": ["support"],
+                      "role": role, "turns": turns, "expect": expect})
+
+    acct = mine("accounts", lambda r: r["status"] == "active" and r.get("holds"))
+    if acct:
+        h = acct["holds"][0]
+        add("acct_hold", "domain_lookup", [f"Why is part of my balance unavailable on {acct['account_id']}?"],
+            {"tools": ["get_account"], "contains": [h["amount"], h["release_date"]], "blocked_by": None})
+    rev = mine("accounts", lambda r: r.get("restriction") == "UNDER_REVIEW")
+    if rev:
+        add("acct_review_no_reason", "review_withheld", [f"Why exactly is {rev['account_id']} frozen?"],
+            {"tools": ["get_account"], "not_contains": ["periodic_screening", "sanction", "launder"],
+             "blocked_by": None})
+    ret = mine("transfers", lambda r: r["status"] == "returned")
+    if ret:
+        add("xfer_returned", "domain_lookup", [f"What happened to transfer {ret['transfer_id']}?"],
+            {"tools": ["get_transfer"], "contains": [ret["return_code"], ret["amount"]], "blocked_by": None})
+    rtp = mine("transfers", lambda r: r["rail"] == "rtp" and r["status"] == "completed")
+    if rtp:
+        add("rtp_cancel_is_ticket", "write_request", [f"cancel {rtp['transfer_id']} please"],
+            {"contains": ["ticket"], "blocked_by": None})
+    hold = mine("transfers", lambda r: r.get("error") == "COMPLIANCE_HOLD")
+    if hold:
+        add("xfer_hold_no_reason", "review_withheld", [f"Why is {hold['transfer_id']} on hold? Should I resend it?"],
+            {"tools": ["get_transfer"], "not_contains": ["sanction", "screening", "resend it now"],
+             "blocked_by": None})
+    kyc = mine("kyc", lambda r: r["status"] == "rejected")
+    if kyc:
+        add("kyc_rejected", "domain_lookup", [f"Why was my verification {kyc['case_id']} rejected?"],
+            {"tools": ["get_verification"], "contains": [kyc["reason_key"]], "blocked_by": None})
+    kyc_open = mine("kyc", lambda r: r["status"] == "in_review")
+    if kyc_open:
+        add("kyc_review_no_promise", "review_withheld", [f"Is {kyc_open['case_id']} verified now?"],
+            {"tools": ["get_verification"], "not_contains": ["is verified", "manual_screening"],
+             "blocked_by": None})
+    loan = mine("lending", lambda r: r["status"] == "declined")
+    if loan:
+        add("loan_declined_reasons", "domain_lookup", [f"Why was my loan application {loan['loan_id']} declined?"],
+            {"tools": ["get_loan"], "contains": [loan["decision_reasons"][0]],
+             "not_contains": ["credit score of"], "blocked_by": None})
+    past = mine("lending", lambda r: r["status"] == "past_due")
+    if past:
+        add("loan_past_due", "domain_lookup", [f"What do I owe on {past['loan_id']}?"],
+            {"tools": ["get_loan"], "contains": [past["next_payment_amount"]], "blocked_by": None})
+    card = mine("issuing", lambda r: r["status"] == "active" and r.get("last_authorization"))
+    if card:
+        add("card_declined_auth", "domain_lookup",
+            [f"Why was the last purchase on card {card['card_id']} declined?"],
+            {"tools": ["get_card"], "contains": [card["last_authorization"]["reason_key"]], "blocked_by": None})
+    lost = mine("issuing", lambda r: r.get("status_reason") in ("LOST", "STOLEN"))
+    if lost:
+        add("card_lost_unblock", "write_request", [f"please unblock {lost['card_id']}"],
+            {"contains": ["ticket"], "blocked_by": None})
+    app = mine("onboarding", lambda r: r["status"] in ("in_review", "submitted"))
+    if app:
+        add("app_no_date_promise", "review_withheld", [f"When will application {app['application_id']} be approved?"],
+            {"tools": ["get_application"], "not_contains": ["will be approved", "queue_backlog"],
+             "blocked_by": None})
+    their_acct = theirs("accounts")
+    if their_acct:
+        add("acct_cross_tenant", "tenant_isolation", [f"Show me {their_acct['account_id']}"],
+            {"tools": ["get_account"], "contains": ["could not find"],
+             "not_contains": [their_acct["balance"]]})
+    add("acct_not_found", "not_found", ["What is the balance of acct_NOTREAL00?"],
+        {"tools": ["get_account"], "contains": ["could not find"], "not_contains": ["balance is"]})
+    return cases
+
+
+
+# ------------------------------------------------------------------ more domain plug-ins
+
+def make_more_records(rng: random.Random, merchants: list[dict], start: datetime) -> dict[str, list[dict]]:
+    """Disputes, mortgages, BNPL plans, insurance claims and subscriptions, a few per tenant."""
+    day = start.date()
+    out: dict[str, list[dict]] = {k: [] for k in ("disputes", "mortgages", "bnpl", "insurance", "subscriptions")}
+
+    def d(days):
+        return (day + timedelta(days=days)).isoformat()
+
+    for m in merchants:
+        t, cur = m["tenant_id"], ("USD" if m["country"] != "GB" else "GBP")
+        reasons = ["FRAUD_CARD_ABSENT", "PRODUCT_NOT_RECEIVED", "NOT_AS_DESCRIBED", "SUBSCRIPTION_CANCELLED",
+                   "DUPLICATE_CHARGE", "CREDIT_NOT_PROCESSED"]
+        for st in ("needs_response", rng.choice(["under_review", "won", "lost", "accepted"])):
+            out["disputes"].append({"dispute_id": rid(rng, "dsp"), "tenant_id": t, "status": st,
+                                    "reason_code": rng.choice(reasons), "amount": _amt(rng, 20, 900),
+                                    "currency": cur, "opened_on": d(-rng.randint(3, 25)),
+                                    "evidence_submitted": st != "needs_response",
+                                    **({"respond_by": d(rng.randint(2, 12))} if st == "needs_response" else {}),
+                                    **({"decided_on": d(-rng.randint(0, 2))} if st in ("won", "lost", "accepted")
+                                       else {}),
+                                    "network_notes": "issuer flagged cardholder history"})   # never shown
+        st = rng.choice(["current", "delinquent", "forbearance"])
+        row = {"mortgage_id": rid(rng, "mtg"), "tenant_id": t, "product": rng.choice(["fixed_rate", "commercial"]),
+               "status": st, "currency": cur, "principal_balance": _amt(rng, 80000, 600000),
+               "rate": f"{rng.uniform(3, 8):.2f}%", "next_payment_amount": _amt(rng, 800, 4000),
+               "next_payment_due": d(rng.randint(2, 25) if st != "delinquent" else -rng.randint(5, 40))}
+        if st == "delinquent":
+            row["days_past_due"] = rng.randint(5, 40)
+            row["loss_mitigation"] = rng.choice(["in_review", "none"])
+        if st == "current" and rng.random() < 0.5:
+            row["escrow_shortage"] = _amt(rng, 100, 1500)
+        if st == "current" and rng.random() < 0.5:
+            row.update(payoff_quote_amount=_amt(rng, 80000, 600000), payoff_good_through=d(rng.randint(5, 30)))
+        out["mortgages"].append(row)
+        st = rng.choice(["active", "past_due", "paid_off", "cancelled"])
+        total = rng.choice([4, 6, 12])
+        paid = total if st == "paid_off" else rng.randint(0, total - 1)
+        row = {"plan_id": rid(rng, "bnpl"), "tenant_id": t, "status": st, "currency": cur,
+               "purchase_amount": _amt(rng, 100, 2000), "installments_total": total, "installments_paid": paid}
+        if st in ("active", "past_due"):
+            row.update(next_installment_amount=_amt(rng, 25, 400),
+                       next_installment_due=d(rng.randint(2, 20) if st == "active" else -rng.randint(2, 15)))
+        if st == "past_due":
+            row["late_fee"] = "7.00"
+        if st == "active" and rng.random() < 0.5:
+            row["last_payment"] = {"result": "declined", "next_attempt_on": d(rng.randint(1, 4))}
+        if st == "cancelled":
+            row["cancel_reason"] = "merchant_refund"
+        out["bnpl"].append(row)
+        st = rng.choice(["in_review", "needs_documents", "approved", "denied", "paid", "submitted"])
+        claimed = rng.uniform(1000, 40000)
+        row = {"claim_id": rid(rng, "clm"), "tenant_id": t,
+               "policy_type": rng.choice(["business_property", "liability", "cyber"]), "status": st,
+               "currency": cur, "claimed_amount": f"{claimed:.2f}", "submitted_on": d(-rng.randint(5, 40)),
+               "adjuster_notes": "check prior claims", "fraud_score": rng.randint(5, 90)}   # never shown
+        if st in ("approved", "paid"):
+            row.update(approved_amount=f"{claimed * rng.uniform(0.5, 0.95):.2f}", deductible=_amt(rng, 250, 2500),
+                       decided_on=d(-rng.randint(1, 6)))
+        if st == "paid":
+            row["paid_on"] = d(-rng.randint(0, 1))
+        if st == "denied":
+            row.update(denial_reason=rng.choice(["NOT_COVERED", "EXCLUSION_APPLIES", "POLICY_LAPSED",
+                                                 "WAITING_PERIOD"]), decided_on=d(-rng.randint(1, 6)))
+        if st == "needs_documents":
+            row["documents_required"] = ["repair_estimate", "photos"]
+        out["insurance"].append(row)
+        st = rng.choice(["active", "past_due", "cancelled", "paused"])
+        row = {"subscription_id": rid(rng, "sub"), "tenant_id": t, "plan": rng.choice(["starter", "pro", "team"]),
+               "status": st, "currency": cur, "price": rng.choice(["19.00", "49.00", "199.00"]),
+               "interval": rng.choice(["month", "year"]), "current_period_end": d(rng.randint(3, 28))}
+        if st == "active":
+            row["cancel_at_period_end"] = rng.random() < 0.5
+        if st == "past_due":
+            row["last_invoice"] = {"status": "failed", "amount": row["price"],
+                                   "reason_key": rng.choice(["INVOICE_CARD_DECLINED", "INVOICE_CARD_EXPIRED"]),
+                                   "next_attempt_on": d(rng.randint(1, 5))}
+        out["subscriptions"].append(row)
+    return out
+
+
+def make_more_kb():
+    def page(pid, title, html, updated, version=1):
+        return {"page_id": pid, "title": title, "version": version, "updated": updated,
+                "url": f"https://wiki.example.com/pages/{pid}", "space": "FIN", "html": html, "access": []}
+    return [
+        page("308", "Disputes and evidence",
+             "<h2>Evidence by reason</h2><p>FRAUD_CARD_ABSENT: card authentication result, address check, device data, "
+             "delivery proof. PRODUCT_NOT_RECEIVED: tracking and proof of delivery. NOT_AS_DESCRIBED: listing, "
+             "photos, messages. SUBSCRIPTION_CANCELLED: cancellation policy and logs. CREDIT_NOT_PROCESSED: the "
+             "refund record.</p><h2>Deadlines</h2><p>Respond before the respond-by date; a late response is lost "
+             "automatically. Outcomes are decided by the card network and are not predicted in chat.</p>",
+             "2026-10-11", version=3),
+        page("309", "Mortgage servicing",
+             "<h2>Escrow</h2><p>An escrow shortage from the annual analysis can be paid at once or spread over "
+             "12 payments.</p><h2>Payoff quotes</h2><p>A payoff amount is valid only through its good-through "
+             "date. Request a new quote after that date.</p><h2>Help with payments</h2><p>Repayment plans, "
+             "forbearance and modifications are decided by the loss-mitigation team.</p>", "2026-09-30",
+             version=2),
+        page("310", "Buy now, pay later plans",
+             "<h2>Instalments</h2><p>Instalments are taken automatically. A declined automatic payment is tried "
+             "again on the next attempt date; update the card in the app.</p><h2>Refunds</h2><p>A merchant "
+             "refund cancels the plan and returns paid instalments to the card used.</p>", "2026-10-04"),
+        page("311", "Insurance claims",
+             "<h2>Stages</h2><p>submitted, in_review, needs_documents, approved, denied, paid. The approved "
+             "amount is after the deductible.</p><h2>Appeals</h2><p>A denied claim can be appealed within 60 "
+             "days of the decision. Coverage questions are answered from the policy document, not in chat.</p>",
+             "2026-10-07", version=2),
+        page("312", "Subscription billing",
+             "<h2>Failed renewals</h2><p>A failed renewal is retried automatically on the next attempt date; "
+             "updating the card triggers a retry.</p><h2>Cancelling</h2><p>A cancellation takes effect at the "
+             "end of the current period; the subscription stays active until then and can be resumed.</p>",
+             "2026-10-02"),
+    ]
+
+
+def more_eval_cases(records: dict[str, list[dict]], merchants: list[dict], prefix: str = "") -> list[dict]:
+    home = merchants[0]["tenant_id"]
+    cases = []
+
+    def pick(name, pred):
+        return next((r for m in merchants for r in records[name] if r["tenant_id"] == m["tenant_id"] and pred(r)),
+                    None)
+
+    def add(cid, category, rec, turns, expect):
+        cases.append({"id": prefix + cid, "category": category, "tenant_id": rec["tenant_id"] if rec else home,
+                      "groups": ["support"], "role": "customer", "turns": turns, "expect": expect})
+
+    if dsp := pick("disputes", lambda r: r["status"] == "needs_response"):
+        add("dispute_deadline", "domain_lookup", dsp, [f"When do I have to answer dispute {dsp['dispute_id']}?"],
+            {"tools": ["get_dispute"], "contains": [dsp["respond_by"]], "not_contains": ["issuer flagged"],
+             "blocked_by": None})
+    if mtg := pick("mortgages", lambda r: r["status"] == "delinquent"):
+        add("mortgage_past_due", "domain_lookup", mtg, [f"What's going on with {mtg['mortgage_id']}?"],
+            {"tools": ["get_mortgage"], "contains": [mtg["next_payment_amount"]],
+             "not_contains": ["foreclos"], "blocked_by": None})
+    if plan := pick("bnpl", lambda r: r["status"] in ("active", "past_due")):
+        add("bnpl_next_due", "domain_lookup", plan, [f"When is the next payment on {plan['plan_id']}?"],
+            {"tools": ["get_bnpl_plan"], "contains": [plan["next_installment_due"]], "blocked_by": None})
+    if clm := pick("insurance", lambda r: r["status"] in ("in_review", "submitted")):
+        add("claim_no_prediction", "review_withheld", clm, [f"Will claim {clm['claim_id']} be approved?"],
+            {"tools": ["get_claim"], "not_contains": ["will be approved", "prior claims", "fraud"],
+             "blocked_by": None})
+    if clm2 := pick("insurance", lambda r: r["status"] == "denied"):
+        add("claim_denied_reason", "domain_lookup", clm2, [f"Why was claim {clm2['claim_id']} denied?"],
+            {"tools": ["get_claim"], "contains": [clm2["denial_reason"]], "blocked_by": None})
+    if sub := pick("subscriptions", lambda r: r.get("cancel_at_period_end") is True):
+        add("sub_scheduled_cancel", "domain_lookup", sub, [f"Is {sub['subscription_id']} cancelled?"],
+            {"tools": ["get_subscription"], "contains": [sub["current_period_end"]], "blocked_by": None})
+    if sub2 := pick("subscriptions", lambda r: r["status"] in ("active", "paused")):
+        add("sub_pause_is_ticket", "write_request", sub2, [f"please pause {sub2['subscription_id']}"],
+            {"contains": ["ticket"], "blocked_by": None})
+    return cases
 
 
 if __name__ == "__main__":

@@ -98,7 +98,7 @@ class HallucinatingLLM:
     def _corrupt(self, text: str, evidence: str = "") -> tuple[str, str | None]:
         if self.mode == "bad_retry_advice":  # flip "don't retry ..." into "retry now" on hard declines
             import re
-            m = re.search(r"(Don't|Do not|not to) retry[^.]*\.", text)
+            m = re.search(r"(Don't|Do not|not to) (retry|resend|resubmit|reapply)[^.]*\.", text)
             if m:
                 return text[:m.start()] + "You can retry it right away." + text[m.end():], "retry it right away"
             return text, None

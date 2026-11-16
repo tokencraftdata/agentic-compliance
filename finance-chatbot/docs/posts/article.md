@@ -1,8 +1,10 @@
-# I built a payments chatbot that isn't allowed to guess
+# I built a fintech chatbot that isn't allowed to guess
 
 *finbot is an open project on Amazon Bedrock: Claude answers, but code decides what it is allowed to claim.*
 
-I started from one rule: a payments support bot must never tell someone something about their money that the records don't back up. Sounding helpful comes second. finbot is my attempt at sticking to that. It's a Python project on Amazon Bedrock, and every answer about a transaction gets checked against the tool results before anyone sees it. In an offline stress test I injected 259 hallucinations on purpose. None of them reached the user.
+I started from one rule: a fintech support bot must never tell someone something about their money that the records don't back up. Sounding helpful comes second. finbot is my attempt at sticking to that. It's a Python project on Amazon Bedrock, and every answer about a record — a bank account, a transfer, a card payment, an identity check, a loan, an onboarding application — gets checked against the tool results before anyone sees it. In an offline stress test I injected 2,259 hallucinations on purpose, across the two splits. None of them reached the user.
+
+Each of those areas is a plug-in. A domain is one Python module: an id prefix, a read-only fetch tool, an allow-list of the fields the model may see, a status vocabulary, a table mapping each reason code to what may be said and done about it, and a summary built by code from the record. The pipeline, the checks, the tickets and the crash recovery are shared. A deployment picks its areas with one setting, so a bank with no card acceptance just leaves "payments" out. Two rules fall out of the structure rather than the prompt: a case that is still in review is never described as decided, in any wording, and the reason for a review never reaches the model at all, so it cannot be tipped off to the customer.
 
 The project rests on three ideas. A **hallucination gate**: code checks every fact in an answer before it's sent. **Adaptive guardrails**: the rules improve from mistakes a reviewer has labelled, without retraining anything and without letting chat text rewrite them. And **resilience**: the bot stays correct when a model or a worker goes down halfway through a conversation.
 
@@ -26,7 +28,9 @@ Most first versions of a finance assistant are built the same way. Chop the wiki
 
 finbot wraps the model in plain code. Claude can reason, call read-only tools and draft an answer. It doesn't get to decide which customer it's talking to, what a decline code means for retries, or whether its own answer is true. Code decides those.
 
-![finbot design: trust boundary, queue workers, the turn pipeline, the model engine with failover, the control plane, shared state and ingestion into a vector DB](../design.png)
+![finbot architecture: the trust boundary, an eleven-stage turn pipeline in a stateless worker, the model engine with failover, read-only tools over twelve domain plug-ins, and the session store, adaptive guardrails, tickets and ingestion around them](../diagrams/finbot-architecture.png)
+
+*Only stage 8 uses the model. Everything else is plain Python that gives the same decision every time.*
 
 One chat turn runs in this order:
 
@@ -38,6 +42,10 @@ One chat turn runs in this order:
 6. **Output guard.** Grounding and PII checks, and a hand-off to a human after repeated failures.
 
 ## The hallucination gate
+
+![One answer through the hallucination gate: a verifier chain, one guided repair, an answer built from the record, then a refusal, with a worked insurance-claim example](../diagrams/finbot-gate.png)
+
+*A draft that calls an undecided claim approved is blocked; the repair states only what the record shows.*
 
 The model's answer is only a draft. Before anyone sees it, a checker (ordinary code, not a second model) compares every factual claim with what the tools returned in this turn:
 
@@ -62,7 +70,9 @@ Why not use a second LLM as the judge? Because the facts that matter here are ex
 
 ## Rules the model can't argue with
 
-In payments, some of the most expensive wrong answers are about retries. Retry a hard decline and you annoy the issuer, and you may pay fees for it. Retry a timeout and you might charge the customer twice. That's why finbot keeps retry policy in a table in code rather than in the prompt.
+Every area gets the same treatment: what may be said and done about a record is a table in code, keyed by the record's reason code, with a next step per role. A returned transfer (R02, account closed) says "ask the recipient for new details"; a settled real-time payment says "irrevocable, a return request is the only path, and the receiving bank can refuse it"; a rejected identity document says which rejections allow a resubmission; a declined loan application gives only the recorded reasons, never the credit score the model was never shown. "Cancel it", "unblock it" and "extend the due date" become tickets a person executes.
+
+The oldest of these tables is payments, where some of the most expensive wrong answers are about retries. Retry a hard decline and you annoy the issuer, and you may pay fees for it. Retry a timeout and you might charge the customer twice. That's why finbot keeps retry policy in a table in code rather than in the prompt.
 
 When the bot fetches a transaction, the tool attaches guidance computed from that table and worded for the person asking:
 
@@ -180,14 +190,14 @@ That's the split I settled on. The model is very good at language and tool use. 
 
 ## What I tested, and what I haven't
 
-Everything below runs offline, with a scripted stand-in for the model and seeded synthetic data: 8 merchants, 600 transactions, 2,993 log events, routing records across three simulated processors, and 9 help pages. One of those pages has a prompt injection planted in it.
+Everything below runs offline, with a scripted stand-in for the model and seeded synthetic data: 8 business customers, 600 card payments, 176 records across the other eleven areas (accounts, transfers on three rails, identity cases, loans, issued cards, onboarding applications, disputes, mortgages, buy-now-pay-later plans, insurance claims, subscriptions), 2,993 log events, routing records across three simulated processors, and 21 help pages. One of those pages has a prompt injection planted in it.
 
 | Check | Result |
 |---|---|
-| Automated tests (guards, crashes, failover, leases, security, queue, ingestion, injection, processor routing, card data, tickets, deployment) | 288 passing |
-| Evaluation set (lookups, not-found, tenant isolation, context bleed, PII, retry advice, processor routing, prompt attacks) | 27 of 27; held-out set 170 of 170; fresh held-out sets 172 of 172 and 177 of 177 |
-| Hallucination stress: 12 kinds of injected errors, including invented cascades, outages, promises, tickets and wrong reasons | 0 of 259 reached the user; 0 of 3,514 on two fresh held-out test sets |
-| False alarms on correct answers about failed payments | 0 of 1,468 blocked |
+| Automated tests (guards, crashes, failover, leases, security, queue, ingestion, injection, processor routing, card data, tickets, deployment, domain plug-ins) | 315 passing |
+| Evaluation set (lookups, not-found, tenant isolation, context bleed, PII, retry advice, processor routing, review withholding, prompt attacks) | 41 of 41; held-out set 185 of 185; fresh held-out sets 192 of 192 and 184 of 184 |
+| Hallucination stress: 12 kinds of injected errors, including invented cascades, outages, promises, tickets, wrong reasons and flipped decisions | 0 of 2,259 reached the user; 0 of 3,774 on two fresh held-out test sets |
+| False alarms on correct answers, across every failed payment and every record in the other eleven areas | 0 of 2,876 blocked |
 | Consistency: every case run 16 times, with half the answers deliberately corrupted | Every case passed all 16 runs; held-out set, all 8 of 8 |
 
 What this **doesn't** show: how it behaves with live Bedrock models, real traffic, real latency or real cost. The AWS adapters (DynamoDB, SQS, OpenSearch, Bedrock embeddings) are written but haven't run against a live account yet. A live evaluation is next, and I'll publish the results whatever they are.
@@ -256,6 +266,18 @@ Where finbot is weaker: every product above runs on real traffic, and finbot doe
 - Consumer Financial Protection Bureau, Chatbots in consumer finance (Issue Spotlight, June 2023); [summary by Consumer Finance Monitor](https://www.consumerfinancemonitor.com/2023/06/08/new-cfpb-report-highlights-concerns-with-growing-use-of-chatbots-by-financial-institutions/)
 - Moffatt v. Air Canada, 2024 BCCRT 149; [summary by the American Bar Association](https://www.americanbar.org/groups/business_law/resources/business-law-today/2024-february/bc-tribunal-confirms-companies-remain-liable-information-provided-ai-chatbot/)
 
+## Where else this works, and where it doesn't
+
+The pattern needs three things: a system of record the bot can read, reason codes that say why a record is in its state, and a table that says what may be said and done about each code. Inside finance that covers more than I expected, which is why finbot now has twelve plug-ins, including disputes, mortgage servicing, buy-now-pay-later plans, insurance claims and subscription billing. Each was a single module, and each one stops a specific wrong answer: a wrong respond-by date on a chargeback, "you're covered" on a claim that is still with an adjuster, "your subscription was cancelled" when it only ends at the period's close.
+
+Outside finance the same shape shows up wherever a record and its codes exist. Airline rebooking and refunds are the obvious one: the Air Canada tribunal case was a refund rule the bot made up, and a fare-rules table checked in code is exactly the fix. Healthcare claims and prior authorization have public adjustment codes. E-commerce returns, shipment tracking and SaaS billing all have order or invoice records with reason codes.
+
+It does not fit where the answer is a judgement. Investment, tax or clinical advice has no record to compare with. Interpreting prose rules is the MyCity failure: retrieval over statutes didn't stop that bot, because no record could say its answer was wrong, and the design only helps once the rules are reduced to a coded table. Decisions that a person makes (a claim, a hardship plan, an underwriting call) can be reported, never made. For those, finbot refuses or hands over, and I think that is the honest boundary of this approach.
+
+![Twelve domain plug-ins: what each module declares, what the core enforces for every domain, and the wrong answer each one stops](../diagrams/finbot-domain.png)
+
+*Each product area is one module; the core enforces the same checks on all of them.*
+
 ## Problems others have documented, and whether this helps
 
 The failures I started from aren't mine alone. Here are chatbot problems that are on the public record, in news reports and in papers, and an honest note on how far finbot's design goes against each.
@@ -273,7 +295,7 @@ The failures I started from aren't mine alone. Here are chatbot problems that ar
 ### The drawbacks, and what I did about each
 
 - **The checker reads patterns, not meaning.** It caught a wrong amount, code, status or link, but not a wrong *reason* given in plain words. Now each decline code maps to one cause, and an answer that gives a different one ("code 05 because the card expired") is blocked. It's still a phrase table: a cause worded in a way the table doesn't know gets through.
-- **Strict means more handoffs.** "I won't guess" is safe, but it resolves nothing. Now, when the model's answer can't be verified, code states what the record shows: status, amount, code and the next step. With a faulty scripted model and no repair call, refusals fell from 41.0% to 9.6% of turns. Help-page questions have no record to fall back on, so they still end in a refusal.
+- **Strict means more handoffs.** "I won't guess" is safe, but it resolves nothing. Now, when the model's answer can't be verified, code states what the record shows: status, amount, code and the next step. With a faulty scripted model and no repair call, refusals fell from 39.9% to 8.9% of turns. Help-page questions have no record to fall back on, so they still end in a refusal.
 - **A repair costs a second model call.** It can now be switched off: a failed draft goes straight to the record-built answer, at 2.0 model calls per turn instead of 2.9 in the same run. A report reads repair, refusal and handoff rates and latency from the audit log. I haven't measured any of this on live traffic.
 - **The rules need upkeep.** Retry tables, cascade rules, processor code mappings and escalation rules all have owners now. The controller reports how often each rule fires, which learned rules never fire, and what is waiting on a person. Reviewers still have to keep labelling mistakes.
 - **It's only as good as the records.** An audit now fails ingestion when a help page is past its age limit or disagrees with the retry and code tables, and an answer that cites an old page gets a "may be out of date" note. A page that is wrong in some other way is still repeated.

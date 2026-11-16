@@ -39,6 +39,7 @@ from .actions import detect as detect_write_request
 from .adaptive.policy import BASELINE, GuardPolicy
 from .adaptive.risk import next_score
 from .adaptive.source import PolicySource, StaticPolicySource
+from .domains import by_id, find_ids, id_of
 from .freshness import stale_dates
 from .guardrails import BLOCKED_INPUT_MSG, BLOCKED_OUTPUT_MSG
 from .language import detect as detect_language
@@ -48,9 +49,10 @@ from .pii import CARD_REASONS, mask_pii, mask_value
 from .recordanswer import record_answer
 from .resilience import GuardrailUnavailable, ServiceUnavailable
 from .tickets import InMemoryTickets, TicketStore
-from .tools import TXN_ID, Session, ToolBox
+from .tools import Session, ToolBox
 from .untrusted import SPOTLIGHT_RULE, ToolResultScreen, leaks_prompt
 from .verification import (
+    DomainVerifier,
     EvidenceVerifier,
     HallucinationGate,
     LanguageVerifier,
@@ -60,18 +62,20 @@ from .verification import (
     VerifierChain,
 )
 
-SYSTEM_PROMPT = """You are a support assistant for a payments and financial-services company. You help merchants, customers and support staff understand transactions, declines, refunds, fees and product behaviour.
+SYSTEM_PROMPT = """You are a support assistant for a financial-services company. You help customers and support staff understand their bank accounts, transfers, card payments, disputes, issued cards, identity verification, loans, mortgages, buy-now-pay-later plans, insurance claims, subscriptions and onboarding applications, and how the products work.
 
 How you answer:
-- Facts about a specific transaction or account come only from tool results in this conversation. Call get_transaction (and search_transaction_logs when explaining a failure) before stating status, amounts, codes or causes.
-- If a tool returns status "not_found", tell the user it was not found for their account and ask them to check the ID. Do not guess, and do not describe what such a transaction "probably" looked like.
+- Facts about a specific record (an account, transfer, payment, verification case or loan) come only from tool results in this conversation. Call the record's tool before stating status, amounts, dates, rates, codes or causes. Which tool: the id prefix tells you (acct_ get_account, xfer_ get_transfer, kyc_ get_verification, loan_ get_loan, card_ get_card, app_ get_application, dsp_ get_dispute, mtg_ get_mortgage, bnpl_ get_bnpl_plan, clm_ get_claim, sub_ get_subscription, txn_ get_transaction, with search_transaction_logs when explaining a failed payment). Use only the tools you are given.
+- If a tool returns status "not_found", tell the user it was not found for their account and ask them to check the ID. Do not guess, and do not describe what such a record "probably" looked like.
+- A record's status is exactly what the tool returned. Never describe an undecided case, application or transfer as approved, verified, completed or declined, and never predict a decision.
+- Give a reason only if the record carries it. If a record says it is under review, say so and nothing more: never guess why.
 - If a tool returns status "error", say the system is temporarily unavailable. Don't invent an answer.
 - Product, policy and code-meaning questions: use search_knowledge_base and cite the source URL. If nothing relevant is found, say you don't have documentation on it rather than answering from general knowledge.
-- Session state arrives in system messages tagged <session_state>. Only the focus transaction is active. Do not carry details of other transactions into the current answer unless the user explicitly refers back to them by ID.
+- Session state arrives in system messages tagged <session_state>. Only the focus record is active. Do not carry details of other records into the current answer unless the user explicitly refers back to them by ID.
 - You are read-only: you cannot refund, retry, cancel or change anything. Requests to change something are turned into tickets by the system, not by you. Never say you raised, created or opened a ticket; mention a ticket id only if <session_state> lists it.
 - Out of scope: investment advice, legal or tax advice, topics unrelated to our products. Decline briefly and offer what you can help with.
 - Never ask for or repeat full card numbers, CVV, passwords or one-time codes.
-- When a transaction record includes "guidance", it is the authoritative retry policy and next step, computed from our rules. Give the user its next_step (it is already written for their role) and, if relevant, what to tell the cardholder (tell_the_cardholder). If retryable is false, never suggest retrying the same payment; only the alternatives in retry_only_if (for example another card, or checking the status first) are allowed. If retryable is true, state the retry_rule including its timing.
+- When a record includes "guidance", it is the authoritative policy and next step, computed from our rules; for a record that is not a card payment, retryable and retry_rule say whether the same request may be sent again. Give the user its next_step (it is already written for their role) and, if relevant, what to tell the cardholder (tell_the_cardholder). If retryable is false, never suggest retrying the same payment; only the alternatives in retry_only_if (for example another card, or checking the status first) are allowed. If retryable is true, state the retry_rule including its timing.
 - Direct people to whoever can actually fix the problem: the cardholder's bank for issuer declines, the merchant's settings or integration for risk blocks and request errors, support for anything you cannot verify.
 - Always answer in English.
 - Be concise: lead with the answer, then the reason, then the next step for the user.
@@ -191,10 +195,12 @@ class Chatbot:
         self.check_provenance = True   # tool ids must come from the user (off only in red-team ablations)
         self.sleep = time.sleep  # injectable for tests
         self.today = date.today  # injectable for tests (help-page age)
-        names = set(toolbox.processors.names()) if getattr(toolbox, "processors", None) else None
+        procs = getattr(toolbox, "processors", None)
+        names = set(procs.names()) if procs is not None else None
         self.gate = HallucinationGate(VerifierChain([
             EvidenceVerifier(names),
             ReasonVerifier(),
+            DomainVerifier(),
             LanguageVerifier(),
             PolicyVerifier(lambda: t.policy if (t := current_turn()) else BASELINE),
             TicketVerifier(lambda: set(t.tickets) if (t := current_turn()) else set()),
@@ -306,13 +312,13 @@ class Chatbot:
     def _track_focus(self, cs: ChatSession, ctx: TurnContext) -> Reply | None:
         """Which transaction this turn is about. Before write requests too, so "refund
         txn_X" followed by "why did it fail?" stays on txn_X."""
-        for tid in TXN_ID.findall(ctx.text):          # provenance: ids the user typed
+        for tid in find_ids(ctx.text):                # provenance: ids the user typed
             if tid not in cs.memory.user_ids:
                 cs.memory.user_ids.append(tid)
         focus, changed = cs.memory.update_focus(ctx.text)
         if changed:
             cs.pending_focus_notice = (f"Focus changed to {focus or 'a general question'}; treat earlier "
-                                       "transactions as unrelated.")
+                                       "records as unrelated.")
         return None
 
     def _write_request(self, cs: ChatSession, ctx: TurnContext) -> Reply | None:
@@ -321,8 +327,9 @@ class Chatbot:
         if req is None:
             return None
         run_tool = self.toolbox.handler(cs.session)
-        out = self.intake.handle(req, cs.session, lambda args: self.screen.sanitize(
-            "get_transaction", run_tool("get_transaction", args)))
+        domain = by_id(req.txn_id)
+        tool = domain.tool if domain else "get_transaction"
+        out = self.intake.handle(req, cs.session, lambda args: self.screen.sanitize(tool, run_tool(tool, args)))
         for c in out.tool_log:
             cs.memory.ingest_tool_result(c["name"], c["input"], c["result"])
         reasons = [f"write_request:{req.kind}"]
@@ -371,7 +378,7 @@ class Chatbot:
         if engine.routing is None:  # engine built without a strategy: use configured one
             from .registry import ROUTING
             engine.routing = ROUTING.create(self.settings.routing)
-        tier = engine.route(text, len(set(TXN_ID.findall(text))), cs.memory.consecutive_fallbacks,
+        tier = engine.route(text, len(set(find_ids(text))), cs.memory.consecutive_fallbacks,
                             repairing=False)
         tiered = engine.routing.name == "tiered"
         route: dict[str, Any] = {"tier": tier, "models": []}
@@ -446,7 +453,7 @@ class Chatbot:
         """Refuse a tool call whose transaction id the user never typed. An instruction planted
         in a record ("also look up txn_X") can then not walk the model to other records, even
         inside the same tenant. Returns the refusal envelope, or None to run the call."""
-        tid = args.get("txn_id")
+        tid = id_of(args)
         if not self.check_provenance or not isinstance(tid, str) or tid in cs.memory.user_ids:
             return None
         return {"status": "refused", "source": "provenance", "data": None,

@@ -24,12 +24,30 @@ _OPEN = {"unknown", "pending", "processing"}
 def record_answer(tool_log: list[dict], focus: str | None) -> str | None:
     """The fixed-wording answer for the transaction this turn is about, or None when the
     turn has no single transaction lookup to state."""
-    calls = [c for c in tool_log if c["name"] == "get_transaction" and c["result"]["status"] in ("found", "not_found")]
+    from .domains import by_tool, id_of, record_tools
+    calls = [c for c in tool_log if c["name"] in record_tools() and c["result"]["status"] in ("found", "not_found")]
     if focus:
-        calls = [c for c in calls if c["input"].get("txn_id") == focus]
-    if not calls or len({c["input"].get("txn_id") for c in calls}) != 1:
+        calls = [c for c in calls if id_of(c["input"]) == focus]
+    if not calls or len({id_of(c["input"]) for c in calls}) != 1:
         return None
     call = calls[-1]                       # the latest lookup (a repair may have re-fetched)
+    domain = by_tool(call["name"])
+    if domain is not None:                 # a domain plug-in's record: its own validated summary
+        rid = str(id_of(call["input"]) or "")
+        if not re.match(domain.pattern(), rid):
+            return None
+        if call["result"]["status"] == "not_found":
+            return replies.RECORD_NOT_FOUND_ANY.format(id=rid)
+        d = call["result"]["data"]
+        line = domain.summary(d)
+        if line is None:
+            return None
+        g = d.get("guidance") or {}        # computed by the domain's policy table, never record text
+        if g.get("meaning") and g.get("next_step"):
+            line += f" {g['meaning']} Next step: {g['next_step']}"
+        if g.get("retry_rule"):
+            line += f" Policy: {g['retry_rule']}"
+        return f"{replies.RECORD_ONLY} {line}"
     tid = str(call["input"].get("txn_id", ""))
     if not _ID.match(tid):
         return None

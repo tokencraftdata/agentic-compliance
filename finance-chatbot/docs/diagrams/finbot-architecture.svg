@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1476" viewBox="0 0 1200 1476"><defs><marker id="a-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9ca3af"/></marker><marker id="a-code" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#047857"/></marker><marker id="a-block" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b91c1c"/></marker><marker id="a-model" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1d4ed8"/></marker><marker id="a-people" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b45309"/></marker><marker id="a-data" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6d28d9"/></marker></defs><rect width="1200" height="1476" fill="#ffffff"/>
+<text x="40" y="54" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="32" font-weight="bold" fill="#1f2937" text-anchor="start">finbot: the model writes, code decides</text>
+<text x="40" y="88" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="normal" fill="#4b5563" text-anchor="start">A fintech support bot on Amazon Bedrock. Every claim about someone&#x27;s money is checked against the records first.</text>
+<rect x="40" y="120" width="330" height="70" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="58" y="152" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#b45309" text-anchor="start">Customer or support agent</text>
+<text x="58" y="176" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">asks about an account, transfer, card, loan …</text>
+<rect x="830" y="120" width="330" height="70" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2"/>
+<text x="848" y="152" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#6b7280" text-anchor="start">Identity provider (OIDC)</text>
+<text x="848" y="176" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">signs the token the API verifies</text>
+<rect x="40" y="220" width="1120" height="74" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="60" y="252" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" text-anchor="start"><tspan font-weight="bold" fill="#047857">Trust boundary  </tspan><tspan font-weight="normal" fill="#1f2937">API verifies the token; tenant, role and groups come from it, never from the chat text</tspan></text>
+<text x="60" y="280" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">then: per-session FIFO turn queue (SQS) · de-duplicated by message id</text>
+<path d="M 205 190 L 205 218" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<path d="M 995 190 L 995 218" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<text x="1005" y="210" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">public keys (JWKS)</text>
+<rect x="40" y="330" width="680" height="760" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2"/>
+<text x="60" y="364" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" font-weight="bold" fill="#1f2937" text-anchor="start">Stateless worker: one turn, in this order</text>
+<path d="M 380 294 L 380 328" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<rect x="60" y="384" width="640" height="56" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="78" y="408" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#047857" text-anchor="start">1  Mask card data</text>
+<text x="78" y="430" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">before anything else sees the text</text>
+<rect x="60" y="446" width="640" height="56" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="78" y="470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#047857" text-anchor="start">2  Risk lock</text>
+<text x="78" y="492" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">a session that kept attacking goes to a person</text>
+<rect x="60" y="508" width="640" height="56" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="78" y="532" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#047857" text-anchor="start">3  Input guard</text>
+<text x="78" y="554" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">prompt attacks, denied topics, PII · Bedrock Guardrails</text>
+<rect x="60" y="570" width="640" height="56" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="78" y="594" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#047857" text-anchor="start">4  Language</text>
+<text x="78" y="616" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">every check reads English; other languages go to a person</text>
+<rect x="60" y="632" width="640" height="56" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="78" y="656" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#047857" text-anchor="start">5  Learned guard policy</text>
+<text x="78" y="678" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">escalate complaints and hardship; block learned attacks</text>
+<rect x="60" y="694" width="640" height="56" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="78" y="718" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#047857" text-anchor="start">6  Focus</text>
+<text x="78" y="740" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">which record this turn is about, decided in code</text>
+<rect x="60" y="756" width="640" height="56" rx="8" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="78" y="780" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#b45309" text-anchor="start">7  Change request?</text>
+<text x="78" y="802" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">refund, cancel, unblock, appeal … becomes a ticket</text>
+<rect x="60" y="818" width="640" height="56" rx="8" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="78" y="842" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#1d4ed8" text-anchor="start">8  Claude + read-only tools</text>
+<text x="78" y="864" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">drafts an answer from tool results only</text>
+<rect x="60" y="880" width="640" height="56" rx="8" fill="#fef2f2" stroke="#b91c1c" stroke-width="2"/>
+<text x="78" y="904" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#b91c1c" text-anchor="start">9  Hallucination gate</text>
+<text x="78" y="926" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">verify · one repair · answer built from the record · refuse</text>
+<rect x="60" y="942" width="640" height="56" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="78" y="966" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#047857" text-anchor="start">10  Output guard</text>
+<text x="78" y="988" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">grounding, PII, prompt-leak canary</text>
+<rect x="60" y="1004" width="640" height="56" rx="8" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="78" y="1028" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="bold" fill="#047857" text-anchor="start">11  Commit the turn</text>
+<text x="78" y="1050" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">compare-and-swap on version and lease · audit line</text>
+<rect x="760" y="330" width="400" height="170" rx="10" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="778" y="362" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#1d4ed8" text-anchor="start">Model engine</text>
+<text x="778" y="388" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">Claude on Amazon Bedrock</text>
+<text x="778" y="412" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">failover: us-east-1 → us-west-2 → Claude API</text>
+<text x="778" y="436" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">circuit breaker per model · 90 s turn deadline</text>
+<text x="778" y="460" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">a backup model gets the same checks</text>
+<path d="M 700 846 L 730 846 L 730 415 L 758 415" fill="none" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#a-model)"/>
+<rect x="760" y="530" width="400" height="150" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="778" y="562" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#047857" text-anchor="start">Read-only tools</text>
+<text x="778" y="588" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">scoped to the tenant in the token</text>
+<text x="778" y="612" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">only ids the user typed (provenance)</text>
+<text x="778" y="636" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">fields cut to an allow-list</text>
+<text x="778" y="660" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">results screened, wrapped as data</text>
+<path d="M 960 500 L 960 528" fill="none" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#a-model)"/>
+<rect x="760" y="710" width="400" height="250" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="778" y="742" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#6d28d9" text-anchor="start">Domain plug-ins (FINBOT_DOMAINS)</text>
+<rect x="778" y="758" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="835" y="783" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">accounts</text>
+<rect x="902" y="758" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="959" y="783" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">transfers</text>
+<rect x="1026" y="758" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="1083" y="783" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">kyc</text>
+<rect x="778" y="806" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="835" y="831" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">lending</text>
+<rect x="902" y="806" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="959" y="831" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">issuing</text>
+<rect x="1026" y="806" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="1083" y="831" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">onboarding</text>
+<rect x="778" y="854" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="835" y="879" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">disputes</text>
+<rect x="902" y="854" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="959" y="879" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">mortgages</text>
+<rect x="1026" y="854" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="1083" y="879" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">bnpl</text>
+<rect x="778" y="902" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="835" y="927" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">insurance</text>
+<rect x="902" y="902" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="959" y="927" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">subscriptions</text>
+<rect x="1026" y="902" width="114" height="38" rx="19" fill="#ffffff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="1083" y="927" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="middle">payments</text>
+<path d="M 960 680 L 960 708" fill="none" stroke="#6d28d9" stroke-width="2.5" marker-end="url(#a-data)"/>
+<rect x="760" y="990" width="400" height="100" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="778" y="1022" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#6d28d9" text-anchor="start">Systems of record and help pages</text>
+<text x="778" y="1048" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">core banking · cards · KYC · loans · billing · claims</text>
+<text x="778" y="1072" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">indexed help pages, cited by URL</text>
+<path d="M 960 960 L 960 988" fill="none" stroke="#6d28d9" stroke-width="2.5" marker-end="url(#a-data)"/>
+<rect x="40" y="1140" width="265" height="170" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2"/>
+<text x="58" y="1172" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#6b7280" text-anchor="start">Session store</text>
+<text x="58" y="1203" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">DynamoDB, one versioned record</text>
+<text x="58" y="1232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">owner lease, compare-and-swap</text>
+<text x="58" y="1261" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">a crashed turn commits nothing</text>
+<text x="58" y="1290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">typed ledger per record</text>
+<rect x="325" y="1140" width="265" height="170" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="343" y="1172" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#047857" text-anchor="start">Adaptive guardrails</text>
+<text x="343" y="1203" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">a reviewer labels a mistake</text>
+<text x="343" y="1232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">rule proposed, then gated on evals</text>
+<text x="343" y="1261" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">shadow → canary → active</text>
+<text x="343" y="1290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">admin approves; rollback in one call</text>
+<rect x="610" y="1140" width="265" height="170" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="628" y="1172" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#b45309" text-anchor="start">People and tickets</text>
+<text x="628" y="1203" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">the bot executes nothing</text>
+<text x="628" y="1232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">tickets for every change request</text>
+<text x="628" y="1261" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">handoff after 2 unverifiable answers</text>
+<text x="628" y="1290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">escalation by policy</text>
+<rect x="895" y="1140" width="265" height="170" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="913" y="1172" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#6d28d9" text-anchor="start">Knowledge ingestion</text>
+<text x="913" y="1203" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">sources → heading-aware chunks</text>
+<text x="913" y="1232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">screened for injection</text>
+<text x="913" y="1261" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">Titan embeddings → vector DB</text>
+<text x="913" y="1290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">feedback never auto-ingested</text>
+<path d="M 172 1092 L 172 1138" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<text x="182" y="1122" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">load / commit</text>
+<path d="M 457 1138 L 457 1092" fill="none" stroke="#047857" stroke-width="2.5" marker-end="url(#a-code)"/>
+<text x="467" y="1122" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">learned rules</text>
+<path d="M 650 1092 L 650 1138" fill="none" stroke="#b45309" stroke-width="2.5" marker-end="url(#a-people)"/>
+<text x="588" y="1122" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">tickets</text>
+<path d="M 1027 1138 L 1027 1092" fill="none" stroke="#6d28d9" stroke-width="2.5" marker-end="url(#a-data)"/>
+<text x="1037" y="1122" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">help pages</text>
+<text x="40" y="1356" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="normal" fill="#4b5563" text-anchor="start">Stages 1–7 and 9–11 are plain Python: the same input gets the same decision every time. Only stage 8 uses the model.</text>
+<rect x="40" y="1388" width="22" height="22" rx="5" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="72" y="1405" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">code decides</text>
+<rect x="191.2" y="1388" width="22" height="22" rx="5" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="223.2" y="1405" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">model writes</text>
+<rect x="342.4" y="1388" width="22" height="22" rx="5" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="374.4" y="1405" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">records and documents</text>
+<rect x="571.0" y="1388" width="22" height="22" rx="5" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="603.0" y="1405" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">people act</text>
+<rect x="705.0" y="1388" width="22" height="22" rx="5" fill="#fef2f2" stroke="#b91c1c" stroke-width="2"/>
+<text x="737.0" y="1405" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">blocked or refused</text>
+<text x="40" y="1438" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">finbot · open source · synthetic data · github.com/tokencraftdata/finbot</text>
+</svg>

@@ -45,20 +45,35 @@ class Session:
     session_id: str
     tenant_id: str          # from auth token, not from chat
     user_groups: list[str]  # for KB access filtering
-    role: str = "support"   # support | merchant
+    role: str = "support"   # support | customer (or the legacy alias "merchant")
+
+
+class RecordStore(Protocol):
+    def get(self, domain: str, tenant_id: str, record_id: str) -> dict | None:
+        """One record of a domain plug-in (finbot/domains) for this tenant, or None."""
+        ...
 
 
 class ToolBox:
-    """Registry: JSON schemas for the LLM + Python handlers bound to a session."""
+    """Registry: JSON schemas for the LLM + Python handlers bound to a session.
 
-    def __init__(self, txns: TransactionStore, logs: LogSearch, kb, sleep=None, processors=None):
+    `domains` lists the plug-ins this deployment offers (finbot/domains): "payments" turns
+    on the card-payment tools, every other name adds that domain's record tool."""
+
+    def __init__(self, txns: TransactionStore, logs: LogSearch, kb, sleep=None, processors=None,
+                 records: RecordStore | None = None, domains: list[str] | None = None):
         import time
 
+        from .domains import DOMAINS, PAYMENTS
         from .resilience import CircuitBreaker
         self.txns, self.logs, self.kb = txns, logs, kb
-        self.processors = processors   # ProcessorDirectory, or None when routing tools are not offered
+        self.records = records
+        names = domains if domains is not None else [PAYMENTS, *(DOMAINS if records is not None else [])]
+        self.payments = PAYMENTS in names
+        self.domains = [DOMAINS[n] for n in names if n != PAYMENTS] if records is not None else []
+        self.processors = processors if self.payments else None   # None: routing tools are not offered
         self.sleep = sleep or time.sleep
-        self.breakers = {n: CircuitBreaker(n) for n in ("txn_db", "log_search", "knowledge_base")}
+        self.breakers = {n: CircuitBreaker(n) for n in ("txn_db", "log_search", "knowledge_base", "records")}
 
     def _call(self, backend: str, fn):
         """Read-only backend call with backoff on transient errors (safe to repeat)."""
@@ -67,6 +82,19 @@ class ToolBox:
 
     # ---- schemas (strict: the model cannot add extra fields such as tenant_id)
     def schemas(self) -> list[dict]:
+        kb = {
+            "name": "search_knowledge_base",
+            "description": ("Search internal documentation (product rules, codes, fees, limits, runbooks). Use "
+                            "for 'what does X mean / how does Y work' questions. Returns chunks with source "
+                            "URLs; cite them."),
+            "input_schema": {"type": "object", "additionalProperties": False,
+                             "properties": {"query": {"type": "string"}},
+                             "required": ["query"]},
+            "strict": True,
+        }
+        return [*(self._payment_schemas() if self.payments else []), kb, *(d.schema() for d in self.domains)]
+
+    def _payment_schemas(self) -> list[dict]:
         return [
             {
                 "name": "get_transaction",
@@ -88,16 +116,6 @@ class ToolBox:
                                  "properties": {"txn_id": {"type": "string", "pattern": "^txn_[A-Za-z0-9]{6,}$"},
                                                 "limit": {"type": "integer"}},
                                  "required": ["txn_id", "limit"]},
-                "strict": True,
-            },
-            {
-                "name": "search_knowledge_base",
-                "description": ("Search internal documentation (decline codes, API specs, surcharge rules, "
-                                "runbooks). Use for 'what does X mean / how does Y work' questions. Returns "
-                                "chunks with source URLs; cite them."),
-                "input_schema": {"type": "object", "additionalProperties": False,
-                                 "properties": {"query": {"type": "string"}},
-                                 "required": ["query"]},
                 "strict": True,
             },
         ] + self._routing_schemas()
@@ -132,11 +150,17 @@ class ToolBox:
         ]
 
     def handler(self, session: Session) -> Callable[[str, dict], dict]:
+        from .domains import by_tool
         from .policy import guidance
         from .resilience import ServiceUnavailable
 
         def run(name: str, args: dict) -> dict:
             try:
+                domain = by_tool(name)
+                if domain is not None and domain in self.domains:
+                    return self._domain_record(session, domain, str(args.get(domain.id_arg, "")))
+                if name in ("get_transaction", "search_transaction_logs") and not self.payments:
+                    return envelope("error", name, note="unknown tool")
                 if name == "get_transaction":
                     rec = self._record(session, args["txn_id"])
                     if rec is None:
@@ -179,6 +203,22 @@ class ToolBox:
             return None
         return rec
 
+    def _domain_record(self, session: Session, domain, record_id: str) -> dict:
+        """One record of a domain plug-in: tenant-scoped, cut to the domain's allow-list of
+        fields (so a field the model must not see never leaves this function), with the
+        domain's policy guidance attached."""
+        assert self.records is not None
+        store = self.records
+        rec = self._call("records", lambda: store.get(domain.name, session.tenant_id, record_id))
+        if rec is None or rec.get("tenant_id") != session.tenant_id:
+            return envelope("not_found", domain.source,
+                            note=f"No {domain.noun} {record_id} exists for this customer.")
+        data = {k: v for k, v in rec.items() if k in domain.fields}
+        g = domain.guidance(rec, session.role)
+        if g:
+            data["guidance"] = g
+        return envelope("found", domain.source, data)
+
     def _routing_trace(self, session: Session, txn_id: str) -> dict:
         from .processors.explain import routing_view
         rec = self._record(session, txn_id)
@@ -212,6 +252,19 @@ class InMemoryTxns:
     def recent(self, tenant_id, limit):
         mine = [r for r in self.rows.values() if r["tenant_id"] == tenant_id]
         return sorted(mine, key=lambda r: r.get("created_at", ""), reverse=True)[:limit]
+
+
+class InMemoryRecords:
+    """Domain records by domain name, e.g. {"accounts": [...], "transfers": [...]}."""
+
+    def __init__(self, rows: dict[str, list[dict]]):
+        from .domains import DOMAINS
+        self.rows = {name: {r[DOMAINS[name].id_arg]: r for r in items} for name, items in rows.items()
+                     if name in DOMAINS}
+
+    def get(self, domain, tenant_id, record_id):
+        r = self.rows.get(domain, {}).get(record_id)
+        return r if r and r["tenant_id"] == tenant_id else None
 
 
 class InMemoryLogs:
@@ -251,3 +304,51 @@ DEMO_DOCS = [
              "request. Surcharges apply to credit cards only, are capped at 3 percent, and must be "
              "disclosed before payment. Debit and prepaid cards cannot be surcharged.</p>"},
 ]
+DEMO_RECORDS: dict[str, list[dict]] = {
+    "accounts": [
+        {"account_id": "acct_M4N5P6Q7", "tenant_id": "m_100", "type": "checking", "status": "active",
+         "currency": "USD", "balance": "2450.00", "available_balance": "1950.00", "opened_on": "2025-03-04",
+         "holds": [{"amount": "500.00", "reason_key": "CHECK_DEPOSIT", "release_date": "2026-11-18"}],
+         "fees": [{"type": "monthly_maintenance", "amount": "12.00", "posted_on": "2026-11-01"}]},
+    ],
+    "transfers": [
+        {"transfer_id": "xfer_R8S9T0U1", "tenant_id": "m_100", "rail": "ach", "direction": "outgoing",
+         "status": "returned", "amount": "640.00", "currency": "USD", "return_code": "R02",
+         "created_at": "2026-11-10T09:15:00Z", "to_account_last4": "7781"},
+    ],
+    "kyc": [
+        {"case_id": "kyc_V2W3X4Y5", "tenant_id": "m_100", "status": "in_review", "level": "enhanced",
+         "submitted_on": "2026-11-09", "review_reason": "manual_screening_queue"},
+    ],
+    "disputes": [
+        {"dispute_id": "dsp_D1E2F3G4", "tenant_id": "m_100", "status": "needs_response",
+         "reason_code": "PRODUCT_NOT_RECEIVED", "amount": "89.00", "currency": "USD", "respond_by": "2026-11-24",
+         "opened_on": "2026-11-10", "evidence_submitted": False},
+    ],
+    "mortgages": [
+        {"mortgage_id": "mtg_H5J6K7L8", "tenant_id": "m_100", "product": "fixed_rate", "status": "delinquent",
+         "currency": "USD", "principal_balance": "312450.00", "rate": "6.25%", "next_payment_amount": "2140.00",
+         "next_payment_due": "2026-11-01", "days_past_due": 14},
+    ],
+    "bnpl": [
+        {"plan_id": "bnpl_M9N8P7Q6", "tenant_id": "m_100", "status": "active", "currency": "USD",
+         "purchase_amount": "480.00", "installments_total": 4, "installments_paid": 2,
+         "next_installment_amount": "120.00", "next_installment_due": "2026-11-28",
+         "last_payment": {"result": "declined", "next_attempt_on": "2026-11-18"}},
+    ],
+    "insurance": [
+        {"claim_id": "clm_R5S4T3U2", "tenant_id": "m_100", "policy_type": "business_property", "status": "in_review",
+         "currency": "USD", "claimed_amount": "18500.00", "submitted_on": "2026-11-03",
+         "adjuster_notes": "possible pre-existing damage", "fraud_score": 71},
+    ],
+    "subscriptions": [
+        {"subscription_id": "sub_V1W2X3Y4", "tenant_id": "m_100", "plan": "pro", "status": "active",
+         "currency": "USD", "price": "49.00", "interval": "month", "current_period_end": "2026-11-30",
+         "cancel_at_period_end": True},
+    ],
+    "lending": [
+        {"loan_id": "loan_Z6A7B8C9", "tenant_id": "m_100", "product": "term_loan", "status": "declined",
+         "principal": "25000.00", "currency": "USD", "decided_on": "2026-11-06",
+         "decision_reasons": ["DTI_HIGH", "CREDIT_HISTORY_SHORT"], "credit_score": 612},
+    ],
+}

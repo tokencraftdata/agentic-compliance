@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1250" viewBox="0 0 1200 1250"><defs><marker id="a-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9ca3af"/></marker><marker id="a-code" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#047857"/></marker><marker id="a-block" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b91c1c"/></marker><marker id="a-model" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1d4ed8"/></marker><marker id="a-people" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b45309"/></marker><marker id="a-data" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6d28d9"/></marker></defs><rect width="1200" height="1250" fill="#ffffff"/>
+<text x="40" y="54" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="32" font-weight="bold" fill="#1f2937" text-anchor="start">A domain plug-in: one module per product area</text>
+<text x="40" y="88" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="normal" fill="#4b5563" text-anchor="start">The core never learns what a transfer is. Each area declares its record, its words and its rules.</text>
+<rect x="40" y="120" width="560" height="560" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="58" y="154" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" font-weight="bold" fill="#6d28d9" text-anchor="start">transfers.py  (money movement)</text>
+<text x="58" y="198" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">prefix · tool</text>
+<text x="210" y="198" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">xfer_…  →  get_transfer(transfer_id)</text>
+<text x="58" y="244" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">fields</text>
+<text x="210" y="244" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">allow-list; hold_reason is not on it</text>
+<line x1="58" y1="214" x2="582" y2="214" stroke="#ddd6fe"/>
+<text x="58" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">statuses</text>
+<text x="210" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">completed · pending · returned · failed</text>
+<line x1="58" y1="260" x2="582" y2="260" stroke="#ddd6fe"/>
+<text x="58" y="336" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">open statuses</text>
+<text x="210" y="336" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">pending, processing: never “completed”</text>
+<line x1="58" y1="306" x2="582" y2="306" stroke="#ddd6fe"/>
+<text x="58" y="382" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">policy</text>
+<text x="210" y="382" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">R02 → don&#x27;t resend; new details needed</text>
+<line x1="58" y1="352" x2="582" y2="352" stroke="#ddd6fe"/>
+<text x="210" y="428" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">SETTLED_IRREVOCABLE → return request only</text>
+<text x="210" y="474" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">COMPLIANCE_HOLD → can&#x27;t share; don&#x27;t resend</text>
+<text x="58" y="520" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">causes</text>
+<text x="210" y="520" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">R02 → account_closed → “account is closed”</text>
+<line x1="58" y1="490" x2="582" y2="490" stroke="#ddd6fe"/>
+<text x="58" y="566" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">summary</text>
+<text x="210" y="566" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">the record in one sentence, every field</text>
+<line x1="58" y1="536" x2="582" y2="536" stroke="#ddd6fe"/>
+<text x="210" y="612" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">validated before it is repeated</text>
+<text x="58" y="660" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#4b5563" text-anchor="start" font-style="italic">One register(Domain(...)) call; no other file changes.</text>
+<rect x="640" y="120" width="520" height="560" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="658" y="154" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#047857" text-anchor="start">What the core does with it, for every domain</text>
+<circle cx="664" cy="192" r="5" fill="#047857"/>
+<text x="678" y="198" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Field allow-list</text>
+<text x="838" y="198" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">hidden fields never leave the tool</text>
+<circle cx="664" cy="238" r="5" fill="#047857"/>
+<text x="678" y="244" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Tenant scope</text>
+<text x="838" y="244" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">another customer&#x27;s record doesn&#x27;t exist</text>
+<circle cx="664" cy="284" r="5" fill="#047857"/>
+<text x="678" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Provenance</text>
+<text x="838" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">only ids the user typed are fetched</text>
+<circle cx="664" cy="330" r="5" fill="#047857"/>
+<text x="678" y="336" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Policy guidance</text>
+<text x="838" y="336" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">the rule, worded for the reader&#x27;s role</text>
+<circle cx="664" cy="376" r="5" fill="#047857"/>
+<text x="678" y="382" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Status check</text>
+<text x="838" y="382" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">no undecided record called decided</text>
+<circle cx="664" cy="422" r="5" fill="#047857"/>
+<text x="678" y="428" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Cause check</text>
+<text x="838" y="428" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">no reason the record doesn&#x27;t carry</text>
+<circle cx="664" cy="468" r="5" fill="#047857"/>
+<text x="678" y="474" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Detail checks</text>
+<text x="838" y="474" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">amounts, dates, rates, digits, links</text>
+<circle cx="664" cy="514" r="5" fill="#047857"/>
+<text x="678" y="520" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Resend check</text>
+<text x="838" y="520" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">no “send it again” against policy</text>
+<circle cx="664" cy="560" r="5" fill="#047857"/>
+<text x="678" y="566" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Tickets</text>
+<text x="838" y="566" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">cancel, unblock, appeal → a person</text>
+<circle cx="664" cy="606" r="5" fill="#047857"/>
+<text x="678" y="612" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="bold" fill="#1f2937" text-anchor="start">Record answer</text>
+<text x="838" y="612" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">the summary, if the model&#x27;s fails</text>
+<path d="M 600 400 L 638 400" fill="none" stroke="#6d28d9" stroke-width="2.5" marker-end="url(#a-data)"/>
+<text x="40" y="730" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" font-weight="bold" fill="#1f2937" text-anchor="start">Twelve domains, and the wrong answer each one is built to stop</text>
+<rect x="40" y="754" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="56" y="784" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">accounts</tspan><tspan font-weight="normal" fill="#4b5563">   acct_</tspan></text>
+<text x="56" y="812" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">a guessed reason for a review</text>
+<rect x="417" y="754" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="433" y="784" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">transfers</tspan><tspan font-weight="normal" fill="#4b5563">   xfer_</tspan></text>
+<text x="433" y="812" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">“cancel it” on a settled instant payment</text>
+<rect x="794" y="754" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="810" y="784" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">kyc</tspan><tspan font-weight="normal" fill="#4b5563">   kyc_</tspan></text>
+<text x="810" y="812" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">“verified” while still in review</text>
+<rect x="40" y="846" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="56" y="876" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">lending</tspan><tspan font-weight="normal" fill="#4b5563">   loan_</tspan></text>
+<text x="56" y="904" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">a reason that isn&#x27;t on the record</text>
+<rect x="417" y="846" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="433" y="876" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">issuing</tspan><tspan font-weight="normal" fill="#4b5563">   card_</tspan></text>
+<text x="433" y="904" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">a stolen card called active</text>
+<rect x="794" y="846" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="810" y="876" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">onboarding</tspan><tspan font-weight="normal" fill="#4b5563">   app_</tspan></text>
+<text x="810" y="904" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">a promised decision date</text>
+<rect x="40" y="938" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="56" y="968" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">disputes</tspan><tspan font-weight="normal" fill="#4b5563">   dsp_</tspan></text>
+<text x="56" y="996" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">a wrong respond-by date</text>
+<rect x="417" y="938" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="433" y="968" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">mortgages</tspan><tspan font-weight="normal" fill="#4b5563">   mtg_</tspan></text>
+<text x="433" y="996" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">any talk of foreclosure</text>
+<rect x="794" y="938" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="810" y="968" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">bnpl</tspan><tspan font-weight="normal" fill="#4b5563">   bnpl_</tspan></text>
+<text x="810" y="996" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">a wrong due date or late fee</text>
+<rect x="40" y="1030" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="56" y="1060" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">insurance</tspan><tspan font-weight="normal" fill="#4b5563">   clm_</tspan></text>
+<text x="56" y="1088" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">“you&#x27;re covered”</text>
+<rect x="417" y="1030" width="361" height="80" rx="8" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+<text x="433" y="1060" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#6d28d9">subscriptions</tspan><tspan font-weight="normal" fill="#4b5563">   sub_</tspan></text>
+<text x="433" y="1088" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">“cancelled” when it ends at period end</text>
+<rect x="794" y="1030" width="361" height="80" rx="8" fill="#f9fafb" stroke="#6b7280" stroke-width="1.5"/>
+<text x="810" y="1060" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" text-anchor="start"><tspan font-weight="bold" fill="#1f2937">payments</tspan><tspan font-weight="normal" fill="#4b5563">   txn_</tspan></text>
+<text x="810" y="1088" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="start">“retry now” on a hard decline</text>
+<text x="40" y="1142" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#4b5563" text-anchor="start">Payments is one plug-in among twelve: leave it out of FINBOT_DOMAINS and its tools disappear.</text>
+<rect x="40" y="1174" width="22" height="22" rx="5" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="72" y="1191" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">code decides</text>
+<rect x="191.2" y="1174" width="22" height="22" rx="5" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="223.2" y="1191" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">model writes</text>
+<rect x="342.4" y="1174" width="22" height="22" rx="5" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="374.4" y="1191" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">records and documents</text>
+<rect x="571.0" y="1174" width="22" height="22" rx="5" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="603.0" y="1191" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">people act</text>
+<rect x="705.0" y="1174" width="22" height="22" rx="5" fill="#fef2f2" stroke="#b91c1c" stroke-width="2"/>
+<text x="737.0" y="1191" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">blocked or refused</text>
+<text x="40" y="1224" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">finbot · open source · synthetic data · github.com/tokencraftdata/finbot</text>
+</svg>

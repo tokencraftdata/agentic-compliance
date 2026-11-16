@@ -1,20 +1,24 @@
-# finbot: a payments support chatbot that isn't allowed to guess
+# finbot: a fintech support chatbot that isn't allowed to guess
 
-finbot is an open-source reference implementation of a finance support chatbot on **Amazon Bedrock** (Claude, Bedrock Guardrails). Claude writes the answer; code decides what it is allowed to claim. It runs on synthetic data and has no connection to any company.
+finbot is an open-source reference implementation of a fintech support chatbot on **Amazon Bedrock** (Claude, Bedrock Guardrails). Claude writes the answer; code decides what it is allowed to claim. It runs on synthetic data and has no connection to any company.
+
+It covers the areas a fintech's support desk actually gets asked about, each as a **domain plug-in** (`finbot/domains/`): bank **accounts** (balances, holds, fees, restrictions), **money movement** (batch, real-time and wire transfers, with irrevocability decided per rail), **issued cards** (status, controls, authorization declines), **KYC / identity verification**, **lending** (applications and servicing), **onboarding**, **disputes and chargebacks**, **mortgage servicing**, **buy now, pay later**, **insurance claims** and **subscription billing** — plus card-payment **acceptance** (declines, retries, processor routing) as one more plug-in that a deployment can switch off (`FINBOT_DOMAINS`). A domain is one module: an id prefix, a read-only fetch tool, an allow-list of fields the model may see, a status vocabulary, a reason-code-to-policy table, and a summary built by code from the record. The core never changes.
 
 It is built around three ideas:
 
 | | What it does | Evidence (offline, scripted model, synthetic data) |
 |---|---|---|
-| **Hallucination gate** | Every amount, currency, percentage, code, status, date, card detail, transaction id and link in an answer is checked against this turn's tool results before anyone sees it. One guided repair, then an answer built by code from the record, and only then an honest "I won't guess". Reasons given in plain words are checked against the recorded code. Retry and processor-cascade advice must match policy tables in code | 259 hallucinations of 12 kinds injected on purpose, none reached the user; 0 of 3,514 on two fresh held-out sets; 0 of 1,468 correct answers falsely blocked |
-| **Adaptive guardrails** | Guardrails improve from reviewer-labelled mistakes, never from raw chat and without retraining. Each proposed rule must fix its own evidence, match no fair question and break no case in the eval and red-team suites, then runs in shadow and a canary before an admin promotes it. Built-in guards are never changed automatically | Escalation to a person, a check on promises the bot can't keep, and a session risk score in the baseline; gate replays 18 guard cases, 27 + 170 eval cases and 35 red-team cases per proposal |
+| **Hallucination gate** | Every amount, currency, percentage, code, status, date, card detail, record id and link in an answer is checked against this turn's tool results before anyone sees it. One guided repair, then an answer built by code from the record, and only then an honest "I won't guess". Reasons given in plain words are checked against the recorded code. Retry and processor-cascade advice must match policy tables in code | 2,259 hallucinations of 12 kinds injected on purpose, none reached the user; 0 of 3,774 on two fresh held-out sets; 0 of 2,876 correct answers falsely blocked |
+| **Adaptive guardrails** | Guardrails improve from reviewer-labelled mistakes, never from raw chat and without retraining. Each proposed rule must fix its own evidence, match no fair question and break no case in the eval and red-team suites, then runs in shadow and a canary before an admin promotes it. Built-in guards are never changed automatically | Escalation to a person, a check on promises the bot can't keep, and a session risk score in the baseline; gate replays 18 guard cases, 41 + 185 eval cases and 35 red-team cases per proposal |
 | **Resilience** | Stateless workers, sessions as versioned records with leases, turns saved only when complete, de-duplicated messages, a model failover chain with a circuit breaker per model, a 90-second turn deadline, fail-closed guardrails | Tests crash a worker at each point of a turn, take the session over, and reject the late worker's write; failover mid-turn keeps the same checks; in the routing simulator a two-hour processor outage moves approval from 80.4% to 80.5% |
 
 Underneath all three: prompt-injection defences. Against a stand-in model that obeys any instruction it sees, 0 of 29 attacks succeed with guardrails on, 21 of 29 without.
 
 Read more: [hallucination control](docs/reliability.md#3-hallucination-control), [adaptive guardrails](docs/design.md#10-adaptive-guardrails), [crash recovery and failover](docs/reliability.md#2-crash-recovery-finbotruntimepy), [the article](docs/posts/article.md).
 
-![finbot architecture](docs/architecture.svg)
+![finbot architecture](docs/diagrams/finbot-architecture.png)
+
+How to add a domain, which other areas the design fits (airline refunds, healthcare claims, returns, SaaS billing) and where it does not (advice, prose rules, discretionary decisions): [docs/domains.md](docs/domains.md). Diagrams for articles, as SVG and 2x PNG: [docs/diagrams/](docs/diagrams/).
 
 ## Common mistakes and what finbot does instead
 
@@ -22,13 +26,15 @@ Read more: [hallucination control](docs/reliability.md#3-hallucination-control),
 |---|---|---|
 | Docs split on word count | Chunks split mid-sentence and mid-table; no context; no way to cite | Chunks follow headings with overlap; each chunk keeps the section path, page id, version and URL (`knowledge.py`) |
 | Pure vector search, or weak embeddings | Weak recall on paraphrases; error codes ("05") are missed in pure-vector search | Hybrid search: BM25 for exact terms plus optional Bedrock Titan embeddings, merged by rank fusion. A minimum score means "no match" is reported instead of padding with weak chunks |
-| No guardrails; a lookup returns nothing and the LLM fills the gap | Hallucinated transaction facts | Tool replies carry `status: not_found` as a normal answer. The prompt rules plus a **deterministic evidence guard** block any amount, currency, percentage, date, card detail, code or txn id not present in this turn's tool data, and any claim about a transaction that wasn't found |
+| No guardrails; a lookup returns nothing and the LLM fills the gap | Hallucinated facts about accounts, transfers, payments or loans | Tool replies carry `status: not_found` as a normal answer. The prompt rules plus a **deterministic evidence guard** block any amount, currency, percentage, date, card detail, code or record id not present in this turn's tool data, and any claim about a record that wasn't found |
 | Answers anything, falling back to the model's own knowledge | Off-topic risk; confident wrong answers on policy | Bedrock denied topics (investment, legal/tax, off-topic). Knowledge questions must cite the KB or say "no documentation", and code checks that they do. Investment, legal and tax advice is also blocked in answers |
-| One long chat; transaction A leaks into the question about B | Context corruption | Each transaction gets its own **typed ledger**. Code detects a new txn id or a general question and switches focus. Other transactions are marked inactive in a system message. State is rebuilt from the ledger every turn and never held by the LLM |
+| The bot explains a decision it can't see the reason for | Tipping off: "your account is under review for sanctions screening" | The reason for a review is **not in the domain's field allow-list**, so it never reaches the model. The policy table's answer is "we can't share details of a review", and a guessed cause (a screening hit, a credit score) is blocked as an unsupported reason |
+| An undecided case described as decided | "Your application was approved" while underwriting is still open | Every domain carries its status vocabulary, and a status the record doesn't have — in any tense for decisions, in the present tense for transient states — is blocked (`finbot/domains/checks.py`) |
+| One long chat; record A leaks into the question about B | Context corruption | Each record (a transfer, a loan, a payment) gets its own **typed ledger**. Code detects a new record id or a general question and switches focus. Other records are marked inactive in a system message. State is rebuilt from the ledger every turn and never held by the LLM |
 | Long chats degrade | Drift, cost | History is append-only (keeps the prompt cache working). After 30 turns a fresh thread starts, seeded with the typed state rather than a lossy summary |
 | Rated answers fed back into the vector DB automatically | **Memory poisoning**: one bad answer becomes a permanent "source" | Feedback goes to a human review queue. Approved fixes are made in the source docs and flow back through normal, versioned ingestion |
 | Long-lived cloud access keys | Leaked keys get reused; no rotation | boto3 default chain (IAM role, SSO, STS); no key is read from code or files. Production sign-in uses the identity provider's public keys (JWKS), so there is no shared secret to store. finbot has no database password; if you add a store that needs one, take it from Secrets Manager |
-| The model chooses which tenant to query | Cross-merchant data leak through prompt injection | The tenant comes from the auth session. Tool schemas are `strict` with no `tenant_id` field. Tools re-check ownership |
+| The model chooses which tenant to query | Cross-customer data leak through prompt injection | The tenant comes from the auth session. Tool schemas are `strict` with no `tenant_id` field. Tools re-check ownership |
 | No per-turn audit trail | Failures can't be diagnosed | One structured audit record per turn (masked text, tools, statuses, guard reasons, latency) |
 
 ## Known drawbacks, and what finbot does about each
@@ -38,7 +44,7 @@ A strict, checked bot has costs. These are the ones I know of, what the code now
 | Drawback | What finbot does | Still open |
 |---|---|---|
 | The checker reads numbers, codes and statuses, not a wrong reason in plain words | `finbot/reasons.py`: each decline code and gateway error maps to one cause, and an answer that states a different cause ("code 05 because the card expired") is blocked | It is a phrase table. A cause worded in a way the table doesn't know gets through to the grounding check |
-| Being strict means more refusals and handoffs | `finbot/recordanswer.py`: when the model's answer can't be verified, code states what the record shows (status, amount, code, policy next step) instead of refusing. With a faulty scripted model and repair switched off, refusals fell from 41.0% to 9.6% of turns | Help-page questions have no record to fall back on, so they still end in "I won't guess" |
+| Being strict means more refusals and handoffs | `finbot/recordanswer.py`: when the model's answer can't be verified, code states what the record shows (status, amount, code, policy next step) instead of refusing. With a faulty scripted model and repair switched off, refusals fell from 39.9% to 8.9% of turns | Help-page questions have no record to fall back on, so they still end in "I won't guess" |
 | A repair costs a second model call | `FINBOT_REPAIR_ATTEMPTS=0` skips it: a failed draft goes straight to the record-built answer (2.0 model calls per turn instead of 2.9 in the same run). `scripts/ops_report.py` reports repair, refusal and handoff rates, calls per turn and latency from the audit log | The record-built answer is plainer than a repaired one |
 | Rules and reviewer labelling need upkeep | `guard_controller.py upkeep`: hits per rule, learned rules that never fire, proposals waiting on a person, labels per 1,000 turns | A person still has to do the reviewing |
 | Only as good as the records and help pages | `scripts/kb_audit.py` fails an ingestion run when a help page is past its age limit or disagrees with the retry and code tables. An answer citing an old page gets a "may be out of date" note added by code | A page that is wrong in a way the tables don't cover is still repeated |
@@ -81,7 +87,11 @@ finbot/config.py         env settings (provider, model, guardrail id, KB path)
 finbot/llm.py            Claude on Bedrock (AnthropicBedrockMantle) | Claude API / gateway | FakeLLM
 finbot/models.py         model orchestrator engine: failover chain, breaker per model, refusal fallback, routing
 finbot/guardrails.py     Bedrock ApplyGuardrail, local fallback, deterministic evidence guard
-finbot/tools.py          typed read-only tools: transaction DB, log search, KB (tenant-scoped)
+finbot/tools.py          typed read-only tools: payment DB, log search, KB, domain records (tenant-scoped)
+finbot/domains/          domain plug-ins: accounts, transfers (ach/rtp/wire), kyc, lending, issuing,
+                         onboarding, disputes, mortgages, bnpl, insurance, subscriptions — each one module
+                         with fields, statuses, policy table and summary; checks.py verifies status,
+                         cause and reason keys for all of them (guide: docs/domains.md)
 finbot/memory.py         per-entity ledger, focus switching, typed state rendering
 finbot/knowledge.py      heading-aware chunks, hybrid BM25 + Titan search
 finbot/orchestrator.py   turn pipeline as ordered stages (risk lock, input guard, language, learned policy, focus,
@@ -92,7 +102,7 @@ finbot/auditlog.py       audit lines to a file or stdout, one "stream" field per
 finbot/store.py          durable session store: versioned state, leases, turn and action journals, TTL
 finbot/runtime.py        stateless workers: claim, load, dedupe, run, commit; takeover recovery
 finbot/faults.py         fault injection: crashing worker, hallucinating model
-finbot/policy.py         payment retry rules and role-based next steps (example policy)
+finbot/policy.py         card-payment retry rules and role-based next steps (example policy)
 finbot/resilience.py     backoff with jitter, circuit breakers, transient-error classification
 finbot/processors/       processor orchestration: dialect adapters, routing rule chain, cascade policy,
                          PaymentOrchestrator engine, seeded simulator, read-side views for the bot
@@ -104,15 +114,16 @@ finbot/redteam.py        red-team harness shared by run_redteam.py and the gate
 infra/create_guardrail.py   creates the Bedrock guardrail (topics, PII, prompt attack, grounding)
 Dockerfile, deploy/k8s/   worker image and reference EKS manifests (workers, API, ingestion, network policy)
 scripts/ingest.py        any source -> any vector store, incremental; or start a Bedrock KB sync
-scripts/generate_synthetic.py seeded synthetic merchants, transactions, logs, KB pages, eval set
+scripts/generate_synthetic.py seeded synthetic customers, payments, domain records, logs, KB pages, eval set
 scripts/run_eval.py      runs data/eval.jsonl through the bot with deterministic checks
 scripts/run_redteam.py   prompt-injection red team (data/redteam.jsonl) with a worst-case model and ablations
 scripts/simulate_routing.py  routing scenarios (steady, processor outage, degradation, issuer outage)
 scripts/guard_controller.py  adaptive guardrail controller: label, cycle, status, approve, promote, rollback, demo
-data/                    synthetic dev split (600 txns, 27-case eval) + data/test/ held-out split
-                         (400 txns, 170-case eval, 21 planted attacks); routing traces on every
-                         transaction; see data/README.md
-docs/architecture.svg    the diagram above
+data/                    synthetic dev split (600 payments + 176 domain records, 41-case eval) +
+                         data/test/ held-out split (400 payments + 176 domain records, 185-case eval,
+                         21 planted attacks); routing traces on every payment; see data/README.md
+docs/diagrams/           article diagrams: make.py draws SVG, export.sh renders 2x PNG
+docs/domains.md          domains: what ships, how to add one, where the design fits and doesn't
 docs/reliability.md      crash recovery, session store, hallucination control
 docs/design.svg          design diagram: layers, control plane, ingestion
 docs/security.md         prompt injection, red-team results, other controls, research references
@@ -138,9 +149,11 @@ tests/test_research.py      8 tests: argument provenance, multi-turn attacks, co
 tests/test_tickets.py       14 tests: write requests become tickets; desk claim and resolve
 tests/test_mitigations.py   27 tests: plain-word reasons, record-built answers, language, source freshness,
                             upkeep and cost reports, stated details, citations
+tests/test_domains.py       27 tests: hidden fields stripped, status/cause/reason-key checks, tickets on
+                            domain records, tenant isolation, provenance, record-built summaries, FINBOT_DOMAINS
 ```
 
-288 tests in all.
+315 tests in all.
 
 ## Design
 
@@ -157,7 +170,8 @@ A reviewer labels a mistake; the controller proposes a rule, gates it against th
 the red team, runs it in shadow on live traffic, and an admin promotes it through a canary. It
 never touches the built-in guards, loosening needs an admin, and rollback is one call. New
 guards in the baseline: escalation to a person (complaints, unauthorised payments, hardship),
-a check on promises the bot can't keep, and a session risk score for multi-turn jailbreaks.
+a check on promises the bot can't keep, and a session risk score for multi-turn jailbreaks;
+the same escalation and promise rules read every domain's answers.
 See [docs/design.md](docs/design.md#10-adaptive-guardrails).
 
 ## Deployment
@@ -189,7 +203,7 @@ Read [docs/reliability.md](docs/reliability.md) for the full picture. In short:
 
 - **Session store:** each session is a durable, versioned case record (ledger, focus, history) with a TTL. Workers are stateless, so any worker can serve any session.
 - **Crash recovery:** a lease plus a compare-and-swap commit. A crash mid-turn commits nothing, and the replacement re-runs the turn. A resent message is answered from the journal without calling the model again. A late writer is rejected. An external action whose outcome was never recorded is reconciled with the system of record before anything is retried.
-- **Hallucination:** a deterministic evidence guard checks amounts, currencies, percentages, dates, card details, codes, ids, status polarity, unknown outcomes, lifecycle claims, URLs and help-page citations. It gives one verifier-guided repair attempt, then states what the record shows, and only then falls back to "I won't guess", with Bedrock contextual grounding on top. A cause given in plain words must match the recorded code, and answers must be in English. Answers that promise outcomes the bot can't grant ("you'll get a refund", "guaranteed") get the same repair. The stress test injects 259 hallucinations of 12 kinds on the dev split and 1,734 on the held-out split, and none leak; 1,468 correct answers produce no false blocks.
+- **Hallucination:** a deterministic evidence guard checks amounts, currencies, percentages, dates, card details, codes, ids, status polarity, unknown outcomes, lifecycle claims, URLs and help-page citations. It gives one verifier-guided repair attempt, then states what the record shows, and only then falls back to "I won't guess", with Bedrock contextual grounding on top. A cause given in plain words must match the recorded code, and answers must be in English. Answers that promise outcomes the bot can't grant ("you'll get a refund", "guaranteed") get the same repair. The stress test injects 342 hallucinations of 12 kinds on the dev split and 1,807 on the held-out split, and none leak; correct answers produce no false blocks (count in docs/reliability.md). Domain records get the same treatment: a wrong status (in any tense for decisions), a cause the record doesn't carry, a guessed review reason or an unseen reason key is blocked.
 - **Payment retries and routing:** retry rules and next steps are computed in code per decline code or gateway error, and worded for the asker's role. A guard blocks retry advice that breaks the policy (hard declines, "retry now" on soft declines, any definite claim on a timeout).
 - **Model orchestrator engine:** every model call goes through an ordered failover chain (for example Bedrock us-east-1, then us-west-2, then the Claude API). Each model has its own circuit breaker (closed, open, half-open probe), refusals fall back to the next model, failover works mid-turn, and optional routing sends simple turns to a faster model. Run `/status` in the CLI to see each model's breaker state and failovers. Breaker state is shared through the session store, so a replacement worker after a crash skips a model another worker already found down. Guards run around the engine, so a backup model's answer gets the same checks. See [how the layers fit together](docs/reliability.md#7-how-the-layers-compose-guardrail-boundary-crash-recovery-resilience).
 - **System retries:** one backoff layer with circuit breakers for each model and each backend. Guardrail failures fail closed. Outages roll the turn back so a resend works. After two unverifiable answers in a row the user is directed to a human, with a reference.
@@ -200,7 +214,7 @@ python3 scripts/run_eval.py --hallucinate
 
 ## Synthetic data
 
-`data/` is ready to use: 8 merchants, 600 transactions (373 approved, 94 declined, 127 failed, 6 unknown after a timeout), 2,993 log events, 9 wiki-style help pages and 27 labelled eval cases. Every transaction carries a routing trace across three simulated processors. The app loads it automatically. Regenerate it, or make a bigger set:
+`data/` is ready to use: 8 customers, 600 card payments (373 approved, 94 declined, 127 failed, 6 unknown after a timeout), 176 domain records (16 accounts, 56 transfers across ach/rtp/wire, 16 KYC cases, 16 loans and applications, 16 issued cards, 8 onboarding applications, 16 disputes, 8 mortgages, 8 buy-now-pay-later plans, 8 insurance claims, 8 subscriptions), 2,993 log events, 21 wiki-style help pages and 41 labelled eval cases. Every payment carries a routing trace across three simulated processors. The app loads it automatically. Regenerate it, or make a bigger set:
 
 ```bash
 python3 scripts/generate_synthetic.py --out data --seed 7 --txns 600
@@ -208,9 +222,9 @@ python3 scripts/generate_synthetic.py --out data --seed 7 --txns 600
 
 The same seed gives byte-identical files; `data/MANIFEST.json` records the counts and hashes.
 
-For measuring, use the held-out test split in `data/test/`. It has 8 different merchants, 400
-new transactions, statement descriptors with 21 planted attacks and 10 benign look-alikes, and a
-170-case templated eval:
+For measuring, use the held-out test split in `data/test/`. It has 8 different customers, 400
+new payments plus its own domain records, statement descriptors with 21 planted attacks and 10
+benign look-alikes, and a 185-case templated eval:
 
 ```bash
 python3 scripts/generate_synthetic.py --split test

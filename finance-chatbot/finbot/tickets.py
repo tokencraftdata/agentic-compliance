@@ -134,9 +134,9 @@ class TicketDesk:
 
     def get(self, who: Principal, ticket_id: str) -> Ticket:
         t = self.store.get(ticket_id)
-        if t is None or (who.role == "merchant" and t.tenant_id != who.tenant_id):
+        if t is None or (who.role not in ("support", "admin") and t.tenant_id != who.tenant_id):
             raise Forbidden("ticket not found or not yours")
-        if who.role not in ("merchant", "support", "admin"):
+        if who.role not in ("customer", "merchant", "support", "admin"):
             raise Forbidden("role may not read tickets")
         return t
 

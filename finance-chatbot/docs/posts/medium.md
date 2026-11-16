@@ -1,12 +1,16 @@
-# Eight ways finance chatbots get it wrong, and how I fixed each one
+# Nine ways finance chatbots get it wrong, and how I fixed each one
 
-*A payments support bot that is not allowed to guess: what goes wrong in most finance chatbots, and what I built instead. Python, Amazon Bedrock, Claude.*
+*A fintech support bot that is not allowed to guess: accounts, transfers, cards, payments, KYC, lending and onboarding, and what goes wrong in most finance chatbots. Python, Amazon Bedrock, Claude.*
 
 ---
 
-A support bot for payments has one job that matters more than sounding helpful: it must never tell someone something about their money that the records don't back up.
+A fintech support bot has one job that matters more than sounding helpful: it must never tell someone something about their money that the records don't back up. That covers more than payments: a balance on hold, a returned transfer, a frozen card, an identity check in review, a loan application, an onboarding decision.
 
-Finance chatbots tend to fail that test in the same few ways. So I built **finbot**, an open reference project, to see whether each failure could be fixed in code rather than with a cleverer prompt. Claude does the language. Code decides what it's allowed to claim.
+Finance chatbots tend to fail that test in the same few ways. So I built **finbot**, an open reference project, to see whether each failure could be fixed in code rather than with a cleverer prompt. Claude does the language. Code decides what it's allowed to claim. Each product area is a plug-in — one module with the record's fields, statuses, reason codes and policy table — and a deployment switches areas on and off with one setting, card payments included.
+
+![finbot architecture: trust boundary, eleven-stage turn pipeline, model engine with failover, read-only tools over twelve domain plug-ins](../diagrams/finbot-architecture.png)
+
+*Only stage 8 uses the model.*
 
 It comes down to three ideas: a **hallucination gate** that checks every fact before it's sent, **adaptive guardrails** that improve from reviewed mistakes without retraining anything, and **resilience**, so the bot stays correct when a model or a worker goes down. Here are the problems, and what I did about each.
 
@@ -26,7 +30,9 @@ It comes down to three ideas: a **hallucination gate** that checks every fact be
 
 A failed answer gets one guided rewrite. The model is told exactly which claims didn't check out, and the rewrite is checked again against the tools it called during the repair. If it still fails, the user sees "I can't verify that, so I won't guess." Two of those in a row and the bot hands over to a person with a reference number.
 
-Here's what that looks like (synthetic data):
+![One answer through the hallucination gate, with a worked example](../diagrams/finbot-gate.png)
+
+Here's what that looks like for a payment (synthetic data):
 
 > **User:** why did txn_A1B2C3D4 fail?
 >
@@ -80,6 +86,20 @@ I tested this against a deliberately gullible stand-in model that obeys any inst
 
 Every model call goes through an ordered failover chain, each model with its own circuit breaker, and a 90-second deadline caps retries and failover together. The backup model's answer goes through exactly the same checks. If a guardrail service is down, the bot fails closed rather than answering unguarded.
 
+## 9. The bot explains a decision it was never allowed to see
+
+**The problem.** An account is frozen for a compliance review, or an application sits with a reviewer, and the bot helpfully speculates: "this is usually a sanctions screening hit". That guess can breach anti-tipping-off rules, and a wrong "your application was approved" is almost as bad.
+
+**What I did.** Two structural rules, not prompt rules. The reason for a review is not in the record's field allow-list, so the model never sees it and cannot repeat it; the policy table's answer is "we can't share details of a review", and a guessed cause (a screening hit, a credit score) is blocked as a reason the records don't carry. And every domain declares its status vocabulary, so an undecided case described as decided — in any tense for decisions — is blocked by the checker.
+
+---
+
+## Where else this works, and where it doesn't
+
+The pattern needs a record, reason codes and a policy table. Inside finance that now covers twelve plug-ins, including disputes, mortgages, buy-now-pay-later, insurance claims and subscription billing. Outside it, airline refunds (the Air Canada case), healthcare claims, returns and SaaS billing have the same shape. It does not fit judgement: advice, interpreting prose rules (the NYC MyCity failure), or decisions a person must make. There the bot refuses or hands over.
+
+![Twelve domain plug-ins and the wrong answer each one stops](../diagrams/finbot-domain.png)
+
 ---
 
 ## Making the guardrails adaptive
@@ -92,12 +112,12 @@ Every model call goes through an ordered failover chain, each model with its own
 
 ## What I tested, and what I haven't
 
-All of this runs offline with a scripted stand-in model and seeded synthetic data.
+All of this runs offline with a scripted stand-in model and seeded synthetic data covering all twelve areas.
 
-- 288 automated tests pass.
-- The eval set passes 27 of 27, and a held-out set 170 of 170.
-- I injected 259 hallucinations of 12 kinds on purpose. None reached the user. On two freshly generated test sets, 0 of 3,514.
-- 1,468 correct answers about failed payments produced no false blocks.
+- 315 automated tests pass.
+- The eval set passes 41 of 41, and a held-out set 185 of 185.
+- I injected 2,259 hallucinations of 12 kinds on purpose, flipped loan and verification decisions included. None reached the user. On two freshly generated test sets, 0 of 3,774.
+- 2,876 correct answers, across failed payments and every other kind of record, produced no false blocks.
 
 What this doesn't show: behaviour with live models, real traffic, real latency or real cost. A live evaluation on Bedrock is next, and I'll publish the results whatever they are.
 
@@ -106,7 +126,7 @@ What this doesn't show: behaviour with live models, real traffic, real latency o
 A bot this strict has costs. These are the ones I know of.
 
 - **The checker reads patterns, not meaning.** It caught a wrong amount, code or status, but not a wrong *reason* in plain words. Now each decline code maps to one cause, and an answer that gives a different one ("code 05 because the card expired") is blocked. It's still a phrase table, so an unfamiliar wording gets through.
-- **Strict means more handoffs.** "I won't guess" is safe, but it resolves nothing. Now, when the model's answer can't be verified, code states what the record shows: status, amount, code and the next step. With a faulty scripted model and no repair call, refusals fell from 41.0% to 9.6% of turns. Help-page questions have no record to fall back on, so they still end in a refusal.
+- **Strict means more handoffs.** "I won't guess" is safe, but it resolves nothing. Now, when the model's answer can't be verified, code states what the record shows: status, amount, code and the next step. With a faulty scripted model and no repair call, refusals fell from 39.9% to 8.9% of turns. Help-page questions have no record to fall back on, so they still end in a refusal.
 - **A repair costs a second model call.** It can be switched off: a failed draft goes straight to the record-built answer, at 2.0 model calls per turn instead of 2.9 in the same run. I haven't measured this on live traffic.
 - **The rules need upkeep.** A report shows how often each rule fires, which learned rules never fire, and what is waiting on a person. Reviewers still have to keep labelling mistakes.
 - **It's only as good as the records.** An audit fails ingestion when a help page is too old or disagrees with the retry and code tables, and an answer that cites an old page gets a "may be out of date" note. A page that is wrong in some other way is still repeated.

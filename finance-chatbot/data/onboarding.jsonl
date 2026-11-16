@@ -1,0 +1,8 @@
+{"application_id": "app_NE3FDYSZ", "decided_on": "2026-11-01", "decision_reasons": ["OB03"], "product": "issuing", "review_reason": "", "status": "declined", "submitted_on": "2026-10-17", "tenant_id": "m_100"}
+{"application_id": "app_3M2DLD05", "product": "issuing", "review_reason": "queue_backlog", "status": "in_review", "submitted_on": "2026-10-20", "tenant_id": "m_200"}
+{"application_id": "app_BCDL2VLN", "product": "business_account", "review_reason": "", "status": "submitted", "submitted_on": "2026-10-25", "tenant_id": "m_300"}
+{"application_id": "app_DDLKDUY5", "missing_items": ["registration_document", "owner_id"], "product": "issuing", "review_reason": "", "status": "needs_information", "submitted_on": "2026-10-21", "tenant_id": "m_400"}
+{"application_id": "app_QWDVA8UH", "decided_on": "2026-11-01", "product": "issuing", "review_reason": "", "status": "approved", "submitted_on": "2026-10-29", "tenant_id": "m_500"}
+{"application_id": "app_64EPGNHZ", "product": "business_account", "review_reason": "queue_backlog", "status": "in_review", "submitted_on": "2026-10-14", "tenant_id": "m_600"}
+{"application_id": "app_0BQ33M9C", "decided_on": "2026-10-31", "product": "business_account", "review_reason": "", "status": "approved", "submitted_on": "2026-10-05", "tenant_id": "m_700"}
+{"application_id": "app_XT8CF8A2", "missing_items": ["registration_document", "owner_id"], "product": "issuing", "review_reason": "", "status": "needs_information", "submitted_on": "2026-10-05", "tenant_id": "m_800"}

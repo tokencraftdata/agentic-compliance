@@ -22,7 +22,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field
 
-from .tools import TXN_ID
+from .domains import by_id, find_ids, id_of, record_tools
 
 GENERAL_CUES = ("in general", "generally", "how does", "what is", "what does", "explain", "what are")
 
@@ -72,27 +72,30 @@ class SessionMemory:
 
     def update_focus(self, user_text: str) -> tuple[str | None, bool]:
         """Return (new_focus, changed). Decided in code, not by the model."""
-        ids = TXN_ID.findall(user_text)
+        ids = find_ids(user_text)
         prev = self.focus
         if ids:
             self.focus = ids[-1]
         elif any(c in user_text.lower() for c in GENERAL_CUES) and not any(
-                w in user_text.lower() for w in ("this transaction", "that transaction", "it fail", "this payment")):
+                w in user_text.lower() for w in ("this transaction", "that transaction", "it fail", "this payment",
+                                                 "this transfer", "this account", "this loan", "this case",
+                                                 "this card", "this application", "this dispute",
+                                                 "this claim", "this subscription", "this mortgage", "this plan")):
             self.focus = None  # generic question: detach from any transaction
         return self.focus, self.focus != prev
 
     def ingest_tool_result(self, name: str, args: dict, result: dict) -> None:
-        tid = args.get("txn_id")
+        tid = id_of(args)
         if not tid:
             return
         ent = self.entities.setdefault(tid, EntityState(tid))
-        if result["status"] == "not_found" and name == "get_transaction":
+        if result["status"] == "not_found" and name in record_tools():
             ent.not_found = True
             return
         if result["status"] != "found":
             return
         ent.not_found = False
-        if name == "get_transaction":
+        if name in record_tools():
             for k, v in result["data"].items():
                 ent.record(k, v, f"{result['source']}:{name}")
         elif name == "search_transaction_logs":
@@ -105,7 +108,7 @@ class SessionMemory:
         lines = ["<session_state>"]
         if self.focus:
             ent = self.entities.get(self.focus)
-            lines.append(f"focus_transaction: {self.focus}")
+            lines.append(f"focus_{'record' if by_id(self.focus) else 'transaction'}: {self.focus}")
             if ent and ent.not_found:
                 lines.append("focus_status: NOT FOUND for this customer (verified by lookup)")
             elif ent:
@@ -114,10 +117,10 @@ class SessionMemory:
                 lines.append("verified_facts: none yet; call tools before stating any fact")
         else:
             lines.append("focus_transaction: none (general question; do not apply any "
-                         "earlier transaction's details unless the user explicitly refers back)")
+                         "earlier record's details unless the user explicitly refers back)")
         others = [e for e in self.entities if e != self.focus]
         if others:
-            lines.append(f"other_transactions_in_session (inactive, do not mix in): {others}")
+            lines.append(f"other_records_in_session (inactive, do not mix in): {others}")
         if self.recap:
             lines.append("earlier_requests_in_this_conversation (from a previous thread, oldest first): "
                          + " | ".join(self.recap))

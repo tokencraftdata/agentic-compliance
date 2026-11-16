@@ -28,6 +28,14 @@ def load_dataset(data_dir: str) -> tuple[list[dict], list[dict], list[dict]] | N
             _jsonl(os.path.join(data_dir, "logs.jsonl")), pages)
 
 
+def load_records(data_dir: str) -> dict[str, list[dict]] | None:
+    """Domain plug-in records (accounts.jsonl, transfers.jsonl, kyc.jsonl, lending.jsonl), if present."""
+    from .domains import DOMAINS
+    out = {name: _jsonl(os.path.join(data_dir, f"{name}.jsonl")) for name in DOMAINS
+           if data_dir and os.path.exists(os.path.join(data_dir, f"{name}.jsonl"))}
+    return out or None
+
+
 def build(settings: Settings | None = None, audit_path: str | None = None) -> Chatbot:
     """The orchestration layer, wired by the composition root (finbot/container.py)."""
     from .container import Container
@@ -47,9 +55,9 @@ def main() -> None:
     worker = Worker(bot, store, lease_s=5)
     tenant = os.environ.get("FINBOT_TENANT", "m_100")
     sid = os.environ.get("FINBOT_SESSION") or worker.start_session(tenant, ["support"])
-    sample = next((t["txn_id"] for t in bot.toolbox.txns.recent(tenant, 50) if t["status"] != "approved"),
-                  "txn_...")
-    print(f"finbot ready, session {sid} (Ctrl-D to quit). Try: why did {sample} fail?")
+    samples = [next(iter(rows)) for rows in getattr(bot.toolbox.records, "rows", {}).values() if rows][:2]
+    print(f"finbot ready, session {sid} (Ctrl-D to quit). Try: what is the status of "
+          f"{' or '.join(samples) or 'acct_...'}?")
     while True:
         try:
             q = input("> ").strip()

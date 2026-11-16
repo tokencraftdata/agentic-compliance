@@ -90,5 +90,125 @@
   "updated": "2026-10-12",
   "url": "https://wiki.example.com/pages/209",
   "version": 1
+ },
+ {
+  "access": [],
+  "html": "<h2>Holds</h2><p>A hold reserves part of the balance until its release date: a deposited check until it clears (CHECK_DEPOSIT), a card authorization until the purchase posts (CARD_AUTHORIZATION), or a large deposit while it is checked (LARGE_DEPOSIT_REVIEW). Held funds are the difference between the balance and the available balance.</p><h2>Restrictions</h2><p>An account can be restricted while identity verification is incomplete (KYC_INCOMPLETE), dormant after long inactivity (DORMANT), or frozen while under review (UNDER_REVIEW). Reviews are never discussed in chat.</p>",
+  "page_id": "301",
+  "space": "FIN",
+  "title": "Account holds and restrictions",
+  "updated": "2026-10-06",
+  "url": "https://wiki.example.com/pages/301",
+  "version": 2
+ },
+ {
+  "access": [],
+  "html": "<h2>Return codes</h2><p>R01 insufficient funds: resend allowed, at most twice within 180 days. R02 account closed, R03 no account found, R04 invalid account number, R16 account frozen: do not resend; corrected details are needed. R08 stop payment: resend only with the account holder's agreement. R10 unauthorized: no further debit without a new written authorization.</p><h2>Limits</h2><p>Transfers over the daily limit are rejected with DAILY_LIMIT_EXCEEDED and can be sent again the next business day or split.</p>",
+  "page_id": "302",
+  "space": "FIN",
+  "title": "Transfer returns and limits",
+  "updated": "2026-10-03",
+  "url": "https://wiki.example.com/pages/302",
+  "version": 3
+ },
+ {
+  "access": [],
+  "html": "<h2>Instant payments</h2><p>A real-time payment settles in seconds and is irrevocable once settled: it cannot be cancelled or recalled automatically. If it went to the wrong account, a return can be requested from the receiving bank, which does not have to agree. If the receiving account cannot accept instant payments (RTP_NOT_ENABLED), use a standard transfer.</p><h2>Wire recalls</h2><p>A wire recall (WIRE_RECALLED) is a request to the receiving bank; funds are only back once it agrees.</p>",
+  "page_id": "303",
+  "space": "FIN",
+  "title": "Real-time payments and wires",
+  "updated": "2026-09-28",
+  "url": "https://wiki.example.com/pages/303",
+  "version": 2
+ },
+ {
+  "access": [],
+  "html": "<h2>Rejections you can fix</h2><p>DOC_EXPIRED, DOC_UNREADABLE, ADDRESS_UNVERIFIED and SELFIE_MISMATCH allow a resubmission with a corrected document or photo. NAME_MISMATCH needs a document in the profile's name or a name correction ticket.</p><h2>Reviews</h2><p>A case in review has no decision yet. The reason for a review is never shared in chat, and no outcome or date is promised.</p>",
+  "page_id": "304",
+  "space": "FIN",
+  "title": "Identity verification",
+  "updated": "2026-10-08",
+  "url": "https://wiki.example.com/pages/304",
+  "version": 4
+ },
+ {
+  "access": [],
+  "html": "<h2>Decisions</h2><p>A declined application lists its recorded reasons (for example DTI_HIGH, INCOME_UNVERIFIED) in the decision letter. Reapply after 30 days, or immediately with documents for INCOME_UNVERIFIED. No one can promise an approval in chat.</p><h2>Servicing</h2><p>A past-due loan stops accruing late fees once the overdue payment is made. Due-date changes and hardship plans are tickets for the collections team.</p>",
+  "page_id": "305",
+  "space": "FIN",
+  "title": "Loans and applications",
+  "updated": "2026-09-25",
+  "url": "https://wiki.example.com/pages/305",
+  "version": 2
+ },
+ {
+  "access": [],
+  "html": "<h2>Card status</h2><p>A card reported lost or stolen is never reactivated; order a replacement. A customer freeze is lifted in the app. A fraud block needs the recent activity confirmed with support.</p><h2>Authorization declines</h2><p>INSUFFICIENT_FUNDS: fund the account. LIMIT_EXCEEDED and MCC_BLOCKED: an admin changes limits and controls by ticket. INCORRECT_PIN: the PIN is visible in the app.</p>",
+  "page_id": "306",
+  "space": "FIN",
+  "title": "Issued cards",
+  "updated": "2026-10-09",
+  "url": "https://wiki.example.com/pages/306",
+  "version": 2
+ },
+ {
+  "access": [],
+  "html": "<h2>Stages</h2><p>draft, submitted, in_review, needs_information, approved, declined, withdrawn. Decision dates are not promised. NEEDS_INFORMATION lists the missing items in the app.</p><h2>Declines</h2><p>OB02 (registration not verified) and OB03 (owner verification incomplete) allow a corrected application; OB01 and OB04 are final for that business type or country.</p>",
+  "page_id": "307",
+  "space": "FIN",
+  "title": "Onboarding applications",
+  "updated": "2026-10-01",
+  "url": "https://wiki.example.com/pages/307",
+  "version": 2
+ },
+ {
+  "access": [],
+  "html": "<h2>Evidence by reason</h2><p>FRAUD_CARD_ABSENT: card authentication result, address check, device data, delivery proof. PRODUCT_NOT_RECEIVED: tracking and proof of delivery. NOT_AS_DESCRIBED: listing, photos, messages. SUBSCRIPTION_CANCELLED: cancellation policy and logs. CREDIT_NOT_PROCESSED: the refund record.</p><h2>Deadlines</h2><p>Respond before the respond-by date; a late response is lost automatically. Outcomes are decided by the card network and are not predicted in chat.</p>",
+  "page_id": "308",
+  "space": "FIN",
+  "title": "Disputes and evidence",
+  "updated": "2026-10-11",
+  "url": "https://wiki.example.com/pages/308",
+  "version": 3
+ },
+ {
+  "access": [],
+  "html": "<h2>Escrow</h2><p>An escrow shortage from the annual analysis can be paid at once or spread over 12 payments.</p><h2>Payoff quotes</h2><p>A payoff amount is valid only through its good-through date. Request a new quote after that date.</p><h2>Help with payments</h2><p>Repayment plans, forbearance and modifications are decided by the loss-mitigation team.</p>",
+  "page_id": "309",
+  "space": "FIN",
+  "title": "Mortgage servicing",
+  "updated": "2026-09-30",
+  "url": "https://wiki.example.com/pages/309",
+  "version": 2
+ },
+ {
+  "access": [],
+  "html": "<h2>Instalments</h2><p>Instalments are taken automatically. A declined automatic payment is tried again on the next attempt date; update the card in the app.</p><h2>Refunds</h2><p>A merchant refund cancels the plan and returns paid instalments to the card used.</p>",
+  "page_id": "310",
+  "space": "FIN",
+  "title": "Buy now, pay later plans",
+  "updated": "2026-10-04",
+  "url": "https://wiki.example.com/pages/310",
+  "version": 1
+ },
+ {
+  "access": [],
+  "html": "<h2>Stages</h2><p>submitted, in_review, needs_documents, approved, denied, paid. The approved amount is after the deductible.</p><h2>Appeals</h2><p>A denied claim can be appealed within 60 days of the decision. Coverage questions are answered from the policy document, not in chat.</p>",
+  "page_id": "311",
+  "space": "FIN",
+  "title": "Insurance claims",
+  "updated": "2026-10-07",
+  "url": "https://wiki.example.com/pages/311",
+  "version": 2
+ },
+ {
+  "access": [],
+  "html": "<h2>Failed renewals</h2><p>A failed renewal is retried automatically on the next attempt date; updating the card triggers a retry.</p><h2>Cancelling</h2><p>A cancellation takes effect at the end of the current period; the subscription stays active until then and can be resumed.</p>",
+  "page_id": "312",
+  "space": "FIN",
+  "title": "Subscription billing",
+  "updated": "2026-10-02",
+  "url": "https://wiki.example.com/pages/312",
+  "version": 1
  }
 ]

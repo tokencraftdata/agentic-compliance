@@ -1,7 +1,20 @@
 {
  "counts": {
-  "eval_cases": 27,
-  "kb_pages": 9,
+  "domain_records": {
+   "accounts": 16,
+   "bnpl": 8,
+   "disputes": 16,
+   "insurance": 8,
+   "issuing": 16,
+   "kyc": 16,
+   "lending": 16,
+   "mortgages": 8,
+   "onboarding": 8,
+   "subscriptions": 8,
+   "transfers": 56
+  },
+  "eval_cases": 41,
+  "kb_pages": 21,
   "log_events": 2993,
   "merchants": 8,
   "transactions": 600,
@@ -10,12 +23,23 @@
  "generator": "scripts/generate_synthetic.py",
  "seed": 7,
  "sha256": {
-  "eval.jsonl": "575aaaac95b2f5da8eb75ae8b02d8511ee649b4afa80f887cc8a49c638b775f1",
-  "kb_pages.json": "f63f6d770a742c7f2b75ab021ec40d5dc15c8f236b3d7dafa2f745114951d644",
+  "accounts.jsonl": "c1829a1ce1e96c93e157e61c8969b7bce441ae003e6dc1e81951c47da867db40",
+  "bnpl.jsonl": "3e893b8c15d0cd21e18e54186976f996ebb8fef82592cab01db175efc86f94c0",
+  "disputes.jsonl": "2aa84002e37f24c98cee1af199218ba805de4e8e0cca0731df639a2184421647",
+  "eval.jsonl": "f66c137479a9693b0df959a4f604bb48184815394ca3f366ea47430c99c75016",
+  "insurance.jsonl": "21f50d70be059bc3a59ea833b5ee0c54f81676f7ba90c5e2b9ada43357c95744",
+  "issuing.jsonl": "efe9b59ede5284a8edab2d4d0287b910df151bce70666dcd423189ab5a5062ea",
+  "kb_pages.json": "23622536a61a6ca5068422921c4e23c12975cb96250bc0d304ba9457abcd0168",
+  "kyc.jsonl": "8cae9da94e8c7637c05f8e18fc425bb0c25efbc6141b75836cdea3600e853565",
+  "lending.jsonl": "7770bbefc8f623bd2f6220f0c68c27d249cff2229f122963c6433f1329905cf3",
   "logs.jsonl": "e8fc0241af9e0e493455c269f3ba4980479b296f195cd2c5ed81a01e7ddb0f86",
-  "merchants.json": "dd94a64eb3690cd7ec0e5b31899644c764219f7b641a1b9e81eee8e2c84ee8d7",
+  "merchants.json": "855c415a8626007aca364f4c32c3084a01cff126591c7c2118805c30709d6927",
+  "mortgages.jsonl": "d9dc89bf504b4d7350cbf4f0960583feca439e6f9f2ab1f2a0fbffc045c131dd",
+  "onboarding.jsonl": "764e1d81e3f559dd98498bc76846162341e48b46d0295bbc5648313000a0ba56",
   "processors.json": "9214008f366e5617450db7e355851f18f7b30261db4f9734d2fce9eb342c29de",
-  "transactions.jsonl": "d5bea0cd1b77c53008e09364dbe94adcb9cab64e21cdca1f10f0f9142cfd6660"
+  "subscriptions.jsonl": "36c57162cdbeed750e93ab4957a53a07bc5d0ee399702d07d24d1a8b689ad6e4",
+  "transactions.jsonl": "d5bea0cd1b77c53008e09364dbe94adcb9cab64e21cdca1f10f0f9142cfd6660",
+  "transfers.jsonl": "25934560708250bbc7531bb68bbade69f0adb788bae2a0148e86226d41f7d534"
  },
  "status_mix": {
   "approved": 373,

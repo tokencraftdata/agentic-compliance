@@ -19,9 +19,11 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+from .domains import by_id, find_ids
+from .domains.base import _PREFIXES  # filled by importing finbot.domains, above
 from .resilience import ServiceUnavailable
 from .tickets import Ticket, TicketStore, open_ticket
-from .tools import TXN_ID, Session
+from .tools import Session
 
 # verb -> ticket kind
 VERBS: dict[str, str] = {
@@ -34,6 +36,11 @@ VERBS: dict[str, str] = {
     "increase": "limit_change", "raise": "limit_change",
     "waive": "fee_waiver",
     "close": "close_account",
+    "approve": "decision_request", "verify": "decision_request",
+    "extend": "payment_arrangement", "defer": "payment_arrangement", "postpone": "payment_arrangement",
+    "recall": "cancel", "stop": "cancel",
+    "pause": "subscription_change", "downgrade": "subscription_change", "upgrade": "subscription_change",
+    "appeal": "decision_request", "dispute": "dispute_request", "accept": "dispute_decision",
 }
 _VERB = "|".join(sorted((re.escape(v) for v in VERBS), key=len, reverse=True))
 _NOUN = {"a refund": "refund", "my money back": "refund", "a reversal": "refund", "a chargeback reversal": "refund",
@@ -41,8 +48,10 @@ _NOUN = {"a refund": "refund", "my money back": "refund", "a reversal": "refund"
 _NOUNS = "|".join(re.escape(n) for n in _NOUN)
 
 # An imperative ("refund txn_X", "cancel it") must name what to act on; "refund policy?" is a topic.
-_TARGET = (r"(?:it|this|that|txn_\w+|the (?:payment|charge|transaction|order|fee|refund)s?|"
-           r"my (?:payment|charge|transaction|order|card|account|limit|details|bank|email|address|payout)s?)\b")
+_TARGET = (rf"(?:it|this|that|(?:{'|'.join(_PREFIXES)})_\w+|"
+           r"the (?:payment|charge|transaction|order|fee|refund|transfer|hold|loan|application|account)s?|"
+           r"my (?:payment|charge|transaction|order|card|account|limit|details|bank|email|address|payout|"
+           r"transfer|loan|application|identity|due date|subscription|claim|dispute|mortgage|plan)s?)\b")
 
 REQUEST = re.compile(
     rf"(?:\b(?:can|could|would|will) you (?:please |just |kindly )?(?P<v1>{_VERB})\b"
@@ -55,7 +64,8 @@ REQUEST = re.compile(
 QUESTION_ABOUT = re.compile(r"^\s*(how|what|why|when|where|which|is it|are|does|do i|can i|could i|should i|"
                             r"is there)\b", re.I)
 # Changing these needs a person, but the target isn't a transaction.
-ACCOUNT_KINDS = {"update_details", "limit_change", "close_account", "unblock", "fee_waiver"}
+ACCOUNT_KINDS = {"update_details", "limit_change", "close_account", "unblock", "fee_waiver",
+                 "decision_request", "payment_arrangement"}
 
 
 @dataclass(frozen=True)
@@ -75,14 +85,17 @@ def detect(text: str, focus: str | None = None) -> WriteRequest | None:
         return None
     verb = next(v for k, v in m.groupdict().items() if v)
     kind = _NOUN.get(verb.lower()) or VERBS.get(verb.lower(), "other")
-    ids = TXN_ID.findall(text)
+    ids = find_ids(text)
     txn = ids[-1] if ids else (focus if kind not in ACCOUNT_KINDS else None)
     return WriteRequest(kind, txn, verb.lower(), text)
 
 
 ACTION_WORDS = {"refund": "refund", "cancel": "cancel", "retry": "retry", "unblock": "unblock",
                 "update_details": "update the details on", "limit_change": "change the limit on",
-                "fee_waiver": "waive the fee on", "close_account": "close", "other": "act on"}
+                "fee_waiver": "waive the fee on", "close_account": "close", "other": "act on",
+                "decision_request": "review", "payment_arrangement": "review the payment terms on",
+                "subscription_change": "change", "dispute_request": "open a dispute on",
+                "dispute_decision": "record your decision on"}
 
 
 # ------------------------------------------------------------------ intake: request -> ticket
@@ -112,15 +125,16 @@ class TicketIntake:
         facts: dict = {}
         policy_note = ""
         if req.txn_id:
-            args = {"txn_id": req.txn_id}
+            domain = by_id(req.txn_id)       # a domain plug-in's record, or a card payment
+            args = {domain.id_arg if domain else "txn_id": req.txn_id}
             res = lookup(args)
-            tool_log.append({"name": "get_transaction", "input": args, "result": res})
+            tool_log.append({"name": domain.tool if domain else "get_transaction", "input": args, "result": res})
             if res["status"] == "error":
                 raise ServiceUnavailable("transaction lookup unavailable; no ticket opened")
             if res["status"] == "not_found":
                 return TicketOutcome(None, tool_log=tool_log)
             data = res.get("data") or {}
-            facts = {k: data[k] for k in self.FACT_KEYS if k in data}
+            facts = {k: data[k] for k in (*self.FACT_KEYS, "return_code", "reason_key") if k in data}
             g = data.get("guidance") or {}
             if req.kind == "retry" and g.get("retryable") is False:
                 policy_note = (f"Retry policy: {g.get('reason_key')} is not retryable; "

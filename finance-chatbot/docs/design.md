@@ -37,6 +37,35 @@ share one codebase and one set of contracts (`finbot/ports.py`).
 Rule: arrows point down only. The orchestration layer never imports boto3,
 anthropic, sqlite3 or a vector DB client.
 
+## 1b. Domain plug-ins
+
+finbot is a fintech support bot, not a payments bot. Each product area is a plug-in in
+`finbot/domains/` — accounts, transfers (ach, rtp, wire), kyc, lending, issuing, onboarding,
+disputes, mortgages, bnpl, insurance, subscriptions —
+and card-payment acceptance (the processor orchestration of section 9) is just one more,
+switched on and off like the rest with `FINBOT_DOMAINS`.
+
+A domain is one frozen dataclass:
+
+| Field | What it fixes |
+|---|---|
+| `prefix`, `tool`, `id_arg`, `source` | how records are named and fetched (`xfer_…` → `get_transfer(transfer_id)`) |
+| `fields` | allow-list: anything else on the record (a review reason, a credit score) never reaches the model |
+| `statuses`, `open_statuses` | the words an answer may use; an undecided record may not be called decided |
+| `policy` (reason key → `Rule`) | meaning, next step per role, and whether the same request may be sent again |
+| `causes`, `cause_phrases` | the plain words people use for each cause, for the reason check |
+| `summary` | the record stated by code, every field validated, used when the model's answer fails |
+
+The shared machinery in `finbot/domains/checks.py` runs the same for every domain: a status the
+record doesn't have is blocked (any tense for final statuses, present tense for transient ones,
+and only with the record itself as the sentence's subject), a cause the records don't carry is
+blocked, a reason key that wasn't in this turn's records is blocked, and anti-tipping-off comes
+free: the reason for a review is not in `fields`, so the bot can't repeat what it never saw.
+
+Adding an area is one module that builds a `Domain` and calls `register()`; the pipeline,
+memory, provenance, tickets, record-built answers and the hallucination gate pick it up with no
+further change.
+
 ## 2. Patterns and where they live
 
 | Pattern | Where | What it buys |
@@ -65,7 +94,7 @@ anthropic, sqlite3 or a vector DB client.
 
 | Failure | Handled by | Proven by |
 |---|---|---|
-| Hallucinated amount, status, code, URL, retry advice | `HallucinationGate`: verify, one repair on the strong tier, re-verify against the repair's own tool results, else a record-built answer, else refusal | `run_eval.py --hallucinate` (0 of 259 leaked), `test_layers.Gate` |
+| Hallucinated amount, status, code, URL, retry advice | `HallucinationGate`: verify, one repair on the strong tier, re-verify against the repair's own tool results, else a record-built answer, else refusal | `run_eval.py --hallucinate` (0 of 2,259 leaked), `test_layers.Gate` |
 | Model 429/5xx/timeout | `retry_call` with jitter, per-model breaker, failover to the next target | `test_model_engine`, `test_boundaries` |
 | Model refuses | refusal fallback to the next target, output still verified | `test_boundaries.test_refusal_fallback_cannot_bypass_guards` |
 | Guardrail service down | fail closed | `test_boundaries` |
@@ -113,7 +142,7 @@ Table definition: `store_dynamo.TABLE_DEFINITION` (on-demand, KMS, PITR).
   - `jwks` (Cognito, Okta or Entra ID via PyJWT) for production.
 - The verifier checks signature, `alg`, `exp`, `nbf`, `iss` and `aud`.
 - The `Authorizer` is deny-by-default:
-  - `merchant` and `support` may chat, in their own tenant's sessions only.
+  - `customer` (legacy alias `merchant`) and `support` may chat, in their own tenant's sessions only.
   - `admin` may use the control plane only.
 - An unknown session and another tenant's session return the same 403, so ids cannot be probed.
 - No static AWS keys anywhere. Every boto3 client uses the default credential chain (IAM role).
@@ -329,7 +358,7 @@ the request body. `Authorizer` is deny-by-default:
 
 | Role | May |
 |---|---|
-| `merchant` | chat, only in sessions of its own tenant |
+| `customer` (alias `merchant`) | chat, only in sessions of its own tenant |
 | `support` | chat; read the review queue; label mistakes for the guard controller |
 | `admin` | model control plane (drain, restore, routing); guard controller (cycle, approve, promote, rollback) |
 
@@ -550,7 +579,7 @@ A strict, checked bot has costs. Each one below has a mitigation in code and a p
 
 | Drawback | Mitigation | Where |
 |---|---|---|
-| The checker reads numbers, codes and statuses, not a wrong reason in plain words | `ReasonVerifier`: a failure key maps to one cause, a cause to its phrases; an answer affirming a cause the turn's records don't carry is blocked. Applies only when one failed transaction was looked up | `finbot/reasons.py` |
+| The checker reads numbers, codes and statuses, not a wrong reason in plain words | `ReasonVerifier` and `DomainVerifier`: a failure key maps to one cause, a cause to its phrases; an answer affirming a cause the turn's records don't carry is blocked, in every domain | `finbot/reasons.py`, `finbot/domains/checks.py` |
 | Strictness means refusals and handoffs | After a failed repair the gate asks for a record-built answer: validated fields and code-table wording only, verified by the same chain. It counts as an answer, so it does not move the session towards a handoff | `finbot/recordanswer.py`, `HallucinationGate.run(fallback=...)` |
 | A repair is a second model call | `FINBOT_REPAIR_ATTEMPTS=0` goes straight to the record-built answer. The audit log carries what is needed to price the trade | `finbot/opsmetrics.py`, `scripts/ops_report.py` |
 | Rules and labels need upkeep | `GuardrailController.upkeep`: hits per rule, idle learned rules, work waiting on a person, labels per 1,000 turns. Retiring a rule is a loosening and still needs an admin | `finbot/adaptive/controller.py` |

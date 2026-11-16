@@ -63,6 +63,12 @@ class Settings:
                                                               "bedrock:amazon.titan-embed-text-v2:0@1024"))
     bedrock_kb_id: str = field(default_factory=lambda: _env("FINBOT_BEDROCK_KB_ID"))
 
+    # Domain plug-ins this deployment offers (finbot/domains). Leave one out to switch it off,
+    # e.g. one with no card payments leaves "payments" out.
+    domains: str = field(default_factory=lambda: _env(
+        "FINBOT_DOMAINS", "accounts,transfers,kyc,lending,issuing,onboarding,disputes,mortgages,bnpl,insurance,"
+                          "subscriptions,payments"))
+
     # Session limits
     max_tool_rounds: int = 6
     # Regenerate once with verifier feedback before falling back. 0 = never call the model a

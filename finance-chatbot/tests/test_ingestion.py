@@ -48,7 +48,7 @@ class Pipeline(unittest.TestCase):
 
     def test_synthetic_kb_quarantines_injection_page(self):
         rep = IngestionPipeline(LocalSource(DATA), HeadingChunker(), self.emb, self.store).run()
-        self.assertEqual((rep.indexed_docs, rep.quarantined), (8, [("209", "prompt_injection_pattern")]))
+        self.assertEqual((rep.indexed_docs, rep.quarantined), (20, [("209", "prompt_injection_pattern")]))
         self.assertNotIn("209", self.store.doc_index())
 
     def test_incremental_and_version_replacement(self):

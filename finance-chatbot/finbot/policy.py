@@ -99,7 +99,7 @@ def guidance(txn: dict, role: str) -> dict | None:
         return None
     key = txn.get("decline_code") or txn.get("error") or ""
     retryable, rule, cardholder, merchant, support = POLICY.get(key, UNKNOWN)
-    next_step = merchant if role == "merchant" else support
+    next_step = support if role == "support" else merchant
     out = {"reason_key": key or "unknown", "retryable": retryable, "retry_rule": rule,
            "next_step": next_step, "tell_the_cardholder": cardholder}
     if not retryable:

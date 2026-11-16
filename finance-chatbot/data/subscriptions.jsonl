@@ -1,0 +1,8 @@
+{"currency": "USD", "current_period_end": "2026-11-04", "interval": "month", "plan": "starter", "price": "199.00", "status": "cancelled", "subscription_id": "sub_XFVXA2HJ", "tenant_id": "m_100"}
+{"currency": "USD", "current_period_end": "2026-11-11", "interval": "month", "plan": "team", "price": "19.00", "status": "cancelled", "subscription_id": "sub_R1S27U9M", "tenant_id": "m_200"}
+{"currency": "GBP", "current_period_end": "2026-11-19", "interval": "month", "plan": "starter", "price": "199.00", "status": "paused", "subscription_id": "sub_F98BVF6B", "tenant_id": "m_300"}
+{"currency": "USD", "current_period_end": "2026-11-16", "interval": "month", "plan": "pro", "price": "199.00", "status": "paused", "subscription_id": "sub_SMA6CMQT", "tenant_id": "m_400"}
+{"cancel_at_period_end": false, "currency": "GBP", "current_period_end": "2026-11-06", "interval": "month", "plan": "pro", "price": "19.00", "status": "active", "subscription_id": "sub_8A0BC91H", "tenant_id": "m_500"}
+{"currency": "GBP", "current_period_end": "2026-11-15", "interval": "year", "plan": "starter", "price": "19.00", "status": "cancelled", "subscription_id": "sub_0G32JN1B", "tenant_id": "m_600"}
+{"currency": "GBP", "current_period_end": "2026-11-15", "interval": "month", "plan": "pro", "price": "19.00", "status": "cancelled", "subscription_id": "sub_3M1PMEXV", "tenant_id": "m_700"}
+{"currency": "GBP", "current_period_end": "2026-11-29", "interval": "month", "plan": "starter", "price": "199.00", "status": "paused", "subscription_id": "sub_DWEQ36SR", "tenant_id": "m_800"}
