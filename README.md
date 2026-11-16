@@ -4,8 +4,8 @@ A replayable limit-order-book simulator for studying agentic compliance: how
 autonomous trading agents interact with pre-trade gates and surveillance rules,
 what the controls prevent, and what they cost in task performance.
 
-**Paper:** [TradeGauntlet: Evaluating Compliance Controls for Autonomous Trading Agents](output/pdf/tradegauntlet_arxiv.pdf)
-(source in [`paper/arxiv/`](paper/arxiv/README.md)).
+**Paper:** [arXiv:2611.18493](https://arxiv.org/abs/2611.18493)
+([PDF in this repo](output/pdf/tradegauntlet_arxiv.pdf); source in [`paper/arxiv/`](paper/arxiv/README.md)).
 
 All trading is simulated. Nothing here measures real-market detection accuracy or
 establishes legal compliance.
@@ -110,6 +110,18 @@ More: [workflow guide](docs/tradegauntlet.md), [LLM-agent run book](docs/llm-age
 
 ## Citation and license
 
-> Sandip Nandi, Aishwarya Bose, Apurba Bose, and Soovadeep Bakshi. *TradeGauntlet: Evaluating Compliance Controls for Autonomous Trading Agents.* Preprint, 2026.
+> Sandip Nandi, Aishwarya Bose, Apurba Bose, and Soovadeep Bakshi. *TradeGauntlet: Evaluating Compliance Controls for Autonomous Trading Agents.* arXiv:2611.18493, 2026. https://arxiv.org/abs/2611.18493
+
+```bibtex
+@misc{nandi2026tradegauntlet,
+  title         = {{TradeGauntlet}: Evaluating Compliance Controls for Autonomous Trading Agents},
+  author        = {Nandi, Sandip and Bose, Aishwarya and Bose, Apurba and Bakshi, Soovadeep},
+  year          = {2026},
+  eprint        = {2611.18493},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.MA},
+  url           = {https://arxiv.org/abs/2611.18493}
+}
+```
 
 Code and data are released under the [MIT License](LICENSE).
