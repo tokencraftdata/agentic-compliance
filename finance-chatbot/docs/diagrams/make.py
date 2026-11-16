@@ -1,4 +1,4 @@
-"""Draws the three article diagrams as SVG; export.sh turns them into 2x PNGs for Medium and Substack.
+"""Draws the four article diagrams as SVG; export.sh turns them into 2x PNGs for Medium and Substack.
 
     python3 docs/diagrams/make.py && sh docs/diagrams/export.sh
 """
@@ -359,8 +359,93 @@ def domain() -> None:
     s.save("finbot-domain.svg")
 
 
+# ------------------------------------------------------------------ 4. platform security, edge to storage
+
+def security() -> None:
+    s = Svg(1200, 1530)
+    s.text(40, 54, "finbot security: every layer assumes the one before it failed", 32, "bold")
+    s.text(40, 88, "One request from the internet to the records and back. Left: the request path. "
+                   "Right: the keys, grants and logs it relies on.", 18, color=MUTED)
+
+    def stage(y, h, kind, title, lines):
+        s.card(40, y, 680, h, kind, title, lines, title_size=20, line_size=16, gap=26)
+
+    stage(120, 76, "people", "Customer, merchant or support agent", [])
+    s.text(58, 182, "HTTPS with a bearer token from the identity provider", 15.5, color=MUTED)
+    stage(226, 150, "block", "AWS WAF", ["per-IP rate limit · IP reputation · anonymous IPs",
+                                         "AWS managed rules: known bad inputs, common, SQL injection",
+                                         "body over 16 KB · token in a query string · unknown path",
+                                         ])
+    s.text(58, 362, "logs redact the Authorization header", 15, color=MUTED)
+    stage(406, 124, "code", "Application Load Balancer", ["TLS 1.2+ with strong ciphers · HTTP redirected to HTTPS",
+                                                           "drops invalid headers · strictest desync mitigation",
+                                                           "access logs to an encrypted bucket"])
+    stage(560, 124, "code", "HTTP API (WSGI)", ["JSON only, at most 16 KB, read with an exact length",
+                                                "no query strings · strict id patterns · security headers",
+                                                "fixed error messages: never why a token failed"])
+    stage(714, 176, "code", "Service boundary, before the turn",
+          ["verify token: signing-key ring by kid, then revocation list",
+           "rate limit per user and per tenant (429 + Retry-After)",
+           "tenant and role from the token, never from the chat text",
+           "DLP on the request: card, SSN, IBAN, routing+account, keys masked"])
+    stage(920, 150, "model", "Turn: model drafts, tools read",
+          ["code mints a 5-minute delegation grant for this turn",
+           "every tool call checks it: user, tenant, session, scope",
+           "read-only ceiling: the agent can never be granted a write"])
+    stage(1100, 124, "code", "Service boundary, after the turn",
+          ["DLP on the response: same detectors, masked again",
+           "card data found on the way out → egress_leak audit record",
+           "only the category is logged, never the value"])
+    for y0, y1 in [(196, 224), (376, 404), (530, 558), (684, 712), (890, 918), (1070, 1098)]:
+        s.arrow([(380, y0), (380, y1)])
+
+    # right column
+    s.card(760, 714, 400, 176, "grey", "Token keys and revocation",
+           ["OIDC (JWKS) or HS256 key ring", "rotate: previous key verifies until removed",
+            "revoke one token (jti) or a whole user", "shared store, seen by all pods in 2 s"],
+           title_size=19, line_size=15.5, gap=26)
+    s.arrow([(758, 790), (722, 790)], color=C["code"][0])
+    s.card(760, 920, 400, 150, "code", "Delegation grant (RFC 8693 style)",
+           ["sub = the user · act = finbot-agent", "tenant · session · read:* scopes",
+            "signed by code, never seen by the model", "denied call → refused, logged"],
+           title_size=19, line_size=15.5, gap=24)
+    s.arrow([(758, 995), (722, 995)], color=C["code"][0])
+
+    s.card(760, 120, 400, 256, "data", "Encryption and keys (KMS)",
+           ["AES-256-GCM envelope encryption", "data key per value, wrapped by KMS",
+            "bound to session + purpose (AAD):", "  copied ciphertext won't decrypt", "key policy allows 4 purposes only",
+            "yearly rotation · rewrap onto a new key", "required mode refuses plaintext"],
+           title_size=19, line_size=15.5, gap=26)
+    s.card(760, 406, 400, 278, "data", "Encrypted at rest",
+           ["session state, user text, answers,", "turn metadata: sealed in the app",
+            "DynamoDB: customer key + PITR", "SQS FIFO turn queue: KMS",
+            "audit bucket: S3 Object Lock,", "  compliance mode, 1 year",
+            "private subnets + VPC endpoints"],
+           title_size=19, line_size=15.5, gap=26)
+    s.arrow([(960, 376), (960, 404)], color=C["data"][0])
+
+    s.card(760, 1100, 400, 124, "data", "Audit log",
+           ["hash-chained per writer, HMAC-SHA256", "edit, delete or reorder → verify fails",
+            "shipped to the Object Lock bucket"], title_size=19, line_size=15.5, gap=24)
+    s.arrow([(722, 1162), (758, 1162)], color=C["data"][0])
+
+    # supply chain
+    s.box(40, 1258, 1120, 120, "grey")
+    s.text(60, 1292, "Code and supply chain, on every push", 20, "bold", C["grey"][0])
+    s.text(60, 1322, "CodeQL · Bandit · ruff security rules · mypy · pip-audit · gitleaks · Trivy image + config scan",
+           16, color=INK)
+    s.text(60, 1350, "Dependabot weekly · red team must stay at 0 successful attacks or the build fails",
+           16, color=INK)
+
+    s.text(40, 1416, "Red team, model that obeys anything: 0 of 34 attacks succeed defended, 25 of 34 undefended.",
+           16.5, color=MUTED)
+    legend(s, 1462)
+    s.save("finbot-security.svg")
+
+
 if __name__ == "__main__":
     architecture()
     gate()
     domain()
+    security()
     print("wrote", ", ".join(n for n in sorted(os.listdir(OUT)) if n.endswith(".svg")))

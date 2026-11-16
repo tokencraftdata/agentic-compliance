@@ -76,7 +76,7 @@ A small simulator runs the same rules over a day of 2,000 synthetic payments. A 
 
 **What I did.** Two layers. First, cut down what reaches the model: the user's message is screened after undoing tricks like invisible characters and base64, Bedrock Guardrails runs on top, and text inside transaction records (a merchant name, a customer note) is screened too, because an attacker can write it. Second, make sure an injection that gets through can't do much: tools are read-only and scoped to the logged-in customer from a verified token, links are allowed only if they're a help page's own address, and answers that ask for a card number or password are blocked.
 
-I tested this against a deliberately gullible stand-in model that obeys any instruction it sees, so the score measures the system rather than the model. With every guardrail on, 0 of 29 attacks succeeded. With none, 21 of 29 did. Harmless look-alikes, like a merchant called "System Repair Shop", were answered normally in every setup.
+I tested this against a deliberately gullible stand-in model that obeys any instruction it sees, so the score measures the system rather than the model. With every guardrail on, 0 of 34 attacks succeeded. With none, 25 of 34 did. Harmless look-alikes, like a merchant called "System Repair Shop", were answered normally in every setup.
 
 ## 8. The bot breaks when something else breaks
 

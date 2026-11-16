@@ -77,7 +77,7 @@ The rest is upkeep and scope. Rules and reviewer labels need owners. The bot rep
 All of this runs offline, on synthetic data, with a scripted stand-in for the model:
 
 - 2,259 hallucinations injected on purpose, flipped loan and verification decisions included; none reached the user
-- 0 of 29 prompt-injection attacks succeeded with guardrails on, against 21 of 29 without
+- 0 of 34 prompt-injection attacks succeeded with guardrails on, against 25 of 34 without
 - 315 automated tests, and a held-out eval of 185 cases that passes
 
 What I don't know yet is how it behaves with live models, real traffic, real latency and real cost. That's the next step, and I'll write about the results whatever they are.

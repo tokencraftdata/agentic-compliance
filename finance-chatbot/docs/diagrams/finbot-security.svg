@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1530" viewBox="0 0 1200 1530"><defs><marker id="a-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9ca3af"/></marker><marker id="a-code" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#047857"/></marker><marker id="a-block" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b91c1c"/></marker><marker id="a-model" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1d4ed8"/></marker><marker id="a-people" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b45309"/></marker><marker id="a-data" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6d28d9"/></marker></defs><rect width="1200" height="1530" fill="#ffffff"/>
+<text x="40" y="54" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="32" font-weight="bold" fill="#1f2937" text-anchor="start">finbot security: every layer assumes the one before it failed</text>
+<text x="40" y="88" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" font-weight="normal" fill="#4b5563" text-anchor="start">One request from the internet to the records and back. Left: the request path. Right: the keys, grants and logs it relies on.</text>
+<rect x="40" y="120" width="680" height="76" rx="10" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="58" y="152" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#b45309" text-anchor="start">Customer, merchant or support agent</text>
+<text x="58" y="182" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#4b5563" text-anchor="start">HTTPS with a bearer token from the identity provider</text>
+<rect x="40" y="226" width="680" height="150" rx="10" fill="#fef2f2" stroke="#b91c1c" stroke-width="2"/>
+<text x="58" y="258" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#b91c1c" text-anchor="start">AWS WAF</text>
+<text x="58" y="286" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">per-IP rate limit · IP reputation · anonymous IPs</text>
+<text x="58" y="312" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">AWS managed rules: known bad inputs, common, SQL injection</text>
+<text x="58" y="338" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">body over 16 KB · token in a query string · unknown path</text>
+<text x="58" y="362" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">logs redact the Authorization header</text>
+<rect x="40" y="406" width="680" height="124" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="58" y="438" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#047857" text-anchor="start">Application Load Balancer</text>
+<text x="58" y="466" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">TLS 1.2+ with strong ciphers · HTTP redirected to HTTPS</text>
+<text x="58" y="492" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">drops invalid headers · strictest desync mitigation</text>
+<text x="58" y="518" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">access logs to an encrypted bucket</text>
+<rect x="40" y="560" width="680" height="124" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="58" y="592" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#047857" text-anchor="start">HTTP API (WSGI)</text>
+<text x="58" y="620" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">JSON only, at most 16 KB, read with an exact length</text>
+<text x="58" y="646" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">no query strings · strict id patterns · security headers</text>
+<text x="58" y="672" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">fixed error messages: never why a token failed</text>
+<rect x="40" y="714" width="680" height="176" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="58" y="746" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#047857" text-anchor="start">Service boundary, before the turn</text>
+<text x="58" y="774" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">verify token: signing-key ring by kid, then revocation list</text>
+<text x="58" y="800" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">rate limit per user and per tenant (429 + Retry-After)</text>
+<text x="58" y="826" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">tenant and role from the token, never from the chat text</text>
+<text x="58" y="852" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">DLP on the request: card, SSN, IBAN, routing+account, keys masked</text>
+<rect x="40" y="920" width="680" height="150" rx="10" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="58" y="952" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#1d4ed8" text-anchor="start">Turn: model drafts, tools read</text>
+<text x="58" y="980" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">code mints a 5-minute delegation grant for this turn</text>
+<text x="58" y="1006" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">every tool call checks it: user, tenant, session, scope</text>
+<text x="58" y="1032" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">read-only ceiling: the agent can never be granted a write</text>
+<rect x="40" y="1100" width="680" height="124" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="58" y="1132" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#047857" text-anchor="start">Service boundary, after the turn</text>
+<text x="58" y="1160" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">DLP on the response: same detectors, masked again</text>
+<text x="58" y="1186" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">card data found on the way out → egress_leak audit record</text>
+<text x="58" y="1212" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">only the category is logged, never the value</text>
+<path d="M 380 196 L 380 224" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<path d="M 380 376 L 380 404" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<path d="M 380 530 L 380 558" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<path d="M 380 684 L 380 712" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<path d="M 380 890 L 380 918" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<path d="M 380 1070 L 380 1098" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
+<rect x="760" y="714" width="400" height="176" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2"/>
+<text x="778" y="746" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#6b7280" text-anchor="start">Token keys and revocation</text>
+<text x="778" y="774" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">OIDC (JWKS) or HS256 key ring</text>
+<text x="778" y="800" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">rotate: previous key verifies until removed</text>
+<text x="778" y="826" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">revoke one token (jti) or a whole user</text>
+<text x="778" y="852" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">shared store, seen by all pods in 2 s</text>
+<path d="M 758 790 L 722 790" fill="none" stroke="#047857" stroke-width="2.5" marker-end="url(#a-code)"/>
+<rect x="760" y="920" width="400" height="150" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="778" y="952" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#047857" text-anchor="start">Delegation grant (RFC 8693 style)</text>
+<text x="778" y="978" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">sub = the user · act = finbot-agent</text>
+<text x="778" y="1002" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">tenant · session · read:* scopes</text>
+<text x="778" y="1026" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">signed by code, never seen by the model</text>
+<text x="778" y="1050" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">denied call → refused, logged</text>
+<path d="M 758 995 L 722 995" fill="none" stroke="#047857" stroke-width="2.5" marker-end="url(#a-code)"/>
+<rect x="760" y="120" width="400" height="256" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="778" y="152" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#6d28d9" text-anchor="start">Encryption and keys (KMS)</text>
+<text x="778" y="180" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">AES-256-GCM envelope encryption</text>
+<text x="778" y="206" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">data key per value, wrapped by KMS</text>
+<text x="778" y="232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">bound to session + purpose (AAD):</text>
+<text x="778" y="258" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">  copied ciphertext won&#x27;t decrypt</text>
+<text x="778" y="284" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">key policy allows 4 purposes only</text>
+<text x="778" y="310" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">yearly rotation · rewrap onto a new key</text>
+<text x="778" y="336" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">required mode refuses plaintext</text>
+<rect x="760" y="406" width="400" height="278" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="778" y="438" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#6d28d9" text-anchor="start">Encrypted at rest</text>
+<text x="778" y="466" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">session state, user text, answers,</text>
+<text x="778" y="492" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">turn metadata: sealed in the app</text>
+<text x="778" y="518" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">DynamoDB: customer key + PITR</text>
+<text x="778" y="544" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">SQS FIFO turn queue: KMS</text>
+<text x="778" y="570" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">audit bucket: S3 Object Lock,</text>
+<text x="778" y="596" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">  compliance mode, 1 year</text>
+<text x="778" y="622" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">private subnets + VPC endpoints</text>
+<path d="M 960 376 L 960 404" fill="none" stroke="#6d28d9" stroke-width="2.5" marker-end="url(#a-data)"/>
+<rect x="760" y="1100" width="400" height="124" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="778" y="1132" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#6d28d9" text-anchor="start">Audit log</text>
+<text x="778" y="1158" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">hash-chained per writer, HMAC-SHA256</text>
+<text x="778" y="1182" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">edit, delete or reorder → verify fails</text>
+<text x="778" y="1206" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">shipped to the Object Lock bucket</text>
+<path d="M 722 1162 L 758 1162" fill="none" stroke="#6d28d9" stroke-width="2.5" marker-end="url(#a-data)"/>
+<rect x="40" y="1258" width="1120" height="120" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2"/>
+<text x="60" y="1292" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#6b7280" text-anchor="start">Code and supply chain, on every push</text>
+<text x="60" y="1322" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">CodeQL · Bandit · ruff security rules · mypy · pip-audit · gitleaks · Trivy image + config scan</text>
+<text x="60" y="1350" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="start">Dependabot weekly · red team must stay at 0 successful attacks or the build fails</text>
+<text x="40" y="1416" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16.5" font-weight="normal" fill="#4b5563" text-anchor="start">Red team, model that obeys anything: 0 of 34 attacks succeed defended, 25 of 34 undefended.</text>
+<rect x="40" y="1446" width="22" height="22" rx="5" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+<text x="72" y="1463" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">code decides</text>
+<rect x="191.2" y="1446" width="22" height="22" rx="5" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+<text x="223.2" y="1463" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">model writes</text>
+<rect x="342.4" y="1446" width="22" height="22" rx="5" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+<text x="374.4" y="1463" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">records and documents</text>
+<rect x="571.0" y="1446" width="22" height="22" rx="5" fill="#fffbeb" stroke="#b45309" stroke-width="2"/>
+<text x="603.0" y="1463" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">people act</text>
+<rect x="705.0" y="1446" width="22" height="22" rx="5" fill="#fef2f2" stroke="#b91c1c" stroke-width="2"/>
+<text x="737.0" y="1463" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">blocked or refused</text>
+<text x="40" y="1496" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#4b5563" text-anchor="start">finbot · open source · synthetic data · github.com/tokencraftdata/finbot</text>
+</svg>

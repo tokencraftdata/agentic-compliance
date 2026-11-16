@@ -7,6 +7,8 @@ instruction it sees, the defended system stopped 34 of 34 attacks in the red-tea
 5 multi-turn escalations. With the defences off, 25 of 34 succeeded. That number describes this suite, not the space of all
 attacks.
 
+![Request path from the WAF to the records and back, with the keys, grants and audit log it relies on](diagrams/finbot-security.png)
+
 ## 1. Where injected text can enter
 
 | Entry point | Example | Defence | Code |
