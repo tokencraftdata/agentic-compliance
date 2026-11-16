@@ -31,6 +31,7 @@ import threading
 import time
 from collections.abc import Callable
 
+from .crypto import Codec, PlainCodec, ctx
 from .pii import mask_pii
 
 
@@ -70,7 +71,9 @@ CREATE TABLE IF NOT EXISTS actions (
 
 class SessionStore:
     def __init__(self, path: str = ":memory:", clock: Callable[[], float] = time.time,
-                 idle_ttl_s: float = 1800):
+                 idle_ttl_s: float = 1800, codec: Codec | None = None):
+        # codec: session state, user text and answers are sealed with it (finbot/crypto.py)
+        self.codec: Codec = codec or PlainCodec()
         self.db = sqlite3.connect(path, isolation_level=None, check_same_thread=False)
         if path != ":memory:":
             self.db.execute("PRAGMA journal_mode=WAL")
@@ -114,12 +117,13 @@ class SessionStore:
         now = self.clock()
         with self._tx() as db:
             db.execute("INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?)",
-                       (session_id, tenant_id, 0, None, None, json.dumps(state), now, now + self.idle_ttl))
+                       (session_id, tenant_id, 0, None, None, self.codec.seal(state, ctx(session_id, "session_state")),
+                        now, now + self.idle_ttl))
 
     def load(self, session_id: str) -> tuple[int, dict]:
         with self._tx() as db:
             _t, version, _o, _l, state, _e = self._row(db, session_id)
-        return version, json.loads(state)
+        return version, self.codec.open(state, ctx(session_id, "session_state"))
 
     def tenant_of(self, session_id: str) -> str:
         """Owner tenant of a session: the API layer checks it against the caller's token."""
@@ -156,14 +160,16 @@ class SessionStore:
             r = db.execute("SELECT status, answer, meta FROM turns WHERE session_id=? AND msg_id=?",
                            (session_id, msg_id)).fetchone()
             if r and r[0] == "committed":
-                return {"answer": r[1], **json.loads(r[2] or "{}"), "deduplicated": True}
+                meta = self.codec.open(r[2], ctx(session_id, "turn_meta")) if r[2] else {}
+                return {"answer": self.codec.open(r[1], ctx(session_id, "answer")), **meta, "deduplicated": True}
             if r:  # started by a worker that crashed (or by us earlier): retry it
                 db.execute("UPDATE turns SET worker=?, attempts=attempts+1, started=? "
                            "WHERE session_id=? AND msg_id=?", (worker, now, session_id, msg_id))
             else:
                 n = db.execute("SELECT COUNT(*) FROM turns WHERE session_id=?", (session_id,)).fetchone()[0]
                 db.execute("INSERT INTO turns (session_id,msg_id,turn_no,status,worker,user_text,started) "
-                           "VALUES (?,?,?,?,?,?,?)", (session_id, msg_id, n + 1, "started", worker, user_text, now))
+                           "VALUES (?,?,?,?,?,?,?)", (session_id, msg_id, n + 1, "started", worker,
+                                                   self.codec.seal(user_text, ctx(session_id, "user_text")), now))
         return None
 
     def commit_turn(self, session_id: str, msg_id: str, worker: str, expected_version: int,
@@ -177,15 +183,19 @@ class SessionStore:
             if owner != worker or not lease_until or lease_until < now:
                 raise StaleWrite(f"lease lost (owner={owner})")
             db.execute("UPDATE sessions SET state=?, version=?, updated=?, expires=? WHERE session_id=?",
-                       (json.dumps(state), version + 1, now, now + self.idle_ttl, session_id))
+                       (self.codec.seal(state, ctx(session_id, "session_state")), version + 1, now,
+                        now + self.idle_ttl, session_id))
             db.execute("UPDATE turns SET status='committed', answer=?, meta=?, committed=? "
-                       "WHERE session_id=? AND msg_id=?", (answer, json.dumps(meta), now, session_id, msg_id))
+                       "WHERE session_id=? AND msg_id=?",
+                       (self.codec.seal(answer, ctx(session_id, "answer")),
+                        self.codec.seal(meta, ctx(session_id, "turn_meta")), now, session_id, msg_id))
         return version + 1
 
     def incomplete_turns(self, session_id: str) -> list[dict]:
         rows = self.db.execute("SELECT msg_id, worker, attempts, user_text FROM turns "
                                "WHERE session_id=? AND status='started'", (session_id,)).fetchall()
-        return [{"msg_id": m, "worker": w, "attempts": a, "user_text": u} for m, w, a, u in rows]
+        return [{"msg_id": m, "worker": w, "attempts": a, "user_text": self.codec.open(u, ctx(session_id, "user_text"))}
+                for m, w, a, u in rows]
 
     def turns(self, session_id: str) -> list[dict]:
         rows = self.db.execute("SELECT msg_id, turn_no, status, worker, attempts FROM turns "

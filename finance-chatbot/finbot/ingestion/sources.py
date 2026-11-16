@@ -46,8 +46,33 @@ def _version(content: str) -> str:
 _MD_HEADING = re.compile(r"^(#{1,4})\s+(.*)$")
 
 
+class _HttpsOnlyRedirects(urllib.request.HTTPRedirectHandler):
+    """Follow a redirect only to another https URL. urllib otherwise follows http and ftp
+    redirects, so a source page could steer ingestion to plain text or another protocol."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        _require_https(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+_OPENER = urllib.request.build_opener(_HttpsOnlyRedirects)
+
+
+def _require_https(url: str) -> None:
+    """Sources are fetched over https only: no file://, ftp:// or plain http (SSRF and
+    local-file reads through a crafted link or config value)."""
+    parts = urllib.parse.urlparse(url)
+    if parts.scheme != "https" or not parts.netloc:
+        raise ValueError(f"refusing to fetch non-https URL: {parts.scheme or '?'}://{parts.netloc}")
+
+
+def _open(req: urllib.request.Request, timeout: float):
+    _require_https(req.full_url)
+    return _OPENER.open(req, timeout=timeout)   # scheme checked above and on every redirect
+
+
 def _fetch(req: urllib.request.Request, timeout: float) -> str:
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
+    with _open(req, timeout) as resp:
         return resp.read().decode("utf-8", errors="replace")
 
 
@@ -84,9 +109,9 @@ def make_doc(source: str, doc_id: str, title: str, url: str, body: str, *, is_ht
 
 def _http_json(url: str, headers: dict, breaker: CircuitBreaker, data: bytes | None = None) -> dict:
     def call():
-        req = urllib.request.Request(url, data=data, headers=headers)
+        req = urllib.request.Request(url, data=data, headers=headers)  # noqa: S310 - https enforced in _open
         try:
-            with urllib.request.urlopen(req, timeout=30) as r:
+            with _open(req, 30) as r:
                 return json.loads(r.read())
         except urllib.error.HTTPError as e:
             if e.code == 429 or e.code >= 500:
@@ -188,7 +213,7 @@ class SharePointSource:
                     ext = os.path.splitext(item["name"])[1].lower()
                     if ext not in (".md", ".txt", ".html", ".htm"):
                         continue  # .docx/.pdf: add a converter (python-docx / Textract) behind this check
-                    req = urllib.request.Request(f"{self.GRAPH}/drives/{self.drive_id}/items/{item['id']}/content",
+                    req = urllib.request.Request(f"{self.GRAPH}/drives/{self.drive_id}/items/{item['id']}/content",  # noqa: S310 - https enforced in _open
                                                  headers=h)
                     body = retry_call(partial(_fetch, req, 60), attempts=3, breaker=self.breaker)
                     yield make_doc("sharepoint", item["id"], item["name"], item.get("webUrl", ""), body,
@@ -228,10 +253,10 @@ class WebSource:
             if not robots[host].can_fetch("finbot-ingest", url):
                 continue
             seen.add(url)
-            req = urllib.request.Request(url, headers={"User-Agent": "finbot-ingest"})
+            req = urllib.request.Request(url, headers={"User-Agent": "finbot-ingest"})  # noqa: S310 - https enforced in _open
             try:
                 body = retry_call(partial(_fetch, req, 30), attempts=3, breaker=self.breaker)
-            except Exception:  # noqa: BLE001 - skip one bad page, keep crawling
+            except Exception:  # noqa: BLE001, S112 - skip one bad page, keep crawling
                 continue
             title = re.search(r"<title>(.*?)</title>", body, re.I | re.S)
             main = re.search(r"<(main|article)[^>]*>(.*?)</\1>", body, re.I | re.S)

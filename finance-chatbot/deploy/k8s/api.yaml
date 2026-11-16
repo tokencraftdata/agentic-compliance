@@ -2,10 +2,9 @@
 # session, validate the message and enqueue it (FIFO, grouped by session_id,
 # deduplicated by the client's msg_id). They never call a model.
 #
-# NOTE: the repository has the service layer (finbot/service.py, ChatService) but
-# no HTTP adapter yet. Wrap ChatService in your framework of choice and map its
-# errors as documented there: AuthError 401, Forbidden 403, BadRequest 400,
-# LeaseHeld 409, unavailable 503 with retry_after_s.
+# The HTTP adapter is finbot/http_api.py (WSGI) served by gunicorn. Traffic arrives
+# only from the ALB (TLS terminated there, WAF in front); deploy/k8s/targetgroupbinding.yaml
+# registers these pods with its target group.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,7 +26,10 @@ spec:
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: api
-          image: REGISTRY/finbot-api:VERSION       # your HTTP adapter around ChatService
+          image: REGISTRY/finbot:VERSION
+          command: ["gunicorn", "finbot.http_api:app_from_env()", "--bind", "0.0.0.0:8080",
+                    "--workers", "2", "--threads", "4", "--limit-request-line", "2048",
+                    "--limit-request-field_size", "8190", "--forwarded-allow-ips", "*"]
           ports: [{containerPort: 8080, name: http}]
           envFrom:
             - configMapRef: {name: finbot-config}

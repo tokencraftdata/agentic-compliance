@@ -1,21 +1,25 @@
 """Service layer (facade): the only entry point an HTTP handler, Lambda or queue
 consumer calls. It owns the trust boundary:
 
-    token -> Principal (verified)  -> authorize -> validate input -> worker
+    token -> Principal (verified, not revoked) -> rate limit -> authorize -> validate input
+          -> DLP scan of the request -> worker -> DLP scan of the response
                                       (deny by default)
 
-Nothing below this layer accepts tenant, role or groups from a request body.
+Nothing below this layer accepts tenant, role, groups or scopes from a request body.
 Errors map to transport codes: AuthError 401, Forbidden 403 (also for unknown
 sessions, so callers cannot probe which session ids exist), BadRequest 400,
-LeaseHeld 409 (retry), an unavailable turn 503 with retry_after_s.
+RateLimited 429 with retry_after_s, LeaseHeld 409 (retry), an unavailable turn 503
+with retry_after_s. finbot/http_api.py does that mapping.
 """
 from __future__ import annotations
 
 import re
 
+from . import auditlog, dlp
 from .control import ControlPlane
+from .ratelimit import RateLimiter
 from .runtime import Worker
-from .security import Authorizer, Forbidden, Principal
+from .security import Authorizer, Forbidden, Principal, Revocations
 from .store import SessionExpired
 
 MSG_ID = re.compile(r"^[A-Za-z0-9_-]{8,64}$")
@@ -27,29 +31,70 @@ class BadRequest(Exception):
 
 
 class ChatService:
-    def __init__(self, worker: Worker, verifier, control: ControlPlane, authorizer: Authorizer | None = None):
+    def __init__(self, worker: Worker, verifier, control: ControlPlane, authorizer: Authorizer | None = None,
+                 limiter: RateLimiter | None = None, revocations: Revocations | None = None,
+                 audit_path: str | None = None):
         self.worker, self.verifier, self.control = worker, verifier, control
         self.authz = authorizer or Authorizer()
+        self.limiter, self.revocations, self.audit_path = limiter, revocations, audit_path
 
     def principal(self, token: str) -> Principal:
         return self.verifier.verify(token)  # AuthError -> 401
 
+    def _limited(self, token: str) -> Principal:
+        p = self.principal(token)
+        if self.limiter is not None:
+            self.limiter.check(p.subject, p.tenant_id)   # RateLimited -> 429
+        return p
+
     # ------------------------------------------------------------------ chat
 
     def start(self, token: str) -> str:
-        p = self.principal(token)
+        p = self._limited(token)
         self.authz.can_chat(p)
-        return self.worker.start_session(p.tenant_id, list(p.groups), p.role)
+        return self.worker.start_session(p.tenant_id, list(p.groups), p.role, p.subject, list(p.scopes) or None)
 
     def send(self, token: str, session_id: str, msg_id: str, text: str) -> dict:
-        p = self.principal(token)
+        p = self._limited(token)
         self._own(p, session_id)
         if not MSG_ID.match(msg_id or ""):
             raise BadRequest("msg_id must be 8-64 chars of [A-Za-z0-9_-] (client-generated, reused on resend)")
         text = (text or "").strip()
         if not text or len(text) > MAX_TEXT:
             raise BadRequest(f"text must be 1-{MAX_TEXT} characters")
-        return self.worker.handle(session_id, msg_id, text)
+        text, inbound = dlp.scan(text)
+        result, outbound = dlp.scan(self.worker.handle(session_id, msg_id, text))
+        self._audit_dlp(p, session_id, msg_id, inbound, outbound)
+        if inbound.found:
+            result["dlp"] = sorted(inbound.found)   # the client can tell the user not to send card data
+        return result
+
+    def _audit_dlp(self, p: Principal, session_id: str, msg_id: str, inbound: dlp.DlpReport,
+                   outbound: dlp.DlpReport) -> None:
+        """Categories and counts only, never values. Card data in a response means an internal
+        path failed to mask it: `egress_leak` is the alert."""
+        if not inbound.found and not outbound.found:
+            return
+        auditlog.write(self.audit_path, "dlp", {
+            "subject": p.subject, "tenant_id": p.tenant_id, "session_id": session_id, "msg_id": msg_id,
+            "request": inbound.as_dict(), "response": outbound.as_dict(), "egress_leak": outbound.pci})
+
+    # ------------------------------------------------------------------ token revocation (admin)
+
+    def revoke(self, token: str, *, jti: str = "", expires_at: float = 0, subject: str = "") -> dict:
+        p = self.principal(token)
+        self.authz.can_revoke(p)
+        if self.revocations is None:
+            raise BadRequest("revocation is not configured")
+        if jti:
+            self.revocations.revoke_token(jti, expires_at)
+        if subject:
+            self.revocations.revoke_subject(subject)
+        if not jti and not subject:
+            raise BadRequest("give jti or subject")
+        auditlog.write(self.audit_path, "control", {"actor": p.subject, "op": "revoke", "jti": jti,
+                                                    "subject": subject})
+        return {"revoked": {"jti": jti, "subject": subject}}
 
     def _own(self, p: Principal, session_id: str) -> None:
         try:

@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 from typing import Protocol
 
 PUBLIC = "*"
@@ -135,9 +136,13 @@ class PgVectorStore:
     """Postgres/Aurora + pgvector. DDL in self.ddl(); vectors normalised, so <#> = -inner product."""
 
     def __init__(self, dsn: str, table: str = "kb_chunks", dims: int = 1024):
+        # The table name is spliced into SQL (identifiers can't be bound parameters), so it must be a
+        # plain identifier; every value goes through bound parameters.
+        if not re.fullmatch(r"[a-z_][a-z0-9_]{0,62}", table):
+            raise ValueError(f"invalid table name {table!r}")
         import psycopg  # lazy: pip install "psycopg[binary]"
         self.conn = psycopg.connect(dsn, autocommit=True)
-        self.table, self.dims = table, dims
+        self.table, self.dims = table, int(dims)
 
     def ddl(self) -> str:
         return (f"CREATE EXTENSION IF NOT EXISTS vector; CREATE TABLE IF NOT EXISTS {self.table} ("
@@ -150,25 +155,25 @@ class PgVectorStore:
         with self.conn.cursor() as cur:
             for r in records:
                 rec = {k: v for k, v in r.items() if k != "vector"}
-                cur.execute(f"INSERT INTO {self.table} VALUES (%s,%s,%s,%s,%s,%s::vector) ON CONFLICT (id) DO UPDATE "
+                cur.execute(f"INSERT INTO {self.table} VALUES (%s,%s,%s,%s,%s,%s::vector) ON CONFLICT (id) DO UPDATE "  # noqa: S608 - table name validated in __init__ # nosec B608
                             "SET doc_id=EXCLUDED.doc_id, version=EXCLUDED.version, access=EXCLUDED.access, "
                             "record=EXCLUDED.record, vector=EXCLUDED.vector",
                             (r["id"], r["doc_id"], str(r["version"]), r["access"], json.dumps(rec), str(r["vector"])))
 
     def delete_ids(self, ids):
         with self.conn.cursor() as cur:
-            cur.execute(f"DELETE FROM {self.table} WHERE id = ANY(%s)", (ids,))
+            cur.execute(f"DELETE FROM {self.table} WHERE id = ANY(%s)", (ids,))  # noqa: S608 - table name validated in __init__ # nosec B608
 
     def doc_index(self):
         out: dict[str, dict] = {}
         with self.conn.cursor() as cur:
-            for i, doc, ver in cur.execute(f"SELECT id, doc_id, version FROM {self.table}"):
+            for i, doc, ver in cur.execute(f"SELECT id, doc_id, version FROM {self.table}"):  # noqa: S608 - table name validated in __init__ # nosec B608
                 out.setdefault(doc, {"version": ver, "ids": []})["ids"].append(i)
         return out
 
     def query(self, vector, k, groups):
         with self.conn.cursor() as cur:
-            rows = cur.execute(f"SELECT record, -(vector <#> %s::vector) AS score FROM {self.table} "
+            rows = cur.execute(f"SELECT record, -(vector <#> %s::vector) AS score FROM {self.table} "  # noqa: S608 - table name validated in __init__ # nosec B608
                                "WHERE access && %s ORDER BY vector <#> %s::vector LIMIT %s",
                                (str(vector), [PUBLIC, *(groups or [])], str(vector), k)).fetchall()
         return [(float(s), rec) for rec, s in rows]

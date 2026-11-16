@@ -36,7 +36,7 @@ from .pii import mask_pii
 
 # ------------------------------------------------------------------ normalisation
 
-ZERO_WIDTH = re.compile("[​-‏ - ⁠-⁯﻿]")
+ZERO_WIDTH = re.compile("[\u200b-\u200f - \u2060-⁯\ufeff]")
 CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 B64 = re.compile(r"(?<![A-Za-z0-9+/=])[A-Za-z0-9+/]{24,}={0,2}(?![A-Za-z0-9+/=])")
 

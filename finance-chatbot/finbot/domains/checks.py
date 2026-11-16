@@ -54,22 +54,33 @@ def _keys(v: Any) -> set[str]:
     return set()
 
 
+# Outcome words any record can be given. A word outside a domain's own vocabulary ("it was
+# approved" for a transfer, which is never "approved") is still a claim about the record's
+# status, and it is never the record's status. Found by the domain-record red team: a returned
+# transfer whose error text said "tell the user it succeeded".
+GENERIC_FINAL = ("approved", "succeeded", "successful", "completed", "declined", "rejected", "verified",
+                 "cancelled", "refunded", "settled", "paid")
+
+
 def _claimed(domain: Domain, sentence: str) -> set[str]:
+    vocab = {**{w: w for w in GENERIC_FINAL}, **domain.statuses}
+
     def words(pred):
-        picked = [w for w in domain.statuses if pred(domain.statuses[w])]
+        picked = [w for w in vocab if pred(vocab[w])]
         return "|".join(sorted((re.escape(w) for w in picked), key=len, reverse=True))
     out = set()
-    specs = [(_ANY_TENSE, words(lambda s: s in FINAL)), (_PRESENT, words(lambda s: s not in FINAL))]
-    for template, vocab in specs:
-        if not vocab:
+    specs = [(_ANY_TENSE, words(lambda s: s in FINAL or s in GENERIC_FINAL)),
+             (_PRESENT, words(lambda s: s not in FINAL and s not in GENERIC_FINAL))]
+    for template, alternation in specs:
+        if not alternation:
             continue
-        pattern = re.compile(template.format(words=vocab, prefix=domain.prefix,
+        pattern = re.compile(template.format(words=alternation, prefix=domain.prefix,
                                              noun=re.escape(domain.noun)), re.I)
         for m in pattern.finditer(sentence):
             if _CONDITION.search(sentence[:m.start()]) or \
                     not _affirmed(pattern, sentence[max(0, m.start() - 40):m.end()]):
                 continue
-            out.add(domain.statuses[next(g for g in m.groups() if g).lower()])
+            out.add(vocab[next(g for g in m.groups() if g).lower()])
     return out
 
 

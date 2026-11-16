@@ -38,6 +38,7 @@ from collections.abc import Callable
 from decimal import Decimal
 from typing import Any, Protocol
 
+from .crypto import Codec, PlainCodec, ctx
 from .pii import mask_pii
 from .store import LeaseHeld, SessionExpired, StaleWrite
 
@@ -269,8 +270,10 @@ class InMemoryDynamo:
 # ------------------------------------------------------------------ the store
 
 class DynamoSessionStore:
-    def __init__(self, table: DynamoTable, clock: Callable[[], float] = time.time, idle_ttl_s: float = 1800):
+    def __init__(self, table: DynamoTable, clock: Callable[[], float] = time.time, idle_ttl_s: float = 1800,
+                 codec: Codec | None = None):
         self.t, self.clock, self.idle_ttl = table, clock, idle_ttl_s
+        self.codec: Codec = codec or PlainCodec()   # seals state, user text and answers (finbot/crypto.py)
 
     def close(self) -> None:
         pass
@@ -288,13 +291,14 @@ class DynamoSessionStore:
     def create(self, session_id, tenant_id, state):
         now = self.clock()
         self.t.put({"pk": f"S#{session_id}", "sk": "META", "tenant_id": tenant_id, "version": 0,
-                    "owner": None, "lease_until": None, "state": json.dumps(state), "updated": now,
+                    "owner": None, "lease_until": None,
+                    "state": self.codec.seal(state, ctx(session_id, "session_state")), "updated": now,
                     "expires": now + self.idle_ttl},
                    ("attribute_not_exists(pk)", {}, {}))
 
     def load(self, session_id):
         m = self._meta(session_id)
-        return m["version"], json.loads(m["state"])
+        return m["version"], self.codec.open(m["state"], ctx(session_id, "session_state"))
 
     def tenant_of(self, session_id):
         return self._meta(session_id)["tenant_id"]
@@ -335,7 +339,9 @@ class DynamoSessionStore:
         pk, sk = f"S#{session_id}", f"T#{msg_id}"
         r = self.t.get(pk, sk)
         if r and r["status"] == "committed":
-            return {"answer": r["answer"], **json.loads(r.get("meta") or "{}"), "deduplicated": True}
+            return {"answer": self.codec.open(r["answer"], ctx(session_id, "answer")),
+                    **(self.codec.open(r["meta"], ctx(session_id, "turn_meta")) if r.get("meta") else {}),
+                    "deduplicated": True}
         if r:
             self.t.put({**r, "worker": worker, "attempts": r["attempts"] + 1, "started": now},
                        ("#a = :a", {"#a": "attempts"}, {":a": r["attempts"]}))
@@ -343,7 +349,8 @@ class DynamoSessionStore:
         n = len(self.t.query(pk, "T#"))
         try:
             self.t.put({"pk": pk, "sk": sk, "msg_id": msg_id, "turn_no": n + 1, "status": "started",
-                        "worker": worker, "attempts": 1, "user_text": user_text, "answer": None, "meta": None,
+                        "worker": worker, "attempts": 1, "answer": None, "meta": None,
+                        "user_text": self.codec.seal(user_text, ctx(session_id, "user_text")),
                         "started": now, "committed": None, "expires": now + self.idle_ttl},
                        ("attribute_not_exists(pk)", {}, {}))
         except ConditionFailed:
@@ -360,14 +367,15 @@ class DynamoSessionStore:
         turn = self.t.get(f"S#{session_id}", f"T#{msg_id}")
         if turn is None:
             raise StaleWrite(f"turn {msg_id} was never claimed in session {session_id}")
-        blob = json.dumps(state)
+        blob = self.codec.seal(state, ctx(session_id, "session_state"))
         if len(blob.encode()) > MAX_STATE_BYTES:
             raise StateTooLarge(f"session state is {len(blob.encode())} bytes; the item limit is 400 KB "
                                 "(lower max_history_chars)")
         new_meta = {**m, "state": blob, "version": expected_version + 1, "updated": now,
                     "expires": now + self.idle_ttl}
         # The journal dedupes resends for as long as the session lives, not 30 min from turn start.
-        new_turn = {**turn, "status": "committed", "answer": answer, "meta": json.dumps(meta), "committed": now,
+        new_turn = {**turn, "status": "committed", "answer": self.codec.seal(answer, ctx(session_id, "answer")),
+                    "meta": self.codec.seal(meta, ctx(session_id, "turn_meta")), "committed": now,
                     "expires": now + self.idle_ttl}
         try:
             self.t.transact_put([
@@ -381,7 +389,8 @@ class DynamoSessionStore:
         return expected_version + 1
 
     def incomplete_turns(self, session_id):
-        return [{"msg_id": r["msg_id"], "worker": r["worker"], "attempts": r["attempts"], "user_text": r["user_text"]}
+        return [{"msg_id": r["msg_id"], "worker": r["worker"], "attempts": r["attempts"],
+                 "user_text": self.codec.open(r["user_text"], ctx(session_id, "user_text"))}
                 for r in self.t.query(f"S#{session_id}", "T#") if r["status"] == "started"]
 
     def turns(self, session_id):

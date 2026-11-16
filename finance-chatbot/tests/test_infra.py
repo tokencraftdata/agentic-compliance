@@ -1,0 +1,109 @@
+"""The AWS stack (infra/cdk) synthesizes and keeps its security properties.
+Skipped where aws-cdk-lib is not installed (pip install -r infra/cdk/requirements.txt)."""
+
+import json
+import os
+import sys
+import unittest
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "infra", "cdk"))
+
+try:
+    import aws_cdk as cdk
+    from aws_cdk.assertions import Match, Template
+except ImportError:  # pragma: no cover
+    cdk = None
+
+
+@unittest.skipIf(cdk is None, "aws-cdk-lib not installed")
+class Stack(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from finbot_stack import FinbotStack
+
+        cls.t = Template.from_stack(FinbotStack(cdk.App(), "Finbot", env=cdk.Environment(region="us-east-1")))
+        cls.json = json.dumps(cls.t.to_json())
+
+    def test_tls_policy_and_http_redirects(self):
+        self.t.has_resource_properties(
+            "AWS::ElasticLoadBalancingV2::Listener",
+            {"Port": 443, "Protocol": "HTTPS", "SslPolicy": "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"},
+        )
+        self.t.has_resource_properties(
+            "AWS::ElasticLoadBalancingV2::Listener",
+            {
+                "Port": 80,
+                "DefaultActions": [
+                    Match.object_like({"Type": "redirect", "RedirectConfig": Match.object_like({"Protocol": "HTTPS"})})
+                ],
+            },
+        )
+
+    def test_alb_hardening(self):
+        attrs = self.t.find_resources("AWS::ElasticLoadBalancingV2::LoadBalancer")
+        (alb,) = attrs.values()
+        kv = {a["Key"]: a["Value"] for a in alb["Properties"]["LoadBalancerAttributes"]}
+        self.assertEqual(kv["routing.http.drop_invalid_header_fields.enabled"], "true")
+        self.assertEqual(kv["routing.http.desync_mitigation_mode"], "strictest")
+        self.assertEqual(kv["deletion_protection.enabled"], "true")
+        self.assertEqual(kv["access_logs.s3.enabled"], "true")
+
+    def test_waf_rules_attached(self):
+        (acl,) = self.t.find_resources("AWS::WAFv2::WebACL").values()
+        names = [r["Name"] for r in acl["Properties"]["Rules"]]
+        for want in (
+            "RatePerIp",
+            "AWSManagedRulesCommonRuleSet",
+            "AWSManagedRulesKnownBadInputsRuleSet",
+            "AWSManagedRulesSQLiRuleSet",
+            "AWSManagedRulesAmazonIpReputationList",
+            "BodyTooLarge",
+            "TokenInQueryString",
+            "UnknownPath",
+        ):
+            self.assertIn(want, names)
+        self.t.resource_count_is("AWS::WAFv2::WebACLAssociation", 1)
+        self.t.has_resource_properties(
+            "AWS::WAFv2::LoggingConfiguration", {"RedactedFields": [{"SingleHeader": {"Name": "authorization"}}]}
+        )
+
+    def test_keys_rotate_and_encrypt_everything(self):
+        self.t.all_resources_properties("AWS::KMS::Key", {"EnableKeyRotation": True})
+        self.t.has_resource_properties(
+            "AWS::DynamoDB::GlobalTable",
+            {"SSESpecification": Match.object_like({"SSEEnabled": True, "SSEType": "KMS"})},
+        )
+        self.t.all_resources_properties("AWS::SQS::Queue", {"KmsMasterKeyId": Match.any_value()})
+        self.assertIn("kms:EncryptionContext:purpose", self.json)  # pod roles: only with a finbot context
+
+    def test_pod_roles_get_table_access(self):
+        # Grants to imported roles must land in a policy; an immutable import drops them silently.
+        self.assertIn("dynamodb:PutItem", self.json)
+        self.assertIn("ApiRolePolicy", self.json)
+
+    def test_audit_bucket_is_write_once(self):
+        self.t.has_resource_properties(
+            "AWS::S3::Bucket",
+            {
+                "ObjectLockEnabled": True,
+                "ObjectLockConfiguration": {
+                    "ObjectLockEnabled": "Enabled",
+                    "Rule": {"DefaultRetention": {"Mode": "COMPLIANCE", "Days": 365}},
+                },
+            },
+        )
+        self.t.all_resources_properties(
+            "AWS::S3::Bucket",
+            {
+                "PublicAccessBlockConfiguration": {
+                    "BlockPublicAcls": True,
+                    "BlockPublicPolicy": True,
+                    "IgnorePublicAcls": True,
+                    "RestrictPublicBuckets": True,
+                }
+            },
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()

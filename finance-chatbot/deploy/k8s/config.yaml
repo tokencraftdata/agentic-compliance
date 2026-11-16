@@ -26,6 +26,15 @@ data:
   FINBOT_KB_PROVIDER: vector
   FINBOT_VECTOR_STORE: opensearch:https://REPLACE_ME.us-east-1.aoss.amazonaws.com/finbot-kb
   FINBOT_VECTOR_EMBEDDER: bedrock:amazon.titan-embed-text-v2:0@1024
+  # Encryption at rest: KMS key from infra/cdk (output DataKeyArn); refuse unencrypted values
+  FINBOT_ENCRYPTION: kms
+  FINBOT_KMS_KEY_ID: alias/finbot-data
+  FINBOT_ENCRYPTION_REQUIRED: "1"
+  # Per verified user / tenant; the WAF limits per IP before this
+  FINBOT_RATE_USER_PER_MIN: "30"
+  FINBOT_RATE_TENANT_PER_MIN: "600"
+  # FINBOT_AUDIT_KEY and FINBOT_GRANT_KEY are secrets: mount them from AWS Secrets Manager
+  # (Secrets Store CSI driver), never put them here.
   FINBOT_AUTH: jwks
   FINBOT_AUTH_ISSUER: https://login.example.com/
   FINBOT_AUTH_AUDIENCE: finbot

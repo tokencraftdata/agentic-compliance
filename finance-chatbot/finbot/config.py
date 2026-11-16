@@ -46,6 +46,26 @@ class Settings:
     auth_issuer: str = field(default_factory=lambda: _env("FINBOT_AUTH_ISSUER"))
     auth_audience: str = field(default_factory=lambda: _env("FINBOT_AUTH_AUDIENCE", "finbot"))
     auth_jwks_url: str = field(default_factory=lambda: _env("FINBOT_AUTH_JWKS_URL"))
+    # HS256 key rotation: the current key's id, and previous keys still accepted ("kid:secret,...").
+    auth_kid: str = field(default_factory=lambda: _env("FINBOT_AUTH_KID", "k1"))
+    auth_previous_secrets: str = field(default_factory=lambda: _env("FINBOT_AUTH_PREVIOUS_SECRETS"), repr=False)
+
+    # Encryption at rest (finbot/crypto.py): session state, user text and answers in the store.
+    # "none", "local" (key ring in FINBOT_LOCAL_KEYS; dev/tests) or "kms" (AWS KMS key FINBOT_KMS_KEY_ID).
+    encryption: str = field(default_factory=lambda: _env("FINBOT_ENCRYPTION", "none"))
+    kms_key_id: str = field(default_factory=lambda: _env("FINBOT_KMS_KEY_ID"))
+    local_keys: str = field(default_factory=lambda: _env("FINBOT_LOCAL_KEYS"), repr=False)
+    # Refuse to read values written before encryption was turned on.
+    encryption_required: bool = field(default_factory=lambda: _env("FINBOT_ENCRYPTION_REQUIRED", "0") == "1")
+
+    # Rate limits per verified user and per tenant (finbot/ratelimit.py); 0 turns them off.
+    rate_user_per_min: float = field(default_factory=lambda: float(_env("FINBOT_RATE_USER_PER_MIN", "30")))
+    rate_tenant_per_min: float = field(default_factory=lambda: float(_env("FINBOT_RATE_TENANT_PER_MIN", "600")))
+
+    # Audit log hash chain: HMAC key for the chain (finbot/auditlog.py). Empty: plain SHA-256.
+    audit_key: str = field(default_factory=lambda: _env("FINBOT_AUDIT_KEY"), repr=False)
+    # Delegation grants for tool calls (finbot/agent_identity.py). Empty: a random per-process key.
+    grant_key: str = field(default_factory=lambda: _env("FINBOT_GRANT_KEY"), repr=False)
 
     # Control plane: how often each worker re-reads shared model config (drain/restore/routing)
     control_sync_s: float = 2.0

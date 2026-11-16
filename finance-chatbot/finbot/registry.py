@@ -87,16 +87,19 @@ def _local_guard(**_):
 def _sqlite_store(settings, clock=None, **_):
     import time
 
+    from .crypto import make_codec
     from .store import SessionStore
-    return SessionStore(settings.store_path, clock=clock or time.time)
+    return SessionStore(settings.store_path, clock=clock or time.time, codec=make_codec(settings))
 
 
 @STORES.register("dynamodb")
 def _dynamo_store(settings, clock=None, **_):
     import time
 
+    from .crypto import make_codec
     from .store_dynamo import Boto3Dynamo, DynamoSessionStore
-    return DynamoSessionStore(Boto3Dynamo(settings.dynamo_table, settings.aws_region), clock=clock or time.time)
+    return DynamoSessionStore(Boto3Dynamo(settings.dynamo_table, settings.aws_region), clock=clock or time.time,
+                              codec=make_codec(settings))
 
 
 @EMBEDDERS.register("none")

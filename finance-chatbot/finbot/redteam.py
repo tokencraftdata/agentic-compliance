@@ -13,7 +13,7 @@ from .faults import GullibleLLM
 from .guardrails import BLOCKED_OUTPUT_MSG, GuardResult
 from .knowledge import Index
 from .llm import FakeLLM
-from .tools import DEMO_DOCS, DEMO_LOGS, DEMO_TXNS
+from .tools import DEMO_DOCS, DEMO_LOGS, DEMO_RECORDS, DEMO_TXNS, InMemoryRecords
 from .verification import HallucinationGate, VerifierChain
 
 CONFIGS = ("defended", "no_screening", "undefended")
@@ -35,6 +35,9 @@ def build_bot(case: dict, config: str, policy=None):
         kb.upsert_page(p)
     s = Settings(llm_provider="fake", guardrail_provider="local", kb_path="/nonexistent", data_dir="")
     overrides = {"dataset": (txns, logs, DEMO_DOCS), "knowledge": kb}
+    if plant.get("records"):   # attacks planted in a domain plug-in's records (accounts, transfers, ...)
+        records = {d: [*DEMO_RECORDS.get(d, []), *rows] for d, rows in plant["records"].items()}
+        overrides["records"] = InMemoryRecords({**DEMO_RECORDS, **records})
     if policy is not None:
         overrides["guard_policy"] = policy
     bot = Container(s, overrides=overrides).chatbot

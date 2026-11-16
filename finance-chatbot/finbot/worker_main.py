@@ -48,9 +48,12 @@ class OneAtATime:
         return getattr(self.source, name)
 
 
+HEARTBEAT = "/tmp/finbot-heartbeat"   # noqa: S108 - liveness file on the pod-private emptyDir # nosec B108
+
+
 class Runner:
     def __init__(self, consumer_factory: Callable[[OneAtATime], QueueConsumer], source: Any,
-                 heartbeat: str = "/tmp/finbot-heartbeat", idle_sleep_s: float = 0.0):
+                 heartbeat: str = HEARTBEAT, idle_sleep_s: float = 0.0):
         self.stopping = False
         self.consumer = consumer_factory(OneAtATime(source, lambda: self.stopping))
         self.heartbeat, self.idle_sleep_s = Path(heartbeat), idle_sleep_s
@@ -91,7 +94,7 @@ def main() -> None:  # pragma: no cover - wiring only; Runner is tested
     c = Container(s, audit_path=os.environ.get("FINBOT_AUDIT"))
     source = SqsQueue(s.queue_url, os.environ["FINBOT_DLQ_URL"], s.aws_region, int(visibility))
     runner = Runner(lambda q: QueueConsumer(q, c.worker, s.max_receives), source,
-                    os.environ.get("FINBOT_HEARTBEAT_FILE", "/tmp/finbot-heartbeat"))
+                    os.environ.get("FINBOT_HEARTBEAT_FILE", HEARTBEAT))
     signal.signal(signal.SIGTERM, runner.stop)
     signal.signal(signal.SIGINT, runner.stop)
     log.info("worker %s polling %s", c.worker.id, s.queue_url)

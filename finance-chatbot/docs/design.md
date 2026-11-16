@@ -151,7 +151,7 @@ Table definition: `store_dynamo.TABLE_DEFINITION` (on-demand, KMS, PITR).
 
 Covered in [security.md](security.md): what reaches the model is screened and spotlighted, and
 a successful injection still can't read other tenants, change state, assert false facts, cite
-planted links, request secrets or leak the prompt. Red team: 0/29 defended, 21/29 undefended.
+planted links, request secrets or leak the prompt. Red team: 0/34 defended, 25/34 undefended.
 
 ## 7. Ingestion → vector DB (Python)
 

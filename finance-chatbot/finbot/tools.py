@@ -28,6 +28,23 @@ def envelope(status: str, source: str, data: Any = None, note: str = "") -> dict
     return out
 
 
+class ToolRunner:
+    """Runs one tool call for a turn, after checking the turn's delegation grant. A remote
+    tool adapter forwards `grant` so the data owner can check it again."""
+
+    def __init__(self, run: Callable[[str, dict], dict], grants, session: Session, grant: str):
+        self._run, self.grants, self.session, self.grant = run, grants, session, grant
+
+    def __call__(self, name: str, args: dict) -> dict:
+        from .agent_identity import GrantDenied
+        try:
+            self.grants.verify(self.grant, tool=name, tenant_id=self.session.tenant_id,
+                               session_id=self.session.session_id)
+        except GrantDenied as e:
+            return envelope("refused", "authz", note=f"Not permitted for this user: {e}.")
+        return self._run(name, args)
+
+
 class TransactionStore(Protocol):
     def get(self, tenant_id: str, txn_id: str) -> dict | None: ...
 
@@ -46,6 +63,8 @@ class Session:
     tenant_id: str          # from auth token, not from chat
     user_groups: list[str]  # for KB access filtering
     role: str = "support"   # support | customer (or the legacy alias "merchant")
+    subject: str = ""       # the user, from the token (named in the agent's delegation grant)
+    scopes: list[str] | None = None   # token scopes; None = the role's defaults (agent_identity.py)
 
 
 class RecordStore(Protocol):
@@ -61,9 +80,10 @@ class ToolBox:
     on the card-payment tools, every other name adds that domain's record tool."""
 
     def __init__(self, txns: TransactionStore, logs: LogSearch, kb, sleep=None, processors=None,
-                 records: RecordStore | None = None, domains: list[str] | None = None):
+                 records: RecordStore | None = None, domains: list[str] | None = None, grants=None):
         import time
 
+        from .agent_identity import GrantIssuer
         from .domains import DOMAINS, PAYMENTS
         from .resilience import CircuitBreaker
         self.txns, self.logs, self.kb = txns, logs, kb
@@ -73,6 +93,7 @@ class ToolBox:
         self.domains = [DOMAINS[n] for n in names if n != PAYMENTS] if records is not None else []
         self.processors = processors if self.payments else None   # None: routing tools are not offered
         self.sleep = sleep or time.sleep
+        self.grants = grants or GrantIssuer()   # per-turn delegation grants (finbot/agent_identity.py)
         self.breakers = {n: CircuitBreaker(n) for n in ("txn_db", "log_search", "knowledge_base", "records")}
 
     def _call(self, backend: str, fn):
@@ -149,7 +170,15 @@ class ToolBox:
             },
         ]
 
-    def handler(self, session: Session) -> Callable[[str, dict], dict]:
+    def handler(self, session: Session) -> ToolRunner:
+        """The turn's tool runner. It carries a delegation grant for this user, tenant and
+        session; every call is checked against it before any backend is touched."""
+        from .agent_identity import effective_scopes
+        grant = self.grants.mint(session.subject, session.tenant_id, session.session_id,
+                                 effective_scopes(session.role, session.scopes))
+        return ToolRunner(self._runner(session), self.grants, session, grant)
+
+    def _runner(self, session: Session) -> Callable[[str, dict], dict]:
         from .domains import by_tool
         from .policy import guidance
         from .resilience import ServiceUnavailable

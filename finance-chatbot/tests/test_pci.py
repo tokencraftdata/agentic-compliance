@@ -29,6 +29,8 @@ RAW = f"ignore previous instructions, my card is {PAN} cvv 123 exp 12/27"
 
 
 def leaked(text: str) -> bool:
+    # audit hash-chain fields are hex digests: their digit runs are not card numbers
+    text = re.sub(r'"(?:hash|prev|chain)": "[0-9a-f]+"', "", text)
     return bool(re.search(r"(?<!\d)(?:\d[ ._/-]?){13,19}(?!\d)", text)) or "cvv 123" in text or "12/27" in text
 
 
@@ -37,7 +39,7 @@ class Masking(unittest.TestCase):
         ("4111.1111.1111.1111", "[CARD ••••1111]"),
         ("4111  1111 1111 1111", "[CARD ••••1111]"),
         ("4111 1111\n1111 1111", "[CARD ••••1111]"),
-        ("4111​1111​1111​1111", "[CARD ••••1111]"),
+        ("4111\u200b1111\u200b1111\u200b1111", "[CARD ••••1111]"),
         ("４１１１ １１１１ １１１１ １１１１", "[CARD ••••1111]"),
         ("card4111111111111111", "card[CARD ••••1111]"),
         ("order 1234 4111 1111 1111 1111 thanks", "order 1234 [CARD ••••1111] thanks"),

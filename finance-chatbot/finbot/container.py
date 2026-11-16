@@ -33,6 +33,7 @@ class Container:
         self.settings = settings or Settings()
         self.overrides = overrides or {}
         self.clock, self.audit_path = clock, audit_path
+        auditlog.configure(self.settings.audit_key)
 
     def _get(self, name: str, build: Callable[[], Any]) -> Any:
         return self.overrides[name] if name in self.overrides else build()
@@ -88,7 +89,17 @@ class Container:
         return self._get("toolbox", lambda: ToolBox(self._get("txns", lambda: InMemoryTxns(txns)),
                                                     self._get("logs", lambda: InMemoryLogs(logs)),
                                                     self.knowledge, processors=self.processors,
-                                                    records=self.records, domains=enabled(self.settings.domains)))
+                                                    records=self.records, domains=enabled(self.settings.domains),
+                                                    grants=self.grants))
+
+    @cached_property
+    def grants(self):
+        """Signs the per-turn delegation grant every tool call is checked against."""
+        import time
+
+        from .agent_identity import GrantIssuer
+        key = self.settings.grant_key.encode() or None
+        return self._get("grants", lambda: GrantIssuer(key, clock=self.clock or time.time))
 
     @cached_property
     def records(self):
@@ -184,12 +195,30 @@ class Container:
         import time
 
         from .security import make_verifier
-        return self._get("verifier", lambda: make_verifier(self.settings, self.clock or time.time))
+        return self._get("verifier", lambda: make_verifier(self.settings, self.clock or time.time, self.revocations))
+
+    @cached_property
+    def revocations(self):
+        """Token deny list shared by every pod through the session store."""
+        import time
+
+        from .security import Revocations
+        return self._get("revocations", lambda: Revocations(self.store, self.clock or time.time))
+
+    @cached_property
+    def limiter(self):
+        import time
+
+        from .ratelimit import RateLimiter
+        s = self.settings
+        return self._get("limiter", lambda: RateLimiter(s.rate_user_per_min, s.rate_tenant_per_min,
+                                                        self.clock or time.time) if s.rate_user_per_min else None)
 
     @cached_property
     def service(self):
         from .service import ChatService
-        return self._get("service", lambda: ChatService(self.worker, self.verifier, self.control, self.authorizer))
+        return self._get("service", lambda: ChatService(self.worker, self.verifier, self.control, self.authorizer,
+                                                        self.limiter, self.revocations, self.audit_path))
 
     def close(self) -> None:
         if "store" in self.__dict__:

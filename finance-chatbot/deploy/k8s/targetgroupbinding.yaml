@@ -1,0 +1,18 @@
+# Registers the API pods with the ALB target group created by infra/cdk (output
+# TargetGroupArn). Needs the AWS Load Balancer Controller. The ALB, its TLS policy, the
+# WAF web ACL and access logs live in infra/cdk, so they are reviewed and versioned with
+# the rest of the AWS stack instead of in Ingress annotations.
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: finbot-api
+  namespace: finbot
+spec:
+  serviceRef: {name: finbot-api, port: 80}
+  targetGroupARN: REPLACE_ME            # infra/cdk output TargetGroupArn
+  targetType: ip
+  networking:
+    ingress:
+      - from:
+          - securityGroup: {groupID: REPLACE_ME}   # the ALB's security group
+        ports: [{protocol: TCP, port: 8080}]

@@ -68,8 +68,10 @@ class Worker:
         bot.engine().attach_health(store)  # model breaker state shared across workers
         self.id = worker_id or f"w_{uuid.uuid4().hex[:8]}"
 
-    def start_session(self, tenant_id: str, groups: list[str], role: str = "support") -> str:
+    def start_session(self, tenant_id: str, groups: list[str], role: str = "support", subject: str = "",
+                      scopes: list[str] | None = None) -> str:
         cs = self.bot.new_session(tenant_id, groups, role)
+        cs.session.subject, cs.session.scopes = subject, scopes
         self.store.create(cs.session.session_id, tenant_id, dump_session(cs))
         return cs.session.session_id
 

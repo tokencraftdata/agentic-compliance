@@ -1,0 +1,78 @@
+# Code vulnerability scanning: on every pull request, on main, and weekly (new CVEs appear
+# in dependencies that did not change). Findings fail the build; SARIF goes to the
+# repository's Security tab.
+#
+#   SAST          CodeQL (security-extended) and Bandit
+#   dependencies  pip-audit against the OSV / PyPI advisory databases
+#   secrets       gitleaks over the full history
+#   container     Trivy: OS and library CVEs in the image (HIGH/CRITICAL fail)
+#   IaC           Trivy config scan of the Dockerfile and Kubernetes manifests, and cdk-nag-style
+#                 assertions in tests/test_infra.py (run by ci.yml)
+name: security
+on:
+  push: {branches: [main]}
+  pull_request:
+  schedule: [{cron: "17 6 * * 1"}]
+permissions: {contents: read}
+
+jobs:
+  codeql:
+    runs-on: ubuntu-latest
+    permissions: {contents: read, security-events: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: github/codeql-action/init@v3
+        with: {languages: python, queries: security-extended}
+      - uses: github/codeql-action/analyze@v3
+
+  bandit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install "bandit[toml]>=1.7"
+      # -ll: medium severity and up. S101 (assert) and S311 (random) are justified in pyproject.toml.
+      - run: bandit -r finbot scripts infra -ll -s B101,B311
+
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install pip-audit
+      - run: pip-audit -r requirements.txt --strict --desc
+      - run: pip-audit -r infra/cdk/requirements.txt --strict
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: gitleaks/gitleaks-action@v2
+        env: {GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"}
+
+  container:
+    runs-on: ubuntu-latest
+    permissions: {contents: read, security-events: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: docker build -t finbot:${{ github.sha }} .
+      - uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: finbot:${{ github.sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: misconfigurations in the Dockerfile and Kubernetes manifests
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: "1"

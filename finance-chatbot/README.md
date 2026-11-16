@@ -12,7 +12,7 @@ It is built around three ideas:
 | **Adaptive guardrails** | Guardrails improve from reviewer-labelled mistakes, never from raw chat and without retraining. Each proposed rule must fix its own evidence, match no fair question and break no case in the eval and red-team suites, then runs in shadow and a canary before an admin promotes it. Built-in guards are never changed automatically | Escalation to a person, a check on promises the bot can't keep, and a session risk score in the baseline; gate replays 18 guard cases, 41 + 185 eval cases and 35 red-team cases per proposal |
 | **Resilience** | Stateless workers, sessions as versioned records with leases, turns saved only when complete, de-duplicated messages, a model failover chain with a circuit breaker per model, a 90-second turn deadline, fail-closed guardrails | Tests crash a worker at each point of a turn, take the session over, and reject the late worker's write; failover mid-turn keeps the same checks; in the routing simulator a two-hour processor outage moves approval from 80.4% to 80.5% |
 
-Underneath all three: prompt-injection defences. Against a stand-in model that obeys any instruction it sees, 0 of 29 attacks succeed with guardrails on, 21 of 29 without.
+Underneath all three: prompt-injection defences. Against a stand-in model that obeys any instruction it sees, 0 of 34 attacks succeed with guardrails on, 25 of 34 without.
 
 Read more: [hallucination control](docs/reliability.md#3-hallucination-control), [adaptive guardrails](docs/design.md#10-adaptive-guardrails), [crash recovery and failover](docs/reliability.md#2-crash-recovery-finbotruntimepy), [the article](docs/posts/article.md).
 
@@ -151,9 +151,14 @@ tests/test_mitigations.py   27 tests: plain-word reasons, record-built answers, 
                             upkeep and cost reports, stated details, citations
 tests/test_domains.py       27 tests: hidden fields stripped, status/cause/reason-key checks, tickets on
                             domain records, tenant isolation, provenance, record-built summaries, FINBOT_DOMAINS
+tests/test_platform_security.py  34 tests: encryption at rest and key rotation, token revocation, agent
+                            delegation grants, rate limits, DLP, audit chain, HTTP adapter, SQL/log/header
+                            injection, https-only ingestion
+tests/test_infra.py          6 tests: ALB TLS and hardening, WAF rules, KMS rotation, write-once audit
+                            bucket (needs aws-cdk-lib)
 ```
 
-315 tests in all.
+355 tests in all.
 
 ## Design
 
@@ -185,11 +190,23 @@ Access, the worker cluster, routing, Kubernetes and crash recovery mid-turn are 
 Prompt injection is handled two ways: reduce what reaches the model (input screening,
 tool-result screening, spotlighting), and limit what a successful injection can do (read-only,
 tenant-scoped tools, evidence checks, KB-only links, no credential requests, leak canary).
-Red team against a model that obeys anything: 0 of 29 attacks succeed defended, 21 of 29
+Red team against a model that obeys anything: 0 of 34 attacks succeed defended, 25 of 34
 undefended, with no loss on benign look-alikes; 0 of 5 multi-turn escalations succeed defended.
 Consistency (pass^k, tau-bench): every eval case passes all k runs with half the answers corrupted. See [docs/security.md](docs/security.md),
 which also maps each defence to the research it follows, including the author's
 MemoryKeeper study.
+
+Platform controls ([docs/security.md, section 5](docs/security.md)):
+
+- **Agent identity:** a per-turn delegation grant (user, agent, tenant, session, read-only scopes, 5 minutes) is checked before every tool call.
+- **Encryption at rest:** AES-256-GCM envelope encryption with KMS, bound to session and purpose.
+- **Tokens:** key rotation by `kid`; revocation shared by every pod.
+- **Rate limits:** per user and per tenant.
+- **DLP:** a PCI and PII scan on every request and response.
+- **Audit:** a hash-chained audit log.
+- **HTTP adapter:** a hardened adapter (`finbot/http_api.py`).
+- **Edge:** the ALB, WAF and KMS stack in Python CDK (`infra/cdk`), not yet deployed.
+- **CI scanning:** CodeQL, Bandit, pip-audit, gitleaks and Trivy.
 
 ```bash
 python3 scripts/run_redteam.py -v

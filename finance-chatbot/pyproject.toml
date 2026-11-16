@@ -11,17 +11,20 @@ extend-exclude = [".venv"]
 
 [tool.ruff.lint]
 # pyflakes, pycodestyle, isort, bugbear, pyupgrade, simplify, comprehensions
-select = ["F", "E", "W", "I", "B", "UP", "SIM", "C4"]
+select = ["F", "E", "W", "I", "B", "UP", "SIM", "C4", "S"]   # S: bandit security rules
 ignore = [
+    "S101",    # assert narrows types for mypy; no security check relies on one
+    "S311",    # random is used for jitter, simulation and synthetic data, never for secrets
     "SIM105",  # contextlib.suppress: explicit try/except reads better around I/O here
     "SIM108",  # ternaries everywhere hurt readability
     "SIM905",  # word lists read better as one string split on whitespace
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"scripts/*" = ["E402"]   # scripts put the repo on sys.path before importing finbot
+"scripts/*" = ["E402"]
+"infra/*" = ["E402"]   # scripts put the repo on sys.path before importing finbot
 "finbot/orchestrator.py" = ["E501"]   # the system prompt is prose, one rule per line
-"tests/*" = ["E402"]
+"tests/*" = ["E402", "S105", "S106", "S108", "S110", "S310", "S324", "S603"]   # test fixtures: fake secrets, temp paths
 
 [tool.mypy]
 python_version = "3.11"

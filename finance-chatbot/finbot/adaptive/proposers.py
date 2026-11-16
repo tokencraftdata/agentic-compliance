@@ -249,7 +249,7 @@ class ClaudeProposer:
                 draft = json.loads(text[text.index("{"): text.rindex("}") + 1])
                 pattern = str(draft["pattern"])
                 validate_pattern(pattern)
-            except Exception:  # unusable draft: no proposal, never a half-valid rule
+            except Exception:  # noqa: S112 - unusable draft: no proposal, never a half-valid rule
                 continue
             rid = slug(f"{kind} {open_[0].id[-6:]}", "llm")
             pid = f"prop_{rid}"
