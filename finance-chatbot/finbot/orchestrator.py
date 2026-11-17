@@ -49,6 +49,7 @@ from .models import ModelOrchestrator, ModelTarget
 from .pii import CARD_REASONS, mask_pii, mask_value
 from .recordanswer import record_answer
 from .resilience import GuardrailUnavailable, ServiceUnavailable
+from .security_gateway import SecurityEvents, SecurityGateway, load_rules
 from .tickets import InMemoryTickets, TicketStore
 from .tools import Session, ToolBox
 from .untrusted import SPOTLIGHT_RULE, ToolResultScreen, leaks_prompt
@@ -185,6 +186,20 @@ class ChatSession:
     nonce: str | None = field(default=None, repr=False, compare=False)
 
 
+SECURITY_CODES = frozenset({"unverified_url", "credential_request", "unverified_contact", "unverified_txn_reference"})
+
+
+def _security_codes(reasons) -> set[str]:
+    """Codes in gate reasons that point at an injection, with "repaired:" / "records_only:" removed."""
+    out = set()
+    for r in reasons:
+        parts = str(r).split(":")
+        code = parts[1] if parts[0] in ("repaired", "records_only") and len(parts) > 1 else parts[0]
+        if code in SECURITY_CODES:
+            out.add(code)
+    return out
+
+
 def _is_failover(engine, target: str | None) -> bool | None:
     """True when a model other than the first of its chain served the call."""
     chains = [c for c in (getattr(engine, "strong", None), getattr(engine, "fast", None)) if c]
@@ -216,6 +231,9 @@ class Chatbot:
             TicketVerifier(lambda: set(t.tickets) if (t := current_turn()) else set()),
         ]), repair_attempts=settings.repair_attempts)
         self.screen = ToolResultScreen(guardrail)  # third-party text in tool results
+        # One place that decides on every tool call and logs security events (security_gateway.py).
+        self.security = SecurityGateway(toolbox.schemas, self.tickets, SecurityEvents(audit_path),
+                                        load_rules(getattr(settings, "tool_policy_path", "")))
         self._wrapped: tuple | None = None
         # The pipeline, in order. Each stage returns a Reply to end the turn, or None.
         self.stages = (self._risk_lock, self._input_guard, self._language, self._learned_policy, self._track_focus,
@@ -301,6 +319,7 @@ class Chatbot:
         if g.action == "block":
             if any(r.startswith("prompt_attack") for r in g.reasons):   # off-topic is not an attack
                 cs.memory.risk = next_score(cs.memory.risk, attack=True, text=ctx.text)
+                self._event(cs, "prompt_injection", "high", "blocked", g.reasons, resource="user_message")
             return Reply(g.text, "input_guardrail", g.reasons)
         ctx.text = g.text      # the guard may mask more (Bedrock anonymizer)
         ctx.notes += g.reasons
@@ -415,6 +434,11 @@ class Chatbot:
             sp.set(finbot__verify__action=gate.action, finbot__repaired=gate.repaired,
                    finbot__records_only=gate.records_only, finbot__reasons=tel.codes(gate.reasons))
         tool_log, answer = gate.tool_log, gate.answer
+        if unsafe := sorted(_security_codes(gate.reasons)):
+            # The model wrote something an injection would want (a planted link, a request for a
+            # secret, a contact lure). Blocked or repaired either way; worth a security event.
+            self._event(cs, "unsafe_output", "high", gate.action if not gate.repaired else "repaired", unsafe,
+                        resource="answer")
         if gate.records_only:
             cs.pending_notice = ("Your previous answer was withheld by the evidence check; the user saw a "
                                  "summary of the record written by code.")
@@ -426,6 +450,7 @@ class Chatbot:
         answer = mask_pii(answer)[0]  # local pass on every provider; Bedrock's anonymizer is a second layer
         if leaks_prompt(answer, SYSTEM_PROMPT):  # canary: an injection that got the model to recite its rules
             cs.pending_notice = "Your previous answer was withheld: it repeated your instructions."
+            self._event(cs, "prompt_leak", "high", "blocked", ["prompt_leak"], resource="answer")
             return Reply(BLOCKED_OUTPUT_MSG, "output_guardrail", ["prompt_leak"], tool_log, route=route)
         grounding = "\n".join(json.dumps(c["result"]) for c in tool_log if c["result"]["status"] == "found")
         g_out = self._guard(self.guard.check_output, answer, grounding, text)
@@ -471,12 +496,15 @@ class Chatbot:
                 with self.telemetry.span(f"execute_tool {b.name}", gen_ai__operation__name="execute_tool",
                                          gen_ai__tool__name=b.name) as sp:
                     res = self._provenance(cs, b.name, dict(b.input)) or \
+                        self.security.check(cs, b.name, dict(b.input), tool_log) or \
                         self.screen.sanitize(b.name, run_tool(b.name, dict(b.input)))
                     sp.set(finbot__tool__status=res["status"],
                            finbot__tool__refused_by=res.get("source") if res["status"] == "refused" else None,
                            finbot__tool__screened=len(res.get("screened") or []) or None)
                 cs.memory.ingest_tool_result(b.name, dict(b.input), res)
                 tool_log.append({"name": b.name, "input": dict(b.input), "result": res})
+                turn = current_turn()
+                self.security.observe(cs, b.name, res, turn.policy.risk_threshold if turn else BASELINE.risk_threshold)
                 results.append({"type": "tool_result", "tool_use_id": b.id,
                                 "content": ToolResultScreen.wrap(res, cs.nonce or ToolResultScreen.new_nonce()),
                                 "is_error": res["status"] == "error"})
@@ -484,6 +512,11 @@ class Chatbot:
         else:
             answer = BLOCKED_OUTPUT_MSG
         return answer or BLOCKED_OUTPUT_MSG  # never send an empty reply
+
+    def _event(self, cs: ChatSession, event_class: str, severity: str, decision: str, reasons, resource: str) -> None:
+        self.security.events.emit(event_class, severity, tenant=cs.session.tenant_id,
+                                  session_id=cs.session.session_id, subject=cs.session.subject,
+                                  resource=resource, decision=decision, reasons=reasons)
 
     def _provenance(self, cs: ChatSession, tool: str, args: dict) -> dict | None:
         """Refuse a tool call whose transaction id the user never typed. An instruction planted

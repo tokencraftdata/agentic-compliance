@@ -77,6 +77,7 @@ finbot/freshness.py      stale help pages, and help pages that disagree with the
 finbot/opsmetrics.py     repair, record-answer, refusal and handoff rates from the turn audit log
 finbot/untrusted.py      prompt-injection defences: normalise + screen, tool-result sanitising, spotlighting, leak canary
 finbot/provenance.py     value provenance: third-party text in tool results cannot vouch for a stated fact
+finbot/security_gateway.py tool-call decisions (schema, rules, approval), behaviour monitor, security events
 finbot/tenancy.py        request tenant scope; session data only through per-tenant credentials (IAM LeadingKeys)
 finbot/cache.py          cache port (memory, Redis/Valkey): help-page searches and breaker health only, never records
 finbot/telemetry.py      AI observability: OpenTelemetry GenAI spans, no prompts, answers or record data
@@ -134,6 +135,7 @@ docs/reliability.md      crash recovery, session store, hallucination control
 docs/design.svg          design diagram: layers, control plane, ingestion
 docs/security.md         prompt injection, red-team results, other controls, research references
 docs/design.md           layers, design patterns, control plane, DynamoDB, security, ingestion, where Claude is used
+docs/agent-security.md   guardrails platform design and twelve agent-security questions, answered from the code
 docs/platform-design.md  agent orchestration platform (Kafka, worker pools, leases, cancellation) and
                          multi-tenant AI platform (isolation, quotas, noisy neighbors, leakage)
 docs/technical-design.md components, interfaces, data model, verification, resiliency, caching, AI observability,
@@ -157,6 +159,7 @@ tests/test_operations.py    9 tests: context budget, session-store limits, ticke
 tests/test_pci.py           13 tests: card data masked on every path (history, audit, tickets, review queue)
 tests/test_research.py      8 tests: argument provenance, multi-turn attacks, code-built recap, pass^k
 tests/test_provenance.py    12 tests: third-party text cannot vouch for an amount, date, phone or email
+tests/test_security_gateway.py 12 tests: argument validation, deny and approval rules, bulk access, behaviour lock, events
 tests/test_tenancy.py   17 tests: tenant-first ids, tenant-bound encryption, scoped data access, shared rate limits
 tests/test_cancellation.py  6 tests: cancel before start or mid-turn, resend after cancel, owner only, HTTP
 tests/test_cache_telemetry.py  14 tests: what is cached, cache outages, records never cached, GenAI spans hold no content
@@ -172,7 +175,7 @@ tests/test_infra.py          6 tests: ALB TLS and hardening, WAF rules, KMS rota
                             bucket (needs aws-cdk-lib)
 ```
 
-405 tests in all.
+417 tests in all.
 
 ## Design
 

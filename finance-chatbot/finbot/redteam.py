@@ -50,6 +50,7 @@ def build_bot(case: dict, config: str, policy=None):
     if config == "undefended":
         bot.gate = HallucinationGate(VerifierChain([]), repair_attempts=0)
         bot.check_provenance = False
+        bot.security.check = lambda *a, **k: None    # no tool-call gateway either
     return bot, model
 
 

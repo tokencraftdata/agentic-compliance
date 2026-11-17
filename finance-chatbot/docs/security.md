@@ -128,6 +128,7 @@ Both are fixed, and a regression test now screens every knowledge-base chunk. Se
 |---|---|
 | Authentication: JWT signature, alg, exp, nbf, iss, aud; HS256 for dev, JWKS for production; HS256 key rotation by `kid`; revocation by token id or by subject, shared by every pod | done (`security.py`); section 5 |
 | Agent identity: per-turn delegation grant (user + agent + tenant + session + scopes, 5 min), checked before every tool call; scopes narrow per token; the agent can never hold a write scope | done (`agent_identity.py`); section 5 |
+| Central security gateway: every tool call checked against its schema and deployment rules, sensitive calls held for human approval, session behaviour scored, one security event stream | done (`security_gateway.py`); [agent-security.md](agent-security.md) |
 | Encryption at rest: AES-256-GCM envelope encryption with KMS of session state, user text, answers and turn metadata, bound to tenant, session and purpose | done (`crypto.py`); section 5 |
 | Authorization: deny by default; an unknown session and another tenant's session give the same 403 | done (`service.py`) |
 | Secrets: IAM roles through the boto3 default chain, no static keys; production sign-in verifies with the identity provider's public keys (JWKS), so no shared secret is stored. The HS256 secret is for development only and comes from the environment | done in code; roles and the identity provider are set up in AWS |

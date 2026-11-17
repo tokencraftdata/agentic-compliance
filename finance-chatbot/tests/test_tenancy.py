@@ -175,7 +175,9 @@ class SharedLimits(unittest.TestCase):
 
     def test_limit_holds_across_pods_sqlite(self):
         clock = Clock()
-        self.check_shared(SessionStore(clock=clock), clock)
+        store = SessionStore(clock=clock)
+        self.addCleanup(store.close)
+        self.check_shared(store, clock)
 
     def test_limit_holds_across_pods_dynamodb(self):
         clock = Clock()
@@ -184,7 +186,9 @@ class SharedLimits(unittest.TestCase):
     def test_window_slides(self):
         clock = Clock()
         clock.t = 1_000_040.0                          # 20 s into a minute (1_000_020 is a boundary)
-        lim = SharedRateLimiter(SessionStore(clock=clock), 5, 1000, clock=clock)
+        store = SessionStore(clock=clock)
+        self.addCleanup(store.close)
+        lim = SharedRateLimiter(store, 5, 1000, clock=clock)
         for _ in range(5):
             lim.check("u1", "m_100")
         clock.t += 60                                  # next window, a third of the way in

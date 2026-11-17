@@ -64,6 +64,8 @@ class Settings:
     # pod: in-process buckets; shared: counters in the session store (exact across pods);
     # auto: shared with the DynamoDB store, pod otherwise.
     # IAM role confined to one tenant's session items; set it to enforce isolation below the app.
+    # Tool-call rules for the security gateway: JSON list of {id, tool, roles, effect, reason}.
+    tool_policy_path: str = field(default_factory=lambda: _env("FINBOT_TOOL_POLICY"))
     tenant_role_arn: str = field(default_factory=lambda: _env("FINBOT_TENANT_ROLE_ARN"))
     rate_scope: str = field(default_factory=lambda: _env("FINBOT_RATE_SCOPE", "auto"))
 

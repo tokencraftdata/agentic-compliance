@@ -52,6 +52,7 @@ person); advice, rules interpretation or discretionary decisions; model training
 | `memory.py` | Typed session state: entities, facts with provenance, focus, user-typed ids, tickets | — |
 | `agent_identity.py` | Per-turn delegation grant, verified at every tool call | — |
 | `crypto.py` | Envelope encryption (AES-256-GCM, KMS-wrapped data keys), bound to tenant, session and purpose | KMS |
+| `security_gateway.py` | Decides on every tool call (schema, rules, bulk access, human approval), watches session behaviour, writes security events | `tickets.py`, `auditlog.py` |
 | `tenancy.py` | Request tenant scope; session items through per-tenant credentials | STS, IAM |
 | `store.py`, `store_dynamo.py` | Session store: SQLite or DynamoDB behind one contract | — |
 | `adaptive/` | Learned guard rules: proposals, gate, shadow, canary, rollback; session risk score | eval and red-team suites |
@@ -117,7 +118,7 @@ Reply body:
 ```
 
 `blocked_by` is one of `null` (answered), `input_guardrail`, `output_guardrail`,
-`evidence_guard`, `escalation`, `language`, `write_request`, `session_risk`, `unavailable`, `cancelled`. On
+`evidence_guard`, `escalation`, `language`, `write_request`, `session_risk`, `unavailable`, `cancelled`. A tool call held for approval comes back to the model as a `refused` envelope with a ticket id. On
 `unavailable` the reply carries `retry_after_s` and the turn is not committed, so resending the
 same `msg_id` later gets a real answer. `dlp` lists categories found in the request, never values.
 
@@ -346,6 +347,7 @@ Selected settings (`finbot/config.py`; all `FINBOT_*` environment variables):
 | `FINBOT_AUTH`, `FINBOT_AUTH_JWKS_URL`, `FINBOT_AUTH_ISSUER`, `FINBOT_AUTH_AUDIENCE` | hmac | token verification |
 | `FINBOT_ENCRYPTION`, `FINBOT_KMS_KEY_ID`, `FINBOT_ENCRYPTION_REQUIRED` | — | envelope encryption |
 | `FINBOT_RATE_USER_PER_MIN`, `FINBOT_RATE_TENANT_PER_MIN`, `FINBOT_RATE_SCOPE` | 30, 600, auto | rate limits; `auto` counts in the shared store with DynamoDB |
+| `FINBOT_TOOL_POLICY` | — | JSON rules for the security gateway: `{id, tool, roles, effect: deny|approve, reason}` |
 | `FINBOT_TENANT_ROLE_ARN` | — | session items only through per-tenant credentials (IAM-enforced isolation) |
 | `FINBOT_KB_MAX_AGE_DAYS` | 540 | when a cited help page counts as stale |
 | `FINBOT_QUEUE_URL` | — | turn queue for workers |
@@ -464,7 +466,7 @@ starting point.
 
 | Suite | What it covers | Result (offline) |
 |---|---|---|
-| Unit and integration tests | 405 tests across 25 files | all pass |
+| Unit and integration tests | 417 tests across 26 files | all pass |
 | Evaluation sets | lookups, not found, tenant isolation, context switches, PII, retry and routing advice, review withholding, domains | 41/41 dev, 185/185 held-out, 192/192 and 184/184 on two unseen data sets |
 | Hallucination stress test | 12 kinds of injected errors | 0 of 392 and 0 of 1,867 reached the user; 0 of 3,774 on the unseen sets |
 | False-block probe | every failed payment and domain record, both roles | 0 of 2,876 correct answers blocked |

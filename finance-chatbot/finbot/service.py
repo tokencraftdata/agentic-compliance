@@ -95,6 +95,13 @@ class ChatService:
         auditlog.write(self.audit_path, "dlp", {
             "subject": p.subject, "tenant_id": p.tenant_id, "session_id": session_id, "msg_id": msg_id,
             "request": inbound.as_dict(), "response": outbound.as_dict(), "egress_leak": outbound.pci})
+        events = self.worker.bot.security.events
+        if inbound.found:
+            events.emit("sensitive_data", "low", tenant=p.tenant_id, session_id=session_id, subject=p.subject,
+                        resource="user_message", decision="masked", reasons=sorted(inbound.found))
+        if outbound.pci:   # an internal path failed to mask card data
+            events.emit("egress_leak", "critical", tenant=p.tenant_id, session_id=session_id, subject=p.subject,
+                        resource="answer", decision="masked", reasons=sorted(outbound.found))
 
     # ------------------------------------------------------------------ token revocation (admin)
 
