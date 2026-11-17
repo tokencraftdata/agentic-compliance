@@ -77,6 +77,7 @@ finbot/freshness.py      stale help pages, and help pages that disagree with the
 finbot/opsmetrics.py     repair, record-answer, refusal and handoff rates from the turn audit log
 finbot/untrusted.py      prompt-injection defences: normalise + screen, tool-result sanitising, spotlighting, leak canary
 finbot/provenance.py     value provenance: third-party text in tool results cannot vouch for a stated fact
+finbot/tenancy.py        request tenant scope; session data only through per-tenant credentials (IAM LeadingKeys)
 finbot/cache.py          cache port (memory, Redis/Valkey): help-page searches and breaker health only, never records
 finbot/telemetry.py      AI observability: OpenTelemetry GenAI spans, no prompts, answers or record data
 finbot/queue.py          queue worker (SQS / in-memory): ack, retry-later, dead-letter
@@ -156,6 +157,7 @@ tests/test_operations.py    9 tests: context budget, session-store limits, ticke
 tests/test_pci.py           13 tests: card data masked on every path (history, audit, tickets, review queue)
 tests/test_research.py      8 tests: argument provenance, multi-turn attacks, code-built recap, pass^k
 tests/test_provenance.py    12 tests: third-party text cannot vouch for an amount, date, phone or email
+tests/test_tenancy.py   17 tests: tenant-first ids, tenant-bound encryption, scoped data access, shared rate limits
 tests/test_cancellation.py  6 tests: cancel before start or mid-turn, resend after cancel, owner only, HTTP
 tests/test_cache_telemetry.py  14 tests: what is cached, cache outages, records never cached, GenAI spans hold no content
 tests/test_tickets.py       14 tests: write requests become tickets; desk claim and resolve
@@ -170,7 +172,7 @@ tests/test_infra.py          6 tests: ALB TLS and hardening, WAF rules, KMS rota
                             bucket (needs aws-cdk-lib)
 ```
 
-387 tests in all.
+405 tests in all.
 
 ## Design
 

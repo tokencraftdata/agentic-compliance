@@ -81,6 +81,15 @@ class Stack(unittest.TestCase):
         self.assertIn("dynamodb:PutItem", self.json)
         self.assertIn("ApiRolePolicy", self.json)
 
+    def test_session_items_need_the_tenant_role(self):
+        # Pod roles: shared items only. Session items: the tenant role, confined by session tag.
+        self.assertIn('"S#${aws:PrincipalTag/tenant_id}.*"', self.json)
+        self.assertIn('"H#*"', self.json)
+        self.assertNotIn('"dynamodb:Scan"', self.json)
+        self.t.has_resource_properties("AWS::IAM::Role", {"RoleName": "finbot-tenant-data"})
+        self.assertIn("sts:TagSession", self.json)
+        self.assertIn("aws:RequestTag/tenant_id", self.json)
+
     def test_audit_bucket_is_write_once(self):
         self.t.has_resource_properties(
             "AWS::S3::Bucket",

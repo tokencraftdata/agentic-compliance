@@ -31,7 +31,7 @@ import threading
 import time
 from collections.abc import Callable
 
-from .crypto import Codec, PlainCodec, ctx
+from .crypto import Codec, PlainCodec, ctx, session_tenant
 from .pii import mask_pii
 
 
@@ -63,6 +63,8 @@ CREATE TABLE IF NOT EXISTS model_health (
   name TEXT PRIMARY KEY, opened_at REAL, cooldown REAL NOT NULL, updated REAL NOT NULL);
 CREATE TABLE IF NOT EXISTS control (
   key TEXT PRIMARY KEY, value TEXT NOT NULL, updated REAL NOT NULL);
+CREATE TABLE IF NOT EXISTS counters (
+  key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires REAL NOT NULL);
 CREATE TABLE IF NOT EXISTS actions (
   op_id TEXT PRIMARY KEY, session_id TEXT NOT NULL, msg_id TEXT, kind TEXT NOT NULL,
   params TEXT, status TEXT NOT NULL, result TEXT, updated REAL NOT NULL);
@@ -114,6 +116,8 @@ class SessionStore:
     # ---------------------------------------------------------------- sessions
 
     def create(self, session_id: str, tenant_id: str, state: dict) -> None:
+        if (named := session_tenant(session_id)) is not None and named != tenant_id:
+            raise ValueError("session id names a different tenant")   # the id's tenant is trusted later
         now = self.clock()
         with self._tx() as db:
             db.execute("INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?)",
@@ -225,6 +229,20 @@ class SessionStore:
     def read_control(self, key: str) -> dict | None:
         r = self.db.execute("SELECT value FROM control WHERE key=?", (key,)).fetchone()
         return json.loads(r[0]) if r else None
+
+    # ---------------------------------------------------------------- shared counters (rate limits)
+
+    def incr_counter(self, key: str, ttl_s: float) -> int:
+        now = self.clock()
+        with self._tx() as db:
+            db.execute("DELETE FROM counters WHERE expires < ?", (now - 3600,))   # keep the table small
+            db.execute("INSERT INTO counters VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET count = count + 1",
+                       (key, now + ttl_s))
+            return int(db.execute("SELECT count FROM counters WHERE key=?", (key,)).fetchone()[0])
+
+    def read_counter(self, key: str) -> int:
+        r = self.db.execute("SELECT count, expires FROM counters WHERE key=?", (key,)).fetchone()
+        return int(r[0]) if r and r[1] > self.clock() else 0
 
     # ---------------------------------------------------------------- side effects
 

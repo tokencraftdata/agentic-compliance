@@ -36,6 +36,7 @@ from dataclasses import dataclass, field
 from .pii import mask_value
 from .runtime import Worker
 from .store import LeaseHeld, SessionExpired, StaleWrite
+from .tenancy import TenantViolation, tenant_scope
 
 log = logging.getLogger("finbot.queue")
 
@@ -154,11 +155,16 @@ class QueueConsumer:
             self.stats.dead_lettered += 1
             return
         try:
-            if self.worker.store.tenant_of(b["session_id"]) != b["tenant_id"]:
-                self.source.dead_letter(m, "tenant mismatch")  # forged or corrupted message: never process
-                self.stats.dead_lettered += 1
-                return
-            r = self.worker.handle(b["session_id"], b["msg_id"], b["text"])   # handle() masks card data
+            with tenant_scope(str(b.get("tenant_id") or "")):   # data access only for the message's tenant
+                if self.worker.store.tenant_of(b["session_id"]) != b["tenant_id"]:
+                    self.source.dead_letter(m, "tenant mismatch")  # forged or corrupted message: never process
+                    self.stats.dead_lettered += 1
+                    return
+                r = self.worker.handle(b["session_id"], b["msg_id"], b["text"])   # handle() masks card data
+        except TenantViolation as e:
+            self.source.dead_letter(m, f"tenant violation: {e}")
+            self.stats.dead_lettered += 1
+            return
         except (KeyError, SessionExpired) as e:
             self.source.dead_letter(m, f"session gone: {type(e).__name__}")
             self.stats.dead_lettered += 1

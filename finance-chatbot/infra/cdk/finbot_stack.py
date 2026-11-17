@@ -163,8 +163,54 @@ class FinbotStack(Stack):
             enforce_ssl=True,
             dead_letter_queue=sqs.DeadLetterQueue(queue=dlq, max_receive_count=5),
         )
+        # Tenant isolation in IAM (finbot/tenancy.py). Session items are keyed "S#<tenant>.<uuid>".
+        # The pod roles may touch only shared items (breaker health, control, rate counters);
+        # session items need the tenant data role, assumed per request with the session tag
+        # tenant_id taken from the verified caller, and confined to that tenant's keys.
+        ddb_actions = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem",
+                       "dynamodb:Query", "dynamodb:ConditionCheckItem"]
+        via_dynamodb = {"StringEquals": {"kms:ViaService": f"dynamodb.{self.region}.amazonaws.com"}}
+        kms_for_table = ["kms:Decrypt", "kms:Encrypt", "kms:GenerateDataKey*", "kms:ReEncrypt*", "kms:DescribeKey"]
+        tenant_role = iam.Role(
+            self,
+            "TenantDataRole",
+            role_name="finbot-tenant-data",
+            max_session_duration=Duration.hours(1),
+            assumed_by=iam.CompositePrincipal(
+                iam.ArnPrincipal(api_role.role_arn), iam.ArnPrincipal(worker_role.role_arn)
+            ).with_session_tags(),
+            description="finbot session data for one tenant at a time (session tag tenant_id)",
+        )
+        tenant_role.add_to_policy(
+            iam.PolicyStatement(
+                actions=ddb_actions + ["dynamodb:TransactWriteItems"],
+                resources=[table.table_arn],
+                conditions={
+                    "ForAllValues:StringLike": {"dynamodb:LeadingKeys": ["S#${aws:PrincipalTag/tenant_id}.*"]}
+                },
+            )
+        )
+        tenant_role.add_to_policy(
+            iam.PolicyStatement(actions=kms_for_table, resources=[data_key.key_arn], conditions=via_dynamodb)
+        )
         for role in (api_role, worker_role):
-            table.grant_read_write_data(role)
+            role.add_to_principal_policy(
+                iam.PolicyStatement(
+                    actions=ddb_actions,
+                    resources=[table.table_arn],
+                    conditions={"ForAllValues:StringLike": {"dynamodb:LeadingKeys": ["H#*", "C#*", "R#*"]}},
+                )
+            )
+            role.add_to_principal_policy(
+                iam.PolicyStatement(actions=kms_for_table, resources=[data_key.key_arn], conditions=via_dynamodb)
+            )
+            role.add_to_principal_policy(
+                iam.PolicyStatement(
+                    actions=["sts:AssumeRole", "sts:TagSession"],
+                    resources=[tenant_role.role_arn],
+                    conditions={"StringLike": {"aws:RequestTag/tenant_id": "?*"}},
+                )
+            )
         queue.grant_send_messages(api_role)
         queue.grant_consume_messages(worker_role)
         dlq.grant_send_messages(worker_role)

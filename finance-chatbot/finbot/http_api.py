@@ -40,8 +40,8 @@ from .store import LeaseHeld, StaleWrite
 log = logging.getLogger("finbot.http")
 
 MAX_BODY = 16 * 1024
-SESSION = re.compile(r"^/v1/sessions/([A-Za-z0-9-]{8,64})/messages$")
-CANCEL = re.compile(r"^/v1/sessions/([A-Za-z0-9-]{8,64})/cancel$")
+SESSION = re.compile(r"^/v1/sessions/([A-Za-z0-9_.-]{8,128})/messages$")
+CANCEL = re.compile(r"^/v1/sessions/([A-Za-z0-9_.-]{8,128})/cancel$")
 REQUEST_ID = re.compile(r"^[A-Za-z0-9-]{8,64}$")
 SECURITY_HEADERS = [
     ("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload"),

@@ -61,6 +61,11 @@ class Settings:
     # Rate limits per verified user and per tenant (finbot/ratelimit.py); 0 turns them off.
     rate_user_per_min: float = field(default_factory=lambda: float(_env("FINBOT_RATE_USER_PER_MIN", "30")))
     rate_tenant_per_min: float = field(default_factory=lambda: float(_env("FINBOT_RATE_TENANT_PER_MIN", "600")))
+    # pod: in-process buckets; shared: counters in the session store (exact across pods);
+    # auto: shared with the DynamoDB store, pod otherwise.
+    # IAM role confined to one tenant's session items; set it to enforce isolation below the app.
+    tenant_role_arn: str = field(default_factory=lambda: _env("FINBOT_TENANT_ROLE_ARN"))
+    rate_scope: str = field(default_factory=lambda: _env("FINBOT_RATE_SCOPE", "auto"))
 
     # Audit log hash chain: HMAC key for the chain (finbot/auditlog.py). Empty: plain SHA-256.
     audit_key: str = field(default_factory=lambda: _env("FINBOT_AUDIT_KEY"), repr=False)

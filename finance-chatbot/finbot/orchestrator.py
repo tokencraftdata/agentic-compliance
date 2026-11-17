@@ -237,7 +237,9 @@ class Chatbot:
         return self._wrapped[1]
 
     def new_session(self, tenant_id: str, groups: list[str], role: str = "support") -> ChatSession:
-        return ChatSession(Session(str(uuid.uuid4()), tenant_id, groups, role))
+        # The id starts with the tenant: tenant-first storage keys (an IAM condition can then
+        # confine a role to one tenant's rows) and the tenant in the encryption context.
+        return ChatSession(Session(f"{tenant_id}.{uuid.uuid4()}", tenant_id, groups, role))
 
     # ------------------------------------------------------------------ main
 

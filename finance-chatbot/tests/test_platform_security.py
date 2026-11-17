@@ -160,7 +160,7 @@ class EncryptedStores(unittest.TestCase):
                                                           "SELECT meta FROM turns") for v in row)
             self.assertNotIn(DECLINED, dump)
             self.assertNotIn("declined", dump)
-            self.assertIn("fbenc1:", dump)
+            self.assertIn("fbenc2:", dump)   # tenant-bound envelope
 
     def test_dynamo_items_hold_no_plaintext(self):
         table = InMemoryDynamo()
@@ -168,7 +168,7 @@ class EncryptedStores(unittest.TestCase):
         self._turn(store)
         dump = json.dumps(list(table.items.values()))
         self.assertNotIn(DECLINED, dump)
-        self.assertIn("fbenc1:", dump)
+        self.assertIn("fbenc2:", dump)   # tenant-bound envelope
 
 
 # --------------------------------------------------------------------- identity: rotation, revocation

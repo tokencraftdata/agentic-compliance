@@ -128,14 +128,14 @@ Both are fixed, and a regression test now screens every knowledge-base chunk. Se
 |---|---|
 | Authentication: JWT signature, alg, exp, nbf, iss, aud; HS256 for dev, JWKS for production; HS256 key rotation by `kid`; revocation by token id or by subject, shared by every pod | done (`security.py`); section 5 |
 | Agent identity: per-turn delegation grant (user + agent + tenant + session + scopes, 5 min), checked before every tool call; scopes narrow per token; the agent can never hold a write scope | done (`agent_identity.py`); section 5 |
-| Encryption at rest: AES-256-GCM envelope encryption with KMS of session state, user text, answers and turn metadata, bound to session and purpose | done (`crypto.py`); section 5 |
+| Encryption at rest: AES-256-GCM envelope encryption with KMS of session state, user text, answers and turn metadata, bound to tenant, session and purpose | done (`crypto.py`); section 5 |
 | Authorization: deny by default; an unknown session and another tenant's session give the same 403 | done (`service.py`) |
 | Secrets: IAM roles through the boto3 default chain, no static keys; production sign-in verifies with the identity provider's public keys (JWKS), so no shared secret is stored. The HS256 secret is for development only and comes from the environment | done in code; roles and the identity provider are set up in AWS |
 | PII / PCI: card data masked at every edge; see section 4a | done (`guardrails.mask_pii`, `tests/test_pci.py`) |
 | Audit: blocked reasons, tools, screened fields per turn; hash-chained (HMAC with `FINBOT_AUDIT_KEY`), checked by `scripts/verify_audit.py`; shipped to S3 Object Lock | done (`auditlog.py`, `infra/cdk`) |
 | DLP: every request and every response scanned at the service boundary (PCI, PII, secrets); card data in a response is masked and raised as `egress_leak` | done (`dlp.py`); section 5 |
 | Lockout after repeated blocked injections | done (session risk score, `adaptive/risk.py`) |
-| Rate limiting per verified user and tenant (token bucket; 429 + Retry-After); per IP at the WAF | done (`ratelimit.py`, `infra/cdk`) |
+| Rate limiting per verified user and tenant (sliding window in the shared store, exact across pods; 429 + Retry-After); per IP at the WAF | done (`ratelimit.py`, `infra/cdk`) |
 | Edge: ALB with TLS 1.2+ (strong ciphers), HTTP redirected, invalid headers dropped, strictest desync mitigation; WAF with managed rule groups, per-IP rate rule, body size, token-in-URL and unknown-path rules | done (`infra/cdk`), not deployed |
 | HTTP adapter: JSON only, 16 KB bodies, strict path and request-id patterns, no query strings, fixed error messages, security headers | done (`http_api.py`) |
 | Write actions: none in the bot; change requests become tickets a person executes (`actions.py`, `tickets.py`) | done |

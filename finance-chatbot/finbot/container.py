@@ -231,10 +231,18 @@ class Container:
     def limiter(self):
         import time
 
-        from .ratelimit import RateLimiter
+        from .ratelimit import RateLimiter, SharedRateLimiter
         s = self.settings
-        return self._get("limiter", lambda: RateLimiter(s.rate_user_per_min, s.rate_tenant_per_min,
-                                                        self.clock or time.time) if s.rate_user_per_min else None)
+
+        def build():
+            if not s.rate_user_per_min:
+                return None
+            shared = s.rate_scope == "shared" or (s.rate_scope == "auto" and s.store_provider == "dynamodb")
+            if shared:
+                return SharedRateLimiter(self.store, s.rate_user_per_min, s.rate_tenant_per_min,
+                                         self.clock or time.time)
+            return RateLimiter(s.rate_user_per_min, s.rate_tenant_per_min, self.clock or time.time)
+        return self._get("limiter", build)
 
     @cached_property
     def service(self):

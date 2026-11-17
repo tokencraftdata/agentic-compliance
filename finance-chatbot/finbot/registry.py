@@ -14,7 +14,7 @@ to the orchestration code (open/closed principle).
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 T = TypeVar("T")
 
@@ -98,7 +98,12 @@ def _dynamo_store(settings, clock=None, **_):
 
     from .crypto import make_codec
     from .store_dynamo import Boto3Dynamo, DynamoSessionStore
-    return DynamoSessionStore(Boto3Dynamo(settings.dynamo_table, settings.aws_region), clock=clock or time.time,
+    table: Any = Boto3Dynamo(settings.dynamo_table, settings.aws_region)
+    if settings.tenant_role_arn:     # session items only through per-tenant credentials (finbot/tenancy.py)
+        from .tenancy import AssumedRoleTables, TenantScopedTable
+        table = TenantScopedTable(table, AssumedRoleTables(settings.dynamo_table, settings.aws_region,
+                                                           settings.tenant_role_arn))
+    return DynamoSessionStore(table, clock=clock or time.time,
                               codec=make_codec(settings))
 
 

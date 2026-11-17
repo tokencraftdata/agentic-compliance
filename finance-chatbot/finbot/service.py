@@ -21,6 +21,7 @@ from .ratelimit import RateLimiter
 from .runtime import Worker
 from .security import Authorizer, Forbidden, Principal, Revocations
 from .store import SessionExpired
+from .tenancy import TenantViolation, tenant_scope
 
 MSG_ID = re.compile(r"^[A-Za-z0-9_-]{8,64}$")
 MAX_TEXT = 4000
@@ -52,10 +53,16 @@ class ChatService:
     def start(self, token: str) -> str:
         p = self._limited(token)
         self.authz.can_chat(p)
-        return self.worker.start_session(p.tenant_id, list(p.groups), p.role, p.subject, list(p.scopes) or None)
+        with tenant_scope(p.tenant_id):          # data access below runs for the caller's tenant only
+            return self.worker.start_session(p.tenant_id, list(p.groups), p.role, p.subject,
+                                             list(p.scopes) or None)
 
     def send(self, token: str, session_id: str, msg_id: str, text: str) -> dict:
         p = self._limited(token)
+        with tenant_scope(p.tenant_id):
+            return self._send(p, session_id, msg_id, text)
+
+    def _send(self, p: Principal, session_id: str, msg_id: str, text: str) -> dict:
         self._own(p, session_id)
         if not MSG_ID.match(msg_id or ""):
             raise BadRequest("msg_id must be 8-64 chars of [A-Za-z0-9_-] (client-generated, reused on resend)")
@@ -72,10 +79,11 @@ class ChatService:
     def cancel(self, token: str, session_id: str, msg_id: str) -> dict:
         """Stop a turn in flight (or one still queued). The owner of the session only."""
         p = self._limited(token)
-        self._own(p, session_id)
-        if not MSG_ID.match(msg_id or ""):
-            raise BadRequest("msg_id must be 8-64 chars of [A-Za-z0-9_-]")
-        self.worker.cancel(session_id, msg_id, by=p.subject)
+        with tenant_scope(p.tenant_id):
+            self._own(p, session_id)
+            if not MSG_ID.match(msg_id or ""):
+                raise BadRequest("msg_id must be 8-64 chars of [A-Za-z0-9_-]")
+            self.worker.cancel(session_id, msg_id, by=p.subject)
         return {"cancelled": msg_id}
 
     def _audit_dlp(self, p: Principal, session_id: str, msg_id: str, inbound: dlp.DlpReport,
@@ -108,7 +116,7 @@ class ChatService:
     def _own(self, p: Principal, session_id: str) -> None:
         try:
             tenant = self.worker.store.tenant_of(session_id)
-        except (KeyError, SessionExpired):
+        except (KeyError, SessionExpired, TenantViolation):   # another tenant's session looks missing
             raise Forbidden("session not found or not yours") from None
         self.authz.can_use_session(p, tenant)
 

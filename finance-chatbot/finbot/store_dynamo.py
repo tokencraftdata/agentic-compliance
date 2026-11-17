@@ -38,7 +38,7 @@ from collections.abc import Callable
 from decimal import Decimal
 from typing import Any, Protocol
 
-from .crypto import Codec, PlainCodec, ctx
+from .crypto import Codec, PlainCodec, ctx, session_tenant
 from .pii import mask_pii
 from .store import LeaseHeld, SessionExpired, StaleWrite
 
@@ -72,6 +72,8 @@ class DynamoTable(Protocol):
 
     def transact_put(self, writes: list[tuple[dict, Cond]]) -> None: ...
 
+    def add(self, pk: str, sk: str, n: int, expires: float) -> int: ...   # atomic counter; returns the new value
+
 
 # ------------------------------------------------------------------ boto3 adapter
 
@@ -98,12 +100,12 @@ def _from_dynamo(v):
 class Boto3Dynamo:
     """Adapter: DynamoTable port -> boto3. IAM role credentials (no static keys)."""
 
-    def __init__(self, table: str, region: str):
+    def __init__(self, table: str, region: str, client=None):
         import boto3  # lazy
         from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
         from botocore.config import Config
         cfg = Config(retries={"mode": "adaptive", "max_attempts": 5}, connect_timeout=2, read_timeout=5)
-        self.client = boto3.client("dynamodb", region_name=region, config=cfg)
+        self.client = client or boto3.client("dynamodb", region_name=region, config=cfg)
         self.table, self._ser, self._de = table, TypeSerializer(), TypeDeserializer()
         self._exc = self.client.exceptions
 
@@ -147,6 +149,14 @@ class Boto3Dynamo:
             if "LastEvaluatedKey" not in r:
                 return out
             kw = {"ExclusiveStartKey": r["LastEvaluatedKey"]}
+
+    def add(self, pk, sk, n, expires):
+        r = self.client.update_item(
+            TableName=self.table, Key=self._enc({"pk": pk, "sk": sk}), ReturnValues="UPDATED_NEW",
+            UpdateExpression="ADD #c :n SET #e = if_not_exists(#e, :e)",
+            ExpressionAttributeNames={"#c": "count", "#e": "expires"},
+            ExpressionAttributeValues=self._enc({":n": n, ":e": int(expires)}))
+        return int(self._dec(r["Attributes"])["count"])
 
     def transact_put(self, writes):
         items = [{"Put": {"TableName": self.table, "Item": self._enc(_strip_none(i)), **self._cond_kw(c, self._enc)}}
@@ -255,6 +265,12 @@ class InMemoryDynamo:
             self._check(item, cond)
             self.items[(item["pk"], item["sk"])] = json.loads(json.dumps(_strip_none(item)))
 
+    def add(self, pk, sk, n, expires):
+        with self._lock:
+            item = self.items.setdefault((pk, sk), {"pk": pk, "sk": sk, "count": 0, "expires": int(expires)})
+            item["count"] += n
+            return item["count"]
+
     def query(self, pk, sk_prefix):
         return [json.loads(json.dumps(v)) for (p, s), v in sorted(self.items.items())
                 if p == pk and s.startswith(sk_prefix)]
@@ -289,6 +305,8 @@ class DynamoSessionStore:
     # ---------------------------------------------------------------- sessions
 
     def create(self, session_id, tenant_id, state):
+        if (named := session_tenant(session_id)) is not None and named != tenant_id:
+            raise ValueError("session id names a different tenant")   # the id's tenant is trusted later
         now = self.clock()
         self.t.put({"pk": f"S#{session_id}", "sk": "META", "tenant_id": tenant_id, "version": 0,
                     "owner": None, "lease_until": None,
@@ -420,6 +438,15 @@ class DynamoSessionStore:
     def read_control(self, key):
         r = self.t.get(f"C#{key}", "C")
         return json.loads(r["value"]) if r else None
+
+    # ---------------------------------------------------------------- shared counters (rate limits)
+
+    def incr_counter(self, key: str, ttl_s: float) -> int:
+        return self.t.add(f"R#{key}", "R", 1, self.clock() + ttl_s)
+
+    def read_counter(self, key: str) -> int:
+        r = self.t.get(f"R#{key}", "R")
+        return int(r["count"]) if r and r.get("expires", 0) > self.clock() else 0
 
     # ---------------------------------------------------------------- side effects
 

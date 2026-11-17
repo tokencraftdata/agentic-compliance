@@ -21,6 +21,12 @@ Rotation: seal always uses the provider's active key; open uses the key named in
 
 Values that are not sealed (no "fbenc1:" prefix) are returned as parsed JSON, so turning
 encryption on does not break sessions written before it; `require` refuses them instead.
+
+Tenant binding. Session ids now start with the tenant ("m_100.<uuid>"), and `ctx` adds the
+tenant to the context. Such values are sealed as "fbenc2:"; a value copied into another
+tenant's row does not decrypt, and CloudTrail shows whose data each KMS Decrypt was for.
+"fbenc1:" values, written before tenant binding, still open with the context they were sealed
+under (session and purpose). The prefix is chosen when sealing, so it cannot be downgraded.
 """
 from __future__ import annotations
 
@@ -30,7 +36,17 @@ import os
 from collections.abc import Mapping
 from typing import Any, Protocol
 
-PREFIX = "fbenc1:"
+PREFIX = "fbenc1:"       # context: session, purpose
+PREFIX2 = "fbenc2:"      # context: tenant, session, purpose
+_PREFIXES = (PREFIX2, PREFIX)
+
+
+def _sealed(blob: str) -> str | None:
+    return next((p for p in _PREFIXES if blob.startswith(p)), None)
+
+
+def _legacy(context: Mapping[str, str]) -> dict[str, str]:
+    return {k: v for k, v in context.items() if k != "tenant_id"}
 _NONCE = 12
 
 
@@ -133,21 +149,24 @@ class EnvelopeCipher:
         nonce = os.urandom(_NONCE)
         ct = _aesgcm(dk).encrypt(nonce, json.dumps(obj, separators=(",", ":")).encode(), _aad(context))
         parts = (_b64e(kid.encode()), _b64e(wrapped), _b64e(nonce), _b64e(ct))
-        return PREFIX + ".".join(parts)
+        return (PREFIX2 if "tenant_id" in context else PREFIX) + ".".join(parts)
 
     @staticmethod
     def _parts(blob: str) -> tuple[str, bytes, bytes, bytes]:
         try:
-            kid, wrapped, nonce, ct = blob[len(PREFIX):].split(".")
+            kid, wrapped, nonce, ct = blob[len(_sealed(blob) or PREFIX):].split(".")
             return _b64d(kid).decode(), _b64d(wrapped), _b64d(nonce), _b64d(ct)
         except Exception:  # noqa: BLE001
             raise DecryptionError("malformed envelope") from None
 
     def open(self, blob: str, context: Mapping[str, str]) -> Any:
-        if not blob.startswith(PREFIX):
+        prefix = _sealed(blob)
+        if prefix is None:
             if self.require:
                 raise DecryptionError("value is not encrypted and FINBOT_ENCRYPTION_REQUIRED is set")
             return json.loads(blob)
+        if prefix == PREFIX:                      # sealed before tenant binding
+            context = _legacy(context)
         kid, wrapped, nonce, ct = self._parts(blob)
         dk = self.provider.decrypt_data_key(wrapped, kid, context)
         try:
@@ -157,7 +176,7 @@ class EnvelopeCipher:
 
     def key_id(self, blob: str) -> str | None:
         """Which key wrapped this value (None if not sealed): for rotation reports."""
-        return self._parts(blob)[0] if blob.startswith(PREFIX) else None
+        return self._parts(blob)[0] if _sealed(blob) else None
 
     def rewrap(self, blob: str, context: Mapping[str, str]) -> str:
         return self.seal(self.open(blob, context), context)
@@ -172,7 +191,7 @@ class PlainCodec:
         return json.dumps(obj)
 
     def open(self, blob: str, context: Mapping[str, str]) -> Any:
-        if blob.startswith(PREFIX):
+        if _sealed(blob):
             raise DecryptionError("value is encrypted but FINBOT_ENCRYPTION=none")
         return json.loads(blob)
 
@@ -192,6 +211,14 @@ def make_codec(settings: Any) -> Codec:
     raise ValueError(f"unknown FINBOT_ENCRYPTION {mode!r} (known: none, local, kms)")
 
 
+def session_tenant(session_id: str) -> str | None:
+    """The tenant a session id names ("m_100.<uuid>" -> "m_100"), or None for an older id."""
+    tenant, dot, rest = session_id.rpartition(".")
+    return tenant if dot and tenant and rest else None
+
+
 def ctx(session_id: str, purpose: str) -> dict[str, str]:
-    """The encryption context used by the session stores."""
-    return {"session_id": session_id, "purpose": purpose}
+    """The encryption context used by the session stores: tenant (when the id names one),
+    session and purpose."""
+    tenant = session_tenant(session_id)
+    return {**({"tenant_id": tenant} if tenant else {}), "session_id": session_id, "purpose": purpose}

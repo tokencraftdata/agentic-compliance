@@ -205,7 +205,7 @@ tenant ─┬─ teams ── users (roles)
 
 | Store | Pool-tier partitioning | finbot today |
 |---|---|---|
-| Sessions and state | partition key starts with the tenant: `T#<tenant>#S#<session>` | `S#<session>` with `tenant_id` as an attribute; every read checks it (`tenant_of`) |
+| Sessions and state | partition key starts with the tenant | **done**: session ids are `<tenant>.<uuid>`, so keys are `S#<tenant>.<uuid>`; the store refuses an id naming another tenant |
 | Records via tools | tenant from the session, passed by code, never by the model | yes: tools scope by session tenant; schemas have no tenant field |
 | Vectors | one index or namespace per tenant, or a mandatory tenant filter applied by code | one shared help-page index, filtered by group; it holds no customer data |
 | Objects | `s3://bucket/<tenant>/...`, bucket policy by prefix | audit bucket only |
@@ -213,10 +213,16 @@ tenant ─┬─ teams ── users (roles)
 | Cache | tenant in every key | help-page search cache keyed by groups (shared docs only); records never cached |
 | Logs and traces | tenant attribute, no content | audit and spans carry tenant; spans hold no content (`telemetry.py`) |
 
-**Add:** the tenant-first partition key, and IAM conditions that enforce it below the
-application: DynamoDB `dynamodb:LeadingKeys` and S3 prefix conditions bound to the caller's
-`aws:PrincipalTag/tenant` (attribute-based access control with session tags). Then even a bug in
-the application cannot read another tenant's rows.
+**Done: enforcement below the application** (`finbot/tenancy.py`, `infra/cdk`). The API sets the
+request's tenant from the verified token, and a queue worker from the message (already checked
+against the session). With `FINBOT_TENANT_ROLE_ARN` set, every call on a session item goes
+through credentials from assuming `finbot-tenant-data` with the session tag `tenant_id` = that
+tenant; the role may only touch keys matching `S#${aws:PrincipalTag/tenant_id}.*`
+(`dynamodb:LeadingKeys`). The pod roles may only touch shared items (`H#`, `C#`, `R#`). So another
+tenant's session is refused twice: in code, because the key names a different tenant than the
+request, and in IAM. The tag comes from the request, never from the key being read; a tag taken
+from the key would only compare a session with itself. Still to add: the same for S3 prefixes,
+once tenant documents are stored.
 
 ### B3. Tenant-scoped authorization
 
@@ -250,7 +256,7 @@ code-held access, after a grant check. For a platform:
 | Layer | Design | finbot today |
 |---|---|---|
 | At rest | envelope encryption, data key per value, wrapped by KMS | yes (`crypto.EnvelopeCipher`, AES-256-GCM) |
-| Context binding | the encryption context names the tenant, session and purpose; a value copied to another tenant's row will not decrypt, and CloudTrail shows whose data each decrypt was for | session and purpose today; **add tenant** to `crypto.ctx` |
+| Context binding | the encryption context names the tenant, session and purpose; a value copied to another tenant's row will not decrypt, and CloudTrail shows whose data each decrypt was for | **done**: `fbenc2:` envelopes bind tenant, session and purpose; older `fbenc1:` values still open; the prefix cannot be downgraded |
 | Keys | shared key for pool, own key for bridge and silo, BYOK for silo | one key, purpose-restricted key policy |
 | Offboarding | crypto-shredding: schedule deletion of the tenant's key, and every copy is unreadable, backups included | — |
 | In transit | TLS everywhere; VPC endpoints to AWS services | ALB TLS, VPC endpoints in `infra/cdk` |
@@ -259,14 +265,14 @@ code-held access, after a grant check. For a platform:
 
 | Quota | Enforced at | finbot today |
 |---|---|---|
-| Requests per minute, per user and per tenant | API admission | yes (`ratelimit.py`, in-process token buckets) |
+| Requests per minute, per user and per tenant | API admission | **done, shared**: `SharedRateLimiter` counts in the session store (DynamoDB atomic `ADD`), a sliding one-minute window, exact across pods; default with DynamoDB (`FINBOT_RATE_SCOPE`) |
 | Model tokens per minute and per day, per tenant | a model gateway in front of the LLM pool | — |
 | Concurrent workflows and concurrent model calls, per tenant | orchestrator admission and LLM pool | — |
 | Storage (sessions, documents, vectors) | write path | session size cap (DynamoDB item limit) |
 | Tool calls per partner API, per tenant | tool bulkheads | — |
 
-Quotas need a shared counter to be exact across pods: DynamoDB atomic counters or Redis `INCR`
-with a TTL. finbot's limiter is per pod today and says so.
+Quotas need a shared counter to be exact across pods; finbot's request limits now use one
+(DynamoDB atomic counters, one key per window). Token and concurrency quotas can reuse it.
 
 ### B7. Noisy-neighbor protection
 
@@ -308,9 +314,9 @@ finbot does with `tenant_isolation`.
 |---|---|---|
 | Tenant from verified token, deny by default | yes | — |
 | Per-call grants with tenant and scope | yes | agent definitions and tool grants as tenant resources |
-| Data partitioning | tenant attribute, checked on every read | tenant-first partition keys; IAM `LeadingKeys` and prefix conditions |
-| Encryption | per-value envelope, session and purpose context | tenant in the context; per-tenant keys; crypto-shredding |
+| Data partitioning | tenant-first keys; tenant-scoped credentials with IAM `LeadingKeys` | S3 prefix conditions for tenant documents |
+| Encryption | per-value envelope bound to tenant, session and purpose | per-tenant keys; crypto-shredding |
 | Credentials | out of the model | per-tenant secrets and a broker |
-| Quotas | requests per user and tenant, per pod | token and concurrency quotas with shared counters |
+| Quotas | requests per user and tenant, shared across pods | token and concurrency quotas on the same counters |
 | Noisy neighbor | rate limits | fair scheduling, per-tenant bulkheads and breakers |
 | Leakage tests | tenant-isolation evals | canary strings and alerts |

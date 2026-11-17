@@ -7,9 +7,12 @@ for everyone else. A refused request costs no model call.
 The WAF's rate-based rule (infra/) limits by client IP before traffic reaches the
 service; this limits by verified identity, which an attacker rotating IPs cannot dodge.
 
-Buckets are kept in process. Each API pod enforces its own share; set limits to
-(budget / replicas), or back BucketStore with a shared counter (DynamoDB atomic
-update, Redis INCR) when exact global limits matter.
+Two implementations:
+    RateLimiter        token buckets kept in process. Each API pod enforces its own share,
+                       so the real limit is (limit x replicas). Dev and single-pod setups.
+    SharedRateLimiter  sliding-window counters in the session store (DynamoDB atomic ADD,
+                       or SQLite), shared by every pod, so a tenant's limit holds however many
+                       pods serve it. The default whenever the store is DynamoDB.
 """
 from __future__ import annotations
 
@@ -60,6 +63,36 @@ class TokenBucket:
                 b.tokens -= 1
                 return 0.0
             return (1 - b.tokens) / self.rate
+
+
+class SharedRateLimiter:
+    """Sliding-window limit over shared counters: count(this minute) + count(last minute) x
+    the share of last minute still inside the window. One atomic increment and one read per
+    scope per request. A refused request still counts, which only makes a flood wait longer."""
+
+    WINDOW_S = 60.0
+
+    def __init__(self, store, user_per_min: float, tenant_per_min: float, clock: Callable[[], float] = time.time):
+        if user_per_min <= 0 or tenant_per_min <= 0:
+            raise ValueError("limits must be positive")
+        self.store, self.clock = store, clock
+        self.limits = {"user": user_per_min, "tenant": tenant_per_min}
+
+    def _take(self, scope: str, key: str) -> float:
+        now = self.clock()
+        window = int(now // self.WINDOW_S)
+        elapsed = (now % self.WINDOW_S) / self.WINDOW_S
+        current = self.store.incr_counter(f"{scope}:{key}:{window}", 2 * self.WINDOW_S)
+        previous = self.store.read_counter(f"{scope}:{key}:{window - 1}")
+        if current + previous * (1 - elapsed) <= self.limits[scope]:
+            return 0.0
+        return max(1.0, (1 - elapsed) * self.WINDOW_S)
+
+    def check(self, subject: str, tenant_id: str) -> None:
+        for scope, key in (("user", f"{tenant_id}/{subject}"), ("tenant", tenant_id)):
+            wait = self._take(scope, key)
+            if wait:
+                raise RateLimited(scope, math.ceil(wait))
 
 
 class RateLimiter:

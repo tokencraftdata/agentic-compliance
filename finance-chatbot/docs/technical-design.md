@@ -51,7 +51,8 @@ person); advice, rules interpretation or discretionary decisions; model training
 | `untrusted.py` | Injection screening, field minimisation, spotlighting, prompt-leak canary | `pii.py` |
 | `memory.py` | Typed session state: entities, facts with provenance, focus, user-typed ids, tickets | — |
 | `agent_identity.py` | Per-turn delegation grant, verified at every tool call | — |
-| `crypto.py` | Envelope encryption (AES-256-GCM, KMS-wrapped data keys) | KMS |
+| `crypto.py` | Envelope encryption (AES-256-GCM, KMS-wrapped data keys), bound to tenant, session and purpose | KMS |
+| `tenancy.py` | Request tenant scope; session items through per-tenant credentials | STS, IAM |
 | `store.py`, `store_dynamo.py` | Session store: SQLite or DynamoDB behind one contract | — |
 | `adaptive/` | Learned guard rules: proposals, gate, shadow, canary, rollback; session risk score | eval and red-team suites |
 | `control.py` | Control plane: drain or restore a model, routing mode | store |
@@ -344,7 +345,8 @@ Selected settings (`finbot/config.py`; all `FINBOT_*` environment variables):
 | `FINBOT_STORE_PROVIDER`, `FINBOT_DYNAMO_TABLE` | sqlite | session store |
 | `FINBOT_AUTH`, `FINBOT_AUTH_JWKS_URL`, `FINBOT_AUTH_ISSUER`, `FINBOT_AUTH_AUDIENCE` | hmac | token verification |
 | `FINBOT_ENCRYPTION`, `FINBOT_KMS_KEY_ID`, `FINBOT_ENCRYPTION_REQUIRED` | — | envelope encryption |
-| `FINBOT_RATE_USER_PER_MIN`, `FINBOT_RATE_TENANT_PER_MIN` | 30, 600 | rate limits |
+| `FINBOT_RATE_USER_PER_MIN`, `FINBOT_RATE_TENANT_PER_MIN`, `FINBOT_RATE_SCOPE` | 30, 600, auto | rate limits; `auto` counts in the shared store with DynamoDB |
+| `FINBOT_TENANT_ROLE_ARN` | — | session items only through per-tenant credentials (IAM-enforced isolation) |
 | `FINBOT_KB_MAX_AGE_DAYS` | 540 | when a cited help page counts as stale |
 | `FINBOT_QUEUE_URL` | — | turn queue for workers |
 | `FINBOT_CACHE`, `FINBOT_CACHE_URL`, `FINBOT_KB_CACHE_TTL_S` | memory, —, 300 | cache backend (section 7.4) |
@@ -462,7 +464,7 @@ starting point.
 
 | Suite | What it covers | Result (offline) |
 |---|---|---|
-| Unit and integration tests | 387 tests across 24 files | all pass |
+| Unit and integration tests | 405 tests across 25 files | all pass |
 | Evaluation sets | lookups, not found, tenant isolation, context switches, PII, retry and routing advice, review withholding, domains | 41/41 dev, 185/185 held-out, 192/192 and 184/184 on two unseen data sets |
 | Hallucination stress test | 12 kinds of injected errors | 0 of 392 and 0 of 1,867 reached the user; 0 of 3,774 on the unseen sets |
 | False-block probe | every failed payment and domain record, both roles | 0 of 2,876 correct answers blocked |

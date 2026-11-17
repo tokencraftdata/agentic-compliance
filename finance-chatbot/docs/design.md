@@ -167,10 +167,12 @@ Table definition: `store_dynamo.TABLE_DEFINITION` (on-demand, KMS, PITR).
 - Each turn gets a delegation grant (`agent_identity.py`): user as `sub`, agent as `act.sub`,
   tenant, session, scopes cut to read-only, five-minute expiry. Every tool call verifies it.
 - Session state, user text and answers are sealed with AES-256-GCM under a per-value data key
-  wrapped by KMS, bound to session and purpose (`crypto.py`).
+  wrapped by KMS, bound to tenant, session and purpose (`crypto.py`). Session items are reached
+  only through credentials for the request's tenant (`tenancy.py`, IAM `LeadingKeys`).
 - `dlp.py` masks card data, SSNs, IBANs, routing and account numbers and secrets on the way in,
   and scans every response on the way out; card data found outbound is audited as `egress_leak`.
-- Rate limits per verified user and per tenant (`ratelimit.py`), on top of the WAF's per-IP rule.
+- Rate limits per verified user and per tenant, counted in the shared store so they hold across pods
+  (`ratelimit.py`), on top of the WAF's per-IP rule.
 - Details and tests: [security.md](security.md), section 5.
 
 ## 6b. Prompt injection
