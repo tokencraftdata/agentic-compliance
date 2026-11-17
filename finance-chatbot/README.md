@@ -83,6 +83,7 @@ finbot/untrusted.py      prompt-injection defences: normalise + screen, tool-res
 finbot/provenance.py     value provenance: third-party text in tool results cannot vouch for a stated fact
 finbot/security_gateway.py tool-call decisions (schema, rules, approval), behaviour monitor, security events
 finbot/tenancy.py        request tenant scope; session data only through per-tenant credentials (IAM LeadingKeys)
+finbot/reconcile.py      reconciliation: tickets vs records, audit log vs committed turns, help-page index vs source
 finbot/cache.py          cache port (memory, Redis/Valkey): help-page searches and breaker health only, never records
 finbot/telemetry.py      AI observability: OpenTelemetry GenAI spans, no prompts, answers or record data
 finbot/queue.py          queue worker (SQS / in-memory): ack, retry-later, dead-letter
@@ -126,6 +127,7 @@ scripts/ingest.py        any source -> any vector store, incremental; or start a
 scripts/generate_synthetic.py seeded synthetic customers, payments, domain records, logs, KB pages, eval set
 scripts/run_eval.py      runs data/eval.jsonl through the bot with deterministic checks
 scripts/run_redteam.py   prompt-injection red team (data/redteam.jsonl) with a worst-case model and ablations
+scripts/reconcile.py     runs the reconciliation jobs; exits 1 on a problem (daily CronJob)
 scripts/durability_test.py real processes: kill -9 mid-turn, frozen worker, failover, contention, killed ingestion
 scripts/load_test.py     load test of the full worker path; --model-latency stands in for a real model
 scripts/simulate_routing.py  routing scenarios (steady, processor outage, degradation, issuer outage)
@@ -168,6 +170,7 @@ tests/test_provenance.py    12 tests: third-party text cannot vouch for an amoun
 tests/test_security_gateway.py 24 tests: argument validation, rules, approval, bulk access, behaviour lock, events,
                             and one regression test per code-review finding
 tests/test_tenancy.py   17 tests: tenant-first ids, tenant-bound encryption, scoped data access, shared rate limits
+tests/test_reconcile.py  9 tests: ticket, audit and index reconciliation, unknown actions, script exit codes
 tests/test_cancellation.py  6 tests: cancel before start or mid-turn, resend after cancel, owner only, HTTP
 tests/test_cache_telemetry.py  14 tests: what is cached, cache outages, records never cached, GenAI spans hold no content
 tests/test_tickets.py       14 tests: write requests become tickets; desk claim and resolve
@@ -182,7 +185,7 @@ tests/test_infra.py          6 tests: ALB TLS and hardening, WAF rules, KMS rota
                             bucket (needs aws-cdk-lib)
 ```
 
-429 tests in all.
+438 tests in all.
 
 ## Design
 

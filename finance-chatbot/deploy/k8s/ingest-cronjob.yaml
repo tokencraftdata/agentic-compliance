@@ -32,3 +32,71 @@ spec:
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities: {drop: ["ALL"]}
+---
+# Weekly full sync: the nightly run only adds and updates, so a page deleted at the source would
+# stay searchable and citable. A full sync also removes those pages from the index.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: finbot-ingest-full-sync
+  namespace: finbot
+spec:
+  schedule: "15 3 * * 0"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          serviceAccountName: finbot-ingest
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: ingest
+              image: REGISTRY/finbot:VERSION
+              command: ["python", "scripts/ingest.py", "--full-sync",
+                        "--source", "s3:REPLACE_ME-help-docs/",
+                        "--store", "opensearch:https://REPLACE_ME.us-east-1.aoss.amazonaws.com/finbot-kb",
+                        "--embed", "bedrock:amazon.titan-embed-text-v2:0@1024"]
+              envFrom:
+                - configMapRef: {name: finbot-config}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities: {drop: ["ALL"]}
+---
+# Daily reconciliation: resolved tickets against the systems of record, and the help-page index
+# against its source. Read-only; differences go to the audit stream "reconciliation" and the job
+# exits non-zero so the scheduler alerts. Runs as the worker identity (read records, read index).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: finbot-reconcile
+  namespace: finbot
+spec:
+  schedule: "45 4 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: finbot-worker
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile: {type: RuntimeDefault}
+          containers:
+            - name: reconcile
+              image: REGISTRY/finbot:VERSION
+              command: ["python", "scripts/reconcile.py", "tickets", "index",
+                        "--source", "s3:REPLACE_ME-help-docs/",
+                        "--store", "opensearch:https://REPLACE_ME.us-east-1.aoss.amazonaws.com/finbot-kb"]
+              envFrom:
+                - configMapRef: {name: finbot-config}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities: {drop: ["ALL"]}

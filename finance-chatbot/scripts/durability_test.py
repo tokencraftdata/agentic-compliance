@@ -14,7 +14,8 @@ Scenarios
     lost_reply  a worker commits and dies before replying; the resend returns the stored
                 answer with no model call
     zombie      a worker freezes past its lease; another finishes the turn; the frozen one
-                wakes up and its late commit is refused
+                wakes up and its late commit is refused; reconciling the audit log against
+                committed turns shows the turn once committed, its re-run named, and no gaps
     memory      32 turns, each in a fresh process, switching between two payments with
                 follow-ups ("can I retry it?"): the follow-up resolves to the right payment
                 every time, across thread rollover
@@ -57,7 +58,8 @@ def settings(db: str, **kw):
 
 def container(db: str, **over):
     from finbot.container import Container
-    c = Container(settings(db), overrides=over or None)
+    # Audit lines go next to the database, so a scenario can reconcile them with committed turns.
+    c = Container(settings(db), overrides=over or None, audit_path=db + ".audit.jsonl")
     c.chatbot.sleep = c.toolbox.sleep = lambda s: None
     return c
 
@@ -247,9 +249,17 @@ def scenario_zombie(db):
     z.send_signal(signal.SIGCONT)
     out, _ = z.communicate(timeout=60)
     late = json.loads([ln for ln in out.splitlines() if ln.startswith("{")][-1])
+    from finbot.reconcile import reconcile_audit
+    s = store(db)
+    try:
+        with open(db + ".audit.jsonl") as f:
+            rep = reconcile_audit(f, s, [sid])
+    finally:
+        s.close()
     ok = "declined" in r["answer"] and late.get("error") in ("LeaseHeld", "StaleWrite") and \
-        len(committed(db, sid)) == 1 and version(db, sid) == 1
-    return ok, f"replacement committed; the frozen worker woke and was refused with {late.get('error')}"
+        len(committed(db, sid)) == 1 and version(db, sid) == 1 and not rep.problems
+    return ok, (f"replacement committed; the frozen worker woke and was refused with {late.get('error')}; "
+                f"audit reconciliation: {rep.counts}, no gaps")
 
 
 def scenario_memory(db):

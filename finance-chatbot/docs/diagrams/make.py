@@ -554,7 +554,7 @@ def system() -> None:
     card(1200, 1260, 360, 200, "people", "People", ["ticket desk: write requests", "approve held tool calls",
                                                      "review queue, labels", "handoff after 2 failures"])
 
-    s.text(40, 1508, "Verified offline (scripted model, synthetic data): 429 tests · 8/8 multi-process durability "
+    s.text(40, 1508, "Verified offline (scripted model, synthetic data): 438 tests · 8/8 multi-process durability "
                      "scenarios (kill -9 mid-turn, frozen worker, lost reply,", 16, color=MUTED)
     s.text(40, 1532, "32-turn memory across restarts, model failover, 6-process contention, guardrail outage, "
                      "killed ingestion) · 0 of 2,259 injected hallucinations reach users ·", 16, color=MUTED)

@@ -79,8 +79,13 @@ def cancel_key(session_id: str, msg_id: str) -> str:
 # ---------------------------------------------------------------- worker
 
 class Worker:
-    def __init__(self, bot: Chatbot, store: SessionStore, worker_id: str | None = None, lease_s: float = 60):
+    def __init__(self, bot: Chatbot, store: SessionStore, worker_id: str | None = None, lease_s: float = 60,
+                 action_checker=None):
         self.bot, self.store, self.lease_s = bot, store, lease_s
+        # Asks the system of record what became of an external action whose outcome a crashed
+        # worker never recorded (store.reconcile). Set it once write tools exist; finbot is
+        # read-only today, so there is nothing to reconcile and it stays None.
+        self.action_checker = action_checker
         # The store's lease tells processes apart, not threads: one worker id serves every thread
         # of a process. This set stops two threads running a turn of the same session at once.
         self._in_flight: set[str] = set()
@@ -135,6 +140,11 @@ class Worker:
             if self.store.read_control(key):
                 raise TurnCancelled(msg_id)
         cs.heartbeat = heartbeat
+        cs.msg_id = msg_id
+        if self.action_checker is not None and self.store.unknown_actions(session_id):
+            # A previous worker started an external action and died before recording the outcome.
+            # Settle it with the system of record before this turn can act again.
+            self.store.reconcile(session_id, self.action_checker)
         try:
             if self.store.read_control(key):                          # cancelled before it started
                 raise TurnCancelled(msg_id)

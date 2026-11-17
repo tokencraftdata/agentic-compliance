@@ -58,6 +58,7 @@ person); advice, rules interpretation or discretionary decisions; model training
 | `adaptive/` | Learned guard rules: proposals, gate, shadow, canary, rollback; session risk score | eval and red-team suites |
 | `control.py` | Control plane: drain or restore a model, routing mode | store |
 | `knowledge.py`, `ingestion/` | Help-page index; ingestion pipeline (screen, chunk, embed, upsert) | vector store adapters |
+| `reconcile.py` | Reconciliation jobs: tickets vs systems of record, audit log vs committed turns, help-page index vs source | `tickets.py`, `auditlog.py` |
 | `cache.py` | Cache port (memory, Redis protocol, none) and the only two cached reads: help-page search and breaker health | — |
 | `telemetry.py` | AI observability: OpenTelemetry GenAI spans for turn, model call, tool call, verification | OpenTelemetry API (optional) |
 | `container.py`, `registry.py` | Composition root and provider factories | — |
@@ -286,7 +287,26 @@ validation.
    conditional writes under contention, SQS redelivery and pod kills have only been tested
    against in-memory fakes that evaluate the same conditions.
 
-### 7.4 Caching (`cache.py`)
+### 7.4 Consistency and reconciliation
+
+| Data | Consistency | Reconciliation |
+|---|---|---|
+| Session state and turn journal | strong: consistent reads; commit is a compare-and-swap on version and lease; one commit per `msg_id` | — (verified by `scripts/durability_test.py`) |
+| Records the bot reads | read fresh every turn, never cached | — |
+| Tickets resolved by the desk | the desk records what a person did | `reconcile_tickets`: a "done" ticket must show on the record (refund issued, cancelled, card active); else `mismatch`. Kinds no record can show (retry, limit change) are `not_verifiable` |
+| Turn audit log | written before the commit, so a crash between them leaves a line for a turn that never counted | `reconcile_audit`: every committed turn has a line (`committed_without_audit` is a gap); uncommitted turns are named (`uncommitted`, `uncommitted_outage`, `uncommitted_cancelled`); re-runs counted (`rerun`). Lines carry the client's `msg_id` |
+| Help-page index | nightly sync adds and updates only | weekly full sync deletes pages gone from the source; `reconcile_index` reports `missing`, `stale`, `orphaned` and `quarantined_but_indexed` |
+| External actions (future write tools) | intent recorded before the call (`begin_action`), keyed by `op_id` | a pending action left by a crashed worker becomes `unknown` on takeover, and `Worker.action_checker` settles it with the system of record before the next turn |
+| Rate-limit counters | approximate by design: sliding window, about one extra request at a boundary | — |
+| Money (ledger vs processor settlement) | not finbot's: the systems of record reconcile it; the bot only reads | — |
+
+`scripts/reconcile.py tickets|audit|index` runs the jobs, writes problems to the audit stream
+`reconciliation` and exits 1 on any problem; `deploy/k8s/ingest-cronjob.yaml` schedules the
+ticket and index jobs daily and the full sync weekly. One limit found while testing: ingestion
+skips a page whose version did not change, so content edited in place without a version bump is
+not re-screened; `reconcile_index` still flags such a page if it now fails screening.
+
+### 7.5 Caching (`cache.py`)
 
 finbot caches only what may be a little stale and holds no customer record:
 
@@ -468,7 +488,8 @@ starting point.
 
 | Suite | What it covers | Result (offline) |
 |---|---|---|
-| Unit and integration tests | 429 tests across 26 files | all pass |
+| Unit and integration tests | 438 tests across 27 files | all pass |
+| Reconciliation | `tests/test_reconcile.py`: tickets vs records, audit vs commits, index vs source, unknown actions, script exit codes | all pass |
 | Multi-process durability | `scripts/durability_test.py`: kill -9 mid-turn, frozen worker, lost reply, 32-turn memory across restarts, model failover, 6-process contention, guardrail outage, killed ingestion | 8/8 |
 | Evaluation sets | lookups, not found, tenant isolation, context switches, PII, retry and routing advice, review withholding, domains | 41/41 dev, 185/185 held-out, 192/192 and 184/184 on two unseen data sets |
 | Hallucination stress test | 12 kinds of injected errors | 0 of 392 and 0 of 1,867 reached the user; 0 of 3,774 on the unseen sets |

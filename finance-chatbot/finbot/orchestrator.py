@@ -185,6 +185,7 @@ class ChatSession:
     heartbeat: Callable[[], object] | None = field(default=None, repr=False, compare=False)  # renews the lease
     deadline: float | None = field(default=None, repr=False, compare=False)
     nonce: str | None = field(default=None, repr=False, compare=False)
+    msg_id: str | None = field(default=None, repr=False, compare=False)   # the client's id, for audit reconciliation
 
 
 class SessionLocked(Exception):
@@ -604,7 +605,7 @@ class Chatbot:
         the log collector ships it; pods have a read-only filesystem)."""
         auditlog.write(self.audit_path, "turn", {
                 "ts": time.time(), "session": cs.session.session_id, "tenant": cs.session.tenant_id,
-                "user_text_masked": turn.question, "blocked_by": turn.blocked_by, "reasons": turn.reasons,
+                "msg_id": cs.msg_id, "user_text_masked": turn.question, "blocked_by": turn.blocked_by, "reasons": turn.reasons,
                 "focus": turn.focus, "latency_ms": turn.latency_ms, "repaired": turn.repaired,
                 "escalated": turn.escalated, "tier": turn.tier, "models": turn.models_used,
                 "policy": turn.policy_version, "risk": cs.memory.risk, **({"shadow": shadow} if shadow else {}),
