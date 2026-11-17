@@ -56,7 +56,7 @@ class SessionStoreLimits(unittest.TestCase):
         self.store.claim("s1", "w1", 60)
         self.store.commit_turn("s1", "m1", "w1", 0, {"x": 2}, "a", {})
         turn = self.store.t.get("S#s1", "T#m1")
-        self.assertEqual(turn["expires"], self.clock.t + 1800)
+        self.assertEqual(turn["expires"], self.store.t.get("S#s1", "META")["hard_expires"])
 
 
 class SharedTickets(unittest.TestCase):

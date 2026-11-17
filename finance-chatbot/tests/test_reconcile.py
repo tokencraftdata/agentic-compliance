@@ -167,5 +167,59 @@ class Script(unittest.TestCase):
             self.assertIn("orphaned", bad.stdout)
 
 
+class ScopedAudit(unittest.TestCase):
+    def setUp(self):
+        from finbot.store_dynamo import DynamoSessionStore, InMemoryDynamo
+        from finbot.tenancy import TenantScopedTable, tenant_scope
+
+        table = InMemoryDynamo()
+        self.used = []
+
+        def for_tenant(tenant):
+            self.used.append(tenant)
+            return table
+
+        self.store = DynamoSessionStore(TenantScopedTable(table, for_tenant))
+        self.lines = []
+        self.sessions = {}
+        for tenant in ("m_100", "m_200"):
+            sid = tenant + ".audit-session"
+            self.sessions[tenant] = sid
+            with tenant_scope(tenant):
+                self.store.create(sid, tenant, {})
+                self.store.claim(sid, "w")
+                self.store.begin_turn(sid, "msg-0001", "w", "hi")
+                self.store.commit_turn(sid, "msg-0001", "w", 0, {}, "hello", {})
+            self.lines.append(json.dumps({"stream": "turn", "session": sid, "msg_id": "msg-0001"}))
+        self.used.clear()
+
+    def test_explicit_tenant_filters_shared_logs_and_restores_context(self):
+        from finbot.tenancy import current_tenant
+
+        report = reconcile_audit(self.lines, self.store, tenant_id="m_100")
+        self.assertEqual(report.counts, {"confirmed": 1})
+        self.assertEqual(self.used, ["m_100"])
+        self.assertIsNone(current_tenant())
+
+    def test_scope_cannot_be_changed_by_argument_or_log_data(self):
+        from finbot.tenancy import TenantViolation, current_tenant, tenant_scope
+
+        with tenant_scope("m_100"):
+            with self.assertRaises(TenantViolation):
+                reconcile_audit(self.lines, self.store, tenant_id="m_200")
+            with self.assertRaises(TenantViolation):
+                reconcile_audit(self.lines, self.store, sessions=[self.sessions["m_200"]])
+            report = reconcile_audit(self.lines, self.store)
+            self.assertEqual(report.counts, {"confirmed": 1})
+            self.assertEqual(current_tenant(), "m_100")
+        self.assertEqual(self.used, ["m_100"])
+
+    def test_script_requires_operator_tenant_instead_of_trusting_logs(self):
+        result = subprocess.run([sys.executable, "scripts/reconcile.py", "audit", "--audit", "missing.jsonl"],
+                                cwd=ROOT, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("--tenant", result.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

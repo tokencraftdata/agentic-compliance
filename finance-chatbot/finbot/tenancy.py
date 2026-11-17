@@ -81,6 +81,9 @@ class TenantScopedTable:
     def query(self, pk, sk_prefix):
         return self._pick(pk).query(pk, sk_prefix)
 
+    def remove_attributes(self, pk, sk, attributes, cond):
+        return self._pick(pk).remove_attributes(pk, sk, attributes, cond)
+
     def add(self, pk, sk, n, expires):
         return self._pick(pk).add(pk, sk, n, expires)
 

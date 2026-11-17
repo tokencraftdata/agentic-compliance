@@ -267,5 +267,43 @@ class QueueWorker(unittest.TestCase):
         self.assertIn("declined", qc.stats.results[0]["answer"])
 
 
+class SessionPermissions(unittest.TestCase):
+    def setUp(self):
+        self.c = container(Clock(), rate_user_per_min=0)
+        self.addCleanup(self.c.close)
+        self.claims = {"sub": "u1", "tenant_id": "m_100", "role": "support",
+                       "groups": ["support", "payments"], "scope": "payments:read kb:read"}
+        self.token = self.c.verifier.issue(self.claims)
+        self.sid = self.c.service.start(self.token)
+        self.c.service.send(self.token, self.sid, "msg-0001", f"why did {DECLINED} fail?")
+
+    def test_changed_scope_role_or_groups_cannot_read_new_or_cached_answers(self):
+        for changed in ({"scope": "kb:read"}, {"role": "customer"}, {"groups": []}):
+            token = self.c.verifier.issue({**self.claims, **changed})
+            for msg in ("msg-0001", "msg-0002"):
+                with self.subTest(changed=changed, msg=msg), self.assertRaisesRegex(Forbidden, "permissions changed"):
+                    self.c.service.send(token, self.sid, msg, f"why did {DECLINED} fail?")
+        self.assertEqual(self.c.store.load(self.sid)[0], 1)
+        self.assertEqual(len(self.c.store.turns(self.sid)), 1)
+
+    def test_renewed_token_with_same_permissions_can_resume(self):
+        token = self.c.verifier.issue({**self.claims, "groups": ["payments", "support"],
+                                       "scope": "kb:read payments:read"})
+        self.assertTrue(self.c.service.send(token, self.sid, "msg-0001", "again")["deduplicated"])
+        self.assertIn("declined", self.c.service.send(token, self.sid, "msg-0002",
+                                                    f"why did {DECLINED} fail?")["answer"])
+
+    def test_new_session_uses_reduced_scope_and_owner_can_still_cancel_old_work(self):
+        from unittest.mock import patch
+
+        token = self.c.verifier.issue({**self.claims, "scope": "kb:read"})
+        self.c.service.cancel(token, self.sid, "msg-0002")
+        sid = self.c.service.start(token)
+        with patch.object(self.c.toolbox.txns, "get", wraps=self.c.toolbox.txns.get) as lookup:
+            result = self.c.service.send(token, sid, "msg-0003", f"why did {DECLINED} fail?")
+            lookup.assert_not_called()
+        self.assertNotIn("129.00", result["answer"])
+
+
 if __name__ == "__main__":
     unittest.main()

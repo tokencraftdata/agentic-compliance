@@ -134,6 +134,10 @@ class Settings:
     telemetry_path: str = field(default_factory=lambda: _env("FINBOT_TELEMETRY_PATH"))
     recap_requests: int = 8   # user requests carried into a fresh thread (each cut to 200 characters)
 
+    def __post_init__(self) -> None:
+        if self.store_provider == "dynamodb" and self.auth_mode == "jwks" and not self.tenant_role_arn:
+            raise ValueError("FINBOT_TENANT_ROLE_ARN is required for DynamoDB with production JWKS authentication")
+
     def resolved_model(self) -> str:
         if self.model:
             return self.model

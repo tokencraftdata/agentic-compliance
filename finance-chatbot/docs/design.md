@@ -146,10 +146,18 @@ uses `InMemoryDynamo`, which evaluates the real condition expressions.
 | one owner per session | conditional Put on owner/lease |
 | commit only if nothing changed | `TransactWriteItems`: session META (version, owner, live lease) + turn item |
 | dedupe | turn item keyed `T#<msg_id>` |
-| idle cleanup | TTL on `expires` (reads also check it) |
+| idle cleanup | 30-minute idle expiry, capped by a 24-hour `hard_expires`; reads enforce both |
+| journal retention | every turn's TTL is the fixed session deadline, so dedupe survives later activity |
+| lease release | remove only owner/lease attributes, conditioned on owner, version and lease expiry |
 | shared breaker health / control config | `H#<model>`, `C#<key>` items |
 
 Table definition: `store_dynamo.TABLE_DEFINITION` (on-demand, KMS, PITR).
+
+A worker keeps its local in-flight guard until release finishes. Sessions cannot be extended
+past their fixed retention deadline; clients start a fresh session then. On upgrade, old
+DynamoDB sessions without that deadline are expired rather than risking replay of a deleted
+journal entry. SQLite migrates its schema while retaining existing data. See
+[technical-design.md, section 5](technical-design.md#5-data-model) for the upgrade contract.
 
 ## 6. Security
 
@@ -161,6 +169,9 @@ Table definition: `store_dynamo.TABLE_DEFINITION` (on-demand, KMS, PITR).
   - `customer` (legacy alias `merchant`) and `support` may chat, in their own tenant's sessions only.
   - `admin` may use the control plane only.
 - An unknown session and another tenant's session return the same 403, so ids cannot be probed.
+- Every send also compares the verified role, groups and scopes with the immutable session
+  snapshot. A change requires a new session before any model work or cached-reply replay.
+  This keeps earlier privileged history out of a reduced-permission conversation.
 - No static AWS keys anywhere. Every boto3 client uses the default credential chain (IAM role).
 - Tokens: an HS256 key ring addressed by `kid`, and revocation by `jti` or by subject, seen by
   every pod within two seconds.
@@ -433,11 +444,11 @@ through shared, durable state, so a pod can die at any point without leaving ano
 
 | From → to | Channel | Guarantee |
 |---|---|---|
-| API → worker | SQS FIFO, grouped by session, deduplicated by `msg_id` | in order per session, at least once |
+| API → worker (intended) | SQS FIFO, grouped by session, deduplicated by `msg_id`; current HTTP path is synchronous (technical design §7.3) | ordered, at-least-once delivery when wired |
 | worker → worker (same session) | session lease + CAS commit in DynamoDB | one owner at a time; a late writer is rejected |
 | worker → worker (model health) | breaker state in the store | one pod's outage finding protects all pods |
 | operator → workers | control config and guard policy in the store, re-read every 2 s | audited; no redeploy |
-| worker → people | tickets in the same DynamoDB table (`DynamoTickets`) | one ticket per request even when two pods race (conditional put) |
+| worker → people | shared `TICKETS` partition (`DynamoTickets`), exact-partition Get/Put/Query permissions | one ticket per request even when two pods race (conditional put) |
 | people → records | `TicketDesk.resolve` with a required note | audited; the bot can't resolve |
 | everything → audit | JSON lines with a `stream` field (`turn`, `control`, `guard`, `tickets`), stdout in containers | one log destination, filterable |
 

@@ -107,8 +107,15 @@ query strings.
 | `GET /healthz` | — | `200 {"ok": true}` | — |
 | `POST /v1/sessions` | — | `201 {"session_id"}` | 401 bad token, 403 role, 429 rate limit |
 | `POST /v1/sessions/{id}/messages` | `{"msg_id", "text"}`; `msg_id` 8–64 chars `[A-Za-z0-9_-]`, client-generated and reused on resend; `text` 1–4,000 chars | `200` reply (below) | 400 invalid, 401, 403 (unknown and other-tenant sessions look the same), 429 |
-| `POST /v1/sessions/{id}/cancel` | `{"msg_id"}` | `202 {"cancelled"}`; the turn stops before its next model call and commits the pre-turn state | 400, 401, 403 (owner only), 429 |
+| `POST /v1/sessions/{id}/cancel` | `{"msg_id"}` | `202 {"cancelled"}`; the turn checks cancellation before its next model call and before commit | 400, 401, 403 (owner only), 429 |
 | `POST /v1/admin/revocations` | `{"jti", "expires_at"}` or `{"subject"}` | `200` | 401, 403 (admin only) |
+
+A session binds the subject, tenant, role, groups and scopes at creation. Each send compares the
+current verified token's role, groups and scopes with that snapshot **before** running the
+worker or returning a deduplicated reply. Changed permissions require a new session (403),
+so prior history, record facts and cached answers cannot survive a permission reduction.
+Renewed tokens with the same permissions still work; ordering of groups/scopes does not matter.
+The owner may still cancel pending work after a scope/group change.
 
 Reply body:
 
@@ -192,7 +199,22 @@ write-once bucket in production.
 
 **DynamoDB keys** (`store_dynamo.py`): session META item (owner, lease expiry, version, state);
 turn items `T#<msg_id>` (journal and committed reply); `H#<model>` breaker health;
-`C#<key>` control configuration; TTL on `expires`.
+`C#<key>` control configuration; TTL on `expires`. Tickets use the separate shared partition
+`TICKETS` with sort key `K#<ticket_id>`.
+
+**Session and journal lifetime.** Both stores enforce a 30-minute idle timeout and a fixed
+24-hour maximum lifetime (`hard_expires`, set at creation). Each commit extends idle expiry
+only up to that fixed deadline. Every DynamoDB turn, including an incomplete turn, retains its
+journal item until `hard_expires`; later turns cannot outlive earlier deduplication records.
+This avoids updating an unbounded number of old items on every commit. Idle session META
+items may disappear sooner; orphaned turn items expire at the fixed deadline. Reads reject
+expired sessions even before DynamoDB's asynchronous TTL deletion runs.
+
+**Upgrade behavior.** Old DynamoDB sessions without `hard_expires` are refused as expired:
+their earlier turn items might already have disappeared, so safe deduplication cannot be
+reconstructed. Clients must start new sessions. SQLite adds the column in a serialized
+migration, retaining state and journals and bounding old sessions to 24 hours from their last
+update. Do not run old and new store writers concurrently during this upgrade.
 
 ## 6. Verification
 
@@ -247,15 +269,21 @@ validation.
 | Stalled worker returns late | version or lease mismatch | its commit fails with `StaleWrite`; heartbeat stops it early | the new worker's answer | `test_3_late_worker_...`, `test_heartbeat_stops_...` |
 | Long but healthy turn | — | lease renewed before every model call and before commit | normal answer | `test_long_healthy_turn_keeps_its_lease` |
 | Follow-up lands on another pod | — | the lease is released when a turn ends normally (left to expire after an exception, as after a crash) | no wait | `test_lease_is_released_after_a_turn` |
-| Same session, two threads in one pod | in-flight set per process | the second gets `LeaseHeld` (409, retry) instead of running the turn twice | one answer | `test_two_threads_in_one_process_cannot_run_the_same_session` |
+| Same session, two threads in one pod | in-flight set held through lease release | the second gets `LeaseHeld` (409, retry); DynamoDB release removes only lease attributes, conditioned on owner, version and lease expiry | one answer; no rollback of a newer commit | `test_deployment.ReleaseExclusion`, `test_store_contract.DynamoRelease` |
 | Everything slow | turn deadline | retries and failover stop at 90 s | "try again", turn uncommitted | `test_retries_and_failover_stop_at_the_turn_deadline` |
 | Duplicate delivery | `msg_id` in the journal | deduplicated | the same answer | `test_layers.QueueWorker` |
 | Poison message | receive count | retried with backoff, dead-lettered after 5 receives | — | `test_layers.QueueWorker` |
 | Forged tenant in a queue message | checked against the session | dead-lettered | — | `test_layers.QueueWorker` |
 | Unknown outcome of an external action | `begin_action` intent without a result | marked `unknown`; not re-sent; reconciled with the system of record first | — | `test_4_unknown_external_action_...` |
 | Guard policy store unreadable | exception | keep the last good policy, else the baseline; guards never switch off | normal | design rule (adaptive/source.py); only the empty-store case is tested |
-| User cancels a turn | cancel flag, checked at every heartbeat and before start | stop before the next model call; commit the pre-turn state with a fixed answer; a resend returns "cancelled" | "Stopped. I didn't finish that request…" | `test_cancellation` |
+| User cancels a turn | cancel flag, checked before start, every model call and after the final output checks | stop before the next model call or commit; commit the pre-turn state with a fixed answer; a resend returns "cancelled" | "Stopped. I didn't finish that request…" | `test_cancellation` |
 | Pod shutdown (rollout, scale-in) | SIGTERM | stop receiving, finish the turn in hand, exit; grace period above the deadline | normal | `worker_main` design |
+
+Cancellation remains cooperative: a call already in flight finishes, then its result is
+discarded if the flag is present at the final checkpoint. Cancellation arriving after that
+checkpoint may lose the race to commit; it does not undo an already committed turn. Session
+history and facts roll back, while raised risk is retained. Tickets already created in the
+separate ticket store remain for human review; cancellation does not undo external work.
 
 ### 7.2 Time budgets
 
@@ -263,6 +291,7 @@ validation.
 |---|---|---|
 | Turn deadline | 90 s | every retry delay and failover stays inside it |
 | Session lease | 60 s | renewed before each model call and before commit |
+| Session activity | 30 min idle, 24 h absolute | activity never extends the fixed journal retention horizon |
 | Queue visibility timeout | 150 s | must exceed the deadline; the worker refuses to start otherwise |
 | Breaker open → probe | 30 s, doubling to 300 s | one probe per worker |
 | Control-plane sync | 2 s | drain or routing change seen by every worker |
@@ -306,6 +335,18 @@ ticket and index jobs daily and the full sync weekly. One limit found while test
 skips a page whose version did not change, so content edited in place without a version bump is
 not re-screened; `reconcile_index` still flags such a page if it now fails screening.
 
+Audit reconciliation is explicitly scoped by the operator:
+
+```bash
+python scripts/reconcile.py audit --audit audit.jsonl --tenant m_100
+```
+
+The job enters `tenant_scope(m_100)` for session reads, filters a shared log to that tenant,
+and never assumes credentials based on a tenant value found in log text. Explicit session
+ids outside the selected tenant are refused. The library also accepts an existing tenant
+scope and refuses attempts to switch it. Schedule separate invocations for authorized tenants;
+the command requires `--tenant` even with SQLite to keep its operational contract consistent.
+
 ### 7.5 Caching (`cache.py`)
 
 finbot caches only what may be a little stale and holds no customer record:
@@ -344,6 +385,15 @@ client ─HTTPS─► ALB + WAF (per-IP rate rule, TLS) ─► api pods (http_ap
 ```
 
 - One service account and IAM role per component (api, worker, ingest); no static keys.
+- The image installs PyJWT with crypto support and the OpenSearch adapter because the supplied
+  deployment enables both. CI builds the image and imports those adapters with networking off.
+- `FINBOT_TENANT_ROLE_ARN` is supplied from the stack's `TenantDataRoleArn` output. DynamoDB
+  with production JWKS authentication fails at settings construction if the ARN is missing.
+  Base pod credentials cannot access session partitions.
+- API and worker roles have an additional exact-`TICKETS` grant for `GetItem`, `PutItem` and
+  `Query`; no scan, delete or table-wide session access. This is the existing shared support
+  desk, whose support/admin roles operate across tenants. It is separate from tenant-isolated
+  session data. A tenant-specific support-desk model would require a different ticket contract.
 - Namespace with the restricted Pod Security standard; containers non-root with a read-only
   root filesystem.
 - Network policy denies by default; workers take no inbound traffic; egress only to DNS and AWS
@@ -370,14 +420,14 @@ Selected settings (`finbot/config.py`; all `FINBOT_*` environment variables):
 | `FINBOT_ENCRYPTION`, `FINBOT_KMS_KEY_ID`, `FINBOT_ENCRYPTION_REQUIRED` | — | envelope encryption |
 | `FINBOT_RATE_USER_PER_MIN`, `FINBOT_RATE_TENANT_PER_MIN`, `FINBOT_RATE_SCOPE` | 30, 600, auto | rate limits; `auto` counts in the shared store with DynamoDB |
 | `FINBOT_TOOL_POLICY` | — | JSON rules for the security gateway: `{id, tool, roles, effect: deny|approve, reason}` |
-| `FINBOT_TENANT_ROLE_ARN` | — | session items only through per-tenant credentials (IAM-enforced isolation) |
+| `FINBOT_TENANT_ROLE_ARN` | — | required with DynamoDB + JWKS; use `TenantDataRoleArn` stack output |
 | `FINBOT_KB_MAX_AGE_DAYS` | 540 | when a cited help page counts as stale |
 | `FINBOT_QUEUE_URL` | — | turn queue for workers |
 | `FINBOT_CACHE`, `FINBOT_CACHE_URL`, `FINBOT_KB_CACHE_TTL_S` | memory, —, 300 | cache backend (section 7.4) |
 | `FINBOT_TELEMETRY`, `FINBOT_TELEMETRY_PATH` | none | AI observability backend (section 10.1) |
 
 Fixed in code: lease 60 s, turn deadline 90 s, 6 tool rounds, 30 turns per thread, handoff after
-2 unverifiable answers, control sync 2 s.
+2 unverifiable answers, control sync 2 s, session idle timeout 30 min and maximum lifetime 24 h.
 
 ## 10. Observability
 
@@ -488,7 +538,12 @@ starting point.
 
 | Suite | What it covers | Result (offline) |
 |---|---|---|
-| Unit and integration tests | 438 tests across 27 files | all pass |
+| Unit and integration tests | 458 tests; includes the review regressions below | all pass |
+| Permission changes | same-subject reduced scopes, role/group changes, old-reply replay, equivalent token renewal and fresh-session access | `test_layers.SessionPermissions` |
+| Release and retention | overlapping release/commit and renewal, local thread exclusion, real adapter update shape, TTL deletion simulation, fixed session horizon and legacy migration | `test_store_contract`, `test_deployment.ReleaseExclusion` |
+| Final-call cancellation | cancellation during the last model response rolls back state and deduplicates, on both stores | `test_cancellation.FinalCallCancellation` |
+| Production configuration | enabled adapters import, missing tenant ARN fails early, synthesized ticket permissions exercised through the real adapter | `test_deployment`, `test_infra` |
+| Scoped audit | explicit tenant, shared-log filtering, restored context, refused tenant switching and CLI argument validation | `test_reconcile.ScopedAudit` |
 | Reconciliation | `tests/test_reconcile.py`: tickets vs records, audit vs commits, index vs source, unknown actions, script exit codes | all pass |
 | Multi-process durability | `scripts/durability_test.py`: kill -9 mid-turn, frozen worker, lost reply, 32-turn memory across restarts, model failover, 6-process contention, guardrail outage, killed ingestion | 8/8 |
 | Evaluation sets | lookups, not found, tenant isolation, context switches, PII, retry and routing advice, review withholding, domains | 41/41 dev, 185/185 held-out, 192/192 and 184/184 on two unseen data sets |

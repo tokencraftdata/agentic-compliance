@@ -20,9 +20,12 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from collections.abc import Callable, Iterable
+from contextlib import nullcontext
 from dataclasses import asdict, dataclass, field
 
 from . import auditlog
+from .crypto import session_tenant
+from .tenancy import TenantViolation, current_tenant, tenant_scope
 
 # What the record must show once a person has done what the ticket asked. A kind not listed
 # here (retry, limit change, fee waiver, ...) cannot be checked from a record: reported as such.
@@ -127,8 +130,13 @@ def toolbox_lookup(toolbox) -> Callable[[str, str], dict]:
 
 # ------------------------------------------------------------------ 2. audit log vs sessions
 
-def reconcile_audit(audit_lines: Iterable[str], store, sessions: Iterable[str] | None = None) -> Report:
+def reconcile_audit(audit_lines: Iterable[str], store, sessions: Iterable[str] | None = None,
+                    *, tenant_id: str | None = None) -> Report:
     """Compare turn audit records with committed turns, per (session, msg_id).
+
+    `tenant_id` is an operator-authorized tenant, not a value inferred from audit text.
+    A scoped caller cannot switch tenants. Shared logs are filtered to that tenant; explicit
+    session ids outside it are refused. Required for a tenant-scoped production store.
 
     committed_without_audit   a committed turn has no audit line: a gap in the trail (problem)
     uncommitted_outage        audit line for a turn that ended "unavailable" (expected: resent later)
@@ -137,6 +145,10 @@ def reconcile_audit(audit_lines: Iterable[str], store, sessions: Iterable[str] |
                               the trail shows work that did not count (problem to look at)
     rerun                     several audit lines for one committed turn: a re-run after a crash
     """
+    scoped = current_tenant()
+    if tenant_id is not None and (not tenant_id or (scoped is not None and scoped != tenant_id)):
+        raise TenantViolation("reconciliation cannot change the caller's tenant")
+    tenant_id = tenant_id or scoped
     rep = Report("audit")
     seen: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for line in audit_lines:
@@ -145,11 +157,16 @@ def reconcile_audit(audit_lines: Iterable[str], store, sessions: Iterable[str] |
         except ValueError:
             continue
         if rec.get("stream") == "turn" and rec.get("msg_id"):
+            if tenant_id is not None and session_tenant(rec["session"]) != tenant_id:
+                continue  # a shared audit stream is filtered, never used to choose credentials
             seen[(rec["session"], rec["msg_id"])].append(rec)
     ids = set(sessions) if sessions is not None else {s for s, _ in seen}
     for sid in sorted(ids):
+        if tenant_id is not None and session_tenant(sid) != tenant_id:
+            raise TenantViolation("session is outside the reconciliation tenant")
         try:
-            turns = store.turns(sid)
+            with tenant_scope(tenant_id) if tenant_id is not None else nullcontext():
+                turns = store.turns(sid)
         except KeyError:
             turns = []
         committed = {t["msg_id"] for t in turns if t["status"] == "committed"}

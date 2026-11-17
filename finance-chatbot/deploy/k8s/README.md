@@ -21,6 +21,27 @@ keys, DynamoDB session table, SQS FIFO queue and dead-letter queue, write-once
 audit bucket, VPC endpoints), the Bedrock guardrail (`infra/create_guardrail.py`),
 the AWS Load Balancer Controller and KEDA installed in the cluster.
 
+Use the stack's **TenantDataRoleArn** output for `FINBOT_TENANT_ROLE_ARN` in `config.yaml`.
+It is required with DynamoDB/JWKS: the API and worker pod roles cannot access session items
+without assuming it. The stack separately grants exact-`TICKETS` Get/Put/Query access for the
+shared human support desk; do not replace this with table-wide permissions.
+
+The image includes the configured JWKS and OpenSearch dependencies. A network-free smoke check:
+
+```bash
+docker build -t finbot:check .
+docker run --rm --network none --entrypoint python finbot:check -c 'import jwt, opensearchpy, gunicorn'
+```
+
+When upgrading to fixed journal retention, drain old workers before starting new ones. Existing
+DynamoDB sessions without `hard_expires` require a fresh session. New sessions expire after
+30 minutes idle or 24 hours total. The HTTP API still runs turns synchronously; queue wiring
+remains the documented gap in the technical design.
+
+Audit reconciliation must run under an operator-authorized tenant, for example
+`python scripts/reconcile.py audit --audit audit.jsonl --tenant m_100`. Never derive that
+argument from untrusted log records.
+
 ```bash
 docker build -t REGISTRY/finbot:VERSION .
 kubectl apply -f deploy/k8s/

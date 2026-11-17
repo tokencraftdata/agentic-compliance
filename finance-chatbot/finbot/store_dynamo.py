@@ -40,7 +40,7 @@ from typing import Any, Protocol
 
 from .crypto import Codec, PlainCodec, ctx, session_tenant
 from .pii import mask_pii
-from .store import LeaseHeld, SessionExpired, StaleWrite
+from .store import MAX_SESSION_LIFETIME_S, LeaseHeld, SessionExpired, StaleWrite
 
 
 class ConditionFailed(Exception):
@@ -69,6 +69,8 @@ class DynamoTable(Protocol):
     def put(self, item: dict, cond: Cond = None) -> None: ...
 
     def query(self, pk: str, sk_prefix: str) -> list[dict]: ...
+
+    def remove_attributes(self, pk: str, sk: str, attributes: list[str], cond: Cond) -> None: ...
 
     def transact_put(self, writes: list[tuple[dict, Cond]]) -> None: ...
 
@@ -135,6 +137,16 @@ class Boto3Dynamo:
         try:
             self.client.put_item(TableName=self.table, Item=self._enc(_strip_none(item)),
                                  **self._cond_kw(cond, self._enc))
+        except self._exc.ConditionalCheckFailedException as e:
+            raise ConditionFailed(str(e)) from None
+
+    def remove_attributes(self, pk, sk, attributes, cond):
+        kw = self._cond_kw(cond, self._enc)
+        names = {f"#remove{i}": attr for i, attr in enumerate(attributes)}
+        kw["ExpressionAttributeNames"] = {**kw.get("ExpressionAttributeNames", {}), **names}
+        try:
+            self.client.update_item(TableName=self.table, Key=self._enc({"pk": pk, "sk": sk}),
+                                    UpdateExpression="REMOVE " + ", ".join(names), **kw)
         except self._exc.ConditionalCheckFailedException as e:
             raise ConditionFailed(str(e)) from None
 
@@ -271,6 +283,13 @@ class InMemoryDynamo:
             item["count"] += n
             return item["count"]
 
+    def remove_attributes(self, pk, sk, attributes, cond):
+        with self._lock:
+            self._check({"pk": pk, "sk": sk}, cond)
+            item = self.items[(pk, sk)]
+            for attr in attributes:
+                item.pop(attr, None)
+
     def query(self, pk, sk_prefix):
         return [json.loads(json.dumps(v)) for (p, s), v in sorted(self.items.items())
                 if p == pk and s.startswith(sk_prefix)]
@@ -298,7 +317,9 @@ class DynamoSessionStore:
         m = self.t.get(f"S#{session_id}", "META")
         if m is None:
             raise KeyError(session_id)
-        if m["expires"] < self.clock():
+        # Legacy sessions had independently expiring journal items and cannot safely dedupe.
+        # Require a fresh session on upgrade rather than silently rerunning an old message.
+        if min(m["expires"], m.get("hard_expires", 0)) <= self.clock():
             raise SessionExpired(session_id)
         return m
 
@@ -311,7 +332,8 @@ class DynamoSessionStore:
         self.t.put({"pk": f"S#{session_id}", "sk": "META", "tenant_id": tenant_id, "version": 0,
                     "owner": None, "lease_until": None,
                     "state": self.codec.seal(state, ctx(session_id, "session_state")), "updated": now,
-                    "expires": now + self.idle_ttl},
+                    "expires": now + min(self.idle_ttl, MAX_SESSION_LIFETIME_S),
+                    "hard_expires": now + MAX_SESSION_LIFETIME_S},
                    ("attribute_not_exists(pk)", {}, {}))
 
     def load(self, session_id):
@@ -345,7 +367,10 @@ class DynamoSessionStore:
     def release(self, session_id, worker):
         m = self._meta(session_id)
         try:
-            self.t.put({**m, "owner": None, "lease_until": None}, ("#o = :me", {"#o": "owner"}, {":me": worker}))
+            self.t.remove_attributes(f"S#{session_id}", "META", ["owner", "lease_until"],
+                                     ("#o = :me AND #v = :v AND #l = :l",
+                                      {"#o": "owner", "#v": "version", "#l": "lease_until"},
+                                      {":me": worker, ":v": m["version"], ":l": m.get("lease_until")}))
         except ConditionFailed:
             pass
 
@@ -355,6 +380,7 @@ class DynamoSessionStore:
         user_text = mask_pii(user_text)[0]   # the journal never holds card data
         now = self.clock()
         pk, sk = f"S#{session_id}", f"T#{msg_id}"
+        m = self._meta(session_id)
         r = self.t.get(pk, sk)
         if r and r["status"] == "committed":
             return {"answer": self.codec.open(r["answer"], ctx(session_id, "answer")),
@@ -369,7 +395,7 @@ class DynamoSessionStore:
             self.t.put({"pk": pk, "sk": sk, "msg_id": msg_id, "turn_no": n + 1, "status": "started",
                         "worker": worker, "attempts": 1, "answer": None, "meta": None,
                         "user_text": self.codec.seal(user_text, ctx(session_id, "user_text")),
-                        "started": now, "committed": None, "expires": now + self.idle_ttl},
+                        "started": now, "committed": None, "expires": m["hard_expires"]},
                        ("attribute_not_exists(pk)", {}, {}))
         except ConditionFailed:
             return self.begin_turn(session_id, msg_id, worker, user_text)  # raced: re-read
@@ -390,11 +416,11 @@ class DynamoSessionStore:
             raise StateTooLarge(f"session state is {len(blob.encode())} bytes; the item limit is 400 KB "
                                 "(lower max_history_chars)")
         new_meta = {**m, "state": blob, "version": expected_version + 1, "updated": now,
-                    "expires": now + self.idle_ttl}
-        # The journal dedupes resends for as long as the session lives, not 30 min from turn start.
+                    "expires": min(now + self.idle_ttl, m["hard_expires"])}
+        # All turns outlive the session: later activity cannot extend it past this fixed horizon.
         new_turn = {**turn, "status": "committed", "answer": self.codec.seal(answer, ctx(session_id, "answer")),
                     "meta": self.codec.seal(meta, ctx(session_id, "turn_meta")), "committed": now,
-                    "expires": now + self.idle_ttl}
+                    "expires": m["hard_expires"]}
         try:
             self.t.transact_put([
                 (new_meta, ("#v = :v AND #o = :me AND #l >= :now",

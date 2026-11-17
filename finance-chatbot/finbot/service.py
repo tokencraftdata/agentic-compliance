@@ -64,7 +64,12 @@ class ChatService:
             return self._send(p, session_id, msg_id, text)
 
     def _send(self, p: Principal, session_id: str, msg_id: str, text: str) -> dict:
-        self._own(p, session_id)
+        saved = self._own(p, session_id)
+        # History and cached replies were produced under these permissions. Never replay them
+        # under a different authorization snapshot, even if the subject and tenant still match.
+        if (p.role != saved.get("role") or set(p.groups) != set(saved.get("user_groups", []))
+                or set(p.scopes) != set(saved.get("scopes") or [])):
+            raise Forbidden("session permissions changed; start a new session")
         if not MSG_ID.match(msg_id or ""):
             raise BadRequest("msg_id must be 8-64 chars of [A-Za-z0-9_-] (client-generated, reused on resend)")
         text = (text or "").strip()
@@ -121,7 +126,7 @@ class ChatService:
                                                     "subject": subject})
         return {"revoked": {"jti": jti, "subject": subject}}
 
-    def _own(self, p: Principal, session_id: str) -> None:
+    def _own(self, p: Principal, session_id: str) -> dict:
         try:
             tenant = self.worker.store.tenant_of(session_id)
         except (KeyError, SessionExpired, TenantViolation):   # another tenant's session looks missing
@@ -129,9 +134,11 @@ class ChatService:
         self.authz.can_use_session(p, tenant)
         # A session belongs to the user who started it, not to the whole tenant: otherwise anyone in
         # the tenant who learns a session id could talk in it with that session's role and scopes.
-        owner = self.worker.store.load(session_id)[1].get("session", {}).get("subject") or ""
+        saved = self.worker.store.load(session_id)[1].get("session", {})
+        owner = saved.get("subject") or ""
         if owner and not hmac.compare_digest(owner, p.subject):
             raise Forbidden("session not found or not yours")
+        return saved
 
     # ------------------------------------------------------------------ control plane
 

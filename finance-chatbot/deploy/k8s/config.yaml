@@ -16,6 +16,8 @@ data:
   FINBOT_GUARDRAIL_VERSION: "1"
   FINBOT_STORE_PROVIDER: dynamodb
   FINBOT_DYNAMO_TABLE: finbot-sessions
+  # Use the TenantDataRoleArn output from infra/cdk; base pod roles cannot read sessions.
+  FINBOT_TENANT_ROLE_ARN: arn:aws:iam::ACCOUNT_ID:role/finbot-tenant-data
   FINBOT_QUEUE_URL: https://sqs.us-east-1.amazonaws.com/ACCOUNT_ID/finbot-turns.fifo
   FINBOT_DLQ_URL: https://sqs.us-east-1.amazonaws.com/ACCOUNT_ID/finbot-turns-dlq.fifo
   FINBOT_VISIBILITY_S: "150"

@@ -145,5 +145,131 @@ class ConditionEvaluator(unittest.TestCase):
             self.ev("size(#a) > :n", {}, {":n": 1}, {"#a": "a"})
 
 
+class DynamoRelease(unittest.TestCase):
+    def setUp(self):
+        self.clock = Clock()
+        self.table = InMemoryDynamo()
+        self.store = DynamoSessionStore(self.table, clock=self.clock)
+        self.store.create("s1", "m_100", {"x": 0})
+        self.store.claim("s1", "w")
+        self.store.begin_turn("s1", "m1", "w", "first")
+        self.store.commit_turn("s1", "m1", "w", 0, {"x": 1}, "first", {})
+
+    def test_release_cannot_roll_back_a_commit_or_clear_its_lease(self):
+        remove = self.table.remove_attributes
+
+        def interleaved(pk, sk, attributes, cond):
+            self.store.begin_turn("s1", "m2", "w", "second")
+            self.store.commit_turn("s1", "m2", "w", 1, {"x": 2}, "second", {})
+            remove(pk, sk, attributes, cond)
+
+        self.table.remove_attributes = interleaved
+        self.store.release("s1", "w")
+        self.assertEqual(self.store.load("s1"), (2, {"x": 2}))
+        self.assertEqual(self.table.get("S#s1", "META")["owner"], "w")
+        self.assertTrue(self.store.begin_turn("s1", "m2", "w", "second")["deduplicated"])
+
+    def test_release_cannot_clear_a_renewed_lease(self):
+        remove = self.table.remove_attributes
+
+        def interleaved(pk, sk, attributes, cond):
+            self.clock.t += 1
+            self.store.claim("s1", "w", 60)
+            remove(pk, sk, attributes, cond)
+
+        self.table.remove_attributes = interleaved
+        self.store.release("s1", "w")
+        self.assertEqual(self.table.get("S#s1", "META")["lease_until"], self.clock.t + 60)
+
+    def test_adapter_uses_conditional_update_not_a_snapshot_put(self):
+        from types import SimpleNamespace
+
+        from finbot.store_dynamo import Boto3Dynamo, ConditionFailed
+
+        calls = []
+        client = SimpleNamespace(exceptions=SimpleNamespace(ConditionalCheckFailedException=ConditionFailed),
+                                 update_item=lambda **kw: calls.append(kw))
+        table = Boto3Dynamo("table", "us-east-1", client=client)
+        table.remove_attributes("S#s1", "META", ["owner", "lease_until"],
+                                ("#v = :v", {"#v": "version"}, {":v": 2}))
+        (call,) = calls
+        self.assertEqual(call["UpdateExpression"], "REMOVE #remove0, #remove1")
+        self.assertEqual(call["ExpressionAttributeNames"],
+                         {"#v": "version", "#remove0": "owner", "#remove1": "lease_until"})
+        self.assertEqual(call["ExpressionAttributeValues"], {":v": {"N": "2"}})
+        self.assertEqual(call["ConditionExpression"], "#v = :v")
+
+
+class JournalRetention(unittest.TestCase):
+    def test_expired_journal_cleanup_never_deletes_an_active_sessions_first_turn(self):
+        clock = Clock()
+        table = InMemoryDynamo()
+        store = DynamoSessionStore(table, clock=clock, idle_ttl_s=30)
+        store.create("s1", "m_100", {})
+        for i in range(4):
+            store.claim("s1", "w")
+            store.begin_turn("s1", f"m{i}", "w", "hi")
+            store.commit_turn("s1", f"m{i}", "w", i, {}, f"answer {i}", {})
+            store.release("s1", "w")
+            clock.t += 20
+            # Emulate DynamoDB deleting every eligible item, including old turns.
+            for key, item in list(table.items.items()):
+                if item.get("expires", float("inf")) <= clock():
+                    del table.items[key]
+        store.claim("s1", "w")
+        prior = store.begin_turn("s1", "m0", "w", "retry")
+        self.assertEqual(prior["answer"], "answer 0")
+        self.assertTrue(prior["deduplicated"])
+
+    def test_active_sessions_expire_at_the_fixed_horizon_on_both_stores(self):
+        from finbot.store import MAX_SESSION_LIFETIME_S
+
+        for factory in (SessionStore, lambda **kw: DynamoSessionStore(InMemoryDynamo(), **kw)):
+            clock = Clock()
+            store = factory(clock=clock, idle_ttl_s=MAX_SESSION_LIFETIME_S + 100)
+            self.addCleanup(store.close)
+            store.create("s1", "m_100", {})
+            clock.t += MAX_SESSION_LIFETIME_S - 1
+            store.claim("s1", "w")
+            store.begin_turn("s1", "m1", "w", "hi")
+            store.commit_turn("s1", "m1", "w", 0, {}, "answer", {})
+            clock.t += 1
+            with self.assertRaises(SessionExpired):
+                store.load("s1")
+            with self.assertRaises(SessionExpired):
+                store.claim("s1", "w")
+
+    def test_legacy_dynamo_session_requires_a_fresh_session(self):
+        clock = Clock()
+        table = InMemoryDynamo()
+        store = DynamoSessionStore(table, clock=clock)
+        store.create("s1", "m_100", {})
+        del table.items[("S#s1", "META")]["hard_expires"]
+        with self.assertRaises(SessionExpired):
+            store.begin_turn("s1", "old-message", "w", "retry")
+
+    def test_sqlite_migrates_the_old_schema_without_losing_state(self):
+        import sqlite3
+        import tempfile
+        from contextlib import closing
+
+        from finbot.store import MAX_SESSION_LIFETIME_S
+
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "old.db")
+            with closing(sqlite3.connect(path)) as db:
+                db.execute("CREATE TABLE sessions (session_id TEXT PRIMARY KEY, tenant_id TEXT, version INTEGER, "
+                           "owner TEXT, lease_until REAL, state TEXT, updated REAL, expires REAL)")
+                db.execute("INSERT INTO sessions VALUES ('s1','m_100',1,NULL,NULL,'{}',1000000,1001800)")
+                db.commit()
+            store = SessionStore(path, clock=Clock())
+            try:
+                self.assertEqual(store.load("s1"), (1, {}))
+                self.assertEqual(store.db.execute("SELECT hard_expires FROM sessions").fetchone()[0],
+                                 1000000 + MAX_SESSION_LIFETIME_S)
+            finally:
+                store.close()
+
+
 if __name__ == "__main__":
     unittest.main()

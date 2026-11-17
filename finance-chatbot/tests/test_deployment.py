@@ -106,5 +106,66 @@ class FifoDeadLetter(unittest.TestCase):
         self.assertEqual((sent[0]["MessageGroupId"], sent[0]["MessageDeduplicationId"]), ("s1", "dlq-m1"))
 
 
+class DeploymentConfiguration(unittest.TestCase):
+    def test_enabled_production_adapters_are_importable(self):
+        # CI installs requirements.txt and checks these same imports inside the built image.
+        from importlib import import_module
+        for module in ("jwt", "opensearchpy", "gunicorn"):
+            with self.subTest(module=module):
+                import_module(module)
+
+    def test_jwks_dynamo_requires_the_tenant_role_before_building_adapters(self):
+        from finbot.config import Settings
+        with self.assertRaisesRegex(ValueError, "FINBOT_TENANT_ROLE_ARN"):
+            Settings(store_provider="dynamodb", auth_mode="jwks", tenant_role_arn="")
+        Settings(store_provider="dynamodb", auth_mode="jwks", tenant_role_arn="arn:aws:iam::123:role/tenant")
+
+    def test_reference_manifest_supplies_the_tenant_role(self):
+        from pathlib import Path
+        config = (Path(__file__).resolve().parents[1] / "deploy/k8s/config.yaml").read_text()
+        self.assertIn("FINBOT_TENANT_ROLE_ARN: arn:aws:iam::ACCOUNT_ID:role/finbot-tenant-data", config)
+
+
+class ReleaseExclusion(unittest.TestCase):
+    def test_followup_cannot_enter_while_previous_turn_is_releasing(self):
+        import threading
+
+        from finbot.store import LeaseHeld
+
+        c = container(Clock())
+        self.addCleanup(c.close)
+        sid = c.worker.start_session("m_100", ["support"])
+        releasing, resume = threading.Event(), threading.Event()
+        release = c.store.release
+        errors = []
+
+        def paused_release(*args):
+            releasing.set()
+            if not resume.wait(5):
+                raise TimeoutError("test release was not resumed")
+            release(*args)
+
+        c.store.release = paused_release
+
+        def first():
+            try:
+                c.worker.handle(sid, "msg-0001", f"why did {DECLINED} fail?")
+            except Exception as exc:
+                errors.append(exc)
+
+        thread = threading.Thread(target=first)
+        thread.start()
+        try:
+            self.assertTrue(releasing.wait(5))
+            with self.assertRaises(LeaseHeld):
+                c.worker.handle(sid, "msg-0002", f"why did {DECLINED} fail?")
+        finally:
+            resume.set()
+            thread.join(5)
+        self.assertFalse(thread.is_alive())
+        self.assertEqual(errors, [])
+        self.assertEqual(c.worker.handle(sid, "msg-0002", f"why did {DECLINED} fail?")["version"], 2)
+
+
 if __name__ == "__main__":
     unittest.main()

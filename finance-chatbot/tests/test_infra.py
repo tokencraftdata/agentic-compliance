@@ -90,6 +90,67 @@ class Stack(unittest.TestCase):
         self.assertIn("sts:TagSession", self.json)
         self.assertIn("aws:RequestTag/tenant_id", self.json)
 
+    def test_ticket_store_operations_are_allowed_without_widening_session_access(self):
+        from finbot.security import Principal
+        from finbot.store_dynamo import InMemoryDynamo
+        from finbot.tenancy import TenantScopedTable, tenant_scope
+        from finbot.tickets import DONE, DynamoTickets, TicketDesk, open_ticket
+
+        policies = self.t.find_resources("AWS::IAM::Policy")
+        for role in ("ApiRolePolicy", "WorkerRolePolicy"):
+            (policy,) = [p["Properties"] for name, p in policies.items() if name.startswith(role)]
+            statements = policy["PolicyDocument"]["Statement"]
+            ticket_statements = [s for s in statements if s.get("Condition", {}).get(
+                "ForAllValues:StringEquals", {}).get("dynamodb:LeadingKeys") == ["TICKETS"]]
+            self.assertEqual(len(ticket_statements), 1)
+            statement = ticket_statements[0]
+            self.assertEqual(set(statement["Action"]), {"dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:Query"})
+            self.assertEqual(statement["Effect"], "Allow")
+            self.assertNotEqual(statement["Resource"], "*")
+
+            class PolicyTable(InMemoryDynamo):
+                # Execute the real ticket adapter against the synthesized exact-partition grant.
+                def __init__(self, grant):
+                    super().__init__()
+                    self.grant = grant
+
+                def allowed(self, pk, action):
+                    if pk not in self.grant["Condition"]["ForAllValues:StringEquals"]["dynamodb:LeadingKeys"]:
+                        raise PermissionError(pk)
+                    if action not in self.grant["Action"]:
+                        raise PermissionError(action)
+
+                def get(self, pk, sk):
+                    self.allowed(pk, "dynamodb:GetItem")
+                    return super().get(pk, sk)
+
+                def put(self, item, cond=None):
+                    self.allowed(item["pk"], "dynamodb:PutItem")
+                    return super().put(item, cond)
+
+                def query(self, pk, sk_prefix):
+                    self.allowed(pk, "dynamodb:Query")
+                    return super().query(pk, sk_prefix)
+
+            table = PolicyTable(statement)
+            store = DynamoTickets(TenantScopedTable(table, lambda t: self.fail("tickets used tenant role")))
+            with tenant_scope("m_100"):
+                ticket, created = open_ticket(store, tenant_id="m_100", session_id="m_100.s1", role="customer",
+                                              kind="refund", txn_id="txn_ABC123", text="refund please", facts={})
+            self.assertTrue(created)
+            desk = TicketDesk(store)
+            support = Principal("staff", "internal", "support")
+            self.assertEqual([t.id for t in desk.list(support)], [ticket.id])
+            desk.claim(support, ticket.id)
+            self.assertEqual(desk.resolve(support, ticket.id, DONE, "completed").status, DONE)
+            with self.assertRaises(PermissionError):
+                table.get("S#m_200.s1", "META")
+
+    def test_tenant_role_is_exported_for_the_manifest(self):
+        outputs = self.t.to_json()["Outputs"]
+        self.assertIn("TenantDataRoleArn", outputs)
+        self.assertIn("TenantDataRole", json.dumps(outputs["TenantDataRoleArn"]["Value"]))
+
     def test_audit_bucket_is_write_once(self):
         self.t.has_resource_properties(
             "AWS::S3::Bucket",

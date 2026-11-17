@@ -213,6 +213,14 @@ class FinbotStack(Stack):
                     conditions={"StringLike": {"aws:RequestTag/tenant_id": "?*"}},
                 )
             )
+        # Tickets are a shared support-desk resource, separate from tenant-isolated sessions.
+        # Only the operations used by DynamoTickets, on its exact partition; never table-wide access.
+        for role in (api_role, worker_role):
+            role.add_to_principal_policy(iam.PolicyStatement(
+                actions=["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:Query"],
+                resources=[table.table_arn],
+                conditions={"ForAllValues:StringEquals": {"dynamodb:LeadingKeys": ["TICKETS"]}},
+            ))
         queue.grant_send_messages(api_role)
         queue.grant_consume_messages(worker_role)
         dlq.grant_send_messages(worker_role)
@@ -405,5 +413,6 @@ class FinbotStack(Stack):
             ("QueueUrl", queue.queue_url),
             ("AuditBucket", audit.bucket_name),
             ("SessionsTable", table.table_name),
+            ("TenantDataRoleArn", tenant_role.role_arn),
         ):
             CfnOutput(self, name, value=value)

@@ -104,5 +104,38 @@ class ServiceAndHttp(unittest.TestCase):
         self.assertEqual(json.loads(out), {"cancelled": "msg-0001"})
 
 
+class FinalCallCancellation(unittest.TestCase):
+    def test_cancel_during_final_call_discards_state_and_deduplicates_on_both_stores(self):
+        from finbot.store import SessionStore
+
+        for factory in (SessionStore, lambda **kw: DynamoSessionStore(InMemoryDynamo(), **kw)):
+            clock = Clock()
+            c = container(clock, store=factory(clock=clock))
+            self.addCleanup(c.close)
+            sid = c.worker.start_session("m_100", ["support"], "customer")
+            before = c.store.load(sid)[1]
+            engine = c.chatbot.engine()
+            original_create = engine.create
+            calls = []
+
+            def cancel_final(*args, create=original_create, seen=calls, worker=c.worker, session_id=sid, **kw):
+                result = create(*args, **kw)
+                seen.append(result.stop_reason)
+                if result.stop_reason != "tool_use":
+                    worker.cancel(session_id, "msg-0001")
+                return result
+
+            engine.create = cancel_final
+            result = c.worker.handle(sid, "msg-0001", f"why did {DECLINED} fail?")
+            self.assertEqual(result["blocked_by"], "cancelled")
+            self.assertEqual(c.store.load(sid)[1], before)
+            self.assertGreater(len(calls), 1)
+            count = len(calls)
+            again = c.worker.handle(sid, "msg-0001", "retry")
+            self.assertTrue(again["deduplicated"])
+            self.assertEqual(again["answer"], replies.CANCELLED)
+            self.assertEqual(len(calls), count)
+
+
 if __name__ == "__main__":
     unittest.main()

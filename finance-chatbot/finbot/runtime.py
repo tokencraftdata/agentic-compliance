@@ -110,17 +110,16 @@ class Worker:
             self._in_flight.add(session_id)
         try:
             result = self._handle(session_id, msg_id, text)
+            # Keep local exclusion through release: another thread has the same worker id.
+            # On a failed turn leave the lease to expire, as after a real crash.
+            try:
+                self.store.release(session_id, self.id)
+            except Exception as e:  # noqa: BLE001 - best effort; the lease expires anyway
+                log.warning("lease release failed for a session: %s", type(e).__name__)
+            return result
         finally:
             with self._in_flight_lock:
                 self._in_flight.discard(session_id)
-        # Free the session at once when the turn ended normally, so a follow-up on another pod
-        # need not wait out the lease. After an exception the lease is left to expire, as it
-        # would after a real crash, so a retry cannot overlap work still unwinding here.
-        try:
-            self.store.release(session_id, self.id)
-        except Exception as e:  # noqa: BLE001 - best effort; the lease expires anyway
-            log.warning("lease release failed for a session: %s", type(e).__name__)
-        return result
 
     def _handle(self, session_id: str, msg_id: str, text: str) -> dict:
         self.store.claim(session_id, self.id, self.lease_s)          # LeaseHeld if another live owner
@@ -149,6 +148,7 @@ class Worker:
             if self.store.read_control(key):                          # cancelled before it started
                 raise TurnCancelled(msg_id)
             turn = self.bot.ask(cs, text)                             # a crash here commits nothing
+            heartbeat()  # also observe cancellation during the final model call or output checks
         except TurnCancelled:
             # Commit the state as it was before the turn, with a fixed answer, so a resend of
             # the same msg_id returns "cancelled" instead of running the turn again.
@@ -169,14 +169,13 @@ class Worker:
                 "repaired": turn.repaired, "escalated": turn.escalated,
                 "tier": turn.tier, "models": turn.models_used,
                 "tools": [c["name"] for c in turn.tools_called]}
-        self.store.claim(session_id, self.id, self.lease_s)          # renew right before committing
         new_version = self.store.commit_turn(session_id, msg_id, self.id, version,
                                              dump_session(cs), turn.answer, meta)   # StaleWrite if superseded
         return {"answer": turn.answer, **meta, "version": new_version, "deduplicated": False}
 
     def cancel(self, session_id: str, msg_id: str, by: str = "") -> None:
         """Ask the worker running (or about to run) this turn to stop. Cooperative: it stops at
-        its next heartbeat, before the next model call. A tool call in flight finishes; nothing
+        its next heartbeat, before the next model call or commit. A tool call in flight finishes; nothing
         is committed but the pre-turn state, and tools are read-only, so stopping is safe."""
         self.store.write_control(cancel_key(session_id, msg_id), {"by": by, "at": self.store.clock()})
 

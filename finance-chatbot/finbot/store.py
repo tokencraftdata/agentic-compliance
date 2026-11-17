@@ -51,10 +51,14 @@ class SessionExpired(StoreError):
     pass
 
 
+MAX_SESSION_LIFETIME_S = 86400  # idle expiry still applies; a new session is required after one day
+
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS sessions (
   session_id TEXT PRIMARY KEY, tenant_id TEXT NOT NULL, version INTEGER NOT NULL,
-  owner TEXT, lease_until REAL, state TEXT NOT NULL, updated REAL NOT NULL, expires REAL NOT NULL);
+  owner TEXT, lease_until REAL, state TEXT NOT NULL, updated REAL NOT NULL, expires REAL NOT NULL,
+  hard_expires REAL NOT NULL);
 CREATE TABLE IF NOT EXISTS turns (
   session_id TEXT NOT NULL, msg_id TEXT NOT NULL, turn_no INTEGER NOT NULL, status TEXT NOT NULL,
   worker TEXT, attempts INTEGER NOT NULL DEFAULT 1, user_text TEXT, answer TEXT, meta TEXT,
@@ -82,6 +86,12 @@ class SessionStore:
         self.db.executescript(SCHEMA)
         self.clock, self.idle_ttl = clock, idle_ttl_s
         self._lock = threading.Lock()
+        # Serialize migration across processes opening an existing database at the same time.
+        # Old SQLite journals have no TTL; retain them while bounding further session activity.
+        with self._tx() as db:
+            if "hard_expires" not in {r[1] for r in db.execute("PRAGMA table_info(sessions)")}:
+                db.execute("ALTER TABLE sessions ADD COLUMN hard_expires REAL NOT NULL DEFAULT 0")
+                db.execute("UPDATE sessions SET hard_expires = updated + ?", (MAX_SESSION_LIFETIME_S,))
 
     def close(self) -> None:
         self.db.close()
@@ -105,13 +115,13 @@ class SessionStore:
         return Tx()
 
     def _row(self, db, session_id):
-        r = db.execute("SELECT tenant_id, version, owner, lease_until, state, expires FROM sessions "
+        r = db.execute("SELECT tenant_id, version, owner, lease_until, state, expires, hard_expires FROM sessions "
                        "WHERE session_id=?", (session_id,)).fetchone()
         if r is None:
             raise KeyError(session_id)
-        if r[5] < self.clock():
+        if min(r[5], r[6]) <= self.clock():
             raise SessionExpired(session_id)
-        return r
+        return r[:6]
 
     # ---------------------------------------------------------------- sessions
 
@@ -120,9 +130,9 @@ class SessionStore:
             raise ValueError("session id names a different tenant")   # the id's tenant is trusted later
         now = self.clock()
         with self._tx() as db:
-            db.execute("INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?)",
+            db.execute("INSERT INTO sessions VALUES (?,?,?,?,?,?,?,?,?)",
                        (session_id, tenant_id, 0, None, None, self.codec.seal(state, ctx(session_id, "session_state")),
-                        now, now + self.idle_ttl))
+                        now, now + min(self.idle_ttl, MAX_SESSION_LIFETIME_S), now + MAX_SESSION_LIFETIME_S))
 
     def load(self, session_id: str) -> tuple[int, dict]:
         with self._tx() as db:
@@ -186,7 +196,8 @@ class SessionStore:
                 raise StaleWrite(f"version {version} != expected {expected_version}")
             if owner != worker or not lease_until or lease_until < now:
                 raise StaleWrite(f"lease lost (owner={owner})")
-            db.execute("UPDATE sessions SET state=?, version=?, updated=?, expires=? WHERE session_id=?",
+            db.execute("UPDATE sessions SET state=?, version=?, updated=?, expires=MIN(?, hard_expires) "
+                       "WHERE session_id=?",
                        (self.codec.seal(state, ctx(session_id, "session_state")), version + 1, now,
                         now + self.idle_ttl, session_id))
             db.execute("UPDATE turns SET status='committed', answer=?, meta=?, committed=? "
