@@ -125,6 +125,7 @@ data/                    synthetic dev split (600 payments + 176 domain records,
                          21 planted attacks); routing traces on every payment; see data/README.md
 docs/diagrams/           article diagrams: make.py draws SVG, export.sh renders 2x PNG
 docs/domains.md          domains: what ships, how to add one, where the design fits and doesn't
+docs/paper.md            the design and its evaluation written up as a paper, including value provenance
 docs/reliability.md      crash recovery, session store, hallucination control
 docs/design.svg          design diagram: layers, control plane, ingestion
 docs/security.md         prompt injection, red-team results, other controls, research references
