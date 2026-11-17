@@ -76,6 +76,7 @@ finbot/language.py       language detection: non-English messages go to a person
 finbot/freshness.py      stale help pages, and help pages that disagree with the retry and code tables
 finbot/opsmetrics.py     repair, record-answer, refusal and handoff rates from the turn audit log
 finbot/untrusted.py      prompt-injection defences: normalise + screen, tool-result sanitising, spotlighting, leak canary
+finbot/provenance.py     value provenance: third-party text in tool results cannot vouch for a stated fact
 finbot/queue.py          queue worker (SQS / in-memory): ack, retry-later, dead-letter
 finbot/worker_main.py    queue worker process for a container: one turn at a time, clean SIGTERM, heartbeat
 finbot/actions.py        write-request detection: refund/cancel/retry/... asked of a read-only bot
@@ -146,6 +147,7 @@ tests/test_deployment.py    5 tests: queue worker under rollout, kill and redeli
 tests/test_operations.py    9 tests: context budget, session-store limits, tickets shared across workers
 tests/test_pci.py           13 tests: card data masked on every path (history, audit, tickets, review queue)
 tests/test_research.py      8 tests: argument provenance, multi-turn attacks, code-built recap, pass^k
+tests/test_provenance.py    12 tests: third-party text cannot vouch for an amount, date, phone or email
 tests/test_tickets.py       14 tests: write requests become tickets; desk claim and resolve
 tests/test_mitigations.py   27 tests: plain-word reasons, record-built answers, language, source freshness,
                             upkeep and cost reports, stated details, citations
@@ -158,7 +160,7 @@ tests/test_infra.py          6 tests: ALB TLS and hardening, WAF rules, KMS rota
                             bucket (needs aws-cdk-lib)
 ```
 
-355 tests in all.
+367 tests in all.
 
 ## Design
 

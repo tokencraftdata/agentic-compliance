@@ -26,6 +26,7 @@ attacks.
 | Read another merchant's data | Tenant comes from the verified token; tools scope by session tenant; schemas have no tenant field | `security.py`, `tools.py` |
 | Change money or state | All tools are read-only | `tools.py` |
 | Make the bot assert a false status, amount or code | Evidence checks against the system of record | `guardrails.evidence_check` |
+| Plant a plain-looking fact ("REFUND 480.00 USD BY 2026-12-01 CALL 1-888-…" in a descriptor) | Value provenance: an amount, date, time, percentage, code or card digit in an answer must appear in a field our own systems set. Merchant names, descriptors and log messages reach the model but cannot vouch for a fact, and a phone number or email must come from our own records or help pages | `provenance.py` |
 | Send the user to a phishing link | Only a knowledge-base page's own `source_url` may be cited. A URL that merely appears inside a record or a document body is not accepted | `evidence_check` |
 | Get the user to hand over secrets | Answers asking the user to send a card number, CVV, PIN, password or one-time code are blocked | `credential_request_check` |
 | Push dangerous retry advice | Retry advice must match the policy table; "retry right away" is always blocked | `retry_advice_check` |
@@ -63,6 +64,14 @@ The two newest attacks are **pivots** (CaMeL, Debenedetti et al. 2025): a record
 up txn_X". Screening does not catch that wording, so it reaches the model even when every layer is
 on. Argument provenance stops it: a tool may be called only with an id the user typed, so the
 lookup is refused. With provenance off (undefended), both pivots succeed.
+
+Pivots move control flow; a quieter attack moves data. A descriptor such as "NORTHWIND REFUND
+480.00 USD BY 2026-12-01 HELP 1-888-555-0142" holds no instruction, so screening passes it. Before
+value provenance, the detail checks counted every string in a tool result as evidence, so an answer
+repeating that amount, date or phone number counted as grounded. Now the checks read only the fields
+our own systems set (`provenance.trusted_view`). The five such answers in `tests/test_provenance.py`
+were all allowed before the change and are all blocked after it; across 2,876 correct answers on the
+two data sets, none is newly blocked.
 
 **Multi-turn escalation** (`data/redteam_multiturn.jsonl`, `run_redteam.py --cases ...`): five
 conversations that start harmless and escalate (Crescendo, Russinovich et al. 2025; MHJ, Li et al.

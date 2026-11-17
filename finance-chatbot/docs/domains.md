@@ -64,7 +64,7 @@ What the core then does for every domain, with no extra code:
 | Status check | a status the record does not have is blocked: in any tense for a decision, in the present tense for a transient state, and only when the sentence is about the record |
 | Cause check | a cause given in words must be one the record's reason keys (or status) carry; a cause no record can carry is always a guess |
 | Reason-key check | a reason key in the answer must be in this turn's records |
-| Detail checks | amounts, currencies, dates, times, percentages, card digits and links must come from the records |
+| Detail checks | amounts, currencies, dates, times, percentages, card digits, links, phone numbers and emails must come from the records' own fields, not from third-party text such as a merchant's descriptor |
 | Resend check | when `resend` is False, advice to send the same request again is blocked unless it carries an allowed qualifier |
 | Write requests | "cancel / unblock / pause / appeal / extend" on any record becomes a ticket for a person |
 | Record-built answer | when the model's answer can't be verified, `summary` plus the policy guidance is said instead of a refusal |

@@ -389,9 +389,10 @@ def detail_check(answer: str, tool_log: list[dict]) -> list[str]:
     """Details beyond amounts and codes: currency, money written loosely ("$130"), percentages,
     card digits and brand, dates and times, known failure keys, and status words. Each must
     appear in this turn's tool data."""
+    from .provenance import trusted_blob
     from .reasons import KEY_CAUSE
     found = [c for c in tool_log if c["result"]["status"] == "found"]
-    blob = " ".join(json.dumps(c["result"]["data"]) for c in found)
+    blob = trusted_blob(tool_log)   # a merchant's descriptor or a log message cannot vouch for a detail
     low, numbers = blob.lower(), _numbers(blob)
     txns = [c["result"]["data"] for c in found if c["name"] == "get_transaction"]
     reasons = [f"ungrounded_currency:{c}" for c in sorted(set(CURRENCY.findall(answer))) if c not in blob]
@@ -456,6 +457,7 @@ def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
     Free-text explanations are left to the contextual grounding filter.
     """
     from .domains import find_ids, id_of, record_tools
+    from .provenance import contact_check, trusted_blob
     reasons: list[str] = []
     found_txns, missing_txns, evidence, statuses = set(), set(), [], {}
     for call in tool_log:
@@ -481,6 +483,7 @@ def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
         if url.rstrip(".,;:") not in kb_urls:
             reasons.append(f"unverified_url:{url}")
     reasons += credential_request_check(answer)
+    reasons += contact_check(answer, tool_log)
     reasons += detail_check(answer, tool_log)
     reasons += citation_check(answer, tool_log)
     reasons += lifecycle_check(answer, tool_log)
@@ -510,6 +513,7 @@ def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
     for tid in set(find_ids(answer)):
         if tid not in found_txns and tid not in missing_txns and tid != focus_txn:
             reasons.append(f"unverified_txn_reference:{tid}")
+    blob = trusted_blob(tool_log)   # amounts and codes rest on our own fields, not third-party text
     for amt in set(AMOUNT.findall(answer)):
         if amt not in blob:
             reasons.append(f"ungrounded_amount:{amt}")
