@@ -7,6 +7,9 @@ Templates with a "customer" and a "support" form are picked with for_role()
 """
 from __future__ import annotations
 
+NOT_ALLOWED = ("I can't look that up for you, so I haven't opened a request. A support specialist can help "
+               "if you need this.")
+
 CANCELLED = "Stopped. I didn't finish that request, and nothing was changed."
 
 UNAVAILABLE = ("I can't reach our systems right now, so I won't guess. Please try again in a minute or two. "

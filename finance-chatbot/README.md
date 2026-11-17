@@ -16,6 +16,10 @@ Underneath all three: prompt-injection defences. Against a stand-in model that o
 
 Read more: [hallucination control](docs/reliability.md#3-hallucination-control), [adaptive guardrails](docs/design.md#10-adaptive-guardrails), [crash recovery and failover](docs/reliability.md#2-crash-recovery-finbotruntimepy), [the article](docs/posts/article.md).
 
+![finbot: the whole system on one page](docs/diagrams/finbot-system.png)
+
+Which requirements are met, with evidence: [docs/requirements.md](docs/requirements.md). The turn pipeline in more detail:
+
 ![finbot architecture](docs/diagrams/finbot-architecture.png)
 
 How to add a domain, which other areas the design fits (airline refunds, healthcare claims, returns, SaaS billing) and where it does not (advice, prose rules, discretionary decisions): [docs/domains.md](docs/domains.md). Diagrams for articles, as SVG and 2x PNG: [docs/diagrams/](docs/diagrams/).
@@ -122,6 +126,7 @@ scripts/ingest.py        any source -> any vector store, incremental; or start a
 scripts/generate_synthetic.py seeded synthetic customers, payments, domain records, logs, KB pages, eval set
 scripts/run_eval.py      runs data/eval.jsonl through the bot with deterministic checks
 scripts/run_redteam.py   prompt-injection red team (data/redteam.jsonl) with a worst-case model and ablations
+scripts/durability_test.py real processes: kill -9 mid-turn, frozen worker, failover, contention, killed ingestion
 scripts/load_test.py     load test of the full worker path; --model-latency stands in for a real model
 scripts/simulate_routing.py  routing scenarios (steady, processor outage, degradation, issuer outage)
 scripts/guard_controller.py  adaptive guardrail controller: label, cycle, status, approve, promote, rollback, demo
@@ -135,6 +140,7 @@ docs/reliability.md      crash recovery, session store, hallucination control
 docs/design.svg          design diagram: layers, control plane, ingestion
 docs/security.md         prompt injection, red-team results, other controls, research references
 docs/design.md           layers, design patterns, control plane, DynamoDB, security, ingestion, where Claude is used
+docs/requirements.md     every requirement: met, partly met or not, with evidence; review findings and fixes
 docs/agent-security.md   guardrails platform design and twelve agent-security questions, answered from the code
 docs/platform-design.md  agent orchestration platform (Kafka, worker pools, leases, cancellation) and
                          multi-tenant AI platform (isolation, quotas, noisy neighbors, leakage)
@@ -159,7 +165,8 @@ tests/test_operations.py    9 tests: context budget, session-store limits, ticke
 tests/test_pci.py           13 tests: card data masked on every path (history, audit, tickets, review queue)
 tests/test_research.py      8 tests: argument provenance, multi-turn attacks, code-built recap, pass^k
 tests/test_provenance.py    12 tests: third-party text cannot vouch for an amount, date, phone or email
-tests/test_security_gateway.py 12 tests: argument validation, deny and approval rules, bulk access, behaviour lock, events
+tests/test_security_gateway.py 24 tests: argument validation, rules, approval, bulk access, behaviour lock, events,
+                            and one regression test per code-review finding
 tests/test_tenancy.py   17 tests: tenant-first ids, tenant-bound encryption, scoped data access, shared rate limits
 tests/test_cancellation.py  6 tests: cancel before start or mid-turn, resend after cancel, owner only, HTTP
 tests/test_cache_telemetry.py  14 tests: what is cached, cache outages, records never cached, GenAI spans hold no content
@@ -175,7 +182,7 @@ tests/test_infra.py          6 tests: ALB TLS and hardening, WAF rules, KMS rota
                             bucket (needs aws-cdk-lib)
 ```
 
-417 tests in all.
+429 tests in all.
 
 ## Design
 

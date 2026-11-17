@@ -1,4 +1,4 @@
-"""Draws the four article diagrams as SVG; export.sh turns them into 2x PNGs for Medium and Substack.
+"""Draws the five article diagrams as SVG; export.sh turns them into 2x PNGs for Medium and Substack.
 
     python3 docs/diagrams/make.py && sh docs/diagrams/export.sh
 """
@@ -444,9 +444,130 @@ def security() -> None:
     s.save("finbot-security.svg")
 
 
+# ------------------------------------------------------------------ 5. the whole system
+
+def system() -> None:
+    s = Svg(1600, 1680)
+    s.text(40, 54, "finbot: the whole system on one page", 32, "bold")
+    s.text(40, 88, "Request path top to bottom; stores, ingestion and governance underneath. "
+                   "Every box is Python in finbot/, infra/cdk or deploy/k8s.", 18, color=MUTED)
+    L, G = 15.5, 24
+
+    def card(x, y, w, h, kind, title, lines):
+        s.card(x, y, w, h, kind, title, lines, title_size=19, line_size=L, gap=G)
+
+    # row 1: edge
+    card(40, 120, 300, 170, "people", "Clients", ["customers, support agents", "bearer token (OIDC)",
+                                                   "client msg_id, reused on resend"])
+    card(380, 120, 420, 170, "block", "Edge (infra/cdk)", ["WAF: per-IP rate, managed rules, 16 KB body",
+                                                           "ALB: TLS 1.2+, HTTP to HTTPS",
+                                                           "private subnets, VPC endpoints", "no NAT for AWS traffic"])
+    card(840, 120, 720, 170, "code", "API boundary (http_api.py, service.py)",
+         ["verify token (key ring by kid) and revocation (2 s) · deny-by-default roles",
+          "rate limit per user and tenant, shared counters across pods",
+          "tenant scope from the token · DLP in and out · cancel a running turn",
+          "same 403 for another tenant's session and a missing one"])
+    s.arrow([(340, 205), (378, 205)])
+    s.arrow([(800, 205), (838, 205)])
+
+    # row 2: queue and workers
+    card(40, 330, 520, 150, "data", "Turn queue (SQS FIFO)", ["group = session, dedup = msg_id",
+                                                             "retry later on outage · DLQ after 5",
+                                                             "forged tenant in a message → DLQ"])
+    card(600, 330, 960, 150, "code", "Worker pool (runtime.py, worker_main.py) · stateless, KEDA on queue depth",
+         ["claim lease (60 s) → load committed state → journal turn by msg_id → run → CAS commit",
+          "heartbeat before each model call · cancel flag checked there · late writer → StaleWrite",
+          "crash = nothing committed; next worker re-runs from the last commit (tools are read-only)"])
+    s.arrow([(1200, 290), (1200, 306), (300, 306), (300, 328)])
+    s.text(320, 322, "intended path; today the API runs the turn in-process", 14, color=MUTED, italic=True)
+    s.arrow([(560, 405), (598, 405)])
+
+    # row 3: the turn
+    s.box(40, 520, 1520, 430, "grey", dash=True)
+    s.text(60, 552, "One turn (orchestrator.py)", 21, "bold", C["grey"][0])
+    s.arrow([(1080, 480), (1080, 518)])
+    card(60, 570, 330, 220, "code", "Stages, in order", ["1 session risk lock", "2 input guard (injection)",
+                                                        "3 language → person", "4 learned input rules",
+                                                        "5 focus + user-typed ids", "6 write request → ticket",
+                                                        "7 model loop, ≤ 6 tool rounds"])
+    card(410, 570, 330, 220, "model", "Model engine (models.py)", ["Bedrock us-east-1", "→ Bedrock us-west-2",
+                                                                    "→ Claude API", "retries inside 90 s deadline",
+                                                                    "breaker per model, shared", "refusal → next model",
+                                                                    "optional cheaper tier"])
+    card(760, 570, 360, 220, "code", "Security gateway",
+         ["record ids must come from the user", "arguments fit the tool schema",
+          "rules: deny or need approval", "> 3 records in a turn → approval",
+          "grant: scope, tenant, session, 5 min", "behaviour → session risk",
+          "one security event stream"])
+    card(1140, 570, 400, 220, "data", "Read-only tools over 12 domains",
+         ["accounts · transfers · KYC · lending", "cards · onboarding · disputes",
+          "mortgages · BNPL · insurance", "subscriptions · card payments",
+          "field allow-list, tenant-scoped", "results screened + spotlighted",
+          "help-page search (cached)"])
+    card(60, 810, 720, 124, "code", "Hallucination gate (verification.py)",
+         ["evidence · reason · domain status and cause · language · commitments · tickets",
+          "value provenance: facts only from our own fields · contacts and links checked",
+          "one repair → answer built from the record → \"I won't guess\" → person after 2"])
+    card(800, 810, 740, 124, "code", "Output", ["output guard (contextual grounding) · PII mask · prompt-leak canary",
+                                               "stale help page → note added by code",
+                                               "DLP on the way out; card data found → egress_leak"])
+    s.arrow([(390, 680), (408, 680)], color=C["model"][0])
+    s.arrow([(740, 680), (758, 680)], color=C["code"][0])
+    s.arrow([(1120, 680), (1138, 680)], color=C["code"][0])
+    s.arrow([(575, 790), (575, 808)], color=C["model"][0])
+    s.arrow([(780, 872), (798, 872)], color=C["code"][0])
+
+    # row 4: stores and ingestion
+    card(40, 990, 470, 230, "data", "Session store (DynamoDB · SQLite in dev)",
+         ["S#<tenant>.<uuid>: state, journal, version, lease", "sealed AES-256-GCM, key per value (KMS)",
+          "context: tenant + session + purpose", "per-tenant IAM role (LeadingKeys)",
+          "H# breaker health · C# control · R# counters", "tickets and approvals · TTL · PITR"])
+    card(530, 990, 300, 230, "data", "Cache (cache.py)", ["Valkey/Redis or memory", "help-page searches, 5 min",
+                                                           "model health, 1 s", "never records or answers",
+                                                           "outage = miss"])
+    card(850, 990, 300, 230, "data", "Help-page index", ["OpenSearch · pgvector", "or local JSON",
+                                                          "hybrid search", "access filter before rank",
+                                                          "cites source_url"])
+    card(1170, 990, 390, 230, "code", "Ingestion (ingestion/, nightly)", ["S3 · SharePoint · web · local",
+                                                                          "screen injection → quarantine",
+                                                                          "mask PII before chunking",
+                                                                          "chunk → embed → upsert",
+                                                                          "incremental by version, atomic save",
+                                                                          "audit: stale or conflicting pages"])
+    s.arrow([(1168, 1105), (1152, 1105)], color=C["code"][0])
+    s.arrow([(800, 950), (800, 970), (275, 970), (275, 988)])
+    s.arrow([(1340, 950), (1340, 970), (1000, 970), (1000, 988)])
+
+    # row 5: observability and governance
+    card(40, 1260, 370, 200, "code", "AI observability (telemetry.py)", ["OpenTelemetry GenAI spans:",
+                                                                         "turn → chat → execute_tool → verify",
+                                                                         "tokens, failover, reason codes",
+                                                                         "no prompts, answers or ids"])
+    card(430, 1260, 370, 200, "data", "Audit and security events", ["one line per turn and decision",
+                                                                    "hash-chained, own KMS key",
+                                                                    "S3 Object Lock, 1 year",
+                                                                    "categories and counts, no values"])
+    card(820, 1260, 360, 200, "code", "Control and adaptive rules", ["drain or restore a model",
+                                                                     "rules from reviewed mistakes",
+                                                                     "gate → shadow → canary → admin",
+                                                                     "versioned, one-call rollback"])
+    card(1200, 1260, 360, 200, "people", "People", ["ticket desk: write requests", "approve held tool calls",
+                                                     "review queue, labels", "handoff after 2 failures"])
+
+    s.text(40, 1508, "Verified offline (scripted model, synthetic data): 429 tests · 8/8 multi-process durability "
+                     "scenarios (kill -9 mid-turn, frozen worker, lost reply,", 16, color=MUTED)
+    s.text(40, 1532, "32-turn memory across restarts, model failover, 6-process contention, guardrail outage, "
+                     "killed ingestion) · 0 of 2,259 injected hallucinations reach users ·", 16, color=MUTED)
+    s.text(40, 1556, "0 of 34 injection attacks succeed defended · never deployed, never run against a live model.",
+           16, color=MUTED)
+    legend(s, 1610)
+    s.save("finbot-system.svg")
+
+
 if __name__ == "__main__":
     architecture()
     gate()
     domain()
     security()
+    system()
     print("wrote", ", ".join(n for n in sorted(os.listdir(OUT)) if n.endswith(".svg")))

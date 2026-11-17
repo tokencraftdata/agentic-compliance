@@ -245,6 +245,8 @@ validation.
 | Crash after commit, before reply | client resend | stored reply returned, no model call | the same answer | `test_2_crash_after_commit_...` |
 | Stalled worker returns late | version or lease mismatch | its commit fails with `StaleWrite`; heartbeat stops it early | the new worker's answer | `test_3_late_worker_...`, `test_heartbeat_stops_...` |
 | Long but healthy turn | — | lease renewed before every model call and before commit | normal answer | `test_long_healthy_turn_keeps_its_lease` |
+| Follow-up lands on another pod | — | the lease is released when a turn ends normally (left to expire after an exception, as after a crash) | no wait | `test_lease_is_released_after_a_turn` |
+| Same session, two threads in one pod | in-flight set per process | the second gets `LeaseHeld` (409, retry) instead of running the turn twice | one answer | `test_two_threads_in_one_process_cannot_run_the_same_session` |
 | Everything slow | turn deadline | retries and failover stop at 90 s | "try again", turn uncommitted | `test_retries_and_failover_stop_at_the_turn_deadline` |
 | Duplicate delivery | `msg_id` in the journal | deduplicated | the same answer | `test_layers.QueueWorker` |
 | Poison message | receive count | retried with backoff, dead-lettered after 5 receives | — | `test_layers.QueueWorker` |
@@ -466,7 +468,8 @@ starting point.
 
 | Suite | What it covers | Result (offline) |
 |---|---|---|
-| Unit and integration tests | 417 tests across 26 files | all pass |
+| Unit and integration tests | 429 tests across 26 files | all pass |
+| Multi-process durability | `scripts/durability_test.py`: kill -9 mid-turn, frozen worker, lost reply, 32-turn memory across restarts, model failover, 6-process contention, guardrail outage, killed ingestion | 8/8 |
 | Evaluation sets | lookups, not found, tenant isolation, context switches, PII, retry and routing advice, review withholding, domains | 41/41 dev, 185/185 held-out, 192/192 and 184/184 on two unseen data sets |
 | Hallucination stress test | 12 kinds of injected errors | 0 of 392 and 0 of 1,867 reached the user; 0 of 3,774 on the unseen sets |
 | False-block probe | every failed payment and domain record, both roles | 0 of 2,876 correct answers blocked |

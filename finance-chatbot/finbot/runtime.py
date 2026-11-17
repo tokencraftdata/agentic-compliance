@@ -18,14 +18,18 @@ no authority from the handoff.
 from __future__ import annotations
 
 import copy
+import logging
+import threading
 import uuid
 from dataclasses import asdict
 
 from . import replies
 from .memory import EntityState, Fact, SessionMemory
 from .orchestrator import Chatbot, ChatSession
-from .store import SessionStore
+from .store import LeaseHeld, SessionStore
 from .tools import Session
+
+log = logging.getLogger("finbot.runtime")
 
 # ---------------------------------------------------------------- (de)serialisation
 
@@ -77,6 +81,10 @@ def cancel_key(session_id: str, msg_id: str) -> str:
 class Worker:
     def __init__(self, bot: Chatbot, store: SessionStore, worker_id: str | None = None, lease_s: float = 60):
         self.bot, self.store, self.lease_s = bot, store, lease_s
+        # The store's lease tells processes apart, not threads: one worker id serves every thread
+        # of a process. This set stops two threads running a turn of the same session at once.
+        self._in_flight: set[str] = set()
+        self._in_flight_lock = threading.Lock()
         from .cache import CachedHealth
         ttl = getattr(getattr(bot, "settings", None), "health_cache_s", 1.0)
         # Model breaker state shared across workers, read from the store at most every `ttl` s.
@@ -91,6 +99,25 @@ class Worker:
         return cs.session.session_id
 
     def handle(self, session_id: str, msg_id: str, text: str) -> dict:
+        with self._in_flight_lock:
+            if session_id in self._in_flight:
+                raise LeaseHeld(f"{session_id} is already running a turn in this process")
+            self._in_flight.add(session_id)
+        try:
+            result = self._handle(session_id, msg_id, text)
+        finally:
+            with self._in_flight_lock:
+                self._in_flight.discard(session_id)
+        # Free the session at once when the turn ended normally, so a follow-up on another pod
+        # need not wait out the lease. After an exception the lease is left to expire, as it
+        # would after a real crash, so a retry cannot overlap work still unwinding here.
+        try:
+            self.store.release(session_id, self.id)
+        except Exception as e:  # noqa: BLE001 - best effort; the lease expires anyway
+            log.warning("lease release failed for a session: %s", type(e).__name__)
+        return result
+
+    def _handle(self, session_id: str, msg_id: str, text: str) -> dict:
         self.store.claim(session_id, self.id, self.lease_s)          # LeaseHeld if another live owner
         version, state = self.store.load(session_id)
         prior = self.store.begin_turn(session_id, msg_id, self.id, text)
@@ -115,6 +142,8 @@ class Worker:
         except TurnCancelled:
             # Commit the state as it was before the turn, with a fixed answer, so a resend of
             # the same msg_id returns "cancelled" instead of running the turn again.
+            # Risk raised during the cancelled turn is kept: cancelling must not wash it out.
+            before["memory"]["risk"] = max(before["memory"].get("risk", 0.0), cs.memory.risk)
             meta = {"blocked_by": "cancelled", "reasons": ["cancelled"], "focus": None, "repaired": False,
                     "escalated": False, "tier": None, "models": [], "tools": []}
             self.store.claim(session_id, self.id, self.lease_s)

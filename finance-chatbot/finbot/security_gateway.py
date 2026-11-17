@@ -80,7 +80,14 @@ class ToolRule:
         if d.get("effect") not in ("deny", "approve"):
             raise ValueError(f"rule {d.get('id')!r}: effect must be deny or approve")
         return ToolRule(str(d["id"]), str(d.get("tool", "*")), d["effect"], str(d.get("reason", "")),
-                        tuple(d.get("roles", ["*"])))
+                        _roles(d.get("roles", ["*"])))
+
+
+def _roles(value) -> tuple[str, ...]:
+    """A role list, or one role written as a plain string (tuple("customer") would split it)."""
+    if isinstance(value, str):
+        return (value,)
+    return tuple(str(r) for r in value)
 
 
 @dataclass
@@ -126,8 +133,8 @@ SIGNALS = {                    # risk added per occurrence
     "provenance": 1.5,         # tried an id the user never typed
     "authz": 1.5,              # tried a tool outside the user's scopes
     "invalid_arguments": 1.0,  # sent arguments the schema does not allow
-    "injection_in_tool_result": 1.0,
-    "enumeration": 2.0,        # third id in a session that does not exist
+    "injection_in_tool_result": 0.0,   # logged, but a third party wrote it: not the user's risk
+    "enumeration": 2.0,        # each new id, from the third on, that does not exist
     "held_for_approval": 0.5,
 }
 
@@ -136,16 +143,20 @@ class BehaviorMonitor:
     def __init__(self, enumeration_after: int = 3):
         self.enumeration_after = enumeration_after
 
-    def signals(self, memory, name: str, result: dict) -> list[str]:
+    def signals(self, memory, name: str, args: dict, result: dict) -> list[str]:
+        """Call BEFORE the result is added to session memory, so a repeat lookup of an id that
+        is already known missing is not counted again."""
+        from .domains import id_of
         out = []
         status, source = result.get("status"), result.get("source")
         if status == "refused" and source in ("provenance", "authz", "approval", "policy"):
             out.append({"approval": "held_for_approval", "policy": "invalid_arguments"}.get(source, source))
-        if result.get("screened"):
+        if [s for s in result.get("screened") or [] if not s.endswith("screening_unavailable")]:
             out.append("injection_in_tool_result")
-        if status == "not_found" and name != "search_knowledge_base":
-            missing = sum(1 for e in memory.entities.values() if e.not_found)
-            if missing >= self.enumeration_after:
+        rid = id_of(args)
+        if status == "not_found" and rid:
+            missing = {k for k, e in memory.entities.items() if e.not_found}
+            if rid not in missing and len(missing) + 1 >= self.enumeration_after:
                 out.append("enumeration")
         return out
 
@@ -157,7 +168,7 @@ class SecurityGateway:
                  rules: Iterable[ToolRule] = (), max_records_per_turn: int = 3,
                  monitor: BehaviorMonitor | None = None):
         self.schemas, self.tickets, self.events = schemas, tickets, events
-        self.rules = list(rules)
+        self.rules = sorted(rules, key=lambda r: r.effect != "deny")   # a deny always wins over approve
         self.max_records_per_turn = max_records_per_turn
         self.monitor = monitor or BehaviorMonitor()
 
@@ -165,7 +176,7 @@ class SecurityGateway:
         return next((s["input_schema"] for s in self.schemas() if s["name"] == tool), None)
 
     def decide(self, cs, tool: str, args: dict, turn_calls: list[dict]) -> Decision:
-        from .domains import id_of, record_tools
+        from .domains import id_of
         bad = _check_args(self._schema(tool), args)
         if bad:
             return Decision("deny", bad)
@@ -175,9 +186,12 @@ class SecurityGateway:
                 if r.effect == "deny":
                     return Decision("deny", [f"rule:{r.id}"])
                 return self._approval(cs, tool, args, f"rule:{r.id}", r.reason)
-        if tool in record_tools():
-            seen = {id_of(c["input"]) for c in turn_calls if c["name"] in record_tools()}
-            rid = id_of(args)
+        rid = id_of(args)
+        if rid is not None:      # any tool that reads one record by id (records, logs, routing traces)
+            # Count only records actually read: a call held or refused earlier read nothing, so a
+            # retry of it must not count as "already seen" (that would skip the approval).
+            seen = {id_of(c["input"]) for c in turn_calls
+                    if id_of(c["input"]) is not None and c["result"].get("status") != "refused"}
             if rid not in seen and len(seen) >= self.max_records_per_turn:
                 return self._approval(cs, tool, args, "bulk_access",
                                       f"more than {self.max_records_per_turn} records in one turn")
@@ -187,13 +201,15 @@ class SecurityGateway:
         """Hold the call until a person approves it. The ticket id is derived from the session,
         tool and arguments, so asking again reuses the same ticket, and an approved ticket lets
         exactly that call through."""
-        from .tickets import DONE, open_ticket
+        from .tickets import DONE, REJECTED, open_ticket
         t, _ = open_ticket(self.tickets, tenant_id=cs.session.tenant_id, session_id=cs.session.session_id,
                            role=cs.session.role, kind=f"approval:{tool}", txn_id=_h(args),
                            text=f"Approve {tool} for this session ({why})", facts={"tool": tool, "args": args},
                            policy_note=why)
         if t.status == DONE:
             return Decision("allow", [f"approved:{t.id}"], t.id)
+        if t.status == REJECTED:              # a person said no: stop asking
+            return Decision("deny", [f"rejected:{t.id}"], t.id)
         return Decision("approve", [reason], t.id)
 
     def check(self, cs, tool: str, args: dict, turn_calls: list[dict]) -> dict | None:
@@ -216,9 +232,13 @@ class SecurityGateway:
                 "note": (f"This lookup needs a person's approval first (ticket {d.ticket}). Tell the user "
                          "it has been sent for approval; do not guess the data.")}
 
-    def observe(self, cs, tool: str, result: dict, threshold: float) -> list[str]:
-        """After a call: add behaviour signals to the session risk score and log them."""
-        sig = self.monitor.signals(cs.memory, tool, result)
+    def locked(self, cs, threshold: float) -> bool:
+        return cs.memory.risk >= threshold
+
+    def observe(self, cs, tool: str, args: dict, result: dict, threshold: float) -> list[str]:
+        """After a call, before its result enters session memory: add behaviour signals to the
+        session risk score and log them."""
+        sig = self.monitor.signals(cs.memory, tool, args, result)
         if not sig:
             return []
         before = cs.memory.risk
@@ -227,9 +247,9 @@ class SecurityGateway:
                 "subject": cs.session.subject, "resource": tool}
         if result.get("source") in ("provenance", "authz"):
             self.events.emit("tool_call_denied", "medium", decision="deny", reasons=[result["source"]], **base)
-        if "injection_in_tool_result" in sig:
-            self.events.emit("prompt_injection", "high", decision="removed", reasons=result.get("screened", []),
-                             **base)
+        if "injection_in_tool_result" in sig:     # reasons: the screen's code, not the field path
+            codes = [str(s).split(":", 1)[1] for s in result.get("screened", []) if ":" in str(s)]
+            self.events.emit("prompt_injection", "high", decision="removed", reasons=codes, **base)
         if before < threshold <= cs.memory.risk:
             self.events.emit("suspicious_agent_behavior", "high", decision="session_locked", reasons=sig,
                              risk=round(cs.memory.risk, 1), **base)

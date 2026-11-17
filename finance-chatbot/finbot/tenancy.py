@@ -56,6 +56,12 @@ class TenantScopedTable:
         self.base, self.for_tenant = base, for_tenant
 
     def _pick(self, pk: str):
+        scoped = current_tenant()
+        if pk.startswith("OP#") and scoped is not None:
+            # An external action's pointer is written in one transaction with the session's
+            # action record, so it must use the same (tenant) credentials. It holds only a
+            # session id; the tenant role may write OP# items (infra/cdk).
+            return self.for_tenant(scoped)
         if not pk.startswith("S#"):
             return self.base
         tenant = current_tenant()

@@ -13,6 +13,7 @@ with retry_after_s. finbot/http_api.py does that mapping.
 """
 from __future__ import annotations
 
+import hmac
 import re
 
 from . import auditlog, dlp
@@ -126,6 +127,11 @@ class ChatService:
         except (KeyError, SessionExpired, TenantViolation):   # another tenant's session looks missing
             raise Forbidden("session not found or not yours") from None
         self.authz.can_use_session(p, tenant)
+        # A session belongs to the user who started it, not to the whole tenant: otherwise anyone in
+        # the tenant who learns a session id could talk in it with that session's role and scopes.
+        owner = self.worker.store.load(session_id)[1].get("session", {}).get("subject") or ""
+        if owner and not hmac.compare_digest(owner, p.subject):
+            raise Forbidden("session not found or not yours")
 
     # ------------------------------------------------------------------ control plane
 

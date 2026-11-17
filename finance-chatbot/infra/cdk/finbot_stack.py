@@ -186,7 +186,9 @@ class FinbotStack(Stack):
                 actions=ddb_actions + ["dynamodb:TransactWriteItems"],
                 resources=[table.table_arn],
                 conditions={
-                    "ForAllValues:StringLike": {"dynamodb:LeadingKeys": ["S#${aws:PrincipalTag/tenant_id}.*"]}
+                    "ForAllValues:StringLike": {
+                        "dynamodb:LeadingKeys": ["S#${aws:PrincipalTag/tenant_id}.*", "OP#*"]
+                    }
                 },
             )
         )

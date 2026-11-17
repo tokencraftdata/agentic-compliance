@@ -143,6 +143,7 @@ class TurnContext:
     tickets: frozenset[str]            # ticket ids this session already has
     t0: float
     notes: list[str] = field(default_factory=list)   # non-blocking reasons gathered on the way
+    calls: list[dict] = field(default_factory=list)  # every tool call this turn, repair included (gateway budget)
 
     @property
     def card_seen(self) -> bool:
@@ -184,6 +185,10 @@ class ChatSession:
     heartbeat: Callable[[], object] | None = field(default=None, repr=False, compare=False)  # renews the lease
     deadline: float | None = field(default=None, repr=False, compare=False)
     nonce: str | None = field(default=None, repr=False, compare=False)
+
+
+class SessionLocked(Exception):
+    """Behaviour signals crossed the session risk threshold during a turn."""
 
 
 SECURITY_CODES = frozenset({"unverified_url", "credential_request", "unverified_contact", "unverified_txn_reference"})
@@ -275,9 +280,19 @@ class Chatbot:
                                      finbot__tenant=cs.session.tenant_id, finbot__role=cs.session.role) as sp:
                 try:
                     reply = self._run(cs, ctx)
+                except SessionLocked as e:
+                    # Behaviour crossed the threshold mid-turn. Drop the turn's model output, keep
+                    # the raised risk (it is committed), and hand the session to a person.
+                    del cs.history[snapshot[0]:]
+                    risk = cs.memory.risk
+                    cs.memory, cs.pending_notice = snapshot[1], snapshot[2]
+                    cs.memory.risk = max(cs.memory.risk, risk)
+                    reply = Reply(self._fixed(cs, replies.RISK_LOCK), "session_risk", [str(e)], escalated=True)
                 except ServiceUnavailable as e:
                     del cs.history[snapshot[0]:]
+                    risk = cs.memory.risk
                     cs.memory, cs.pending_notice = snapshot[1], snapshot[2]
+                    cs.memory.risk = max(cs.memory.risk, risk)   # an outage does not wash out raised risk
                     reply = Reply(replies.UNAVAILABLE.format(contact=self.settings.support_contact,
                                                              ref=self._ref(cs)), "unavailable", [str(e)])
                 turn = self._finish(cs, ctx, reply)
@@ -367,10 +382,16 @@ class Chatbot:
         run_tool = self.toolbox.handler(cs.session)
         domain = by_id(req.txn_id)
         tool = domain.tool if domain else "get_transaction"
-        out = self.intake.handle(req, cs.session, lambda args: self.screen.sanitize(tool, run_tool(tool, args)))
+
+        def lookup(args: dict) -> dict:     # the same gateway and screening as a model's tool call
+            return self.security.check(cs, tool, args, ctx.calls) or self.screen.sanitize(tool, run_tool(tool, args))
+        out = self.intake.handle(req, cs.session, lookup)
         for c in out.tool_log:
+            self.security.observe(cs, c["name"], c["input"], c["result"], ctx.policy.risk_threshold)
             cs.memory.ingest_tool_result(c["name"], c["input"], c["result"])
         reasons = [f"write_request:{req.kind}"]
+        if any(c["result"].get("status") == "refused" for c in out.tool_log):
+            return Reply(replies.NOT_ALLOWED, "write_request", [*reasons, "refused_by_policy"], out.tool_log)
         if out.ticket is None:
             return Reply(replies.TICKET_NOT_FOUND.format(txn=req.txn_id), "write_request",
                          [*reasons, "txn_not_found"], out.tool_log)
@@ -495,16 +516,23 @@ class Chatbot:
                     continue
                 with self.telemetry.span(f"execute_tool {b.name}", gen_ai__operation__name="execute_tool",
                                          gen_ai__tool__name=b.name) as sp:
+                    turn = current_turn()
+                    budget = turn.calls if turn else tool_log     # the whole turn, the repair pass included
                     res = self._provenance(cs, b.name, dict(b.input)) or \
-                        self.security.check(cs, b.name, dict(b.input), tool_log) or \
+                        self.security.check(cs, b.name, dict(b.input), budget) or \
                         self.screen.sanitize(b.name, run_tool(b.name, dict(b.input)))
                     sp.set(finbot__tool__status=res["status"],
                            finbot__tool__refused_by=res.get("source") if res["status"] == "refused" else None,
                            finbot__tool__screened=len(res.get("screened") or []) or None)
+                threshold = turn.policy.risk_threshold if turn else BASELINE.risk_threshold
+                self.security.observe(cs, b.name, dict(b.input), res, threshold)   # before memory sees it
                 cs.memory.ingest_tool_result(b.name, dict(b.input), res)
-                tool_log.append({"name": b.name, "input": dict(b.input), "result": res})
-                turn = current_turn()
-                self.security.observe(cs, b.name, res, turn.policy.risk_threshold if turn else BASELINE.risk_threshold)
+                call = {"name": b.name, "input": dict(b.input), "result": res}
+                tool_log.append(call)
+                if turn is not None and budget is not tool_log:
+                    turn.calls.append(call)
+                if self.security.locked(cs, threshold):
+                    raise SessionLocked(f"risk:{cs.memory.risk:g}")   # stop now: no more tools, no answer
                 results.append({"type": "tool_result", "tool_use_id": b.id,
                                 "content": ToolResultScreen.wrap(res, cs.nonce or ToolResultScreen.new_nonce()),
                                 "is_error": res["status"] == "error"})

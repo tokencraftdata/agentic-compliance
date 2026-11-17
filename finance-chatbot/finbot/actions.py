@@ -131,7 +131,7 @@ class TicketIntake:
             tool_log.append({"name": domain.tool if domain else "get_transaction", "input": args, "result": res})
             if res["status"] == "error":
                 raise ServiceUnavailable("transaction lookup unavailable; no ticket opened")
-            if res["status"] == "not_found":
+            if res["status"] in ("not_found", "refused"):   # refused: the security gateway said no
                 return TicketOutcome(None, tool_log=tool_log)
             data = res.get("data") or {}
             facts = {k: data[k] for k in (*self.FACT_KEYS, "return_code", "reason_key") if k in data}
