@@ -23,6 +23,13 @@ the lease + CAS commit is the backstop if it is.
 Messages are authorized at the API before enqueue AND re-checked here
 (tenant_id in the body must match the session), so a forged queue message
 cannot cross tenants.
+
+Access is the caller's as of the request, as on the direct path (service.py): the API
+puts the verified token's role, groups and scopes in the body as "principal". A queue
+body is not a verified token, so the worker never takes more from it than the session
+already had: the role is the less privileged of the two, groups and scopes the
+intersection. A principal naming another user is dead-lettered. A body without one
+keeps the session's stored access, unless require_principal is set.
 """
 from __future__ import annotations
 
@@ -129,10 +136,43 @@ class ConsumerStats:
     results: list = field(default_factory=list)
 
 
+ROLE_RANK = {"support": 1, "customer": 0, "merchant": 0}   # chat roles, most privileged first
+
+
+class PrincipalMismatch(Exception):
+    """The message's principal is not the session's owner."""
+
+
+def narrowed(stored: dict, given: dict) -> dict:
+    """The access a queued message may use: never more than the session already had.
+
+    stored: the session as saved (role, user_groups, scopes, subject).
+    given:  the principal the API put in the message, from the caller's verified token."""
+    owner, who = stored.get("subject") or "", given.get("subject")
+    if who is not None and who != owner:
+        raise PrincipalMismatch("message principal is not the session owner")
+    s_role, g_role = stored.get("role", "customer"), given.get("role", "customer")
+    if g_role not in ROLE_RANK:                  # unknown role: least privilege
+        g_role = "customer"
+    role = g_role if ROLE_RANK[g_role] <= ROLE_RANK.get(s_role, 0) else s_role
+    s_groups = list(stored.get("user_groups") or [])
+    g_groups = set(given.get("groups") or [])
+    groups = [g for g in s_groups if g in g_groups]
+    s_sc, g_sc = stored.get("scopes"), given.get("scopes")
+    if s_sc is None:
+        scopes = list(g_sc) if g_sc is not None else None
+    elif g_sc is None:
+        scopes = list(s_sc)
+    else:
+        scopes = [x for x in s_sc if x in set(g_sc)]
+    return {"role": role, "groups": groups, "scopes": scopes}
+
+
 class QueueConsumer:
     def __init__(self, source, worker: Worker, max_receives: int = 5,
-                 on_result: Callable[[dict, dict], None] | None = None):
+                 on_result: Callable[[dict, dict], None] | None = None, require_principal: bool = False):
         self.source, self.worker, self.max_receives = source, worker, max_receives
+        self.require_principal = require_principal
         self.on_result = on_result or (lambda body, result: None)  # e.g. push to a websocket / write to a table
         self.rng = random.Random()
         self.stats = ConsumerStats()
@@ -160,7 +200,20 @@ class QueueConsumer:
                     self.source.dead_letter(m, "tenant mismatch")  # forged or corrupted message: never process
                     self.stats.dead_lettered += 1
                     return
-                r = self.worker.handle(b["session_id"], b["msg_id"], b["text"])   # handle() masks card data
+                principal = None
+                if isinstance(b.get("principal"), dict):
+                    stored = self.worker.store.load(b["session_id"])[1].get("session", {})
+                    principal = narrowed(stored, b["principal"])
+                elif self.require_principal:
+                    self.source.dead_letter(m, "no principal")
+                    self.stats.dead_lettered += 1
+                    return
+                r = self.worker.handle(b["session_id"], b["msg_id"], b["text"],   # handle() masks card data
+                                       principal=principal)
+        except PrincipalMismatch:
+            self.source.dead_letter(m, "principal mismatch")
+            self.stats.dead_lettered += 1
+            return
         except TenantViolation as e:
             self.source.dead_letter(m, f"tenant violation: {e}")
             self.stats.dead_lettered += 1

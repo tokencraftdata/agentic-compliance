@@ -103,13 +103,13 @@ class Worker:
         self.store.create(cs.session.session_id, tenant_id, dump_session(cs))
         return cs.session.session_id
 
-    def handle(self, session_id: str, msg_id: str, text: str) -> dict:
+    def handle(self, session_id: str, msg_id: str, text: str, principal: dict | None = None) -> dict:
         with self._in_flight_lock:
             if session_id in self._in_flight:
                 raise LeaseHeld(f"{session_id} is already running a turn in this process")
             self._in_flight.add(session_id)
         try:
-            result = self._handle(session_id, msg_id, text)
+            result = self._handle(session_id, msg_id, text, principal)
             # Keep local exclusion through release: another thread has the same worker id.
             # On a failed turn leave the lease to expire, as after a real crash.
             try:
@@ -121,7 +121,7 @@ class Worker:
             with self._in_flight_lock:
                 self._in_flight.discard(session_id)
 
-    def _handle(self, session_id: str, msg_id: str, text: str) -> dict:
+    def _handle(self, session_id: str, msg_id: str, text: str, principal: dict | None = None) -> dict:
         self.store.claim(session_id, self.id, self.lease_s)          # LeaseHeld if another live owner
         version, state = self.store.load(session_id)
         prior = self.store.begin_turn(session_id, msg_id, self.id, text)
@@ -129,6 +129,12 @@ class Worker:
             return prior
         before = copy.deepcopy(state)        # the session shares lists with `state`; keep a clean copy
         cs = load_session(state)
+        if principal is not None:
+            # The caller's access as of this request (service.py): a role or group taken away
+            # since the session started no longer applies to it.
+            cs.session.role = principal["role"]
+            cs.session.user_groups = list(principal.get("groups") or [])
+            cs.session.scopes = principal.get("scopes")
         key = cancel_key(session_id, msg_id)
 
         def heartbeat():

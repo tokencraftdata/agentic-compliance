@@ -340,7 +340,8 @@ class Dlp(unittest.TestCase):
             tok = c.verifier.issue({"sub": "u1", "tenant_id": "m_100", "role": "customer"})
             sid = c.service.start(tok)
             leaky = c.worker.handle
-            c.service.worker.handle = lambda *a: {**leaky(*a), "debug": f"raw card {PAN}"}   # a path that forgot
+            # a path that forgot to scan
+            c.service.worker.handle = lambda *a, **kw: {**leaky(*a, **kw), "debug": f"raw card {PAN}"}
             r = c.service.send(tok, sid, "msg-0001", f"why did {DECLINED} fail? my card is {PAN}")
             self.assertNotIn("4111 1111", json.dumps(r))
             self.assertIn("pci:card", r["dlp"])

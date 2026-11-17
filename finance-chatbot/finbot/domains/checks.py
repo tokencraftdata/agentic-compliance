@@ -13,6 +13,7 @@ from typing import Any
 
 from ..guardrails import _affirmed, _sentences
 from .base import DOMAINS, Domain, by_tool
+from .base import record_tools as record_tools_
 
 PAYMENT_CLAIM = re.compile(r"\bthe (payment|transaction|charge)\s+(was|has been|is)\s+"
                            r"(approved|declined|failed|refunded|settled|rejected|blocked)\b", re.I)
@@ -155,16 +156,28 @@ def _event_check(sentences: list[str], records: list[dict]) -> list[str]:
 
 
 def domain_check(answer: str, tool_log: list[dict]) -> list[str]:
-    found = [(by_tool(c["name"]), c["result"]["data"]) for c in tool_log if c["result"]["status"] == "found"]
-    records = [(d, data) for d, data in found if d is not None and isinstance(data, dict)]
+    from ..binding import segments
+    from .base import id_of
+    found = [(by_tool(c["name"]), c["result"]["data"], id_of(c["input"])) for c in tool_log
+             if c["result"]["status"] == "found"]
+    with_ids = [(d, data, rid) for d, data, rid in found if d is not None and isinstance(data, dict)]
+    records = [(d, data) for d, data, _ in with_ids]
     if not records:
         return []
     reasons: list[str] = []
     sentences = _sentences(answer)
-    for domain, data in records:
+    # With several records fetched, a clause that names one (or follows one) is checked against
+    # that record only (finbot/binding.py): "loan_A is declined. loan_B is paid off." is right,
+    # and swapping the two statuses is wrong. A clause about no one record is checked against all.
+    fetched = {rid for c in tool_log if c["result"]["status"] == "found" and (rid := id_of(c["input"]))
+               and c["name"] in record_tools_()}
+    clauses = segments(answer, fetched) if len(fetched) > 1 else [(s, None) for s in sentences]
+    for domain, data, rid in with_ids:
         actual = str(data.get("status", "")).lower()
         allowed = {actual} | domain.implied.get(actual, frozenset())
-        for s in sentences:
+        for s, subject in clauses:
+            if subject is not None and subject != rid:
+                continue
             for claimed in sorted(_claimed(domain, s) - allowed):
                 reasons.append(f"status_mismatch:{domain.noun}:record={actual},claimed={claimed}")
     blob = " ".join(json.dumps(c["result"]["data"]) for c in tool_log if c["result"]["status"] == "found")

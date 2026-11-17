@@ -146,10 +146,18 @@ class BedrockGuardrail:
 # ------------------------------------------------------------------ evidence guard
 
 AMOUNT = re.compile(r"\b\d+\.\d{2}\b")
-CODE = re.compile(r"\b(?:code|decline code|response code)\s*[\"']?(\w{2,4})\b", re.I)
+CODE = re.compile(r"\b(?i:code|decline code|response code|error|reason)\s*[\"']?([A-Z0-9][A-Z0-9_]{1,31})\b")
+# Record fields whose whole value is a code. A stated code must equal one of them; finding "05"
+# somewhere in the data (a date, an amount) is not evidence for "code 05".
+CODE_FIELDS = frozenset({"decline_code", "error", "code", "final_code", "reason_key", "return_code", "reason_code",
+                         "processor_response", "restriction", "response_code"})
 URL = re.compile(r"https?://[^\s)\]>\"']+")
-POSITIVE = re.compile(r"\b(approved|succeeded|successful|went through|was completed)\b", re.I)
-NEGATIVE = re.compile(r"\b(declined|failed|rejected|unsuccessful|did not go through|didn't go through|blocked)\b", re.I)
+# Outcome words for a card payment. Found missing by the randomized stress test (finbot/faultgen.py):
+# "was accepted", "has cleared", "processed successfully", "was turned down", "bounced".
+POSITIVE = re.compile(r"\b(approved|succeeded|successful(ly)?|went through|was completed|(was|has been|is) "
+                      r"(accepted|authori[sz]ed)|(has|had) cleared)\b", re.I)
+NEGATIVE = re.compile(r"\b(declined|failed|rejected|unsuccessful|did not go through|didn't go through|blocked|"
+                      r"turned down|bounced|(was|were|got) refused|did ?n[o']t clear)\b", re.I)
 STATUS_CLAIM = re.compile(r"\b(it|the (payment|transaction|charge))\s+(was|has been|is)\s+"
                           r"(approved|declined|failed|refunded|settled|rejected|blocked)\b", re.I)
 NEGATIVE_STATUSES = {"declined", "failed"}
@@ -373,6 +381,16 @@ _MONTHS = ("january february march april may june july august september october 
 _MONTH = "(" + "|".join(f"{m}|{m[:3]}" for m in _MONTHS) + r")\.?"
 WORD_DATE = re.compile(rf"\b(?:(\d{{1,2}})(?:st|nd|rd|th)?\s+{_MONTH},?\s+(\d{{4}})|"
                        rf"{_MONTH}\s+(\d{{1,2}})(?:st|nd|rd|th)?,?\s+(\d{{4}}))\b", re.I)
+DAY_MONTH = re.compile(rf"\b(?:(\d{{1,2}})(?:st|nd|rd|th)?\s+(?:of\s+)?{_MONTH}|"
+                       rf"{_MONTH}\s+(\d{{1,2}})(?:st|nd|rd|th)?)\b"
+                       rf"(?!,?\s+\d{{4}})(?![\d:])", re.I)
+# A timeline promised in words ("within 5 business days", "in 3 days", "by Friday"). It must be one
+# the tool data states: nothing on a record says when money will move unless a field does.
+TIMELINE = re.compile(r"\b(?:within|in)\s+(\d{1,3}(?:\s*(?:-|to)\s*\d{1,3})?)\s+"
+                      r"((?:business|working|calendar)\s+)?days?\b"
+                      r"|\bby\s+((?:next |this )?(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)|tomorrow|"
+                      r"the end of (?:the |this |next )?(?:day|week|month))\b", re.I)
+FUTURE = re.compile(r"\b(will|'ll|should|going to|expect)\b", re.I)
 BRANDS = re.compile(r"\b(visa|mastercard|amex|american express|discover|maestro|jcb|unionpay|diners)\b", re.I)
 OTHER_STATUS = re.compile(r"\b(it|the (payment|transaction|charge)|txn_\w+)\s+(is|was|has been|remains)\s+(still\s+)?"
                           r"(pending|processing|reversed|voided|cancell?ed|captured|authori[sz]ed|on hold|"
@@ -413,6 +431,22 @@ def detail_check(answer: str, tool_log: list[dict]) -> list[str]:
         iso = f"{year}-{[x[:3] for x in _MONTHS].index(month[:3].lower()) + 1:02d}-{int(day):02d}"
         if iso not in blob:
             reasons.append(f"ungrounded_date:{iso}")
+    for m in DAY_MONTH.finditer(answer):          # "Nov 2", "2nd of November": some record date must match
+        day, month = (m.group(1), m.group(2)) if m.group(1) else (m.group(4), m.group(3))
+        md = f"-{[x[:3] for x in _MONTHS].index(month[:3].lower()) + 1:02d}-{int(day):02d}"
+        if not 1 <= int(day) <= 31 or not re.search(rf"\d{{4}}{md}\b", blob):
+            reasons.append(f"ungrounded_date:{md[1:]}")
+    for x in _sentences(answer):                  # a promised timeline the data doesn't state
+        if not FUTURE.search(x):
+            continue
+        for m in TIMELINE.finditer(x):
+            if m.group(1):
+                num = r"\s*(-|to)\s*".join(re.escape(n) for n in re.findall(r"\d+", m.group(1)))
+                said = rf"(?<![\d.-]){num}\s+{re.escape((m.group(2) or '').lower())}days?\b"
+            else:
+                said = re.escape(m.group(3).lower())
+            if not re.search(said, low):
+                reasons.append(f"ungrounded_timeline:{m.group(0).lower()}")
     if txns:
         reasons += [f"ungrounded_card_brand:{b}" for b in sorted({b.lower() for b in BRANDS.findall(answer)})
                     if b not in low]
@@ -513,12 +547,19 @@ def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
     for tid in set(find_ids(answer)):
         if tid not in found_txns and tid not in missing_txns and tid != focus_txn:
             reasons.append(f"unverified_txn_reference:{tid}")
+    from .provenance import trusted_view
     blob = trusted_blob(tool_log)   # amounts and codes rest on our own fields, not third-party text
+    kb_text = " ".join(json.dumps(c["result"]["data"]) for c in tool_log
+                       if c["name"] == "search_knowledge_base" and c["result"]["status"] == "found")
     for amt in set(AMOUNT.findall(answer)):
         if amt not in blob:
             reasons.append(f"ungrounded_amount:{amt}")
+    codes = _code_values([trusted_view(c["result"]["data"]) for c in tool_log if c["result"]["status"] == "found"])
     for code in set(CODE.findall(answer)):
-        if code not in blob and not code.isalpha():
+        if code.isalpha() and not code.isupper():
+            continue                                  # a word after "reason"/"error", not a code
+        # A code on a record must be that record's value; a help page may quote any code it names.
+        if code not in codes and not (kb_text and re.search(rf"(?<![\w-]){re.escape(code)}(?![\w-])", kb_text)):
             reasons.append(f"ungrounded_code:{code}")
     if missing_txns and not found_txns:
         low = answer.lower()
@@ -530,6 +571,17 @@ def evidence_check(answer: str, tool_log: list[dict], focus_txn: str | None,
     if reasons:
         return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons)
     return GuardResult("allow", answer)
+
+
+def _code_values(v) -> set[str]:
+    """Every value of a code field, at any depth (records, log events, routing attempts, guidance)."""
+    if isinstance(v, dict):
+        own = {x for k, x in v.items() if k in CODE_FIELDS and isinstance(x, str)}
+        own |= {y for k, x in v.items() if k in CODE_FIELDS and isinstance(x, list) for y in x if isinstance(y, str)}
+        return own.union(*(_code_values(x) for x in v.values()))
+    if isinstance(v, list):
+        return set().union(*(_code_values(x) for x in v))
+    return set()
 
 
 def make_guardrail(settings):

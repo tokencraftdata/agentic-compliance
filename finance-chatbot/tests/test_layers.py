@@ -129,6 +129,27 @@ class ServiceBoundary(unittest.TestCase):
         with self.assertRaisesRegex(Forbidden, "not found or not yours"):
             self.c.service.send(self.other, "no-such-session", "msg-0001", "hi")
 
+    def test_changed_role_cannot_reuse_the_session(self):
+        # A support agent moved to a merchant role keeps neither the support access nor the
+        # history produced under it: the old session is refused and a new one must be started.
+        v = self.c.verifier
+        support = v.issue({"sub": "u1", "tenant_id": "m_100", "role": "support"})
+        sid = self.c.service.start(support)
+        with self.assertRaisesRegex(Forbidden, "permissions changed"):
+            self.c.service.send(self.merchant, sid, "msg-0001", f"why did {DECLINED} fail?")
+        self.assertEqual(self.c.store.load(sid)[1]["session"]["role"], "support")
+        self.assertEqual(self.c.store.load(sid)[1].get("history", []), [])
+
+    def test_token_without_subject_cannot_start_a_session(self):
+        anon = self.c.verifier.issue({"sub": "", "tenant_id": "m_100", "role": "merchant"})
+        with self.assertRaisesRegex(Forbidden, "no subject"):
+            self.c.service.start(anon)
+
+    def test_session_without_owner_is_nobodys(self):
+        sid = self.c.worker.start_session("m_100", [], "merchant", subject="")   # e.g. made before owners existed
+        with self.assertRaisesRegex(Forbidden, "not found or not yours"):
+            self.c.service.send(self.merchant, sid, "msg-0001", "hi")
+
     def test_admin_cannot_chat_and_merchant_cannot_control(self):
         with self.assertRaises(Forbidden):
             self.c.service.start(self.admin)

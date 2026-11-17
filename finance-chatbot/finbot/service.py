@@ -57,6 +57,10 @@ class ChatService:
     def start(self, token: str) -> str:
         p = self._limited(token)
         self.authz.can_chat(p)
+        if not p.subject:
+            # A session is owned by the user who starts it; with no user there is no owner, and
+            # anyone in the tenant could talk in it.
+            raise Forbidden("token has no subject")
         with tenant_scope(p.tenant_id):          # data access below runs for the caller's tenant only
             return self.worker.start_session(p.tenant_id, list(p.groups), p.role, p.subject,
                                              list(p.scopes) or None)
@@ -139,7 +143,7 @@ class ChatService:
         # the tenant who learns a session id could talk in it with that session's role and scopes.
         saved = self.worker.store.load(session_id)[1].get("session", {})
         owner = saved.get("subject") or ""
-        if owner and not hmac.compare_digest(owner, p.subject):
+        if not owner or not p.subject or not hmac.compare_digest(owner, p.subject):
             raise Forbidden("session not found or not yours")
         return saved
 

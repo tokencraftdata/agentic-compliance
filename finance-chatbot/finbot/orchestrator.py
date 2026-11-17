@@ -54,6 +54,7 @@ from .tickets import InMemoryTickets, TicketStore
 from .tools import Session, ToolBox
 from .untrusted import SPOTLIGHT_RULE, ToolResultScreen, leaks_prompt
 from .verification import (
+    BindingVerifier,
     DomainVerifier,
     EvidenceVerifier,
     HallucinationGate,
@@ -232,6 +233,7 @@ class Chatbot:
             EvidenceVerifier(names),
             ReasonVerifier(),
             DomainVerifier(),
+            BindingVerifier(),
             LanguageVerifier(),
             PolicyVerifier(lambda: t.policy if (t := current_turn()) else BASELINE),
             TicketVerifier(lambda: set(t.tickets) if (t := current_turn()) else set()),

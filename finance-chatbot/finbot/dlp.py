@@ -33,7 +33,8 @@ ROUTING_ACCOUNT = re.compile(r"\b(?:routing|aba)(?: number| no\.?)?\W{0,3}(\d{9}
                              r"(?:[^\d\n]{0,40}\b(?:account|acct)(?: number| no\.?)?\W{0,3}(\d{4,17})\b)?", re.I)
 ACCOUNT = re.compile(r"\b(?:bank )?(?:account|acct)(?: number| no\.?| #)\W{0,3}(\d{6,17})\b", re.I)
 EMAIL = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
-PHONE = re.compile(r"(?<![\w.])(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4}(?![\w.])")
+# A period may end the sentence after the number; only ".<digit>" (a longer number) rules it out.
+PHONE = re.compile(r"(?<![\w.])(?:\+?1[ .-]?)?\(?\d{3}\)?[ .-]\d{3}[ .-]\d{4}(?!\w|\.\d)")
 PRIVATE_KEY = re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----")
 BEARER = re.compile(r"\b(?:Bearer\s+)?eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b")
 REDACTED = "[REDACTED]"

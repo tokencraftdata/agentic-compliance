@@ -61,6 +61,17 @@ class DomainVerifier:
         return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons) if reasons else GuardResult("allow", answer)
 
 
+class BindingVerifier:
+    """With several records in a turn, each amount, date, code and payment status an answer
+    states must come from the record its clause is about, not from another one (finbot/binding.py)."""
+    name = "binding"
+
+    def check(self, answer, tool_log, focus):
+        from .binding import binding_check
+        reasons = binding_check(answer, tool_log)
+        return GuardResult("block", BLOCKED_OUTPUT_MSG, reasons) if reasons else GuardResult("allow", answer)
+
+
 class LanguageVerifier:
     """Answers are in English, the only language the other verifiers can read."""
     name = "language"
