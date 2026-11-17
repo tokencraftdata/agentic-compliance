@@ -34,6 +34,7 @@ from datetime import date
 from typing import Any
 
 from . import auditlog, replies
+from . import telemetry as tel
 from .actions import ACTION_WORDS, TicketIntake
 from .actions import detect as detect_write_request
 from .adaptive.policy import BASELINE, GuardPolicy
@@ -184,6 +185,14 @@ class ChatSession:
     nonce: str | None = field(default=None, repr=False, compare=False)
 
 
+def _is_failover(engine, target: str | None) -> bool | None:
+    """True when a model other than the first of its chain served the call."""
+    chains = [c for c in (getattr(engine, "strong", None), getattr(engine, "fast", None)) if c]
+    if not target or not chains:
+        return None
+    return all(c[0].name != target for c in chains)
+
+
 class Chatbot:
     def __init__(self, llm, guardrail, toolbox: ToolBox, settings, audit_path: str | None = None,
                  policies: PolicySource | None = None, tickets: TicketStore | None = None):
@@ -193,6 +202,7 @@ class Chatbot:
         self.tickets: TicketStore = tickets if tickets is not None else InMemoryTickets()
         self.intake = TicketIntake(self.tickets)
         self.check_provenance = True   # tool ids must come from the user (off only in red-team ablations)
+        self.telemetry = tel.NOOP      # AI observability (finbot/telemetry.py); the container sets it
         self.sleep = time.sleep  # injectable for tests
         self.today = date.today  # injectable for tests (help-page age)
         procs = getattr(toolbox, "processors", None)
@@ -241,14 +251,21 @@ class Chatbot:
                           frozenset(t["id"] for t in cs.memory.tickets), t0)
         token = _TURN.set(ctx)
         try:
-            try:
-                reply = self._run(cs, ctx)
-            except ServiceUnavailable as e:
-                del cs.history[snapshot[0]:]
-                cs.memory, cs.pending_notice = snapshot[1], snapshot[2]
-                reply = Reply(replies.UNAVAILABLE.format(contact=self.settings.support_contact, ref=self._ref(cs)),
-                              "unavailable", [str(e)])
-            return self._finish(cs, ctx, reply)
+            with self.telemetry.span("finbot.turn", gen_ai__conversation__id=tel.session_ref(cs.session.session_id),
+                                     finbot__tenant=cs.session.tenant_id, finbot__role=cs.session.role) as sp:
+                try:
+                    reply = self._run(cs, ctx)
+                except ServiceUnavailable as e:
+                    del cs.history[snapshot[0]:]
+                    cs.memory, cs.pending_notice = snapshot[1], snapshot[2]
+                    reply = Reply(replies.UNAVAILABLE.format(contact=self.settings.support_contact,
+                                                             ref=self._ref(cs)), "unavailable", [str(e)])
+                turn = self._finish(cs, ctx, reply)
+                sp.set(finbot__blocked_by=turn.blocked_by or "none", finbot__reasons=tel.codes(turn.reasons),
+                       finbot__repaired=turn.repaired, finbot__escalated=turn.escalated, finbot__tier=turn.tier,
+                       finbot__policy_version=turn.policy_version, finbot__tool_calls=len(turn.tools_called),
+                       finbot__model_calls=len(turn.models_used))
+                return turn
         finally:
             _TURN.reset(token)
 
@@ -391,7 +408,10 @@ class Chatbot:
             return out, retry_log
 
         fallback = (lambda log: record_answer(log, cs.memory.focus)) if self.settings.record_fallback else None
-        gate = self.gate.run(answer, tool_log, lambda: cs.memory.focus, regenerate, fallback)
+        with self.telemetry.span("finbot.verify") as sp:
+            gate = self.gate.run(answer, tool_log, lambda: cs.memory.focus, regenerate, fallback)
+            sp.set(finbot__verify__action=gate.action, finbot__repaired=gate.repaired,
+                   finbot__records_only=gate.records_only, finbot__reasons=tel.codes(gate.reasons))
         tool_log, answer = gate.tool_log, gate.answer
         if gate.records_only:
             cs.pending_notice = ("Your previous answer was withheld by the evidence check; the user saw a "
@@ -423,8 +443,17 @@ class Chatbot:
             if cs.heartbeat:  # renew the lease before every model call (raises if superseded)
                 cs.heartbeat()
             engine = self.engine()
-            resp = engine.create(SYSTEM_PROMPT, cs.history, self.toolbox.schemas(), tier=tier,
-                                 deadline=cs.deadline)
+            with self.telemetry.span("chat", gen_ai__operation__name="chat") as sp:
+                resp = engine.create(SYSTEM_PROMPT, cs.history, self.toolbox.schemas(), tier=tier,
+                                     deadline=cs.deadline)
+                target = engine.last_target
+                usage = getattr(resp, "usage", None)
+                sp.name = f"chat {tel.model_of(target) or 'unknown'}"
+                sp.set(gen_ai__provider__name=tel.provider_of(target), gen_ai__request__model=tel.model_of(target),
+                       gen_ai__response__finish_reasons=[str(resp.stop_reason)],
+                       gen_ai__usage__input_tokens=getattr(usage, "input_tokens", None),
+                       gen_ai__usage__output_tokens=getattr(usage, "output_tokens", None),
+                       finbot__failover=_is_failover(engine, target))
             models_used.append(engine.last_target or "unknown")
             cs.history.append({"role": "assistant", "content": _mask_blocks(resp.content)})
             if resp.stop_reason == "refusal":
@@ -437,8 +466,13 @@ class Chatbot:
             for b in resp.content:
                 if b.type != "tool_use":
                     continue
-                res = self._provenance(cs, b.name, dict(b.input)) or \
-                    self.screen.sanitize(b.name, run_tool(b.name, dict(b.input)))
+                with self.telemetry.span(f"execute_tool {b.name}", gen_ai__operation__name="execute_tool",
+                                         gen_ai__tool__name=b.name) as sp:
+                    res = self._provenance(cs, b.name, dict(b.input)) or \
+                        self.screen.sanitize(b.name, run_tool(b.name, dict(b.input)))
+                    sp.set(finbot__tool__status=res["status"],
+                           finbot__tool__refused_by=res.get("source") if res["status"] == "refused" else None,
+                           finbot__tool__screened=len(res.get("screened") or []) or None)
                 cs.memory.ingest_tool_result(b.name, dict(b.input), res)
                 tool_log.append({"name": b.name, "input": dict(b.input), "result": res})
                 results.append({"type": "tool_result", "tool_use_id": b.id,

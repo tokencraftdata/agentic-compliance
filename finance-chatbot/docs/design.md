@@ -1,18 +1,29 @@
 # finbot design: layers, patterns, control plane, ingestion
 
-![finbot design: layers, control plane, ingestion](design.svg)
+*Updated November 2026. The component-level specification (interfaces, data model, sequences,
+resiliency, deployment) is in [technical-design.md](technical-design.md).*
+
+![finbot architecture: trust boundary, turn pipeline, model engine, tools over twelve domain plug-ins](diagrams/finbot-architecture.png)
 
 Everything here is Python. The serving path and the ingestion/data-science path
 share one codebase and one set of contracts (`finbot/ports.py`).
 
+**Current state.** Twelve domain plug-ins behind one core; a six-verifier hallucination gate with
+one repair and a record-built fallback; argument and value provenance; per-turn delegation grants,
+envelope encryption, DLP at the edge; model failover with shared circuit breakers; crash-safe
+stateless workers. Verified offline only (scripted models, synthetic data); never deployed, never
+run against a live model. More diagrams: [the gate](diagrams/finbot-gate.png),
+[a domain plug-in](diagrams/finbot-domain.png), [security](diagrams/finbot-security.png).
+
 ## 1. Layers
 
 ```
-  HTTP / Lambda / CLI
+  HTTP (http_api.py) / Lambda / CLI
         │  token
   ┌─────▼──────────────────────────────────────────────────────────────┐
   │ service.py       trust boundary (facade)                           │
-  │   verify token → Principal → Authorizer → validate input           │
+  │   verify token → revocation → rate limit → Authorizer →            │
+  │   validate input → DLP scan in and out (dlp.py)                    │
   ├────────────────────────────────────────────────────────────────────┤
   │ queue.py         QueueConsumer (SQS / in-memory): at-least-once,   │
   │                  retry_later on outage, DLQ after max_receives      │
@@ -23,13 +34,16 @@ share one codebase and one set of contracts (`finbot/ports.py`).
   │   input guard → focus/state → model loop → HallucinationGate →     │
   │   output guard → escalation → audit                                │
   │ verification.py  Verifier chain + bounded repair                   │
+  │ provenance.py    which tool-result fields may vouch for a fact     │
+  │ agent_identity   per-turn delegation grant, checked per tool call  │
   │ models.py        model engine: chain, breakers, failover, routing  │
   │ resilience.py    retry_call (jitter, deadline), CircuitBreaker     │
   ├────────────────────────────────────────────────────────────────────┤
   │ control.py       CONTROL PLANE: drain/restore models, routing mode │
   ├────────────────────────────────────────────────────────────────────┤
   │ adapters         llm.py · guardrails.py · tools.py · store.py ·    │
-  │                  store_dynamo.py · ingestion/*                      │
+  │                  store_dynamo.py · crypto.py (KMS envelope) ·       │
+  │                  ingestion/*                                        │
   └────────────────────────────────────────────────────────────────────┘
   container.py wires it all (composition root); registry.py holds the factories.
 ```
@@ -88,6 +102,8 @@ further change.
 | State machine | `adaptive/controller.py` (proposed → rejected / report / awaiting_approval → shadow → canary → active) | A change can't skip the gate, shadow traffic or an admin |
 | Pipeline (ordered stages) | `Chatbot.stages`: risk lock → input guard → language → learned policy → focus → write request → model | The flow is one readable list; each stage ends the turn with a `Reply` or passes; a new check is one method |
 | Context object | `TurnContext` (one context variable, `current_turn()`) | Per-turn facts (masked text, policy version, known tickets, PII found) set once and read by verifiers, never threaded through every call |
+| Data-flow labelling (value provenance) | `provenance.py` (`trusted_view`, `trusted_blob`, `contact_check`) | Third-party text reaches the model but never counts as evidence for a stated fact |
+| Capability token (delegation grant) | `agent_identity.py` (`GrantIssuer`, `TOOL_SCOPES`) | A tool runs only with a short-lived grant for its scope; the model holds no credential |
 | Single responsibility | `pii.py` (masking), `replies.py` (fixed wording), `actions.TicketIntake` (request → ticket), `auditlog.py` (where audit lines go) | Each rule lives in one module; the orchestrator only sequences them |
 
 ## 3. Robustness map
@@ -146,12 +162,26 @@ Table definition: `store_dynamo.TABLE_DEFINITION` (on-demand, KMS, PITR).
   - `admin` may use the control plane only.
 - An unknown session and another tenant's session return the same 403, so ids cannot be probed.
 - No static AWS keys anywhere. Every boto3 client uses the default credential chain (IAM role).
+- Tokens: an HS256 key ring addressed by `kid`, and revocation by `jti` or by subject, seen by
+  every pod within two seconds.
+- Each turn gets a delegation grant (`agent_identity.py`): user as `sub`, agent as `act.sub`,
+  tenant, session, scopes cut to read-only, five-minute expiry. Every tool call verifies it.
+- Session state, user text and answers are sealed with AES-256-GCM under a per-value data key
+  wrapped by KMS, bound to session and purpose (`crypto.py`).
+- `dlp.py` masks card data, SSNs, IBANs, routing and account numbers and secrets on the way in,
+  and scans every response on the way out; card data found outbound is audited as `egress_leak`.
+- Rate limits per verified user and per tenant (`ratelimit.py`), on top of the WAF's per-IP rule.
+- Details and tests: [security.md](security.md), section 5.
 
 ## 6b. Prompt injection
 
 Covered in [security.md](security.md): what reaches the model is screened and spotlighted, and
 a successful injection still can't read other tenants, change state, assert false facts, cite
 planted links, request secrets or leak the prompt. Red team: 0/34 defended, 25/34 undefended.
+Two provenance rules close the paths screening cannot: a record lookup needs an id the user typed
+(argument provenance), and an amount, date, code, phone number or email in an answer must come
+from a field our own systems set, not from a merchant's descriptor or a processor's log message
+(value provenance, `provenance.py`).
 
 ## 7. Ingestion → vector DB (Python)
 
@@ -320,7 +350,8 @@ The baseline ships with escalation and commitment rules and is checked against
   baseline. Guards never switch off.
 
 **Demo:** `python3 scripts/guard_controller.py demo` labels five mistakes, runs a cycle (three
-rules pass the gate on 18/18 guard cases, 27/27 dev, 170/170 held-out, 33/33 red team; one false
+rules pass the gate on 18/18 guard cases, 41/41 dev, 185/185 held-out, 41/41 red team (34 attacks
+and 7 benign look-alikes); one false
 block on a built-in guard goes to engineering), runs 120 turns with the shadow policy logged
 (one turn diverges, as expected), promotes through a 10% canary and rolls back.
 
@@ -329,7 +360,13 @@ block on a built-in guard goes to engineering), runs 120 turns with the shadow p
 How finbot runs as a service on AWS with Kubernetes (EKS). The worker process
 (`finbot/worker_main.py`), the container image (`Dockerfile`) and reference manifests
 (`deploy/k8s/`) are in the repo; they have **not** been run against a live account or
-cluster yet. The HTTP adapter around `ChatService` is not in the repo.
+cluster yet. The HTTP adapter is `finbot/http_api.py` (WSGI, under gunicorn).
+
+**Gap between this design and the code.** The diagram below has API pods enqueue the turn and
+never call a model. Today `ChatService.send` runs the turn in the API process
+(`self.worker.handle(...)`), so an API pod does call the model and needs the worker's
+permissions. Closing it means an enqueue-and-wait path in `ChatService` (or an async reply
+channel); see [technical-design.md](technical-design.md), section 8.
 
 ```
  client ──HTTPS──► load balancer ──► api pods (ChatService: verify token, own session?, validate)

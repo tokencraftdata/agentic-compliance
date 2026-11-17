@@ -41,6 +41,7 @@ log = logging.getLogger("finbot.http")
 
 MAX_BODY = 16 * 1024
 SESSION = re.compile(r"^/v1/sessions/([A-Za-z0-9-]{8,64})/messages$")
+CANCEL = re.compile(r"^/v1/sessions/([A-Za-z0-9-]{8,64})/cancel$")
 REQUEST_ID = re.compile(r"^[A-Za-z0-9-]{8,64}$")
 SECURITY_HEADERS = [
     ("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload"),
@@ -50,7 +51,7 @@ SECURITY_HEADERS = [
     ("Referrer-Policy", "no-referrer"),
     ("Cache-Control", "no-store"),
 ]
-STATUS = {200: "200 OK", 201: "201 Created", 400: "400 Bad Request", 401: "401 Unauthorized",
+STATUS = {200: "200 OK", 201: "201 Created", 202: "202 Accepted", 400: "400 Bad Request", 401: "401 Unauthorized",
           403: "403 Forbidden", 404: "404 Not Found", 405: "405 Method Not Allowed", 409: "409 Conflict",
           413: "413 Payload Too Large", 415: "415 Unsupported Media Type", 429: "429 Too Many Requests",
           500: "500 Internal Server Error", 503: "503 Service Unavailable"}
@@ -155,6 +156,10 @@ class App:
         if m:
             token, body = _token(environ), _body(environ)
             return 200, self.service.send(token, m.group(1), _str(body, "msg_id"), _str(body, "text")), []
+        m = CANCEL.match(path)
+        if m:
+            token, body = _token(environ), _body(environ)
+            return 202, self.service.cancel(token, m.group(1), _str(body, "msg_id")), []
         if path == "/v1/admin/revocations":
             token, body = _token(environ), _body(environ)
             exp = body.get("expires_at", 0)

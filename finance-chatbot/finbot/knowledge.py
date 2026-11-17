@@ -134,6 +134,7 @@ def _cos(a: list[float], b: list[float]) -> float:
 class Index:
     def __init__(self, chunks: list[Chunk] | None = None, embed: Callable[[str], list[float]] | None = None):
         self.embed = embed
+        self.generation = 0
         self._reset(chunks or [])
 
     def _reset(self, chunks: list[Chunk]) -> None:
@@ -159,6 +160,7 @@ class Index:
         return len(new)
 
     def add(self, c: Chunk) -> None:
+        self.generation = getattr(self, "generation", 0) + 1   # any change invalidates cached searches
         toks = tokenize(f"{c.section} {c.text}")
         tf = Counter(toks)
         self.chunks.append(c)

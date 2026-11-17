@@ -79,7 +79,20 @@ class Container:
             for page in self.dataset[2]:
                 kb.upsert_page(page)
             return kb
-        return self._get("knowledge", build)
+
+        def cached():
+            kb = build()
+            if self.settings.cache == "none":
+                return kb
+            from .cache import CachedKnowledge
+            return CachedKnowledge(kb, self.cache, self.settings.kb_cache_ttl_s)
+        return self._get("knowledge", cached)
+
+    @cached_property
+    def cache(self):
+        """Shared cache for help-page searches (finbot/cache.py). Never holds records."""
+        from .cache import make_cache
+        return self._get("cache", lambda: make_cache(self.settings.cache, self.settings.cache_url))
 
     @cached_property
     def toolbox(self):
@@ -124,9 +137,18 @@ class Container:
     @cached_property
     def chatbot(self):
         from .orchestrator import Chatbot
-        return self._get("chatbot", lambda: Chatbot(self.engine, self.guardrail, self.toolbox, self.settings,
-                                                    self.audit_path, policies=self.guard_policy,
-                                                    tickets=self.tickets))
+        def build():
+            bot = Chatbot(self.engine, self.guardrail, self.toolbox, self.settings, self.audit_path,
+                          policies=self.guard_policy, tickets=self.tickets)
+            bot.telemetry = self.telemetry
+            return bot
+        return self._get("chatbot", build)
+
+    @cached_property
+    def telemetry(self):
+        """AI observability: OpenTelemetry GenAI spans (finbot/telemetry.py)."""
+        from .telemetry import Telemetry
+        return self._get("telemetry", lambda: Telemetry(self.settings.telemetry, self.settings.telemetry_path))
 
     @cached_property
     def tickets(self):

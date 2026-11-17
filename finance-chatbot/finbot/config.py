@@ -117,6 +117,14 @@ class Settings:
     # ...or earlier, when the history passes this size (characters, ~4 per token). Bounds the
     # model's context and the stored session (DynamoDB items are capped at 400 KB).
     max_history_chars: int = 120_000
+    # Cache (finbot/cache.py): help-page searches and model breaker health only, never records.
+    cache: str = field(default_factory=lambda: _env("FINBOT_CACHE", "memory"))   # memory | redis | none
+    cache_url: str = field(default_factory=lambda: _env("FINBOT_CACHE_URL"))     # rediss://... for redis
+    kb_cache_ttl_s: float = field(default_factory=lambda: float(_env("FINBOT_KB_CACHE_TTL_S", "300")))
+    health_cache_s: float = 1.0   # breaker health read from the store at most this often per worker
+    # AI observability (finbot/telemetry.py): none | log | otel. No prompt, answer or record data in spans.
+    telemetry: str = field(default_factory=lambda: _env("FINBOT_TELEMETRY", "none"))
+    telemetry_path: str = field(default_factory=lambda: _env("FINBOT_TELEMETRY_PATH"))
     recap_requests: int = 8   # user requests carried into a fresh thread (each cut to 200 characters)
 
     def resolved_model(self) -> str:

@@ -17,9 +17,11 @@ no authority from the handoff.
 """
 from __future__ import annotations
 
+import copy
 import uuid
 from dataclasses import asdict
 
+from . import replies
 from .memory import EntityState, Fact, SessionMemory
 from .orchestrator import Chatbot, ChatSession
 from .store import SessionStore
@@ -60,12 +62,25 @@ def load_session(d: dict) -> ChatSession:
     return ChatSession(Session(**d["session"]), mem, d["history"], d["pending_notice"])
 
 
+# ---------------------------------------------------------------- cancellation
+
+class TurnCancelled(Exception):
+    """The user (or an operator) cancelled this turn. Raised at the next heartbeat."""
+
+
+def cancel_key(session_id: str, msg_id: str) -> str:
+    return f"cancel:{session_id}:{msg_id}"
+
+
 # ---------------------------------------------------------------- worker
 
 class Worker:
     def __init__(self, bot: Chatbot, store: SessionStore, worker_id: str | None = None, lease_s: float = 60):
         self.bot, self.store, self.lease_s = bot, store, lease_s
-        bot.engine().attach_health(store)  # model breaker state shared across workers
+        from .cache import CachedHealth
+        ttl = getattr(getattr(bot, "settings", None), "health_cache_s", 1.0)
+        # Model breaker state shared across workers, read from the store at most every `ttl` s.
+        bot.engine().attach_health(CachedHealth(store, ttl) if ttl > 0 else store)
         self.id = worker_id or f"w_{uuid.uuid4().hex[:8]}"
 
     def start_session(self, tenant_id: str, groups: list[str], role: str = "support", subject: str = "",
@@ -81,12 +96,31 @@ class Worker:
         prior = self.store.begin_turn(session_id, msg_id, self.id, text)
         if prior:                                                     # already answered: no new model call
             return prior
+        before = copy.deepcopy(state)        # the session shares lists with `state`; keep a clean copy
         cs = load_session(state)
-        # Heartbeat: renew the lease before each model call so a long but healthy turn
-        # keeps ownership. If another worker took over, claim() raises and the turn
-        # stops early instead of doing work that could never be committed.
-        cs.heartbeat = lambda: self.store.claim(session_id, self.id, self.lease_s)
-        turn = self.bot.ask(cs, text)                                 # a crash here commits nothing
+        key = cancel_key(session_id, msg_id)
+
+        def heartbeat():
+            # Renew the lease before each model call so a long but healthy turn keeps
+            # ownership. If another worker took over, claim() raises and the turn stops early
+            # instead of doing work that could never be committed. A cancel flag stops it too.
+            self.store.claim(session_id, self.id, self.lease_s)
+            if self.store.read_control(key):
+                raise TurnCancelled(msg_id)
+        cs.heartbeat = heartbeat
+        try:
+            if self.store.read_control(key):                          # cancelled before it started
+                raise TurnCancelled(msg_id)
+            turn = self.bot.ask(cs, text)                             # a crash here commits nothing
+        except TurnCancelled:
+            # Commit the state as it was before the turn, with a fixed answer, so a resend of
+            # the same msg_id returns "cancelled" instead of running the turn again.
+            meta = {"blocked_by": "cancelled", "reasons": ["cancelled"], "focus": None, "repaired": False,
+                    "escalated": False, "tier": None, "models": [], "tools": []}
+            self.store.claim(session_id, self.id, self.lease_s)
+            new_version = self.store.commit_turn(session_id, msg_id, self.id, version, before,
+                                                 replies.CANCELLED, meta)
+            return {"answer": replies.CANCELLED, **meta, "version": new_version, "deduplicated": False}
         if turn.blocked_by == "unavailable":
             # Dependency outage: leave the turn uncommitted so the client can resend
             # the same msg_id later and get a real answer (not a cached apology).
@@ -100,6 +134,12 @@ class Worker:
         new_version = self.store.commit_turn(session_id, msg_id, self.id, version,
                                              dump_session(cs), turn.answer, meta)   # StaleWrite if superseded
         return {"answer": turn.answer, **meta, "version": new_version, "deduplicated": False}
+
+    def cancel(self, session_id: str, msg_id: str, by: str = "") -> None:
+        """Ask the worker running (or about to run) this turn to stop. Cooperative: it stops at
+        its next heartbeat, before the next model call. A tool call in flight finishes; nothing
+        is committed but the pre-turn state, and tools are read-only, so stopping is safe."""
+        self.store.write_control(cancel_key(session_id, msg_id), {"by": by, "at": self.store.clock()})
 
     def recover(self, session_id: str) -> dict:
         """Run on takeover: report what the dead worker left unfinished."""

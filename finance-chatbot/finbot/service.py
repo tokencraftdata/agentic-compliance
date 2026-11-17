@@ -69,6 +69,15 @@ class ChatService:
             result["dlp"] = sorted(inbound.found)   # the client can tell the user not to send card data
         return result
 
+    def cancel(self, token: str, session_id: str, msg_id: str) -> dict:
+        """Stop a turn in flight (or one still queued). The owner of the session only."""
+        p = self._limited(token)
+        self._own(p, session_id)
+        if not MSG_ID.match(msg_id or ""):
+            raise BadRequest("msg_id must be 8-64 chars of [A-Za-z0-9_-]")
+        self.worker.cancel(session_id, msg_id, by=p.subject)
+        return {"cancelled": msg_id}
+
     def _audit_dlp(self, p: Principal, session_id: str, msg_id: str, inbound: dlp.DlpReport,
                    outbound: dlp.DlpReport) -> None:
         """Categories and counts only, never values. Card data in a response means an internal

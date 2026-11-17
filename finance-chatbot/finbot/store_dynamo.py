@@ -412,7 +412,10 @@ class DynamoSessionStore:
         return {"opened_at": r.get("opened_at"), "cooldown": r["cooldown"], "updated": r["updated"]} if r else None
 
     def write_control(self, key, value):
-        self.t.put({"pk": f"C#{key}", "sk": "C", "value": json.dumps(value), "updated": self.clock()})
+        item = {"pk": f"C#{key}", "sk": "C", "value": json.dumps(value), "updated": self.clock()}
+        if key.startswith("cancel:"):            # cancel flags only matter for a day; TTL removes them
+            item["expires"] = int(self.clock() + 86400)
+        self.t.put(item)
 
     def read_control(self, key):
         r = self.t.get(f"C#{key}", "C")
