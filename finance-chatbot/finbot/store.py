@@ -186,6 +186,16 @@ class SessionStore:
                                                    self.codec.seal(user_text, ctx(session_id, "user_text")), now))
         return None
 
+    def reply(self, session_id: str, msg_id: str) -> dict | None:
+        """The committed answer for one message, or None while it is not committed. Read-only:
+        the API polls this in queue mode and never runs the turn itself."""
+        r = self.db.execute("SELECT status, answer, meta FROM turns WHERE session_id=? AND msg_id=?",
+                            (session_id, msg_id)).fetchone()
+        if not r or r[0] != "committed":
+            return None
+        meta = self.codec.open(r[2], ctx(session_id, "turn_meta")) if r[2] else {}
+        return {"answer": self.codec.open(r[1], ctx(session_id, "answer")), **meta}
+
     def commit_turn(self, session_id: str, msg_id: str, worker: str, expected_version: int,
                     state: dict, answer: str, meta: dict) -> int:
         """Atomically persist the new state and mark the turn committed."""

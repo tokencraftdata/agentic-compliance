@@ -155,7 +155,10 @@ class App:
         m = SESSION.match(path)
         if m:
             token, body = _token(environ), _body(environ)
-            return 200, self.service.send(token, m.group(1), _str(body, "msg_id"), _str(body, "text")), []
+            result = self.service.send(token, m.group(1), _str(body, "msg_id"), _str(body, "text"))
+            if result.get("pending"):   # queue mode: not committed yet; resend the same msg_id
+                return 202, result, [("Retry-After", str(result.get("retry_after_s", 2)))]
+            return 200, result, []
         m = CANCEL.match(path)
         if m:
             token, body = _token(environ), _body(environ)

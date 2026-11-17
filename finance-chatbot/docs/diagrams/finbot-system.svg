@@ -31,7 +31,7 @@
 <text x="618" y="412" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">heartbeat before each model call · cancel flag checked there · late writer → StaleWrite</text>
 <text x="618" y="436" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">crash = nothing committed; next worker re-runs from the last commit (tools are read-only)</text>
 <path d="M 1200 290 L 1200 306 L 300 306 L 300 328" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
-<text x="320" y="322" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#4b5563" text-anchor="start" font-style="italic">intended path; today the API runs the turn in-process</text>
+<text x="320" y="322" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#4b5563" text-anchor="start" font-style="italic">FINBOT_DISPATCH=queue: enqueue, poll for the commit, 202 if slow</text>
 <path d="M 560 405 L 598 405" fill="none" stroke="#9ca3af" stroke-width="2.5" marker-end="url(#a-grey)"/>
 <rect x="40" y="520" width="1520" height="430" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2" stroke-dasharray="8 6"/>
 <text x="60" y="552" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" font-weight="bold" fill="#6b7280" text-anchor="start">One turn (orchestrator.py)</text>
@@ -144,7 +144,7 @@
 <text x="1218" y="1342" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">approve held tool calls</text>
 <text x="1218" y="1366" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">review queue, labels</text>
 <text x="1218" y="1390" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">handoff after 2 failures</text>
-<text x="40" y="1508" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">Verified offline (scripted model, synthetic data): 438 tests · 8/8 multi-process durability scenarios (kill -9 mid-turn, frozen worker, lost reply,</text>
+<text x="40" y="1508" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">Verified offline (scripted model, synthetic data): 475 tests · 8/8 multi-process durability scenarios (kill -9 mid-turn, frozen worker, lost reply,</text>
 <text x="40" y="1532" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">32-turn memory across restarts, model failover, 6-process contention, guardrail outage, killed ingestion) · 0 of 2,259 injected hallucinations reach users ·</text>
 <text x="40" y="1556" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start">0 of 34 injection attacks succeed defended · never deployed, never run against a live model.</text>
 <rect x="40" y="1594" width="22" height="22" rx="5" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>

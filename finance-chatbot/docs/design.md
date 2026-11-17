@@ -375,11 +375,11 @@ How finbot runs as a service on AWS with Kubernetes (EKS). The worker process
 (`deploy/k8s/`) are in the repo; they have **not** been run against a live account or
 cluster yet. The HTTP adapter is `finbot/http_api.py` (WSGI, under gunicorn).
 
-**Gap between this design and the code.** The diagram below has API pods enqueue the turn and
-never call a model. Today `ChatService.send` runs the turn in the API process
-(`self.worker.handle(...)`), so an API pod does call the model and needs the worker's
-permissions. Closing it means an enqueue-and-wait path in `ChatService` (or an async reply
-channel); see [technical-design.md](technical-design.md), section 8.
+**API dispatch.** With `FINBOT_DISPATCH=queue` (the reference config) the API pods do what the
+diagram below shows: enqueue the turn, poll the session store for the worker's commit, and answer
+`202` with `Retry-After` when it takes longer; they never call a model (`finbot/dispatch.py`,
+[decisions.md](decisions.md) ADR-006). `inline` (the default) runs the turn in the API process,
+for development and single-box use.
 
 ```
  client ──HTTPS──► load balancer ──► api pods (ChatService: verify token, own session?, validate)

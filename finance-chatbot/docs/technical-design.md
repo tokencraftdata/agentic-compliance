@@ -299,12 +299,10 @@ separate ticket store remain for human review; cancellation does not undo extern
 
 ### 7.3 Gaps and planned additions
 
-1. **The API runs turns in-process.** `ChatService.send` calls `Worker.handle` directly, so an
-   API pod calls the model, holds the worker's permissions, and loses the turn if the pod dies
-   (the client must resend). The intended design enqueues to SQS FIFO and the API never calls a
-   model (design.md, section 11). Needed: an enqueue path in `ChatService` with a wait on the
-   committed reply (poll the turn item by `msg_id`, bounded by the deadline) or an asynchronous
-   reply channel, and API IAM permissions cut to `sqs:SendMessage` and reading the session owner.
+1. ~~The API runs turns in-process.~~ Done: `FINBOT_DISPATCH=queue` (`dispatch.py`). The API
+   returns a committed answer if there is one, else enqueues and polls the store for the commit
+   up to `FINBOT_DISPATCH_WAIT_S`, then answers `202` with `Retry-After`; the client resends the
+   same `msg_id`. An API pod that dies after enqueuing loses nothing. `tests/test_dispatch.py`.
 2. **No load shedding or per-tenant bulkhead inside the worker pool.** Rate limits cap each user
    and tenant, but one tenant's slow records backend can still occupy workers until its breaker
    opens. A per-backend concurrency cap would bound that.
@@ -373,8 +371,8 @@ failure is a miss, never an error.
 
 ```
 client ─HTTPS─► ALB + WAF (per-IP rate rule, TLS) ─► api pods (http_api.py, gunicorn, HPA 2–20 on CPU)
-                                                        │ today: runs the turn in-process (gap 7.3.1)
-                                                        │ intended: enqueue to SQS FIFO (group = session_id)
+                                                        │ FINBOT_DISPATCH=queue: enqueue to SQS FIFO
+                                                        │ (group = session_id), poll for the commit, 202 if slow
                                                         ▼
                                        worker pods (worker_main.py, KEDA on queue depth, PDB)
                                                         │
@@ -538,7 +536,8 @@ starting point.
 
 | Suite | What it covers | Result (offline) |
 |---|---|---|
-| Unit and integration tests | 458 tests; includes the review regressions below | all pass |
+| Unit and integration tests | 475 tests; includes the review regressions below | all pass where the production packages are installed |
+| Release gate | `scripts/release_check.py`: every gate with fixed thresholds | see [release.md](release.md) |
 | Permission changes | same-subject reduced scopes, role/group changes, old-reply replay, equivalent token renewal and fresh-session access | `test_layers.SessionPermissions` |
 | Release and retention | overlapping release/commit and renewal, local thread exclusion, real adapter update shape, TTL deletion simulation, fixed session horizon and legacy migration | `test_store_contract`, `test_deployment.ReleaseExclusion` |
 | Final-call cancellation | cancellation during the last model response rolls back state and deduplicates, on both stores | `test_cancellation.FinalCallCancellation` |
@@ -560,7 +559,7 @@ Commands: `python -m unittest discover -s tests`, `scripts/run_eval.py [--data D
 | Issue | Impact | Next step |
 |---|---|---|
 | No live-model evaluation | real wordings may slip past or trip the pattern checks | run the eval, stress test and red team against Bedrock |
-| API runs turns in-process | API pods need model permissions; a pod crash drops the in-flight turn | enqueue-and-wait (section 7.3) |
+| Queue mode not yet run on AWS | the 202-and-resend path depends on real SQS and ALB timing | measure wait times on staging; tune `FINBOT_DISPATCH_WAIT_S` |
 | Pattern-based status and cause checks | misses and false blocks on unfamiliar wording | measure on live traffic; consider claim-level checking |
 | Help-page answers not checked against the page | a wrong summary of a correct page passes | claim-level check against the cited page |
 | Grants signed with HS256 | tool services share a secret | asymmetric KMS signing |

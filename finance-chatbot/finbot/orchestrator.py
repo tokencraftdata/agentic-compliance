@@ -33,7 +33,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
-from . import auditlog, replies
+from . import __version__, auditlog, replies
 from . import telemetry as tel
 from .actions import ACTION_WORDS, TicketIntake
 from .actions import detect as detect_write_request
@@ -605,7 +605,7 @@ class Chatbot:
         the log collector ships it; pods have a read-only filesystem)."""
         auditlog.write(self.audit_path, "turn", {
                 "ts": time.time(), "session": cs.session.session_id, "tenant": cs.session.tenant_id,
-                "msg_id": cs.msg_id, "user_text_masked": turn.question, "blocked_by": turn.blocked_by, "reasons": turn.reasons,
+                "msg_id": cs.msg_id, "version": __version__, "user_text_masked": turn.question, "blocked_by": turn.blocked_by, "reasons": turn.reasons,
                 "focus": turn.focus, "latency_ms": turn.latency_ms, "repaired": turn.repaired,
                 "escalated": turn.escalated, "tier": turn.tier, "models": turn.models_used,
                 "policy": turn.policy_version, "risk": cs.memory.risk, **({"shadow": shadow} if shadow else {}),

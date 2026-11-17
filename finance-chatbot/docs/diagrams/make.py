@@ -479,7 +479,8 @@ def system() -> None:
           "heartbeat before each model call · cancel flag checked there · late writer → StaleWrite",
           "crash = nothing committed; next worker re-runs from the last commit (tools are read-only)"])
     s.arrow([(1200, 290), (1200, 306), (300, 306), (300, 328)])
-    s.text(320, 322, "intended path; today the API runs the turn in-process", 14, color=MUTED, italic=True)
+    s.text(320, 322, "FINBOT_DISPATCH=queue: enqueue, poll for the commit, 202 if slow", 14, color=MUTED,
+           italic=True)
     s.arrow([(560, 405), (598, 405)])
 
     # row 3: the turn
@@ -554,7 +555,7 @@ def system() -> None:
     card(1200, 1260, 360, 200, "people", "People", ["ticket desk: write requests", "approve held tool calls",
                                                      "review queue, labels", "handoff after 2 failures"])
 
-    s.text(40, 1508, "Verified offline (scripted model, synthetic data): 438 tests · 8/8 multi-process durability "
+    s.text(40, 1508, "Verified offline (scripted model, synthetic data): 475 tests · 8/8 multi-process durability "
                      "scenarios (kill -9 mid-turn, frozen worker, lost reply,", 16, color=MUTED)
     s.text(40, 1532, "32-turn memory across restarts, model failover, 6-process contention, guardrail outage, "
                      "killed ingestion) · 0 of 2,259 injected hallucinations reach users ·", 16, color=MUTED)

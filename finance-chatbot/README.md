@@ -83,6 +83,8 @@ finbot/untrusted.py      prompt-injection defences: normalise + screen, tool-res
 finbot/provenance.py     value provenance: third-party text in tool results cannot vouch for a stated fact
 finbot/security_gateway.py tool-call decisions (schema, rules, approval), behaviour monitor, security events
 finbot/tenancy.py        request tenant scope; session data only through per-tenant credentials (IAM LeadingKeys)
+finbot/dispatch.py       how the API gets turns run: inline (dev) or enqueue-and-wait for workers (production)
+finbot/rollout.py        canary decisions: promote, wait or roll back from the canary's own behaviour
 finbot/reconcile.py      reconciliation: tickets vs records, audit log vs committed turns, help-page index vs source
 finbot/cache.py          cache port (memory, Redis/Valkey): help-page searches and breaker health only, never records
 finbot/telemetry.py      AI observability: OpenTelemetry GenAI spans, no prompts, answers or record data
@@ -127,6 +129,9 @@ scripts/ingest.py        any source -> any vector store, incremental; or start a
 scripts/generate_synthetic.py seeded synthetic customers, payments, domain records, logs, KB pages, eval set
 scripts/run_eval.py      runs data/eval.jsonl through the bot with deterministic checks
 scripts/run_redteam.py   prompt-injection red team (data/redteam.jsonl) with a worst-case model and ablations
+scripts/release_check.py the release gate: every behavioural check with fixed thresholds; exit 1 on a miss
+scripts/rollout.py       canary rollout with automatic rollback (kubectl, used by the release pipeline)
+scripts/false_block_probe.py every correct answer must get through; exit 1 if any is blocked
 scripts/reconcile.py     runs the reconciliation jobs; exits 1 on a problem (daily CronJob)
 scripts/durability_test.py real processes: kill -9 mid-turn, frozen worker, failover, contention, killed ingestion
 scripts/load_test.py     load test of the full worker path; --model-latency stands in for a real model
@@ -142,6 +147,9 @@ docs/reliability.md      crash recovery, session store, hallucination control
 docs/design.svg          design diagram: layers, control plane, ingestion
 docs/security.md         prompt injection, red-team results, other controls, research references
 docs/design.md           layers, design patterns, control plane, DynamoDB, security, ingestion, where Claude is used
+docs/README.md           map of the documentation: what to read for which question
+docs/decisions.md        13 architecture decisions: what, why, and what each costs
+docs/release.md          versions, the release gate, pipeline, canary and rollback, data migrations
 docs/requirements.md     every requirement: met, partly met or not, with evidence; review findings and fixes
 docs/agent-security.md   guardrails platform design and twelve agent-security questions, answered from the code
 docs/platform-design.md  agent orchestration platform (Kafka, worker pools, leases, cancellation) and
@@ -170,6 +178,8 @@ tests/test_provenance.py    12 tests: third-party text cannot vouch for an amoun
 tests/test_security_gateway.py 24 tests: argument validation, rules, approval, bulk access, behaviour lock, events,
                             and one regression test per code-review finding
 tests/test_tenancy.py   17 tests: tenant-first ids, tenant-bound encryption, scoped data access, shared rate limits
+tests/test_dispatch.py   6 tests: queue mode, 202 and resend, API crash after enqueue, wiring
+tests/test_release.py    11 tests: versions agree, gate parsers, canary decisions, rollout driver
 tests/test_reconcile.py  9 tests: ticket, audit and index reconciliation, unknown actions, script exit codes
 tests/test_cancellation.py  6 tests: cancel before start or mid-turn, resend after cancel, owner only, HTTP
 tests/test_cache_telemetry.py  14 tests: what is cached, cache outages, records never cached, GenAI spans hold no content
@@ -185,7 +195,8 @@ tests/test_infra.py          6 tests: ALB TLS and hardening, WAF rules, KMS rota
                             bucket (needs aws-cdk-lib)
 ```
 
-438 tests in all.
+475 tests in all (4 need the production packages from requirements.txt: boto3, pyjwt, opensearch-py, gunicorn).
+Releases: [CHANGELOG.md](CHANGELOG.md) and [docs/release.md](docs/release.md).
 
 ## Design
 

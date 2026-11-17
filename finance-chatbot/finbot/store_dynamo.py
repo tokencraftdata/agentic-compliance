@@ -376,6 +376,13 @@ class DynamoSessionStore:
 
     # ---------------------------------------------------------------- turns
 
+    def reply(self, session_id, msg_id):
+        r = self.t.get(f"S#{session_id}", f"T#{msg_id}")
+        if not r or r["status"] != "committed":
+            return None
+        return {"answer": self.codec.open(r["answer"], ctx(session_id, "answer")),
+                **(self.codec.open(r["meta"], ctx(session_id, "turn_meta")) if r.get("meta") else {})}
+
     def begin_turn(self, session_id, msg_id, worker, user_text):
         user_text = mask_pii(user_text)[0]   # the journal never holds card data
         now = self.clock()

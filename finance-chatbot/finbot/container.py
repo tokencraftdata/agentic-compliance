@@ -248,7 +248,26 @@ class Container:
     def service(self):
         from .service import ChatService
         return self._get("service", lambda: ChatService(self.worker, self.verifier, self.control, self.authorizer,
-                                                        self.limiter, self.revocations, self.audit_path))
+                                                        self.limiter, self.revocations, self.audit_path,
+                                                        dispatcher=self.dispatcher))
+
+    @cached_property
+    def dispatcher(self):
+        """How the API gets turns run (dispatch.py): inline, or enqueued for workers."""
+        from .dispatch import InlineDispatcher, QueueDispatcher
+
+        def build():
+            s = self.settings
+            if s.dispatch == "inline":
+                return InlineDispatcher(self.worker)
+            if s.dispatch != "queue":
+                raise ValueError(f"unknown FINBOT_DISPATCH {s.dispatch!r} (known: inline, queue)")
+            if not s.queue_url:
+                raise ValueError("FINBOT_DISPATCH=queue needs FINBOT_QUEUE_URL")
+            from .queue import SqsQueue
+            queue = SqsQueue(s.queue_url, os.environ.get("FINBOT_DLQ_URL", ""), s.aws_region)
+            return QueueDispatcher(queue, self.store, wait_s=s.dispatch_wait_s)
+        return self._get("dispatcher", build)
 
     def close(self) -> None:
         store = self.__dict__.get("store") or self.overrides.get("store")   # built, or passed in

@@ -1,0 +1,131 @@
+# Release pipeline: a tag vX.Y.Z on main becomes a signed image, a GitHub release, a staging
+# deploy and, after approval, a canary to production. See docs/release.md.
+#
+#   gate        scripts/release_check.py: every behavioural gate with fixed thresholds
+#   image       build once; SBOM; Trivy (HIGH/CRITICAL fail); push by digest; cosign keyless signature
+#   release     GitHub release with the CHANGELOG section and the gate report attached
+#   staging     deploy the digest; smoke test; reconciliation; durability against staging   (environment)
+#   production  canary 10% -> 50% -> 100% with automatic rollback signals             (environment, approval)
+#
+# Not run against a real account yet: the registry, role ARNs and cluster names are repository
+# variables (vars.*) that must be set first. Jobs that need them are skipped while they are empty.
+name: release
+on:
+  push: {tags: ["v*.*.*"]}
+permissions: {contents: read}
+concurrency: {group: release, cancel-in-progress: false}
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12", cache: pip}
+      - run: pip install -r requirements.txt ruff mypy -r infra/cdk/requirements.txt
+      - name: tag matches the package version
+        run: |
+          v=$(python -c 'import finbot; print(finbot.__version__)')
+          test "v$v" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} != package v$v"; exit 1; }
+      - name: release gate (all gates, fixed thresholds)
+        run: python scripts/release_check.py --report release-report.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: release-report, path: release-report.md}
+
+  image:
+    needs: gate
+    if: vars.ECR_REGISTRY != ''
+    runs-on: ubuntu-latest
+    permissions: {contents: read, id-token: write}      # OIDC: AWS role and keyless signing
+    outputs: {digest: "${{ steps.push.outputs.digest }}"}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with: {role-to-assume: "${{ vars.RELEASE_ROLE_ARN }}", aws-region: "${{ vars.AWS_REGION }}"}
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: build
+        run: |
+          docker build --label org.opencontainers.image.version="${GITHUB_REF_NAME}" \
+                       --label org.opencontainers.image.revision="${GITHUB_SHA}" \
+                       -t "${{ vars.ECR_REGISTRY }}/finbot:${GITHUB_REF_NAME}" .
+      - uses: anchore/sbom-action@v0
+        with: {image: "${{ vars.ECR_REGISTRY }}/finbot:${{ github.ref_name }}", format: spdx-json,
+               output-file: sbom.spdx.json}
+      - uses: aquasecurity/trivy-action@0.28.0
+        with: {image-ref: "${{ vars.ECR_REGISTRY }}/finbot:${{ github.ref_name }}", severity: "HIGH,CRITICAL",
+               exit-code: "1", ignore-unfixed: true}
+      - id: push
+        run: |
+          docker push "${{ vars.ECR_REGISTRY }}/finbot:${GITHUB_REF_NAME}"
+          echo "digest=$(docker inspect --format='{{index .RepoDigests 0}}' "${{ vars.ECR_REGISTRY }}/finbot:${GITHUB_REF_NAME}")" >> "$GITHUB_OUTPUT"
+      - uses: sigstore/cosign-installer@v3
+      - name: sign the image and attach the SBOM (keyless, OIDC)
+        run: |
+          cosign sign --yes "${{ steps.push.outputs.digest }}"
+          cosign attest --yes --type spdxjson --predicate sbom.spdx.json "${{ steps.push.outputs.digest }}"
+      - uses: actions/upload-artifact@v4
+        with: {name: sbom, path: sbom.spdx.json}
+
+  release:
+    needs: gate
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/download-artifact@v4
+        with: {name: release-report}
+      - name: release notes from CHANGELOG.md
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v v="$v" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
+          test -s notes.md || { echo "no CHANGELOG section for $v"; exit 1; }
+      - uses: softprops/action-gh-release@v2
+        with: {body_path: notes.md, files: release-report.md, draft: true}
+
+  staging:
+    needs: image
+    if: vars.STAGING_CLUSTER != ''
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions: {contents: read, id-token: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with: {role-to-assume: "${{ vars.STAGING_DEPLOY_ROLE_ARN }}", aws-region: "${{ vars.AWS_REGION }}"}
+      - name: verify the signature, then deploy by digest
+        run: |
+          cosign verify "${{ needs.image.outputs.digest }}" \
+            --certificate-identity-regexp "https://github.com/${GITHUB_REPOSITORY}/" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com
+          aws eks update-kubeconfig --name "${{ vars.STAGING_CLUSTER }}"
+          kubectl -n finbot set image deployment/finbot-worker worker="${{ needs.image.outputs.digest }}"
+          kubectl -n finbot set image deployment/finbot-api api="${{ needs.image.outputs.digest }}"
+          kubectl -n finbot rollout status deployment/finbot-worker --timeout=10m
+          kubectl -n finbot rollout status deployment/finbot-api --timeout=10m
+      - name: post-deploy checks
+        run: |
+          kubectl -n finbot create job --from=cronjob/finbot-reconcile "reconcile-${GITHUB_RUN_ID}"
+          kubectl -n finbot wait --for=condition=complete "job/reconcile-${GITHUB_RUN_ID}" --timeout=15m
+
+  production:
+    needs: [image, staging]
+    if: vars.PROD_CLUSTER != ''
+    runs-on: ubuntu-latest
+    environment: production          # required reviewers on this environment = the release approval
+    permissions: {contents: read, id-token: write}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: aws-actions/configure-aws-credentials@v4
+        with: {role-to-assume: "${{ vars.PROD_DEPLOY_ROLE_ARN }}", aws-region: "${{ vars.AWS_REGION }}"}
+      - name: canary rollout with automatic rollback (docs/release.md)
+        run: |
+          aws eks update-kubeconfig --name "${{ vars.PROD_CLUSTER }}"
+          python scripts/rollout.py --image "${{ needs.image.outputs.digest }}" --steps 10,50,100 --bake-minutes 15 \
+            --metrics-cmd "${{ vars.CANARY_METRICS_CMD }}"

@@ -79,6 +79,9 @@ class Settings:
 
     # Queue worker (SQS in production)
     queue_url: str = field(default_factory=lambda: _env("FINBOT_QUEUE_URL"))
+    # inline: the API runs turns itself (dev, one box); queue: the API enqueues and waits (dispatch.py)
+    dispatch: str = field(default_factory=lambda: _env("FINBOT_DISPATCH", "inline"))
+    dispatch_wait_s: float = field(default_factory=lambda: float(_env("FINBOT_DISPATCH_WAIT_S", "25")))
     max_receives: int = 5  # then dead-letter: a message that keeps failing needs a human
 
     # Knowledge read path: "index" (local BM25+dense JSON), "vector" (VectorKnowledge over

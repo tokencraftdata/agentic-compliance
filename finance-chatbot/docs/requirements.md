@@ -70,7 +70,7 @@ are fixed, each with a regression test in `tests/test_security_gateway.py`:
 | 6 | Context memory across turns, workers and restarts | Met offline | typed state, focus, user-typed ids, rollover with recap; durability: memory 32/32; `tests/test_finbot.py`, `test_operations.py` |
 | 7 | Resiliency: retries, breakers, deadlines, fail closed, cancellation | Met offline | durability: guard down; `tests/test_boundaries.py`, `test_model_engine.py`, `test_cancellation.py` |
 | 8 | Model orchestration: failover chain, shared breakers, refusal fallback, tiered routing, control plane | Met offline | durability: failover; `tests/test_model_engine.py`, `test_layers.py` |
-| 9 | High availability | Partly met | stateless workers, leases, compare-and-swap commits, 2+ replicas with disruption budgets, 3 AZs, models in two regions; durability: contention. Not met: data plane is single-region (no cross-region session store); the API still runs turns in-process instead of only enqueuing; nothing deployed |
+| 9 | High availability | Partly met | stateless workers, leases, compare-and-swap commits, 2+ replicas with disruption budgets, 3 AZs, models in two regions; durability: contention. Not met: data plane is single-region (no cross-region session store); nothing deployed. Now met: the API enqueues and waits in queue mode (`dispatch.py`, `tests/test_dispatch.py`) |
 | 10 | Data ingestion | Met offline | sources (S3, SharePoint, web, local, Bedrock KB), injection quarantine, PII masked before chunking, incremental by version, atomic saves, help-page audit; durability: ingestion; `tests/test_ingestion.py` |
 | 11 | Identity and authentication | Met offline | OIDC/JWKS or HS256 key ring, revocation by `jti` or subject; per-turn delegation grant (user + agent); `tests/test_platform_security.py`. Not done: asymmetric grant signing, a workload identity per agent |
 | 12 | Authorization, least privilege | Met offline | deny-by-default roles, scopes per tool, read-only agent ceiling, security gateway rules; IAM roles per component; `tests/test_platform_security.py`, `test_security_gateway.py`, `test_infra.py` |
@@ -87,7 +87,7 @@ are fixed, each with a regression test in `tests/test_security_gateway.py`:
 | 23 | Multi-tenant AI platform (quotas, noisy neighbours, leakage) | Designed; parts built | platform-design.md Part B. Built: isolation, shared request limits. Not built: token and concurrency quotas, fair scheduling, canary strings |
 | 24 | Secure deployment | Template only | `infra/cdk` (WAF, ALB, KMS, DynamoDB, SQS, Object Lock, VPC endpoints, tenant role), `deploy/k8s` (restricted pods, network policy, IRSA); `tests/test_infra.py` asserts properties. Never applied |
 | 25a | Consistency and reconciliation | Met offline | strong session consistency (CAS, one commit per message); `reconcile.py`: tickets vs systems of record, audit log vs committed turns, help-page index vs source; weekly full sync; unknown external actions settled before the next turn; `tests/test_reconcile.py`, durability: zombie (audit reconciled, no gaps) |
-| 25 | Code hygiene | Met | `ruff` and `mypy` clean across the repo, 438 tests pass, no leaked resources (0 `ResourceWarning`); independent review findings fixed (above) |
+| 25 | Code hygiene | Met | `ruff` and `mypy` clean across the repo, 475 tests (471 pass here; 4 need production packages not installed locally), no leaked resources (0 `ResourceWarning`); independent review findings fixed (above) |
 | 26 | Design documents and diagrams | Met | [design.md](design.md), [technical-design.md](technical-design.md), [platform-design.md](platform-design.md), [agent-security.md](agent-security.md), five diagrams in `docs/diagrams/` |
 | 27 | Nothing from the author's employer in code, docs or posts | Met (reviewed) | synthetic data and public sources only |
 | 28 | Live-model evaluation | Not met | every number above comes from a scripted model |
@@ -95,7 +95,8 @@ are fixed, each with a regression test in `tests/test_security_gateway.py`:
 ## Open items, most important first
 
 1. Run the evaluation, stress test, red team and durability scenarios against Bedrock and on AWS.
-2. API enqueue-and-wait, so API pods never call a model and an API crash cannot drop a turn.
+2. First release through the pipeline (`.github/workflows/release.yml`, [release.md](release.md)):
+   set registry, roles, clusters and the canary metrics command.
 3. Cross-region data plane (DynamoDB global table, queue per region) if regional HA is required.
 4. Asymmetric signing for delegation grants; per-agent workload identities; per-tenant KMS keys.
 5. AI-disclosure notice; retention and erasure workflow.

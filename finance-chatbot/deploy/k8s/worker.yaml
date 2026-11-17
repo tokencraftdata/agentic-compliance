@@ -9,12 +9,12 @@ metadata:
 spec:
   replicas: 2
   selector:
-    matchLabels: {app: finbot-worker}
+    matchLabels: {app: finbot-worker, track: stable}
   strategy:
     rollingUpdate: {maxUnavailable: 0, maxSurge: 1}
   template:
     metadata:
-      labels: {app: finbot-worker}
+      labels: {app: finbot-worker, track: stable}
     spec:
       serviceAccountName: finbot-worker
       automountServiceAccountToken: true          # needed for IRSA web identity

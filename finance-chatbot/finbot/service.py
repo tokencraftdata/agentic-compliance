@@ -35,8 +35,11 @@ class BadRequest(Exception):
 class ChatService:
     def __init__(self, worker: Worker, verifier, control: ControlPlane, authorizer: Authorizer | None = None,
                  limiter: RateLimiter | None = None, revocations: Revocations | None = None,
-                 audit_path: str | None = None):
+                 audit_path: str | None = None, dispatcher=None):
         self.worker, self.verifier, self.control = worker, verifier, control
+        # inline: run the turn here; queue: enqueue it for a worker and wait for the commit (dispatch.py)
+        from .dispatch import InlineDispatcher
+        self.dispatch = dispatcher or InlineDispatcher(worker)
         self.authz = authorizer or Authorizer()
         self.limiter, self.revocations, self.audit_path = limiter, revocations, audit_path
 
@@ -76,7 +79,7 @@ class ChatService:
         if not text or len(text) > MAX_TEXT:
             raise BadRequest(f"text must be 1-{MAX_TEXT} characters")
         text, inbound = dlp.scan(text)
-        result, outbound = dlp.scan(self.worker.handle(session_id, msg_id, text))
+        result, outbound = dlp.scan(self.dispatch.run(p.tenant_id, session_id, msg_id, text))
         self._audit_dlp(p, session_id, msg_id, inbound, outbound)
         if inbound.found:
             result["dlp"] = sorted(inbound.found)   # the client can tell the user not to send card data

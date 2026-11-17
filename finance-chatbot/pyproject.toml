@@ -1,7 +1,7 @@
 [project]
 name = "finbot"
-version = "0.3.0"
-description = "Guarded payments support chatbot with processor-orchestration tooling (synthetic data only)"
+version = "0.4.0"
+description = "Guarded fintech support chatbot: the model drafts, code verifies (synthetic data only)"
 requires-python = ">=3.11"
 
 [tool.ruff]

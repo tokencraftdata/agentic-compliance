@@ -21,6 +21,10 @@ data:
   FINBOT_QUEUE_URL: https://sqs.us-east-1.amazonaws.com/ACCOUNT_ID/finbot-turns.fifo
   FINBOT_DLQ_URL: https://sqs.us-east-1.amazonaws.com/ACCOUNT_ID/finbot-turns-dlq.fifo
   FINBOT_VISIBILITY_S: "150"
+  # API pods enqueue turns and wait for the worker's commit; they never call a model (finbot/dispatch.py).
+  # Keep the wait below the ALB idle timeout; past it the API answers 202 and the client resends.
+  FINBOT_DISPATCH: queue
+  FINBOT_DISPATCH_WAIT_S: "25"
   # Audit records (turns, control plane, guard controller, tickets) as JSON lines on stdout
   FINBOT_AUDIT: "-"
   # Workers follow the guardrail controller's active / canary / shadow policy
