@@ -148,6 +148,7 @@ class TurnGuards(unittest.TestCase):
 class Sources(unittest.TestCase):
     def test_canary_is_stable_per_session(self):
         store = SessionStore()
+        self.addCleanup(store.close)
         canary = BASELINE.with_rule(Rule("esc_manager", "escalate", r"\bspeak to a manager\b"))
         store.write_control(CONTROL_KEY, {"active": BASELINE.to_dict(),
                                           "canary": {"policy": canary.to_dict(), "percent": 30}})
@@ -160,6 +161,7 @@ class Sources(unittest.TestCase):
 
     def test_bad_state_falls_back_to_last_good(self):
         store, now = SessionStore(), [0.0]
+        self.addCleanup(store.close)
         src = StorePolicySource(store, clock=lambda: now[0], sync_s=1)
         self.assertEqual(src.for_session("s").version, 1)          # nothing stored: baseline
         store.write_control(CONTROL_KEY, {"active": {"version": 7, "rules": [{"id": "x"}]}})   # corrupt

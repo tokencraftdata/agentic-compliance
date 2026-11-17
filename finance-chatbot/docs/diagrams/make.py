@@ -413,7 +413,8 @@ def security() -> None:
 
     s.card(760, 120, 400, 256, "data", "Encryption and keys (KMS)",
            ["AES-256-GCM envelope encryption", "data key per value, wrapped by KMS",
-            "bound to session + purpose (AAD):", "  copied ciphertext won't decrypt", "key policy allows 4 purposes only",
+            "bound to tenant + session + purpose:", "  copied ciphertext won't decrypt",
+            "key policy allows 4 purposes only",
             "yearly rotation · rewrap onto a new key", "required mode refuses plaintext"],
            title_size=19, line_size=15.5, gap=26)
     s.card(760, 406, 400, 278, "data", "Encrypted at rest",

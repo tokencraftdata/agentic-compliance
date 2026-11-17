@@ -36,6 +36,7 @@ class SessionIds(unittest.TestCase):
 
     def test_store_refuses_an_id_naming_another_tenant(self):
         for store in (SessionStore(), DynamoSessionStore(InMemoryDynamo())):
+            self.addCleanup(store.close)
             with self.assertRaises(ValueError):
                 store.create(B, "m_100", {})
 

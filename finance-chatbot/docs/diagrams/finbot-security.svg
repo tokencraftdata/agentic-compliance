@@ -60,7 +60,7 @@
 <text x="778" y="152" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="bold" fill="#6d28d9" text-anchor="start">Encryption and keys (KMS)</text>
 <text x="778" y="180" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">AES-256-GCM envelope encryption</text>
 <text x="778" y="206" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">data key per value, wrapped by KMS</text>
-<text x="778" y="232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">bound to session + purpose (AAD):</text>
+<text x="778" y="232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">bound to tenant + session + purpose:</text>
 <text x="778" y="258" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">  copied ciphertext won&#x27;t decrypt</text>
 <text x="778" y="284" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">key policy allows 4 purposes only</text>
 <text x="778" y="310" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15.5" font-weight="normal" fill="#1f2937" text-anchor="start">yearly rotation · rewrap onto a new key</text>

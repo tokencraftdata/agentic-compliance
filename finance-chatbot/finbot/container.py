@@ -251,5 +251,6 @@ class Container:
                                                         self.limiter, self.revocations, self.audit_path))
 
     def close(self) -> None:
-        if "store" in self.__dict__:
-            self.store.close()
+        store = self.__dict__.get("store") or self.overrides.get("store")   # built, or passed in
+        if store is not None and hasattr(store, "close"):
+            store.close()
